@@ -35,6 +35,8 @@ class UserRoutePageName extends Component
                 //route page name for managing school
                 'admin.school.index' => __('Admin - Manage School'),
                 'admin.staff.index' => __('Admin - Manage Admin Staff'),
+                'admin.employee.index' => __('Admin - Manage Employee'),
+                'admin.student.index' => __('Admin - Manage Student'),
             ];
 
             $this->title = $titles[$routeName] ?? __('University of Bohol Attendance System');

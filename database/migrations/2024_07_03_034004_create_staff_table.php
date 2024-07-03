@@ -15,14 +15,16 @@ return new class extends Migration
         Schema::create('staff', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('school_id')->nullable();
-             $table->string('staff_id');
-            $table->string('staff_name');
+            $table->string('staff_id');
+            $table->string('staff_firstname');
+            $table->string('staff_middlename');
+            $table->string('staff_lastname');
+            $table->string('staff_rfid');
             $table->enum('access_type', ['administrative', 'departmental'])->default('administrative');
             $table->timestamps();
             
             $table->foreign('school_id')->references('id')->on('schools')->onDelete('restrict');
 
-            
         });
     }
 

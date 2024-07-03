@@ -2,18 +2,18 @@
 
 namespace App\Livewire\Admin;
 
-use \App\Models\Admin\Staff; 
+use \App\Models\Admin\Employee; 
 use \App\Models\Admin\School; 
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
 
-class ShowStaffTable extends Component
+class ShowEmployeeTable extends Component
 {
     use WithPagination;
 
     public $search = '';
-    public $sortField = 'staff_id';
+    public $sortField = 'school_id';
     public $sortDirection = 'asc';
 
     public function updatingSearch()
@@ -35,14 +35,13 @@ class ShowStaffTable extends Component
     public function render()
     {
 
-        $staffs = Staff::with('school')
+        $employees = Employee::with('school')
             ->where(function (Builder $query) {
-                $query->where('staff_id', 'like', '%' . $this->search . '%')
-                      ->orWhere('staff_firstname', 'like', '%' . $this->search . '%')
-                      ->orWhere('staff_middlename', 'like', '%' . $this->search . '%')
-                      ->orWhere('staff_lastname', 'like', '%' . $this->search . '%')
-                      ->orWhere('staff_rfid', 'like', '%' . $this->search . '%')
-                      ->orWhere('access_type', 'like', '%' . $this->search . '%')
+                $query->where('employee_id', 'like', '%' . $this->search . '%')
+                      ->orWhere('employee_firstname', 'like', '%' . $this->search . '%')
+                      ->orWhere('employee_middlename', 'like', '%' . $this->search . '%')
+                      ->orWhere('employee_lastname', 'like', '%' . $this->search . '%')
+                      ->orWhere('employee_rfid', 'like', '%' . $this->search . '%')
                       ->orWhereHas('school', function (Builder $query) {
                           $query->where('abbreviation', 'like', '%' . $this->search . '%')
                           ->orWhere('school_name', 'like', '%' . $this->search . '%');
@@ -53,10 +52,10 @@ class ShowStaffTable extends Component
 
             $schools = School::all();
 
-        return view('livewire.admin.show-staff-table', [
-            'staffs' => $staffs,
+        return view('livewire.admin.show-employee-table', [
+            'employees' => $employees,
             'schools' => $schools,
         ]);
     }
-
+    
 }

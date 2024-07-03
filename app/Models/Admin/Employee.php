@@ -7,23 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasRoles;
 use \App\Models\Admin\School; 
 
-class Staff extends Model
+class Employee extends Model
 {
-    use HasFactory, HasRoles;
-
-    protected $table = 'staff';
+    use HasFactory;
+    protected $table = 'employees';
 
     protected $fillable = [
         'school_id',
-        'staff_id',
-        'staff_firstname',
-        'staff_middlename',
-        'staff_lastname',
-        'staff_rfid',
-        'access_type',
+        'employee_id',
+        'employee_firstname',
+        'employee_middlename',
+        'employee_lastname',
+        'employee_rfid',
     ];
 
-    //each staff belongs to one school
+    //each employee belongs to one school
     public function school()
     {
         return $this->belongsTo(School::class);

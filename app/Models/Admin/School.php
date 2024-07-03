@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasRoles;
 use \App\Models\Admin\Staff; 
+use \App\Models\Admin\Employee; 
+use \App\Models\Admin\Student; 
 
 class School extends Model
 {
@@ -22,5 +24,17 @@ class School extends Model
     public function staff()
     {
         return $this->hasMany(Staff::class);
+    }
+
+    // A school has many employee
+    public function employee()
+    {
+        return $this->hasMany(Employee::class);
+    }
+
+    // A school has many student
+    public function student()
+    {
+        return $this->hasMany(Student::class);
     }
 }

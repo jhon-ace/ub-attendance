@@ -4,6 +4,9 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\SchoolController;
+use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\StudentController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +39,26 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'staff.update'
         ]);
         Route::delete('staff', [AdminStaffController::class, 'deleteAll'])->name('staff.deleteAll');
+
+        // Employee routes
+        Route::resource('employee', EmployeeController::class)->names([
+            'index' => 'employee.index',
+            'create' => 'employee.create',
+            'store' => 'employee.store',
+            'edit' => 'employee.edit',
+            'update' => 'employee.update'
+        ]);
+        Route::delete('employee', [EmployeeController::class, 'deleteAll'])->name('employee.deleteAll');
+
+        // Student routes
+        Route::resource('student', StudentController::class)->names([
+            'index' => 'student.index',
+            'create' => 'student.create',
+            'store' => 'student.store',
+            'edit' => 'student.edit',
+            'update' => 'student.update'
+        ]);
+        Route::delete('student', [StudentController::class, 'deleteAll'])->name('student.deleteAll');
 
 
 

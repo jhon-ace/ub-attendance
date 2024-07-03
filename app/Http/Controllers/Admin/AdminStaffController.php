@@ -33,7 +33,10 @@ class AdminStaffController extends Controller
          $validatedData = $request->validate([
             'school_id' => 'required|exists:schools,id',
             'staff_id' => 'required|string|max:255|unique:staff', 
-            'staff_name' => 'required|string|max:255',
+            'staff_firstname' => 'required|string|max:255',
+            'staff_middlename' => 'required|string|max:255',
+            'staff_lastname' => 'required|string|max:255',
+            'staff_rfid' => 'required|string|max:255',
             'access_type' => 'required|string|max:255',
 
         ]);
@@ -66,11 +69,15 @@ class AdminStaffController extends Controller
      */
     public function update(Request $request, Staff $staff)
     {
-        $validatedData = $request->validate([
-            'staff_id' => 'required|string|max:255|unique:staff,staff_id,' . $staff->id,
-            'staff_name' => 'required|string|max:255',
-            'access_type' => 'required|string|max:255',
+         $validatedData = $request->validate([
             'school_id' => 'required|exists:schools,id',
+            'staff_id' => 'required|string|max:255|unique:staff,staff_id,' . $staff->id,
+            'staff_firstname' => 'required|string|max:255',
+            'staff_middlename' => 'required|string|max:255',
+            'staff_lastname' => 'required|string|max:255',
+            'staff_rfid' => 'required|string|max:255|unique:staff',
+            'access_type' => 'required|string|max:255',
+
         ]);
 
         // Check for changes
