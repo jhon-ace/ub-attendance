@@ -25,16 +25,17 @@ Route::middleware(['auth'])->group(function () {
             'edit' => 'school.edit',
             'update' => 'school.update'
         ]);
-        Route::delete('school', [SchoolController::class, 'deleteSelected'])->name('school.deleteSelected');
+        Route::delete('school', [SchoolController::class, 'deleteAll'])->name('school.deleteAll');
         
         //staff routes
         Route::resource('staff', AdminStaffController::class)->names([
             'index' => 'staff.index',
-            'create' => 'Staff.create',
+            'create' => 'staff.create',
             'store' => 'staff.store',
             'edit' => 'staff.edit',
             'update' => 'staff.update'
         ]);
+        Route::delete('staff', [AdminStaffController::class, 'deleteAll'])->name('staff.deleteAll');
 
 
 

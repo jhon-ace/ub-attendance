@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use \App\Models\Admin\Staff;
+
 
 class AdminStaffController extends Controller
 {
@@ -20,7 +22,7 @@ class AdminStaffController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -28,12 +30,24 @@ class AdminStaffController extends Controller
      */
     public function store(Request $request)
     {
-        //
+         $validatedData = $request->validate([
+            'school_id' => 'required|exists:schools,id',
+            'staff_id' => 'required|string|max:255|unique:staff', 
+            'staff_name' => 'required|string|max:255',
+            'access_type' => 'required|string|max:255',
+
+        ]);
+
+        Staff::create($validatedData);
+
+        return redirect()->route('admin.staff.index')
+                        ->with('success', 'Staff created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
+
     public function show(string $id)
     {
         //
@@ -50,16 +64,60 @@ class AdminStaffController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Staff $staff)
     {
-        //
+        $validatedData = $request->validate([
+            'staff_id' => 'required|string|max:255|unique:staff,staff_id,' . $staff->id,
+            'staff_name' => 'required|string|max:255',
+            'access_type' => 'required|string|max:255',
+            'school_id' => 'required|exists:schools,id',
+        ]);
+
+        // Check for changes
+        $changesDetected = false;
+        foreach ($validatedData as $key => $value) {
+            if ($staff->$key !== $value) {
+                $changesDetected = true;
+                break;
+            }
+        }
+
+        if (!$changesDetected) {
+            return redirect()->route('admin.staff.index')->with('info', 'No changes were made.');
+        }
+
+        // Update the staff record
+        $staff->update($validatedData);
+
+        return redirect()->route('admin.staff.index')->with('success', 'Staff updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Staff $staff)
     {
-        //
+        $staff->delete();
+
+        return redirect()->route('admin.staff.index')->with('success', 'Staff deleted successfully.');
     }
+
+
+    public function deleteAll(Request $request)
+    {
+        $count = Staff::count();
+
+        if ($count === 0) {
+            return redirect()->route('admin.staff.index')->with('info', 'There are no staff/s to delete.');
+        }
+        else{
+            
+            Staff::truncate();
+            return redirect()->route('admin.staff.index')->with('success', 'All staff/s deleted successfully.');
+        }
+
+        
+    }
+
 }

@@ -35,13 +35,12 @@
                         <span class="ml-2 text-sm tracking-wide truncate text-gray-200">School</span>
                     </a>
                 </li>
-                <li x-data="{ open: false }">
+                <li x-data="{ open: {{ request()->routeIs('admin.staff.index') ? 'true'  : 'false' }} }">
                     <a @click="open = !open" class="cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
-                        
                         <span class="inline-flex justify-center items-center ml-3">
                             <i class="fa-solid fa-users fa-sm text-gray-200"></i>
                         </span>
-                        <span class=" text-sm tracking-wide truncate  text-gray-200 ml-2"> Users</span>
+                        <span class="text-sm tracking-wide truncate text-gray-200 ml-2">Users</span>
                         <span class="ml-auto">
                             <svg fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
                                 <path x-show="!open" fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
@@ -49,20 +48,20 @@
                             </svg>
                         </span>
                     </a>
-                    <ul x-show="open" @click.away="open = false" x-cloak class="ml-3 mt-1 space-y-1">
+                    <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1">
                         <li>
-                            <a href="{{ route('admin.staff.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white">
-                               <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Admin Staff
+                            <a href="{{ route('admin.staff.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.staff.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                            <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Admin Staff
                             </a>
                         </li>
                         <li>
                             <a href="" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white">
-                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Employee
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Employee
                             </a>
                         </li>
                         <li>
                             <a href="" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white">
-                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Student
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Student
                             </a>
                         </li>
                     </ul>

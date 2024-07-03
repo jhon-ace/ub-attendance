@@ -60,9 +60,31 @@ class SchoolController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    
     public function update(Request $request, School $school)
     {
-        //
+        
+        $validatedData = $request->validate([
+            'school_name' => 'required|string|max:255',
+            'abbreviation' => 'required|string|max:255|unique:schools,abbreviation,' . $school->id,
+        ]);
+
+        // Check for changes
+        $changes = false;
+        foreach ($validatedData as $key => $value) {
+            if ($school->$key !== $value) {
+                $changes = true;
+                break;
+            }
+        }
+
+        if (!$changes) {
+            return redirect()->route('admin.school.index')->with('info', 'No changes were made.');
+        }
+
+        $school->update($validatedData);
+
+        return redirect()->route('admin.school.index')->with('success', 'School updated successfully.');
     }
 
     /**
@@ -70,44 +92,24 @@ class SchoolController extends Controller
      */
     public function destroy(School $school)
     {
-        //
+        $school->delete();
+
+        return redirect()->route('admin.school.index')->with('success', 'School deleted successfully.');
     }
 
-        public function deleteSelected(Request $request)
+    public function deleteAll(Request $request)
     {
+        $count = School::count();
 
-        $selectedSchool = $request->input('selected');
-
-        if ($selectedSchool) {
-            // // Fetch departments associated with deans
-            // $departmentsWithDeans = \DB::table('deans')
-            //     ->whereIn('department_id', $selectedDepartments)
-            //     ->pluck('department_id')
-            //     ->toArray();
-
-            // // Get the departments that are not associated with deans
-            // $departmentsWithoutDeans = array_diff($selectedDepartments, $departmentsWithDeans);
-
-            // Attempt to delete departments without deans
-            // try {
-            //     if (!empty($departmentsWithoutDeans)) {
-                    School::whereIn('id', $selectedSchool)->delete();
-                    $message = 'Selected school/s  have been deleted successfully.';
-                // }
-               
-                // if (!empty($departmentsWithDeans)) {
-                //     $message .= ' However, the following departments could not be deleted because they are associated with deans: ' 
-                //         . implode(', ', Department::whereIn('id', $departmentsWithDeans)->pluck('department_name')->toArray()) . '.';
-                // }
-
-                return redirect()->route('admin.school.index')->with('success', $message);
-            // } catch (\Exception $e) {
-            //     return redirect()->route('admin.department.index')->with('error', 'The following departments could not be deleted because they are associated with deans: ' 
-            //     . implode(', ', Department::whereIn('id', $departmentsWithDeans)->pluck('department_name')->toArray()) . '.');
-            // }
-        } else {
-            return redirect()->route('admin.school.index')->with('error', 'No school/s selected.');
+        if ($count === 0) {
+            return redirect()->route('admin.school.index')->with('info', 'There are no schools to delete.');
         }
+        else{
+            
+            School::truncate();
+            return redirect()->route('admin.school.index')->with('success', 'All schools deleted successfully.');
+        }
+
         
     }
 
