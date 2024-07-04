@@ -35,6 +35,15 @@
                         <span class="ml-2 text-sm tracking-wide truncate text-gray-200">School</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.department.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                    {{ request()->routeIs('admin.department.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                        <span class="inline-flex justify-center items-center ml-4">
+                            <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                        </span>
+                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Department</span>
+                    </a>
+                </li>
                 <li x-data="{ open: {{ request()->routeIs('admin.staff.index')  || request()->routeIs('admin.employee.index') || request()->routeIs('admin.student.index') ? 'true'  : 'false' }} }">
                     <a @click="open = !open" class="cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
                         <span class="inline-flex justify-center items-center ml-3">
@@ -49,11 +58,11 @@
                         </span>
                     </a>
                     <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1">
-                        <li>
+                        <!-- <li>
                             <a href="{{ route('admin.staff.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.staff.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                             <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Admin Staff
                             </a>
-                        </li>
+                        </li> -->
                         <li>
                             <a href="{{ route('admin.employee.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.employee.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Employee
@@ -80,11 +89,11 @@
                         </span>
                     </a>
                     <ul x-show="open" @click.away="open = false" x-cloak class="ml-4 mt-1 space-y-1">
-                        <li>
+                        <!-- <li>
                             <a href="" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white">
                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Admin Staff
                             </a>
-                        </li>
+                        </li> -->
                         <li>
                             <a href="" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white">
                                  <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Employee

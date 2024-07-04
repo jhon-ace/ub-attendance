@@ -322,7 +322,7 @@
         event.preventDefault(); // Prevent form submission initially
 
         Swal.fire({
-            title: `Are you sure you want to delete the staff ${studentFirstname} ${studentMiddlename} ${studentLastname}?`,
+            title: `Are you sure you want to delete the student ${studentFirstname} ${studentMiddlename} ${studentLastname}?`,
             text: "You won't be able to revert this!",
             icon: 'warning',
             showCancelButton: true,

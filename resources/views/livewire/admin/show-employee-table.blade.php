@@ -30,15 +30,28 @@
                             <div class="mb-4 grid grid-cols-2 gap-4">
                                 <div>
                                     <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">Employee belongs to:</label>
-                                    <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                        <option value="" selected>Select School</option>
+                                    <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                        <option value="">Select School</option>
                                         @foreach($schools as $school)
                                             <option value="{{ $school->id }}">{{ $school->abbreviation }} - {{ $school->school_name }}</option>
                                         @endforeach
                                     </select>
                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                 </div>
-
+                                <div>
+                                    <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Departments:</label>
+                                    <select wire:model="selectedDepartment" id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
+                                        <option value="">Select Department</option>
+                                        @if ($departments->isEmpty())
+                                            <option value="0">No department</option>
+                                        @else
+                                            @foreach($departments as $department)
+                                                <option value="{{ $department->id }}">{{ $department->department_abbreviation }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
+                                </div>
                                 <div>
                                     <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2">Employee School ID</label>
                                     <input type="text" name="employee_id" id="employee_id" value="{{ old('employee_id') }}" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_id') is-invalid @enderror" required autofocus>
@@ -169,8 +182,20 @@
                         </button>
                     </th>
                     <th class="border border-gray-400 px-3 py-2">
+                        <button wire:click="sortBy('department_id')" class="w-full h-full flex items-center justify-center">
+                            Department
+                            @if ($sortField == 'department_id')
+                                @if ($sortDirection == 'asc')
+                                    &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                @else
+                                    &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                @endif
+                            @endif
+                        </button>
+                    </th>
+                    <th class="border border-gray-400 px-3 py-2">
                         <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                            School / Department
+                            School
                             @if ($sortField == 'school_id')
                                 @if ($sortDirection == 'asc')
                                     &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -191,6 +216,7 @@
                         <td class="text-black border border-gray-400">{{ $employee->employee_firstname}}</td>
                         <td class="text-black border border-gray-400">{{ $employee->employee_middlename}}</td>
                         <td class="text-black border border-gray-400">{{ $employee->employee_rfid}}</td>
+                        <td class="text-black border border-gray-400">{{ $employee->department->department_abbreviation }} - {{ $employee->department->department_name }}</td>
                         <td class="text-black border border-gray-400">{{ $employee->school->abbreviation }} - {{ $employee->school->school_name }}</td>
                         <td class="text-black border border-gray-400 px-1 py-1">
                             <div class="flex justify-center items-center space-x-2">
@@ -322,7 +348,7 @@
         event.preventDefault(); // Prevent form submission initially
 
         Swal.fire({
-            title: `Are you sure you want to delete the staff ${employeeFirstname} ${employeeMiddlename} ${employeeLastname}?`,
+            title: `Are you sure you want to delete the employee ${employeeFirstname} ${employeeMiddlename} ${employeeLastname}?`,
             text: "You won't be able to revert this!",
             icon: 'warning',
             showCancelButton: true,

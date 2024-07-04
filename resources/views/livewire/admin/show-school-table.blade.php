@@ -69,7 +69,7 @@
     @elseif(!$search && $schools->isEmpty())
         <p class="text-black mt-8 text-center">No data available in table</p>
     @else
-        <table class="table-auto border-collapse border border-gray-400 w-full text-center mb-4">
+        <table class="table-auto border-collapse border border-gray-400 w-full text-sm text-center mb-4">
             <thead class="bg-gray-200 text-black">
                 <tr>
                     <th class="border border-gray-400 px-3 py-2">

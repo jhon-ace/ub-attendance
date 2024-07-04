@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasRoles;
 use \App\Models\Admin\School; 
+use \App\Models\Admin\Employee; 
 
 class Employee extends Model
 {
@@ -25,5 +26,17 @@ class Employee extends Model
     public function school()
     {
         return $this->belongsTo(School::class);
+    }
+
+    // Each employee belongs to one departments
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+     // Each employee can have many attendance records
+    public function attendance()
+    {
+        return $this->hasMany(EmployeeAttendance::class);
     }
 }

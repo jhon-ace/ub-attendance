@@ -5,6 +5,7 @@ namespace App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasRoles;
+use \App\Models\Admin\Department; 
 use \App\Models\Admin\Staff; 
 use \App\Models\Admin\Employee; 
 use \App\Models\Admin\Student; 
@@ -19,6 +20,12 @@ class School extends Model
         'abbreviation',
         'school_name',
     ];
+
+        // A school has many department
+    public function department()
+    {
+        return $this->hasMany(Department::class);
+    }
 
     // A school has many staff
     public function staff()
@@ -37,4 +44,5 @@ class School extends Model
     {
         return $this->hasMany(Student::class);
     }
+    
 }

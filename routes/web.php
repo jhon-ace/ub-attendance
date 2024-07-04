@@ -4,8 +4,10 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\SchoolController;
+use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\AttendanceController;
 
 
 Route::get('/', function () {
@@ -30,6 +32,16 @@ Route::middleware(['auth'])->group(function () {
         ]);
         Route::delete('school', [SchoolController::class, 'deleteAll'])->name('school.deleteAll');
         
+        //department routes
+        Route::resource('department', DepartmentController::class)->names([
+            'index' => 'department.index',
+            'create' => 'department.create',
+            'store' => 'department.store',
+            'edit' => 'department.edit',
+            'update' => 'department.update'
+        ]);
+        Route::delete('department', [DepartmentController::class, 'deleteAll'])->name('department.deleteAll');
+
         //staff routes
         Route::resource('staff', AdminStaffController::class)->names([
             'index' => 'staff.index',
@@ -61,7 +73,15 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('student', [StudentController::class, 'deleteAll'])->name('student.deleteAll');
 
 
-
+        // Attendance routes
+        Route::resource('attendance', AttendanceController::class)->names([
+            'index' => 'attendance.index',
+            'create' => 'attendance.create',
+            'store' => 'attendance.store',
+            'edit' => 'attendance.edit',
+            'update' => 'attendance.update'
+        ]);
+        Route::delete('attendance', [AttendanceController::class, 'deleteAll'])->name('attendance.deleteAll');
 
 
 
