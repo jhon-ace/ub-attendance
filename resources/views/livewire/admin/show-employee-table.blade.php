@@ -30,7 +30,9 @@
                             <div class="mb-4 grid grid-cols-2 gap-4">
                                 <div>
                                     <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">Employee belongs to:</label>
-                                    <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                    <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments"
+                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror"
+                                            required>
                                         <option value="">Select School</option>
                                         @foreach($schools as $school)
                                             <option value="{{ $school->id }}">{{ $school->abbreviation }} - {{ $school->school_name }}</option>
@@ -40,7 +42,9 @@
                                 </div>
                                 <div>
                                     <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Departments:</label>
-                                    <select wire:model="selectedDepartment" id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
+                                    <select wire:model="selectedDepartment" id="department_id" name="department_id"
+                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror"
+                                            @if(empty($selectedSchool)) disabled @endif required>
                                         <option value="">Select Department</option>
                                         @if ($departments->isEmpty())
                                             <option value="0">No department</option>
@@ -216,7 +220,13 @@
                         <td class="text-black border border-gray-400">{{ $employee->employee_firstname}}</td>
                         <td class="text-black border border-gray-400">{{ $employee->employee_middlename}}</td>
                         <td class="text-black border border-gray-400">{{ $employee->employee_rfid}}</td>
-                        <td class="text-black border border-gray-400">{{ $employee->department->department_abbreviation }} - {{ $employee->department->department_name }}</td>
+                        <td class="text-black border border-gray-400">
+                             @if ($employee->department)
+                                {{ $employee->department->department_id }} - {{ $employee->department->department_abbreviation }} 
+                            @else
+                                No department assigned
+                            @endif
+                        </td>
                         <td class="text-black border border-gray-400">{{ $employee->school->abbreviation }} - {{ $employee->school->school_name }}</td>
                         <td class="text-black border border-gray-400 px-1 py-1">
                             <div class="flex justify-center items-center space-x-2">

@@ -15,3 +15,12 @@
     background-color: gray;
     border-radius: 4px;
 }
+
+select[disabled] {
+    cursor: not-allowed;
+}
+
+input[disabled] {
+    cursor: not-allowed;
+    opacity: 0.9; /* Optionally reduce opacity to indicate disabled state */
+}

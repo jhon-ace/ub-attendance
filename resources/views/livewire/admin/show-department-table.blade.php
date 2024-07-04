@@ -66,27 +66,51 @@
             </div>
         </div>
     </div>
-    <hr class="border-gray-200 my-4">
+    <div class="flex flex-col md:flex-row items-center md:items-start md:justify-start">
+        <label for="school_id" class="block text-sm text-gray-700  font-bold mt-2 md:mr-4">Display department by school:</label>
+        <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments"
+                class="cursor-pointer text-sm shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
+                required>
+            <option class="" value="">Select School</option>
+            @foreach($schools as $school)
+                <option value="{{ $school->id }}">{{ $school->abbreviation }} - {{ $school->school_name }}</option>
+            @endforeach
+        </select>
+    </div>
     <div class="flex items-center mb-4 justify-between">
-    <div class="flex w-24 mr-2 sm:mr-0">
-        <form id="deleteAll" action="{{ route('admin.department.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="text-xs lg:text-sm w-full mt-2 bg-red-500  text-white px-4 py-2.5 rounded-md hover:bg-red-700">
-                Delete All
-            </button>
-        </form>
+        <div class="flex w-24 mr-2 sm:mr-0">
+            <form id="deleteAll" action="{{ route('admin.department.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="school_id" id="school_id_to_delete">
+                <button type="submit" class="text-xs lg:text-sm w-full mt-2 bg-red-500  text-white px-4 py-2.5 rounded-md hover:bg-red-700">
+                    Delete All
+                </button>
+            </form>
+        </div>
+        <div class="flex w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2">
+            <input wire:model.live="search" type="text" class="border text-black border-gray-300 rounded-md p-2 w-full" placeholder="Search..." autofocus  @if(empty($selectedSchool)) disabled @endif>
+        </div>
     </div>
-    <div class="flex w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2">
-        <input wire:model.live="search" type="text" class="border text-black border-gray-300 rounded-md p-2 w-full" placeholder="Search..." autofocus>
-    </div>
-</div>
+
+    @if($schoolToShow)
+        @foreach ($schoolToShow as $schoolSelected)
+            <p class="text-black mt-2 mb-4">Selected School: {{ $schoolSelected->school_name }}</p>
+        @endforeach
+    @else
+        <p class="text-black mt-2 mb-4">No chosen school</p>
+    @endif
 
 
-    @if($search && $departments->isEmpty())
-        <p class="text-black mt-8 text-center">No department/s found for matching "{{ $search }}"</p>
-    @elseif(!$search && $departments->isEmpty())
-        <p class="text-black mt-8 text-center">No data available in table</p>
+    <hr class="border-gray-200 my-4">
+    @if($search && !$departments && !$departmentsToShow->isEmpty())
+
+    @elseif($search && !$departmentsToShow->isEmpty())
+        @foreach ($schoolToShow as $schoolSelected)
+            <p class="text-black mt-8 text-center">No department/s found in {{ $schoolSelected->school_name }} for matching "{{ $search }}"</p>
+        @endforeach
+    @elseif(!$search && $departmentsToShow->isEmpty())
+        <p class="text-black mt-8 text-center">No data available.</p>
     @else
     <div class="overflow-x-auto">
         <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
@@ -143,9 +167,9 @@
                     <th class="border border-gray-400 px-3 py-2">Action</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach ($departments as $department)
-                    <tr class="hover:bg-gray-100">
+            <tbody >
+                @foreach ($departmentsToShow as $department)
+                    <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
                         <td class="text-black border border-gray-400  ">{{ $department->department_id }}</td>
                         <td class="text-black border border-gray-400">{{ $department->department_abbreviation}}</td>
                         <td class="text-black border border-gray-400">{{ $department->department_name}}</td>
@@ -231,20 +255,47 @@
 
 <script>
 
-    function confirmDeleteAll(event) {
+function searchDepartments(event) {
+        let searchTerm = event.target.value.toLowerCase();
+        if (searchTerm === '') {
+            this.departmentsToShow = @json($departmentsToShow->toArray());
+        } else {
+            this.departmentsToShow = this.departmentsToShow.filter(department =>
+                department.department_name.toLowerCase().includes(searchTerm) ||
+                department.department_abbreviation.toLowerCase().includes(searchTerm) ||
+                department.school.school_name.toLowerCase().includes(searchTerm)
+            );
+        }
+    }
+
+        function confirmDeleteAll(event) {
         event.preventDefault(); // Prevent form submission initially
 
         Swal.fire({
-            title: 'Are you sure to delete all records?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
+            title: 'Select School to Delete All Records',
+            html: `
+                <select id="school_id_select" class="swal2-select">
+                    <option value="">Select School</option>
+                    @foreach($schools as $school)
+                        <option value="{{ $school->id }}">{{ $school->abbreviation }} - {{ $school->school_name }}</option>
+                    @endforeach
+                </select>
+            `,
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete all!'
+            confirmButtonText: 'Yes, delete all!',
+            preConfirm: () => {
+                const schoolId = Swal.getPopup().querySelector('#school_id_select').value;
+                if (!schoolId) {
+                    Swal.showValidationMessage(`Please select a school`);
+                }
+                return { schoolId: schoolId };
+            }
         }).then((result) => {
             if (result.isConfirmed) {
-                // If confirmed, submit the form programmatically
+                const schoolId = result.value.schoolId;
+                document.getElementById('school_id_to_delete').value = schoolId;
                 document.getElementById('deleteAll').submit();
             }
         });

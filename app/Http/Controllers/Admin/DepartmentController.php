@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use \App\Models\Admin\School; 
-use \App\Models\Admin\Department; 
+use \App\Models\Admin\Department;
+use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
 {
@@ -32,7 +33,14 @@ class DepartmentController extends Controller
     {
         $validatedData = $request->validate([
             'school_id' => 'required|exists:schools,id',
-            'department_id' => 'required|string|max:255|unique:departments', 
+            'department_id' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('departments')->where(function ($query) use ($request) {
+                    return $query->where('school_id', $request->school_id);
+                }),
+            ],
             'department_abbreviation' => 'required|string|max:255',
             'department_name' => 'required|string|max:255',
         ]);
@@ -40,7 +48,7 @@ class DepartmentController extends Controller
         Department::create($validatedData);
 
         return redirect()->route('admin.department.index')
-                        ->with('success', 'Department created successfully.');
+            ->with('success', 'Department created successfully.');
     }
 
     /**
@@ -102,16 +110,23 @@ class DepartmentController extends Controller
 
     public function deleteAll(Request $request)
     {
-        $count = Department::count();
+        // $count = Department::count();
 
-        if ($count === 0) {
-            return redirect()->route('admin.department.index')->with('info', 'There are no department/s to delete.');
-        }
-        else{
+        // if ($count === 0) {
+        //     return redirect()->route('admin.department.index')->with('info', 'There are no department/s to delete.');
+        // }
+        // else{
             
-            Department::truncate();
-            return redirect()->route('admin.department.index')->with('success', 'All department/s deleted successfully.');
+        //     Department::truncate();
+        //     return redirect()->route('admin.department.index')->with('success', 'All department/s deleted successfully.');
+        // }
+
+        $schoolId = $request->input('school_id');
+        if ($schoolId) {
+            Department::where('school_id', $schoolId)->delete();
+            return redirect()->back()->with('success', 'All records for the selected school have been deleted.');
         }
+        return redirect()->back()->with('error', 'No school selected.');
 
         
     }

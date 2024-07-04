@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use \App\Models\Admin\Employee;
+use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
@@ -31,19 +32,33 @@ class EmployeeController extends Controller
     {
         $validatedData = $request->validate([
             'school_id' => 'required|exists:schools,id',
-            'employee_id' => 'required|string|max:255|unique:employees', 
+            'department_id' => [
+                'required',
+                'exists:departments,id',
+                // Custom rule to ensure unique employee_id for each department_id
+                Rule::unique('employees')->where(function ($query) use ($request) {
+                    return $query->where('employee_id', $request->employee_id)
+                                ->where('department_id', '!=', $request->department_id); // Ensure different department_id
+                }),
+            ],
+            'employee_id' => [
+                'required',
+                'string',
+                'max:255',
+                'exists:employees,id', // Check if employee_id exists in employees table
+            ],
             'employee_firstname' => 'required|string|max:255',
             'employee_middlename' => 'required|string|max:255',
             'employee_lastname' => 'required|string|max:255',
             'employee_rfid' => 'required|string|max:255|unique:employees',
-
         ]);
+
 
         Employee::create($validatedData);
 
         return redirect()->route('admin.employee.index')
-                        ->with('success', 'Employee created successfully.');
-    }
+            ->with('success', 'Employee created successfully.');
+}
 
     /**
      * Display the specified resource.
@@ -68,6 +83,7 @@ class EmployeeController extends Controller
     {
         $validatedData = $request->validate([
             'school_id' => 'required|exists:schools,id',
+            'department_id' => 'required|exists:departments,id',
             'employee_id' => 'required|string|max:255|unique:employees,employee_id,' . $employee->id,
             'employee_firstname' => 'required|string|max:255',
             'employee_middlename' => 'required|string|max:255',
