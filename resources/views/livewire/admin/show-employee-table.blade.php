@@ -78,52 +78,68 @@
                     <option value="{{ $school->id }}">{{ $school->abbreviation }} - {{ $school->school_name }}</option>
                 @endforeach
             </select>
+            
             <form id="deleteAll" action="{{ route('admin.employee.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);" class="flex ml-4">
                 @csrf
                 @method('DELETE')
                 <input type="hidden" name="school_id" id="school_id_to_delete">
-                <button type="submit" class="text-xs lg:text-sm bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-700">
+                
+                <button type="submit" class="text-xs lg:text-sm bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-700
+                       @if(empty($selectedSchool) || empty($selectedDepartment)) cursor-not-allowed opacity-50 @endif"
+                    @if(empty($selectedSchool) || empty($selectedDepartment)) disabled @endif>
                     <i class="fa-solid fa-trash fa-sm"></i>
                 </button>
             </form>
         </div>
+
         <!-- Search Input -->
-        <div class="w-full flex justify-end mt-4 md:mt-0 md:ml-4">
-             @if(empty($selectedSchool)) 
-                
-            @else
-                <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-64" placeholder="Search..." autofocus>
-            @endif
-        </div>
+        
     </div>
-    <hr class="border-gray-200 my-4">
-    <!--  -->
     @if($schoolToShow)
         <p class="text-black mt-2 text-sm mb-4">Selected School: <text class="text-red-500">{{ $schoolToShow->school_name }}</text></p>
     @else
+        <hr class="border-gray-200 my-4">
         <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected school</p>
     @endif
+
+    
     <!--  -->
-    @if(!empty($selectedSchool)) 
+   @if(!empty($selectedSchool))
+   <hr class="border-gray-200 my-4">
         <div class="flex items-center w-full md:w-auto mb-4">
             <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display by department:</label>
-            <select wire:model="selectedDepartment" id="school_id" name="school_id" wire:change="updateEmployeesByDepartment"
+            <select x-data="{ noDepartmentSelected: false }"
+                    x-init="noDepartmentSelected = {{ $departments->isEmpty() ? 'true' : 'false' }}"
+                    wire:model="selectedDepartment"
+                    id="school_id" name="school_id"
+                    wire:change="updateEmployeesByDepartment"
                     class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
-                    required>
-                <option value="">Select Department</option>
-                @foreach($departments as $department)
-                    <option value="{{ $department->id }}">{{$department->department_name}}</option>
-                @endforeach
+                    :disabled="noDepartmentSelected" required>
+                @if($departments->isEmpty())
+                    <option value="0" x-bind:class="{ 'cursor-not-allowed': noDepartmentSelected }">No Department</option>
+                @else
+                    <option value="">Select Department</option>
+                    @foreach($departments as $department)
+                        <option value="{{ $department->id }}">{{$department->department_name}}</option>
+                    @endforeach
+                @endif
             </select>
         </div>
         @if($departmentToShow)
-            <p class="text-black mt-2 text-sm mb-4">Selected Department: <text class="text-red-500">{{ $departmentToShow->department_name }}</text></p>
+            <div class="flex flex-col md:flex-row md:justify-between items-start md:items-center">
+                <p class="text-black mt-2 w-full text-sm mb-4 md:mb-0 md:mr-4">Selected Department: <span class="text-red-500">{{ $departmentToShow->department_name }}</span></p>
+                <div class="w-full flex justify-end mt-4 md:mt-0">
+                    <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-full md:w-64" placeholder="Search..." autofocus>
+                </div>
+            </div>
         @else
-            <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected department</p>
+            <p x-show="noDepartmentSelected" class="text-black text-sm mt-2 mb-4 uppercase text-center">No department selected</p>
         @endif
     @endif
+
     <!--  -->
     @if($departmentToShow)
+        <hr class="border-gray-200 my-4">
         @if($search && $employees->isEmpty())
         <p class="text-black mt-8 text-center">No employee/s found in <text class="text-red-500">{{ $departmentToShow->department_name }}</text> for matching "{{ $search }}"</p>  
         @elseif(!$search && $employees->isEmpty())
@@ -131,6 +147,9 @@
         @else
             <div class="overflow-x-auto">
                 <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                    <caption class="caption-top">
+                        Employee List
+                    </caption>
                     <thead class="bg-gray-200 text-black">
                         <tr>
                             <th class="border border-gray-400 px-3 py-2">
@@ -328,7 +347,7 @@
         event.preventDefault(); // Prevent form submission initially
 
         Swal.fire({
-            title: 'Select School to Delete All Records',
+            title: 'Select Employee to Delete All Records',
             html: `
                 <select id="school_id_select" class="cursor-pointer hover:border-red-500 swal2-select">
                     <option value="">Select School</option>
