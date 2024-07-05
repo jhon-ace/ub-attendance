@@ -11,8 +11,8 @@ class ShowSchoolTable extends Component
     use WithPagination;
 
     public $search = '';
-    public $sortField = 'abbreviation';
-    public $sortDirection = 'desc';
+    public $sortField = 'id';
+    public $sortDirection = 'asc';
 
     public function updatingSearch()
     {

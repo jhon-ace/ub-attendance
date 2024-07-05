@@ -73,6 +73,18 @@
             <thead class="bg-gray-200 text-black">
                 <tr>
                     <th class="border border-gray-400 px-3 py-2">
+                        <button wire:click="sortBy('id')" class="w-full h-full flex items-center justify-center">
+                            School ID
+                            @if ($sortField == 'id')
+                                @if ($sortDirection == 'asc')
+                                    &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                @else
+                                    &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                @endif
+                            @endif
+                        </button>
+                    </th>
+                    <th class="border border-gray-400 px-3 py-2">
                         <button wire:click="sortBy('abbreviation')" class="w-full h-full flex items-center justify-center">
                             School Abbreviation
                             @if ($sortField == 'abbreviation')
@@ -102,6 +114,7 @@
             <tbody>
                 @foreach ($schools as $school)
                     <tr>
+                        <td class="text-black border border-gray-400 px-3 py-2">{{ $school->id }}</td>
                         <td class="text-black border border-gray-400 px-3 py-2">{{ $school->abbreviation }}</td>
                         <td class="text-black border border-gray-400 px-3 py-2">{{ $school->school_name}}</td>
                         <td class="text-black border border-gray-400 px-3 py-2">

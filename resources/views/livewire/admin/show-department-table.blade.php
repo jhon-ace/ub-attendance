@@ -12,6 +12,46 @@
     @endif
     <div class="flex justify-between mb-4 sm:-mt-4">
         <div class="font-bold text-md tracking-tight text-md text-black  mt-2">Admin / Manage Department</div>
+    </div>
+    <div class="flex flex-col md:flex-row items-start md:items-center md:justify-start">
+        <!-- Dropdown and Delete Button -->
+        <div class="flex items-center w-full md:w-auto">
+            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display department by school:</label>
+            <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments"
+                    class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
+                    required>
+                <option value="">Select School</option>
+                @foreach($schools as $school)
+                    <option value="{{ $school->id }}">{{ $school->id }} | {{ $school->abbreviation }} - {{ $school->school_name }}</option>
+                @endforeach
+            </select>
+            
+            @if($schoolToShow)
+                <form id="deleteAll" action="{{ route('admin.department.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);" class="flex ml-4">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="school_id" id="school_id_to_delete">
+                <button type="submit" class="text-xs lg:text-sm bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-700">
+                    <i class="fa-solid fa-trash fa-sm"></i>
+                </button>
+            </form>
+            @else
+                
+            @endif
+        </div>
+        <!-- Search Input -->
+        <div class="w-full flex justify-end mt-4 md:mt-0 md:ml-4">
+             @if(empty($selectedSchool)) 
+                
+            @else
+                <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-64" placeholder="Search..." autofocus>
+            @endif
+        </div>
+    </div>
+    <hr class="border-gray-200 my-4">
+    @if($schoolToShow)
+    <div class="flex justify-between">
+        <p class="text-black mt-2 text-sm mb-4">Selected School: <text class="uppercase text-red-500">{{ $schoolToShow->school_name }}</text></p>
         <div x-data="{ open: false }">
             <button @click="open = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                 <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Department
@@ -28,16 +68,12 @@
                             @csrf
 
                                 <div class="mb-2">
-                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">Department belongs to:</label>
+                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School where department belong: </label>
                                     <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                        <option value="" selected>Select School</option>
-                                        @foreach($schools as $school)
-                                            <option value="{{ $school->id }}">{{ $school->abbreviation }} - {{ $school->school_name }}</option>
-                                        @endforeach
+                                            <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->id }} - {{ $schoolToShow->school_name }}</option>
                                     </select>
                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                 </div>
-
                                 <div class="mb-2">
                                     <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department School ID</label>
                                     <input type="text" name="department_id" id="department_id" value="{{ old('department_id') }}" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required autofocus>
@@ -66,46 +102,13 @@
             </div>
         </div>
     </div>
-    <div class="flex flex-col md:flex-row items-start md:items-center md:justify-start">
-        <!-- Dropdown and Delete Button -->
-        <div class="flex items-center w-full md:w-auto">
-            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display department by school:</label>
-            <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments"
-                    class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
-                    required>
-                <option value="">Select School</option>
-                @foreach($schools as $school)
-                    <option value="{{ $school->id }}">{{ $school->abbreviation }} - {{ $school->school_name }}</option>
-                @endforeach
-            </select>
-            <form id="deleteAll" action="{{ route('admin.department.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);" class="flex ml-4">
-                @csrf
-                @method('DELETE')
-                <input type="hidden" name="school_id" id="school_id_to_delete">
-                <button type="submit" class="text-xs lg:text-sm bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-700">
-                    <i class="fa-solid fa-trash fa-sm"></i>
-                </button>
-            </form>
-        </div>
-        <!-- Search Input -->
-        <div class="w-full flex justify-end mt-4 md:mt-0 md:ml-4">
-             @if(empty($selectedSchool)) 
-                
-            @else
-                <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-64" placeholder="Search..." autofocus>
-            @endif
-        </div>
-    </div>
-    <hr class="border-gray-200 my-4">
-    @if($schoolToShow)
-        <p class="text-black mt-2 text-sm mb-4">Selected School: {{ $schoolToShow->school_name }}</p>
     @else
         
     @endif
     @if($search && $departments->isEmpty())
      <p class="text-black mt-8 text-center">No employee/s found in {{ $schoolToShow->school_name }} for matching "{{ $search }}"</p>  
     @elseif(!$search && $departments->isEmpty())
-        <p class="text-black mt-8 text-center">No data available in table</p>
+        <p class="text-black mt-8 text-center uppercase">No data available in school <text class="text-red-500">{{ $schoolToShow->abbreviation}}</text></p>
     @else
 
         @if($schoolToShow)
@@ -151,6 +154,18 @@
                             </th>
                             <th class="border border-gray-400 px-3 py-2">
                                 <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
+                                    School ID
+                                    @if ($sortField == 'school_id')
+                                        @if ($sortDirection == 'asc')
+                                            &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                        @else
+                                            &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                        @endif
+                                    @endif
+                                </button>
+                            </th>
+                            <th class="border border-gray-400 px-3 py-2">
+                                <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
                                     School
                                     @if ($sortField == 'school_id')
                                         @if ($sortDirection == 'asc')
@@ -170,15 +185,18 @@
                                 <td class="text-black border border-gray-400  ">{{ $department->department_id }}</td>
                                 <td class="text-black border border-gray-400">{{ $department->department_abbreviation}}</td>
                                 <td class="text-black border border-gray-400">{{ $department->department_name}}</td>
+                                <td class="text-black border border-gray-400">{{ $department->school->id}}</td>
                                 <td class="text-black border border-gray-400">{{ $department->school->abbreviation }} - {{ $department->school->school_name }}</td>
                                 <td class="text-black border border-gray-400 px-1 py-1">
                                     <div class="flex justify-center items-center space-x-2">
+                                        @if($schoolToShow && $department)
                                         <div x-data="{ open: false, 
-                                                id: '{{ $department->id }}', 
-                                                department_id: '{{ $department->department_id }}',
-                                                department_abbreviation: '{{ $department->department_abbreviation }}',
-                                                school: '{{ $department->school_id }}',
-                                                department_name: '{{ $department->department_name }}',
+                                               id: {{ json_encode($department->id) }},
+                                                department_id: {{ json_encode($department->department_id) }},
+                                                department_abbreviation: {{ json_encode($department->department_abbreviation) }},
+                                                school: {{ json_encode($department->school_id) }},
+                                                department_name: {{ json_encode($department->department_name) }},
+                                                
                                                 }">
                                             <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                                                 <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i>
@@ -197,6 +215,7 @@
                                                                 <div class="mb-4">
                                                                     <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department belongs to:</label>
                                                                     <select id="school_id" name="school_id" x-model="school" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                                                        
                                                                         @foreach($schools as $school)
                                                                             <option value="{{ $school->id }}" {{ $department->school_id == $school->id ? 'selected' : '' }}>
                                                                                 {{ $school->abbreviation }} - {{ $school->school_name }}
@@ -207,18 +226,18 @@
                                                                 </div>
                                                                 <div class="mb-4">
                                                                     <label for="department_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department School ID</label>
-                                                                    <input type="text" name="department_id" id="department_id" x-model="department_id" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required autofocus>
+                                                                    <input type="text" name="department_id" id="department_id" x-model="department_id" value="{{ $department->department_id }}"  class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required autofocus>
                                                                     <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
                                                                 </div>
                                                                 <div class="mb-4">
                                                                     <label for="department_abbreviation" class="block text-gray-700 text-md font-bold mb-2 text-left">Department Abbreviation</label>
-                                                                    <input type="text" name="department_abbreviation" id="department_abbreviation" x-model="department_abbreviation" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_abbreviation') is-invalid @enderror" required>
+                                                                    <input type="text" name="department_abbreviation" id="department_abbreviation" x-model="department_abbreviation" value="{{ $department->department_abbreviation }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_abbreviation') is-invalid @enderror" required>
                                                                     <x-input-error :messages="$errors->get('department_abbreviation')" class="mt-2" />
                                                                 </div>
 
                                                                 <div class="mb-4">
                                                                     <label for="department_name" class="block text-gray-700 text-md font-bold mb-2 text-left">Department Name</label>
-                                                                    <input type="text" name="department_name" id="department_name" x-model="department_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_name') is-invalid @enderror" required>
+                                                                    <input type="text" name="department_name" id="department_name" x-model="department_name" value="{{ $department->department_name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_name') is-invalid @enderror" required>
                                                                     <x-input-error :messages="$errors->get('department_name')" class="mt-2" />
                                                                 </div>
                                                             <div class="flex mb-4 mt-10 justify-center">
@@ -238,6 +257,7 @@
                                                 <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i>
                                             </button>
                                         </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

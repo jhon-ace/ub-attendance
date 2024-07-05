@@ -14,7 +14,7 @@ class ShowDepartmentTable extends Component
     use WithPagination;
 
     public $search = '';
-    public $sortField = 'school_id';
+    public $sortField = 'department_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
     public $selectedDepartment = null;

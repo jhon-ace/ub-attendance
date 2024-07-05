@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use \App\Models\Admin\School; 
+use \App\Models\Admin\School;
+use \App\Models\Admin\Employee;
+use \App\Models\Admin\Department;  
 
 class SchoolController extends Controller
 {
@@ -92,6 +94,13 @@ class SchoolController extends Controller
      */
     public function destroy(School $school)
     {
+
+        // Check if there are any associated records
+        if ($school->employee()->exists() || $school->department()->exists()) {
+            return redirect()->route('admin.school.index')->with('error', 'Cannot delete school because it has associated data.');
+        }
+
+        // If no associated records, proceed with deletion
         $school->delete();
 
         return redirect()->route('admin.school.index')->with('success', 'School deleted successfully.');
@@ -99,15 +108,32 @@ class SchoolController extends Controller
 
     public function deleteAll(Request $request)
     {
-        $count = School::count();
+        
+        
+         $count = School::count();
 
         if ($count === 0) {
             return redirect()->route('admin.school.index')->with('info', 'There are no schools to delete.');
         }
-        else{
-            
+
+        try {
+            // Use a transaction to ensure data integrity
+            \DB::beginTransaction();
+
+            // Delete related data in other tables first (e.g., staff)
+            School::whereHas('school')->delete();
+
+            // Now you can delete the schools
             School::truncate();
+
+            \DB::commit();
+
             return redirect()->route('admin.school.index')->with('success', 'All schools deleted successfully.');
+        } catch (\Exception $e) {
+            \DB::rollback();
+
+            // Log the error or handle it appropriately
+            return redirect()->route('admin.school.index')->with('error', 'Cannot delete schools because they have associated departments.');
         }
 
         

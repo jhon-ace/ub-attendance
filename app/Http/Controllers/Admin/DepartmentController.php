@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use \App\Models\Admin\School; 
 use \App\Models\Admin\Department;
+use \App\Models\Admin\Employee;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class DepartmentController extends Controller
 {
@@ -72,30 +74,51 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, Department $department)
     {
-        $validatedData = $request->validate([
-            'school_id' => 'required|exists:schools,id',
-            'department_id' => 'required|string|max:255|unique:departments,department_id,' . $department->id,
-            'department_abbreviation' => 'required|string|max:255|unique:departments,department_abbreviation,' . $department->id,
-            'department_name' => 'required|string|max:255',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'school_id' => 'required|exists:schools,id',
+                'department_id' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('departments')->where(function ($query) use ($request, $department) {
+                        return $query->where('school_id', $request->school_id)
+                                    ->where('id', '<>', $department->id);
+                    }),
+                ],
+                'department_abbreviation' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('departments')->where(function ($query) use ($request, $department) {
+                        return $query->where('school_id', $request->school_id)
+                                    ->where('id', '<>', $department->id);
+                    }),
+                ],
+                'department_name' => 'required|string|max:255',
+            ]);
+            
+            $hasChanges = false;
+            if ($request->school_id !== $department->school_id ||
+                $request->department_id !== $department->department_id ||
+                $request->department_abbreviation !== $department->department_abbreviation ||
+                $request->department_name !== $department->department_name) 
+            {
+                $hasChanges = true;
+            }
 
-        $hasChanges = false;
-        if ($request->school_id !== $department->school_id ||
-            $request->department_id !== $department->department_id ||
-            $request->department_abbreviation !== $department->department_abbreviation ||
-            $request->department_name !== $department->department_name) 
-        {
-            $hasChanges = true;
+            if (!$hasChanges) {
+                return redirect()->route('admin.department.index')->with('info', 'No changes were made.');
+            }
+
+            // Update the department record
+            $department->update($validatedData);
+
+            return redirect()->route('admin.department.index')->with('success', 'Department updated successfully.');
+        } catch (ValidationException $e) {
+            $errors = $e->errors();
+            return redirect()->back()->withErrors($errors)->with('error', $errors['department_id'][0] ?? 'Validation error');
         }
-
-        if (!$hasChanges) {
-            return redirect()->route('admin.department.index')->with('info', 'No changes were made.');
-        }
-
-        // Update the department record
-        $department->update($validatedData);
-
-        return redirect()->route('admin.department.index')->with('success', 'Department updated successfully.');
     }
 
     /**
@@ -103,6 +126,10 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
+         if ($department->employees()->exists()) {
+            return redirect()->route('admin.department.index')->with('error', 'Cannot delete department because it has associated data.');
+        }
+
          $department->delete();
 
         return redirect()->route('admin.department.index')->with('success', 'Department/s deleted successfully.');
@@ -110,23 +137,24 @@ class DepartmentController extends Controller
 
     public function deleteAll(Request $request)
     {
-        // $count = Department::count();
-
-        // if ($count === 0) {
-        //     return redirect()->route('admin.department.index')->with('info', 'There are no department/s to delete.');
-        // }
-        // else{
-            
-        //     Department::truncate();
-        //     return redirect()->route('admin.department.index')->with('success', 'All department/s deleted successfully.');
-        // }
 
         $schoolId = $request->input('school_id');
-        if ($schoolId) {
-            Department::where('school_id', $schoolId)->delete();
-            return redirect()->back()->with('success', 'All records for the selected school have been deleted.');
+
+        if (!$schoolId) {
+            return redirect()->back()->with('error', 'No school selected.');
         }
-        return redirect()->back()->with('error', 'No school selected.');
+
+        // Check if there are any departments associated with this school
+        $departmentsWithEmployees = Department::where('school_id', $schoolId)->whereHas('employees')->exists();
+
+        if ($departmentsWithEmployees) {
+            return redirect()->route('admin.department.index')->with('error', 'Cannot delete departments because they have associated employees.');
+        }
+
+        // If no departments have associated employees, proceed with deletion
+        Department::where('school_id', $schoolId)->delete();
+
+        return redirect()->back()->with('success', 'All departments for the selected school have been deleted.');
 
         
     }
