@@ -33,6 +33,11 @@ class ShowDepartmentTable extends Component
         $this->departmentsToShow = collect([]); // Initialize as an empty collection
         $this->schoolToShow = collect([]); // Initialize as an empty collection
     }
+
+    public function updatingSelectedSchool()
+    {
+        $this->resetPage();
+    }
     
 
 
@@ -48,49 +53,54 @@ class ShowDepartmentTable extends Component
     }
 
 public function render()
-{
-             $query = Department::with('school')
-                ->where(function (Builder $query) {
-                    $query->where('department_id', 'like', '%' . $this->search . '%')
-                        ->orWhere('department_abbreviation', 'like', '%' . $this->search . '%')
-                        ->orWhere('department_name', 'like', '%' . $this->search . '%')
-                        ->orWhereHas('school', function (Builder $query) {
-                            $query->where('abbreviation', 'like', '%' . $this->search . '%')
-                                ->orWhere('school_name', 'like', '%' . $this->search . '%');
-                        });
+    {
+        $query = Department::with('school');
 
-                    if ($this->selectedSchool) {
-                        $query->where('school_id', $this->selectedSchool);
-                    }
+        // Apply search filters
+        $query = $this->applySearchFilters($query);
 
-                    // Add condition to filter by selected department
-                    if ($this->selectedDepartment) {
-                        $query->where('id', $this->selectedDepartment);
-                    }
-                });
+        // Apply selected school filter
+        if ($this->selectedSchool) {
+            $query->where('school_id', $this->selectedSchool);
+            $this->schoolToShow = School::findOrFail($this->selectedSchool);
+        } else {
+            $this->schoolToShow = null; // Reset schoolToShow if no school is selected
+        }
 
-            $departments = $query->orderBy($this->sortField, $this->sortDirection)
-                ->paginate(10);
+        $departments = $query->orderBy($this->sortField, $this->sortDirection)
+                             ->paginate(10);
 
-            $schools = School::all();
+        $schools = School::all();
 
         return view('livewire.admin.show-department-table', [
             'departments' => $departments,
             'schools' => $schools,
-            // 'selectedSchool' => $selectedSchool,
         ]);
-}
-
+    }
 
     public function updateDepartments()
     {
+        // Update departmentsToShow based on selected school
         if ($this->selectedSchool) {
-            $this->departmentsToShow = Department::where('school_id', $this->selectedSchool)->get(); // Ensure this returns a collection
-            $this->schoolToShow = School::where('id', $this->selectedSchool)->get();
+            $this->departmentsToShow = Department::where('school_id', $this->selectedSchool)
+                ->get(); // Ensure this returns a collection
         } else {
             $this->departmentsToShow = collect(); // Reset to empty collection if no school is selected
-            $this->schoolToShow = collect(); // Reset to empty collection if no school is selected
         }
     }
+
+    protected function applySearchFilters($query)
+{
+    return $query->where(function (Builder $query) {
+        $query->where('department_id', 'like', '%' . $this->search . '%')
+            ->orWhere('department_abbreviation', 'like', '%' . $this->search . '%')
+            ->orWhere('department_name', 'like', '%' . $this->search . '%')
+            ->orWhereHas('school', function (Builder $query) {
+                $query->where('abbreviation', 'like', '%' . $this->search . '%')
+                    ->orWhere('school_name', 'like', '%' . $this->search . '%');
+            });
+    });
+}
+
     
 }
