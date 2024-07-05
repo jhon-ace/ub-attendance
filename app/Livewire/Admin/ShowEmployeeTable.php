@@ -87,10 +87,11 @@ class ShowEmployeeTable extends Component
         $schools = School::all();
         $departments = Department::where('school_id', $this->selectedSchool)->get();
 
-        $departmentCounts = Department::select('school_id', \DB::raw('count(*) as department_count'))
-            ->groupBy('school_id')
+        // Count employees by department
+        $departmentCounts = Employee::select('department_id', \DB::raw('count(*) as employee_count'))
+            ->groupBy('department_id')
             ->get()
-            ->keyBy('school_id');
+            ->keyBy('department_id');
 
         return view('livewire.admin.show-employee-table', [
             'employees' => $employees,
