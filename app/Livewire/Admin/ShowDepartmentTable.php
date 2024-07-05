@@ -72,9 +72,16 @@ public function render()
 
         $schools = School::all();
 
+
+         $departmentCounts = Department::select('school_id', \DB::raw('count(*) as department_count'))
+                                  ->groupBy('school_id')
+                                  ->get()
+                                  ->keyBy('school_id');
+
         return view('livewire.admin.show-department-table', [
             'departments' => $departments,
             'schools' => $schools,
+            'departmentCounts' => $departmentCounts,
         ]);
     }
 

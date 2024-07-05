@@ -11,7 +11,7 @@
         <x-sweetalert type="error" :message="session('error')" />
     @endif
     <div class="flex justify-between mb-4 sm:-mt-4">
-        <div class="font-bold text-md tracking-tight text-sm text-black  mt-2">Admin / Manage Department</div>
+        <div class="font-bold text-md tracking-tight text-md text-black  mt-2">Admin / Manage Department</div>
         <div x-data="{ open: false }">
             <button @click="open = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                 <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Department
@@ -69,9 +69,9 @@
     <div class="flex flex-col md:flex-row items-start md:items-center md:justify-start">
         <!-- Dropdown and Delete Button -->
         <div class="flex items-center w-full md:w-auto">
-            <label for="school_id" class="block text-sm text-gray-700 font-bold mt-2 md:mr-4 truncate">Display department by school:</label>
+            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display department by school:</label>
             <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments"
-                    class="cursor-pointer text-sm shadow appearance-none border rounded py-2 px-5 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
+                    class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                     required>
                 <option value="">Select School</option>
                 @foreach($schools as $school)
@@ -89,7 +89,11 @@
         </div>
         <!-- Search Input -->
         <div class="w-full flex justify-end mt-4 md:mt-0 md:ml-4">
-            <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-96" placeholder="Search..." autofocus @if(empty($selectedSchool)) disabled @endif>
+             @if(empty($selectedSchool)) 
+                
+            @else
+                <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-64" placeholder="Search..." autofocus>
+            @endif
         </div>
     </div>
     <hr class="border-gray-200 my-4">
@@ -240,11 +244,18 @@
                         @endforeach
                     </tbody>
                 </table>
+                @if($schoolToShow)
+                    <tr>
+                        <td colspan="2">
+                            <p class="text-black text-right mt-2 text-sm mb-4 mr-10">Total: {{ $departmentCounts[$schoolToShow->id]->department_count ?? 0 }}</p>
+                        </td>
+                    </tr>
+                @endif
             </div>
+             {{ $departments->links() }}
         @else
             <p class="text-black mt-10  text-center">Select table to show data</p>
         @endif
-        {{ $departments->links() }}
     @endif
 </div>
 
@@ -270,7 +281,7 @@ function searchDepartments(event) {
         Swal.fire({
             title: 'Select School to Delete All Records',
             html: `
-                <select id="school_id_select" class="swal2-select">
+                <select id="school_id_select" class="cursor-pointer hover:border-red-500 swal2-select">
                     <option value="">Select School</option>
                     @foreach($schools as $school)
                         <option value="{{ $school->id }}">{{ $school->abbreviation }} - {{ $school->school_name }}</option>

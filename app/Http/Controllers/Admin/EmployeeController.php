@@ -45,7 +45,7 @@ class EmployeeController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'exists:employees,id', // Check if employee_id exists in employees table
+                // Check if employee_id exists in employees table
             ],
             'employee_firstname' => 'required|string|max:255',
             'employee_middlename' => 'required|string|max:255',

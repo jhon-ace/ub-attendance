@@ -11,18 +11,40 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ShowEmployeeTable extends Component
 {
-    use WithPagination;
-
+    use WithPagination; 
     public $search = '';
     public $sortField = 'school_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
     public $selectedDepartment = null;
+    public $departmentsToShow;
+    public $schoolToShow;
+    public $departmentToShow;
 
+    protected $listeners = ['updateEmployees', 'updateEmployeesByDepartment'];
 
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function mount()
+    {
+        $this->departmentsToShow = collect([]); // Initialize as an empty collection
+        $this->schoolToShow = collect([]); // Initialize as an empty collection
+        $this->departmentToShow = collect([]);
+    }
+
+    public function updatingSelectedSchool()
+    {
+        $this->resetPage();
+        $this->updateEmployees();
+    }
+
+    public function updatingSelectedDepartment()
+    {
+        $this->resetPage();
+        $this->updateEmployeesByDepartment();
     }
 
     public function sortBy($field)
@@ -36,48 +58,85 @@ class ShowEmployeeTable extends Component
         $this->sortField = $field;
     }
 
-    
-    
-
     public function render()
     {
-        $employees = Employee::with(['school', 'department'])
-                    ->where(function (Builder $query) {
-                        $query->where('employee_id', 'like', '%' . $this->search . '%')
-                            ->orWhere('employee_firstname', 'like', '%' . $this->search . '%')
-                            ->orWhere('employee_middlename', 'like', '%' . $this->search . '%')
-                            ->orWhere('employee_lastname', 'like', '%' . $this->search . '%')
-                            ->orWhere('employee_rfid', 'like', '%' . $this->search . '%')
-                            ->orWhereHas('school', function (Builder $query) {
-                                $query->where('abbreviation', 'like', '%' . $this->search . '%')
-                                        ->orWhere('school_name', 'like', '%' . $this->search . '%');
-                            });
-                    })
-                    ->orderBy($this->sortField, $this->sortDirection)
-                    ->paginate(10);
+        $query = Employee::with('school');
 
-                     // Apply school filter if selectedSchool is not null
-                    // if ($this->selectedSchool) {
-                    //     $query->where('school_id', $this->selectedSchool);
-                    // }
+        // Apply search filters
+        $query = $this->applySearchFilters($query);
 
-                    // $employees = $query->orderBy($this->sortField, $this->sortDirection)
-                    //                 ->paginate(10);
+        // Apply selected school filter
+        if ($this->selectedSchool) {
+            $query->where('school_id', $this->selectedSchool);
+            $this->schoolToShow = School::find($this->selectedSchool);
+        } else {
+            $this->schoolToShow = null; // Reset schoolToShow if no school is selected
+        }
 
-                    // Fetch all schools and departments
-            $schools = School::all();
-            $departments = Department::where('school_id', $this->selectedSchool)->get();
+        // Apply selected department filter
+        if ($this->selectedDepartment) {
+            $query->where('department_id', $this->selectedDepartment);
+            $this->departmentToShow = Department::find($this->selectedDepartment);
+        } else {
+            $this->departmentToShow = null; // Reset departmentToShow if no department is selected
+        }
+
+        $employees = $query->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(10);
+
+        $schools = School::all();
+        $departments = Department::where('school_id', $this->selectedSchool)->get();
+
+        $departmentCounts = Department::select('school_id', \DB::raw('count(*) as department_count'))
+            ->groupBy('school_id')
+            ->get()
+            ->keyBy('school_id');
 
         return view('livewire.admin.show-employee-table', [
             'employees' => $employees,
             'schools' => $schools,
             'departments' => $departments,
+            'departmentCounts' => $departmentCounts,
         ]);
     }
 
-    public function updateDepartments()
+    public function updateEmployees()
     {
-        $this->departments = Department::where('school_id', $this->selectedSchool)->get();
+        // Update departmentsToShow based on selected school
+        if ($this->selectedSchool) {
+            $this->departmentsToShow = Department::where('school_id', $this->selectedSchool)->get();
+        } else {
+            $this->departmentsToShow = collect(); // Reset to empty collection if no school is selected
+        }
+
+        // Ensure departmentToShow is reset if the selected school changes
+        $this->selectedDepartment = null;
+        $this->departmentToShow = null;
+    }
+
+    public function updateEmployeesByDepartment()
+    {
+        // Update departmentToShow based on selected department
+        if ($this->selectedDepartment) {
+            $this->departmentToShow = Department::find($this->selectedDepartment);
+        } else {
+            $this->departmentToShow = collect(); // Reset to empty collection if no department is selected
+        }
+    }
+
+    protected function applySearchFilters($query)
+    {
+        return $query->where(function (Builder $query) {
+            $query->where('employee_id', 'like', '%' . $this->search . '%')
+                ->orWhere('employee_firstname', 'like', '%' . $this->search . '%')
+                ->orWhere('employee_middlename', 'like', '%' . $this->search . '%')
+                ->orWhere('employee_lastname', 'like', '%' . $this->search . '%')
+                ->orWhere('employee_rfid', 'like', '%' . $this->search . '%')
+                ->orWhereHas('school', function (Builder $query) {
+                    $query->where('abbreviation', 'like', '%' . $this->search . '%')
+                        ->orWhere('school_name', 'like', '%' . $this->search . '%');
+                });
+        });
     }
     
 }
