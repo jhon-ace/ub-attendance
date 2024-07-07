@@ -1,3 +1,4 @@
+import tippy from "tippy.js";
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 

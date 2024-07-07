@@ -10,6 +10,7 @@
     @if (session('error'))
         <x-sweetalert type="error" :message="session('error')" />
     @endif
+
     <div class="flex justify-between mb-4 sm:-mt-4">
         <div class="font-bold text-md tracking-tight text-md text-black  mt-2">Admin / Manage Department</div>
     </div>
@@ -108,7 +109,10 @@
     @if($search && $departments->isEmpty())
      <p class="text-black mt-8 text-center">No employee/s found in {{ $schoolToShow->school_name }} for matching "{{ $search }}"</p>  
     @elseif(!$search && $departments->isEmpty())
-        <p class="text-black mt-8 text-center uppercase">No data available in school <text class="text-red-500">{{ $schoolToShow->abbreviation}}</text></p>
+        <p class="text-black mt-8 text-center uppercase">No data available in school <text class="text-red-500">
+            @if($schoolToShow)
+            {{ $schoolToShow->abbreviation}}
+        @endif</text></p>
     @else
 
         @if($schoolToShow)
@@ -208,7 +212,7 @@
                                                         <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                     </div>
                                                     <div class="mb-4">
-                                                        <form id="updateStaffForm" action="{{ route('admin.department.update', $department->id )}}" method="POST" class="">
+                                                        <form id="updateStaffForm" action="{{ route('admin.department.update', $department->department_id )}}" method="POST" class="">
                                                             <x-caps-lock-detector />
                                                             @csrf
                                                             @method('PUT')

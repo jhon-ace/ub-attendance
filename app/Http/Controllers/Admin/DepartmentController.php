@@ -41,18 +41,28 @@ class DepartmentController extends Controller
                 'max:255',
                 Rule::unique('departments')->where(function ($query) use ($request) {
                     return $query->where('school_id', $request->school_id);
-                }),
+                })->ignore($request->department_id, 'department_id'), // Ensure to ignore by 'department_id'
             ],
             'department_abbreviation' => 'required|string|max:255',
             'department_name' => 'required|string|max:255',
+        ], [
+            'department_id.unique' => 'The department ID is already taken in this school.',
         ]);
 
-        Department::create($validatedData);
-
-        return redirect()->route('admin.department.index')
-            ->with('success', 'Department created successfully.');
+        // Attempt to create the Department record
+        try {
+            Department::create($validatedData);
+            
+            // If creation succeeds, redirect with success message
+            return redirect()->route('admin.department.index')
+                ->with('success', 'Department created successfully.');
+        } catch (\Exception $e) {
+            // If an exception occurs (unlikely in normal validation flow)
+            // Handle any specific errors or logging as needed
+            // You can redirect back with an error message or do other error handling
+            return  redirect()->route('admin.department.index')->with('error','The department ID is already taken in this school.');
+        }
     }
-
     /**
      * Display the specified resource.
      */

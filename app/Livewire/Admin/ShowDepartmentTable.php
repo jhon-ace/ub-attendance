@@ -94,6 +94,8 @@ public function render()
         } else {
             $this->departmentsToShow = collect(); // Reset to empty collection if no school is selected
         }
+
+        
     }
 
     protected function applySearchFilters($query)

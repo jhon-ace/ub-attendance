@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
-use \App\Models\Admin\Employee;
 use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
+use Illuminate\Validation\ValidationException;
+use \App\Models\Admin\Employee;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
 class EmployeeController extends Controller
@@ -46,7 +49,7 @@ class EmployeeController extends Controller
                 'required',
                 'string',
                 'max:255',
-                // Example: 'exists:employees,employee_id' if it exists in another table
+                
             ],
             'employee_firstname' => 'required|string|max:255',
             'employee_middlename' => 'required|string|max:255',
@@ -102,36 +105,82 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
+   
+
     public function update(Request $request, Employee $employee)
     {
-        $validatedData = $request->validate([
-            'school_id' => 'required|exists:schools,id',
-            'department_id' => 'required|exists:departments,id',
-            'employee_id' => 'required|string|max:255|unique:employees,employee_id,' . $employee->id,
-            'employee_firstname' => 'required|string|max:255',
-            'employee_middlename' => 'required|string|max:255',
-            'employee_lastname' => 'required|string|max:255',
-            'employee_rfid' => 'required|string|max:255|unique:employees,employee_rfid,' . $employee->id,
-        ]);
+        try {
+            // Validate the incoming request data
+            $validatedData = $request->validate([
+                'school_id' => 'sometimes|required|exists:schools,id',
+                'department_id' => 'sometimes|required|exists:departments,id',
+                'employee_id' => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('employees')->where(function ($query) use ($request, $employee) {
+                        if (isset($request->department_id)) {
+                            return $query->where('department_id', $request->department_id)
+                                        ->where('id', '!=', $employee->id);
+                        }
+                        // Handle the case when department_id is not set
+                        return $query->where('id', '!=', $employee->id);
+                    }),
+                ],
+                'employee_firstname' => 'sometimes|required|string|max:255',
+                'employee_middlename' => 'sometimes|required|string|max:255',
+                'employee_lastname' => 'sometimes|required|string|max:255',
+                'employee_rfid' => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('employees')->where(function ($query) use ($request, $employee) {
+                        if (isset($request->department_id)) {
+                            return $query->where('department_id', $request->department_id)
+                                        ->where('employee_rfid', '!=', $employee->employee_rfid);
+                        }
+                        // Handle the case when department_id is not set
+                        return $query->where('employee_rfid', '!=', $employee->employee_rfid);
+                    }),
+                ],
+            ]);
 
-        // Check for changes
-        $changesDetected = false;
-        foreach ($validatedData as $key => $value) {
-            if ($employee->$key !== $value) {
-                $changesDetected = true;
-                break;
+            // Check if department_id is set in validatedData
+            $departmentId = $validatedData['department_id'] ?? null;
+
+            // Check if employee_id already exists in the selected department
+            if (isset($validatedData['employee_id']) && $departmentId &&
+                Employee::where('employee_id', $validatedData['employee_id'])
+                        ->where('department_id', $departmentId)
+                        ->where('id', '!=', $employee->id)
+                        ->exists()) {
+                $existingEmployee = Employee::where('employee_id', $validatedData['employee_id'])
+                                            ->where('department_id', $departmentId)
+                                            ->first();
+                return redirect()->route('admin.employee.index')->with('error', 'Employee ID: ' . $validatedData['employee_id'] . ' is already taken by ' . $existingEmployee->employee_lastname . ', ' . $existingEmployee->employee_firstname . ' in the selected department.');
             }
+
+            // Update the employee with validated data
+            $employee->fill($validatedData);
+
+            if (!$employee->isDirty()) {
+                return redirect()->route('admin.employee.index')->with('info', 'No changes were made.');
+            }
+
+            $employee->save();
+
+            return redirect()->route('admin.employee.index')->with('success', 'Employee updated successfully.');
+
+        } catch (ValidationException $e) {
+            $errors = $e->errors();
+            return redirect()->back()->withErrors($errors)->with('error', $errors['employee_id'][0] ?? 'Validation error');
         }
-
-        if (!$changesDetected) {
-            return redirect()->route('admin.employee.index')->with('info', 'No changes were made.');
-        }
-
-        // Update the employee record
-        $employee->update($validatedData);
-
-        return redirect()->route('admin.employee.index')->with('success', 'Employee updated successfully.');
     }
+
+
+
 
 
     /**

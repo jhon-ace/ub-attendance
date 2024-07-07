@@ -3,7 +3,7 @@
                         window.addEventListener('resize', () => {
                             isFullScreen = (window.innerHeight === screen.height);
                         });
-                    " x-show="!isFullScreen" id="sidebarContainer" class="fixed flex flex-col left-0 w-14 hover:w-48 md:w-48 bg-[#263544]  h-full text-black transition-all duration-300 border-r-2 border-gray-300 dark:border-gray-600 z-10 sidebar">
+                    " x-show="!isFullScreen" id="sidebarContainer"  class="fixed flex flex-col left-0 w-14 hover:w-48 md:w-48 bg-[#263544]  h-full text-black transition-all duration-300 border-r-2 border-gray-300 dark:border-gray-600 z-10 sidebar">
         <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-0.5">
             <ul class="flex flex-col py-2 space-y-1 text-gray-800" >
                 <a href="#" class="flex justify-center items-center">
@@ -26,7 +26,7 @@
                         <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Dashboard</span>
                     </a>
                 </li>
-                <li>
+                <li >
                     <a href="{{ route('admin.school.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
                     {{ request()->routeIs('admin.school.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                         <span class="inline-flex justify-center items-center ml-4">
@@ -203,6 +203,8 @@
 @else
 
 @endif
+
+
 <!-- end of admin navigation -->
     <script>
             function confirmLogout(event) {
