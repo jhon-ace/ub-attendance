@@ -53,13 +53,11 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('staff', [AdminStaffController::class, 'deleteAll'])->name('staff.deleteAll');
 
         // Employee routes
-        Route::resource('employee', EmployeeController::class)->names([
-            'index' => 'employee.index',
-            'create' => 'employee.create',
-            'store' => 'employee.store',
-            'edit' => 'employee.edit',
-            'update' => 'employee.update'
-        ]);
+        Route::get('/employees', [EmployeeController::class, 'index'])->name('employee.index');
+        Route::post('/employees', [EmployeeController::class, 'store'])->name('employee.store');
+        Route::get('/employees/{employee_id}/edit', [EmployeeController::class, 'edit'])->name('employee.edit');
+        Route::put('/employees/{employee_id}', [EmployeeController::class, 'update'])->name('employee.update');
+        Route::delete('/employees/{employee_id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
         Route::delete('employee', [EmployeeController::class, 'deleteAll'])->name('employee.deleteAll');
 
         // Student routes

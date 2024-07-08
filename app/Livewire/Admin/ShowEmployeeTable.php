@@ -60,7 +60,7 @@ class ShowEmployeeTable extends Component
 
     public function render()
     {
-        $query = Employee::with('school');
+        $query = Employee::with('department')->with('school');
 
         // Apply search filters
         $query = $this->applySearchFilters($query);
@@ -115,15 +115,18 @@ class ShowEmployeeTable extends Component
         $this->departmentToShow = null;
     }
 
-    public function updateEmployeesByDepartment()
-    {
-        // Update departmentToShow based on selected department
-        if ($this->selectedDepartment) {
-            $this->departmentToShow = Department::find($this->selectedDepartment);
-        } else {
-            $this->departmentToShow = collect(); // Reset to empty collection if no department is selected
-        }
+public function updateEmployeesByDepartment()
+{
+    if ($this->selectedDepartment && $this->selectedSchool) {
+        $this->departmentToShow = Department::where('department_id', $this->selectedDepartment)
+                                            ->where('school_id', $this->selectedSchool)
+                                            ->first();
+    } else {
+        $this->departmentToShow = null;
     }
+}
+
+
 
     protected function applySearchFilters($query)
     {

@@ -46,7 +46,7 @@ class DepartmentController extends Controller
             'department_abbreviation' => 'required|string|max:255',
             'department_name' => 'required|string|max:255',
         ], [
-            'department_id.unique' => 'The department ID is already taken in this school.',
+            'department_id.unique' => 'The department ID is not valid.',
         ]);
 
         // Attempt to create the Department record

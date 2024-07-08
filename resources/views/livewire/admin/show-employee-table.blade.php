@@ -14,52 +14,46 @@
         <div class="font-bold text-md tracking-tight text-md text-black  mt-2">Admin / Manage Employee</div>
     </div>
 
-    <div class="flex flex-column overflow-x-auto -mb-5">
-        <div class="col-span-3  p-4">
-            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display employee by school:</label>
-            <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
-                    class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
-                    required>
-                <option value="">Select School</option>
-                @foreach($schools as $school)
-                    <option value="{{ $school->id }}">{{ $school->id }} | {{ $school->abbreviation }} - {{ $school->school_name }}</option>
-                @endforeach
-            </select>
-             @if($schoolToShow)
-                <p class="text-black mt-2 text-sm mb-1 ">Selected School ID: <text class="text-red-500 ml-2">{{ $schoolToShow->id }}</text></p>
-                <p class="text-black  text-sm ml-4">Selected School: <text class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</text></p>
-            @else
-                
-            @endif
-        </div>
+        <div class="flex flex-column overflow-x-auto -mb-5">
+            <div class="col-span-3 p-4">
+                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display employee by school:</label>
+                <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
+                        class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
+                        required>
+                    <option value="">Select School</option>
+                    @foreach($schools as $school)
+                        <option value="{{ $school->id }}">{{ $school->id }} | {{ $school->abbreviation }} - {{ $school->school_name }}</option>
+                    @endforeach
+                </select>
+                @if($schoolToShow)
+                    <p class="text-black mt-2 text-sm mb-1 ">Selected School ID: <span class="text-red-500 ml-2">{{ $schoolToShow->id }}</span></p>
+                    <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p>
+                @endif
+            </div>
+
         <div class="col-span-1 p-4">
             @if(!empty($selectedSchool))
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display by department:</label>
-                <select x-data="{ noDepartmentSelected: false }"
-                        x-init="noDepartmentSelected = {{ $departments->isEmpty() ? 'true' : 'false' }}"
-                        wire:model="selectedDepartment"
-                        id="school_id" name="school_id"
+                <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display by department:</label>
+                <select wire:model="selectedDepartment" id="department_id" name="department_id"
                         wire:change="updateEmployeesByDepartment"
-                        class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
-                        :disabled="noDepartmentSelected" required>
-                    
+                        class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
+                        required>
                     @if($departments->isEmpty())
-                        <option value="0" x-bind:class="{ 'cursor-not-allowed': noDepartmentSelected }">No Department</option>
+                        <option value="0">No Departments</option>
                     @else
                         <option value="">Select Department</option>
                         @foreach($departments as $department)
-                            <option value="{{ $department->department_id }}">{{$department->department_id}} | {{$department->department_abbreviation}} - {{$department->department_name}}</option>
+                            <option value="{{ $department->id }}">{{ $department->department_id }} | {{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
                         @endforeach
                     @endif
                 </select>
                 @if($departmentToShow)
-                    <p class="text-black mt-2 text-sm mb-1 ">Selected School ID: <text class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</text></p>
-                    <p class="text-black  text-sm ml-4">Selected School: <text class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</text></p>
-                @else
-                    
+                    <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p>
+                    <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p>
                 @endif
-            @endif  
+            @endif
         </div>
+
     </div>
     <hr class="border-gray-200 my-4">
         @if(!$schoolToShow)
@@ -80,10 +74,10 @@
             <div class="flex justify-center items-center mt-5">
                 <div x-data="{ open: false }">
                     <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
-                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Employee in {{$departmentToShow->department_abbreviation}} - {{$departmentToShow->department_name}} department
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> {{$departmentToShow->department_id}} - {{$departmentToShow->department_name}}
                     </button>
                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <div @click.away="open = false" class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
+                        <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
                             <div class="flex justify-between items-center pb-3">
                                 <p class="text-xl font-bold">Add Employee</p>
                                 <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
@@ -139,7 +133,7 @@
                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                             <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }} | {{ $departmentToShow->school->school_name }}</option>
                                         </select>
-                                        <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                        <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                     </div>
 
                                     <div class="mb-2">
@@ -147,9 +141,12 @@
                                         <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
                                             <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }} | {{ $departmentToShow->department_name }}</option>
                                         </select>
-                                        <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
+                                        <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                     </div>
-
+                                    @if($departmentToShow)
+                    <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p>
+                    <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p>
+                @endif
                                     <div class="flex mb-4 mt-10 justify-center">
                                         <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
                                             Save
@@ -160,7 +157,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         @else
             <div class="flex justify-between">
@@ -183,7 +179,7 @@
                             <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> {{$departmentToShow->department_id}} - {{$departmentToShow->department_name}}
                         </button>
                         <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                            <div @click.away="open = false" class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
+                            <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
                                 <div class="flex justify-between items-center pb-3">
                                     <p class="text-xl font-bold">Add Employee</p>
                                     <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
@@ -247,9 +243,12 @@
                                             <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
                                                 <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }} | {{ $departmentToShow->department_name }}</option>
                                             </select>
-                                            <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
+                                            <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                         </div>
-
+            @if($schoolToShow)
+                <p class="text-black mt-2 text-sm mb-1 ">Selected School ID: <span class="text-red-500 ml-2">{{ $schoolToShow->id }}</span></p>
+                <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p>
+            @endif
                                         <div class="flex mb-4 mt-10 justify-center">
                                             <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
                                                 Save
@@ -278,9 +277,6 @@
                         </tr> -->
                         <tr>
                             <th class="border border-gray-400 px-3 py-2">
-                                Photo
-                            </th>
-                            <th class="border border-gray-400 px-3 py-2">
 
                                 <button wire:click="sortBy('employee_id')" class="w-full h-full flex items-center justify-center">
                                     ID
@@ -292,8 +288,9 @@
                                         @endif
                                     @endif
                                 </button>
-                                   
-
+                            </th>
+                            <th class="border border-gray-400 px-3 py-2">
+                                Photo
                             </th>
                             <th class="border border-gray-400 px-3 py-2">
                                 <button wire:click="sortBy('employee_lastname')" class="w-full h-full flex items-center justify-center">
@@ -374,6 +371,7 @@
                         
                         @foreach ($employees as $employee)
                             <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
+                                <td class="text-black border border-gray-400">{{ $employee->employee_id}}</td>
                                 <td class="text-black border border-gray-400 border-t-0 border-r-0 px-4 py-2 flex items-center justify-center" >
                                     @if ($employee->employee_photo && Storage::exists('public/employee_photo/' . $employee->employee_photo))
                                         <a  href="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" 
@@ -386,84 +384,89 @@
                                     @endif
                                 </td>
 
-                                <td x-data="{ editing: false, DepartmentID: '{{$employee->department_id}}', value: '{{ $employee->employee_id }}', originalValue: '{{ $employee->employee_id }}' }"
-                                    x-on:click="editing = true"
-                                    x-on:blur="cancelEdit"
-                                    x-on:click.outside="cancelEdit"
-                                    class="text-black border border-gray-400 cursor-pointer relative">
-                                    <span x-show="!editing">{{ $employee->employee_id }}</span>
-
-                                    <form x-show="editing" x-on:submit.prevent="submitForm" x-bind:action="'{{ route('admin.employee.update', $employee->department_id) }}'" method="POST"
-                                    x-ref="updateForm">
-                                        @csrf
-                                        @method('PUT')
-
-                                        <input type="hidden" name="employee_id" x-model="value">
-                                        <input type="hidden" name="department_id" x-model="DepartmentID">
-
-                                        <input x-show="editing"
-                                        x-model="value"
-                                        value= "{{ $employee->employee_id }}"
-                                            x-on:keydown.enter.prevent="confirmUpdate"
-                                        class="text-black border-none cursor-pointer">
-
-                                    </form>
-                                </td>
+                               
                                 <td class="text-black border border-gray-400">{{ $employee->employee_lastname}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->employee_firstname}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->employee_middlename}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->employee_rfid}}</td>
-                                <td class="text-black border border-gray-400">{{ $employee->department->department_name}}</td>
+                                <td class="text-black border border-gray-400">{{ $employee->department->department_id}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->school->school_name}}</td>
                                 <td class="text-black border border-gray-400 px-1 py-1">
                                     <div class="flex justify-center items-center space-x-2">
                                         <div x-data="{ open: false, 
                                                 id: '{{ $employee->employee_id }}', 
                                                 employee_id: '{{ $employee->employee_id }}',
-                                                employee_abbreviation: '{{ $employee->employee_lastname }}',
-                                                school: '{{ $employee->employee_firstname }}',
-                                                employee_name: '{{ $employee->employee_middlename }}',
+                                                employee_lastname: '{{ $employee->employee_lastname }}',
+                                                employee_firstname: '{{ $employee->employee_firstname }}',
+                                                employee_middlename: '{{ $employee->employee_middlename }}',
+                                                employee_rfid: '{{ $employee->employee_rfid }}',
                                                 }">
                                             <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                                                 <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i>
                                             </a>
                                             <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
+                                                <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto  mx-auto">
                                                     <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
                                                         <p class="text-xl font-bold">Edit employee</p>
                                                         <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                     </div>
                                                     <div class="mb-4">
-                                                        <form id="updateStaffForm" action="{{ route('admin.employee.update', $employee->employee_id )}}" method="POST" class="">
+                                                        <form id="updateStaffForm" action="{{ route('admin.employee.update', $employee->employee_id, $employee->department_id, $employee->school_id )}}" method="POST" class="">
                                                             <x-caps-lock-detector />
                                                             @csrf
                                                             @method('PUT')
                                                                 <div class="mb-4">
-                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">employee belongs to:</label>
-                                                                    <select id="school_id" name="school_id" x-model="school" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                                                        @foreach($schools as $school)
-                                                                            <option value="{{ $school->id }}" {{ $employee->school_id == $school->id ? 'selected' : '' }}>
-                                                                                {{ $school->abbreviation }} - {{ $school->school_name }}
-                                                                            </option>
-                                                                        @endforeach
-                                                                    </select>
+                                                                    <input type="file" name="employee_photo" id="teacher_photo" class="hidden" accept="image/*" onchange="previewImage(event)">
+                                                                    <label for="employee_photo" class="cursor-pointer flex flex-col items-center">
+                                                                        <div id="imagePreviewContainer" class="mb-2 text-center">
+                                                                            <img id="imagePreview" src="{{ $employee->employee_photo ? asset('storage/employee_photo/' . $employee->employee_photo) : asset('assets/img/user.png') }}"
+                                                                            class="rounded-lg w-48 h-auto" onerror="handleImageError(this)">
+                                                                        </div>
+                                                                        <span class="text-sm text-gray-500">Select Photo</span>
+                                                                        <span id="errorMessage" class="text-sm" style="display: none; color: red;">Failed to load image from database, default photo displayed.</span>
+                                                                        
+                                                                    </label>
+                                                                    <x-input-error :messages="$errors->get('employee_photo')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee School ID</label>
+                                                                    <input type="text" readonly name="school_id" id="school_id" x-model="employee_id" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required autofocus>
                                                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                                                 </div>
                                                                 <div class="mb-4">
-                                                                    <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">employee School ID</label>
-                                                                    <input type="text" name="employee_id" id="employee_id" x-model="employee_id" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_id') is-invalid @enderror" required autofocus>
-                                                                    <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
-                                                                </div>
-                                                                <div class="mb-4">
-                                                                    <label for="employee_abbreviation" class="block text-gray-700 text-md font-bold mb-2 text-left">employee Abbreviation</label>
-                                                                    <input type="text" name="employee_abbreviation" id="employee_abbreviation" x-model="employee_abbreviation" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_abbreviation') is-invalid @enderror" required>
-                                                                    <x-input-error :messages="$errors->get('employee_abbreviation')" class="mt-2" />
+                                                                    <label for="employee_lastname" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Lastname</label>
+                                                                    <input type="text" name="employee_lastname" id="employee_lastname" x-model="employee_lastname" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_lastname') is-invalid @enderror" required>
+                                                                    <x-input-error :messages="$errors->get('employee_lastname')" class="mt-2" />
                                                                 </div>
 
                                                                 <div class="mb-4">
-                                                                    <label for="employee_name" class="block text-gray-700 text-md font-bold mb-2 text-left">employee Name</label>
-                                                                    <input type="text" name="employee_name" id="employee_name" x-model="employee_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_name') is-invalid @enderror" required>
-                                                                    <x-input-error :messages="$errors->get('employee_name')" class="mt-2" />
+                                                                    <label for="employee_firstname" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Firstname</label>
+                                                                    <input type="text" name="employee_firstname" id="employee_firstname" x-model="employee_firstname" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_firstname') is-invalid @enderror" required>
+                                                                    <x-input-error :messages="$errors->get('employee_firstname')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="employee_middlename" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Middlename</label>
+                                                                    <input type="text" name="employee_middlename" id="employee_middlename" x-model="employee_middlename" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_middlename') is-invalid @enderror" required>
+                                                                    <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="employee_rfid" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee RFID No</label>
+                                                                    <input type="text" name="employee_rfid" id="employee_rfid" x-model="employee_rfid" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_middlename') is-invalid @enderror" required>
+                                                                    <x-input-error :messages="$errors->get('employee_rfid')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School:</label>
+                                                                    <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
+                                                                        <option value="{{ $departmentToShow->school_id }}">{{ $departmentToShow->school_id }} | {{ $departmentToShow->school->school_name }}</option>
+                                                                    </select>
+                                                                    <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department:</label>
+                                                                    <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
+                                                                        <option value="{{ $departmentToShow->department_id }}">{{ $departmentToShow->department_id }} | {{ $departmentToShow->department_name }}</option>
+                                                                    </select>
+                                                                    <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
                                                                 </div>
                                                             <div class="flex mb-4 mt-10 justify-center">
                                                                 <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">

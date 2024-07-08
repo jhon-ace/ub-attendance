@@ -33,57 +33,74 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'school_id' => 'required|exists:schools,id',
-            'department_id' => [
-                'required',
-                'exists:departments,id',
-                Rule::unique('employees')->where(function ($query) use ($request) {
-                    return $query->where('employee_id', $request->employee_id)
-                        ->where('department_id', '!=', $request->department_id);
-                }),
-            ],
-            'employee_id' => [
-                'required',
-                'string',
-                'max:255',
-                
-            ],
-            'employee_firstname' => 'required|string|max:255',
-            'employee_middlename' => 'required|string|max:255',
-            'employee_lastname' => 'required|string|max:255',
-            'employee_rfid' => 'required|string|max:255|unique:employees',
-            'employee_photo' => 'image|max:2048', // Example: validation for image upload
-        ]);
+        public function store(Request $request)
+        {
+            // Validate input data
+            $request->validate([
+                'school_id' => 'required|exists:schools,id',
+                'department_id' => [
+                    'required',
+                    'exists:departments,id',
+                ],
+                'employee_id' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
+                'employee_firstname' => 'required|string|max:255',
+                'employee_middlename' => 'required|string|max:255',
+                'employee_lastname' => 'required|string|max:255',
+                'employee_rfid' => 'required|string|max:255',
+                'employee_photo' => 'image|max:2048', // Example: validation for image upload
+            ]);
 
-        // Handle file upload if 'employee_photo' is present
-        if ($request->hasFile('employee_photo')) {
-            $fileNameWithExt = $request->file('employee_photo')->getClientOriginalName();
-            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
-            $extension = $request->file('employee_photo')->getClientOriginalExtension();
-            $fileNameToStore = $filename . '_' . time() . '.' . $extension;
-            $path = $request->file('employee_photo')->storeAs('public/employee_photo', $fileNameToStore);
-        } else {
-            $fileNameToStore = 'user.png'; // Default file if no photo is uploaded
+            // Handle file upload if 'employee_photo' is present
+            if ($request->hasFile('employee_photo')) {
+                $fileNameWithExt = $request->file('employee_photo')->getClientOriginalName();
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+                $extension = $request->file('employee_photo')->getClientOriginalExtension();
+                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+                $path = $request->file('employee_photo')->storeAs('public/employee_photo', $fileNameToStore);
+            } else {
+                $fileNameToStore = 'user.png'; // Default file if no photo is uploaded
+            }
+
+            // Check if an employee with the same employee_id or employee_rfid already exists
+            $existingEmployeeById = Employee::where('employee_id', $request->input('employee_id'))->first();
+            $existingEmployeeByRfid = Employee::where('employee_rfid', $request->input('employee_rfid'))->first();
+
+            if (!$existingEmployeeById && !$existingEmployeeByRfid) {
+                $employee = new Employee();
+                $employee->school_id = $request->input('school_id');
+                $employee->department_id = $request->input('department_id');
+                $employee->employee_id = $request->input('employee_id');
+                $employee->employee_firstname = $request->input('employee_firstname');
+                $employee->employee_middlename = $request->input('employee_middlename');
+                $employee->employee_rfid = $request->input('employee_rfid');
+                $employee->employee_lastname = $request->input('employee_lastname');
+                $employee->employee_photo = $fileNameToStore;
+                $employee->save();
+
+                return redirect()->route('admin.employee.index')
+                    ->with('success', 'Employee created successfully.');
+            } else {
+                $errorMessage = '';
+                if ($existingEmployeeById) {
+                    $employeeName = $existingEmployeeById->employee_firstname . ' ' . $existingEmployeeById->employee_lastname;
+                    $errorMessage .= 'Employee ID ' . $request->input('employee_id') . ' is already taken by ' . $employeeName . '. ';
+                }
+                if ($existingEmployeeByRfid) {
+                    $employeeName = $existingEmployeeByRfid->employee_firstname . ' ' . $existingEmployeeByRfid->employee_lastname;
+                    $errorMessage .= 'RFID ' . $request->input('employee_rfid') . ' is already taken by ' . $employeeName . '. ';
+                }
+
+                return redirect()->route('admin.employee.index')
+                    ->with('error', $errorMessage . 'Try again.');
+            }
         }
 
-        $employee = new Employee();
-        $employee->school_id = $request->input('school_id');
-        $employee->department_id = $request->input('department_id');
-        $employee->employee_id= $request->input('employee_id');
-        $employee->employee_firstname = $request->input('employee_firstname');
-        $employee->employee_middlename = $request->input('employee_middlename');
-        $employee->employee_rfid = $request->input('employee_rfid');
-        $employee->employee_lastname = $request->input('employee_lastname');
-        $employee->employee_photo = $fileNameToStore;
-        $employee->save();
 
 
-        return redirect()->route('admin.employee.index')
-            ->with('success', 'Employee created successfully.');
-    }
 
 
     /**
@@ -107,77 +124,75 @@ class EmployeeController extends Controller
      */
    
 
-    public function update(Request $request, Employee $employee)
-    {
-        try {
-            // Validate the incoming request data
-            $validatedData = $request->validate([
-                'school_id' => 'sometimes|required|exists:schools,id',
-                'department_id' => 'sometimes|required|exists:departments,id',
-                'employee_id' => [
-                    'sometimes',
-                    'required',
-                    'string',
-                    'max:255',
-                    Rule::unique('employees')->where(function ($query) use ($request, $employee) {
-                        if (isset($request->department_id)) {
-                            return $query->where('department_id', $request->department_id)
-                                        ->where('id', '!=', $employee->id);
-                        }
-                        // Handle the case when department_id is not set
-                        return $query->where('id', '!=', $employee->id);
-                    }),
-                ],
-                'employee_firstname' => 'sometimes|required|string|max:255',
-                'employee_middlename' => 'sometimes|required|string|max:255',
-                'employee_lastname' => 'sometimes|required|string|max:255',
-                'employee_rfid' => [
-                    'sometimes',
-                    'required',
-                    'string',
-                    'max:255',
-                    Rule::unique('employees')->where(function ($query) use ($request, $employee) {
-                        if (isset($request->department_id)) {
-                            return $query->where('department_id', $request->department_id)
-                                        ->where('employee_rfid', '!=', $employee->employee_rfid);
-                        }
-                        // Handle the case when department_id is not set
-                        return $query->where('employee_rfid', '!=', $employee->employee_rfid);
-                    }),
-                ],
-            ]);
+   public function update(Request $request, $employee_id)
+{
+    // Validate the request
+    $validatedData = $request->validate([
+        'employee_firstname' => 'sometimes|required|string|max:255',
+        'employee_middlename' => 'sometimes|required|string|max:255',
+        'employee_lastname' => 'sometimes|required|string|max:255',
+        'employee_rfid' => [
+            'sometimes',
+            'required',
+            'string',
+            'max:255',
+            Rule::unique('employees')->ignore($employee_id, 'employee_id'),
+        ],
+        'school_id' => 'required|string|max:255',
+        'department_id' => 'required|string|max:255',
+        'employee_photo' => 'image|max:2048', // Example: validation for image upload
+    ]);
 
-            // Check if department_id is set in validatedData
-            $departmentId = $validatedData['department_id'] ?? null;
+    try {
+        // Retrieve the employee by employee_id
+        $employee = Employee::findOrFail($employee_id);
 
-            // Check if employee_id already exists in the selected department
-            if (isset($validatedData['employee_id']) && $departmentId &&
-                Employee::where('employee_id', $validatedData['employee_id'])
-                        ->where('department_id', $departmentId)
-                        ->where('id', '!=', $employee->id)
-                        ->exists()) {
-                $existingEmployee = Employee::where('employee_id', $validatedData['employee_id'])
-                                            ->where('department_id', $departmentId)
-                                            ->first();
-                return redirect()->route('admin.employee.index')->with('error', 'Employee ID: ' . $validatedData['employee_id'] . ' is already taken by ' . $existingEmployee->employee_lastname . ', ' . $existingEmployee->employee_firstname . ' in the selected department.');
+        // Update the employee fields based on request data
+        $employee->employee_firstname = $request->input('employee_firstname', $employee->employee_firstname);
+        $employee->employee_middlename = $request->input('employee_middlename', $employee->employee_middlename);
+        $employee->employee_lastname = $request->input('employee_lastname', $employee->employee_lastname);
+        $employee->employee_rfid = $request->input('employee_rfid', $employee->employee_rfid);
+        $employee->school_id = $request->input('school_id', $employee->school_id);
+        $employee->department_id = $request->input('department_id', $employee->department_id);
+
+        // Handle file upload if 'employee_photo' is present
+        if ($request->hasFile('employee_photo')) {
+            // Delete old employee photo if it exists
+            if ($employee->employee_photo) {
+                Storage::delete('public/employee_photo/' . $employee->employee_photo);
             }
 
-            // Update the employee with validated data
-            $employee->fill($validatedData);
-
-            if (!$employee->isDirty()) {
-                return redirect()->route('admin.employee.index')->with('info', 'No changes were made.');
-            }
-
-            $employee->save();
-
-            return redirect()->route('admin.employee.index')->with('success', 'Employee updated successfully.');
-
-        } catch (ValidationException $e) {
-            $errors = $e->errors();
-            return redirect()->back()->withErrors($errors)->with('error', $errors['employee_id'][0] ?? 'Validation error');
+            // Store new employee photo
+            $fileNameWithExt = $request->file('employee_photo')->getClientOriginalName();
+            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+            $extension = $request->file('employee_photo')->getClientOriginalExtension();
+            $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+            $path = $request->file('employee_photo')->storeAs('public/employee_photo', $fileNameToStore);
+            $employee->employee_photo = $fileNameToStore;
         }
+
+        // Save the updated employee record
+        $employee->save();
+
+        // Redirect back to the employee index page with success message
+        return redirect()->route('employee.index')->with('success', 'Employee updated successfully.');
+
+    } catch (ModelNotFoundException $e) {
+        // Handle model not found exception (e.g., if employee_id doesn't exist)
+        return redirect()->route('employee.index')->with('error', 'Employee not found.');
+    } catch (ValidationException $e) {
+        // Handle validation errors
+        return redirect()->back()->withErrors($e->validator->errors())->withInput();
+    } catch (\Exception $e) {
+        // Handle other unexpected errors
+        \Log::error('Error updating employee: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'Failed to update employee. Please try again later.');
     }
+}
+
+
+
+
 
 
 
