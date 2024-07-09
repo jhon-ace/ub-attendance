@@ -28,14 +28,14 @@
             </select>
             
             @if($schoolToShow)
-                <form id="deleteAll" action="{{ route('admin.department.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);" class="flex ml-4">
+                <!-- <form id="deleteAll" action="{{ route('admin.department.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);" class="flex ml-4">
                 @csrf
                 @method('DELETE')
                 <input type="hidden" name="school_id" id="school_id_to_delete">
                 <button type="submit" class="text-xs lg:text-sm bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-700">
                     <i class="fa-solid fa-trash fa-sm"></i>
                 </button>
-            </form>
+            </form> -->
             @else
                 
             @endif
@@ -212,7 +212,7 @@
                                                         <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                     </div>
                                                     <div class="mb-4">
-                                                        <form id="updateStaffForm" action="{{ route('admin.department.update', $department->department_id )}}" method="POST" class="">
+                                                        <form id="updateStaffForm" action="{{ route('admin.department.update', $department->id )}}" method="POST" class="">
                                                             <x-caps-lock-detector />
                                                             @csrf
                                                             @method('PUT')

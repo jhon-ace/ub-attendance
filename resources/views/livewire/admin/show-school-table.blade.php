@@ -48,8 +48,8 @@
         </div>
     </div>
     <hr class="border-gray-200 my-4">
-    <div class="flex items-center mb-4 justify-between">
-    <div class="flex w-24 mr-2 sm:mr-0">
+    <div class="flex items-center mb-4 justify-end">
+    <!-- <div class="flex w-24 mr-2 sm:mr-0">
         <form id="deleteAll" action="{{ route('admin.school.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);">
             @csrf
             @method('DELETE')
@@ -57,7 +57,7 @@
                 Delete All
             </button>
         </form>
-    </div>
+    </div> -->
     <div class="flex w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2">
         <input wire:model.live="search" type="text" class="border text-black border-gray-300 rounded-md p-2 w-full" placeholder="Search..." autofocus>
     </div>

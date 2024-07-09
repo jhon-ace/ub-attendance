@@ -143,10 +143,6 @@
                                         </select>
                                         <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                     </div>
-                                    @if($departmentToShow)
-                    <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p>
-                    <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p>
-                @endif
                                     <div class="flex mb-4 mt-10 justify-center">
                                         <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
                                             Save
@@ -161,17 +157,21 @@
         @else
             <div class="flex justify-between">
                 <div class="">
-                    <form id="deleteAll" action="{{ route('admin.employee.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);" class="flex ml-4">
+                    @if($departmentToShow)
+                    <!-- <form id="deleteAll" action="{{ route('admin.employee.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);" class="flex ml-4">
                         @csrf
                         @method('DELETE')
-                        <input type="hidden" name="school_id" id="school_id_to_delete">
+                        <input type="hidden" name="department_id" value="{{$departmentToShow->id }}" id="department_id_to_delete">
                         
                         <button type="submit" class="text-xs lg:text-sm bg-red-500 text-white px-3 py-2 -ml-3 -mt-1 rounded-md hover:bg-red-700
                             @if(empty($selectedSchool) || empty($selectedDepartment)) cursor-not-allowed opacity-50 @endif"
                             @if(empty($selectedSchool) || empty($selectedDepartment)) disabled @endif>
                             <i class="fa-solid fa-trash fa-sm"></i> Delete All Records
                         </button>
-                    </form>
+                    </form> -->
+                    @else
+
+                    @endif
                 </div>
                 <div class="flex justify-center items-center">
                     <div x-data="{ open: false }">
@@ -245,10 +245,6 @@
                                             </select>
                                             <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                         </div>
-            @if($schoolToShow)
-                <p class="text-black mt-2 text-sm mb-1 ">Selected School ID: <span class="text-red-500 ml-2">{{ $schoolToShow->id }}</span></p>
-                <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p>
-            @endif
                                         <div class="flex mb-4 mt-10 justify-center">
                                             <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
                                                 Save
@@ -281,6 +277,18 @@
                                 <button wire:click="sortBy('employee_id')" class="w-full h-full flex items-center justify-center">
                                     ID
                                     @if ($sortField == 'employee_id')
+                                        @if ($sortDirection == 'asc')
+                                            &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                        @else
+                                            &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                        @endif
+                                    @endif
+                                </button>
+                            </th>
+                            <th class="border border-gray-400 px-3 py-2">
+                                <button wire:click="sortBy('employee_rfid')" class="w-full h-full flex items-center justify-center">
+                                    RFID No
+                                    @if ($sortField == 'employee_rfid')
                                         @if ($sortDirection == 'asc')
                                             &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
                                         @else
@@ -329,18 +337,6 @@
                                 </button>
                             </th>
                             <th class="border border-gray-400 px-3 py-2">
-                                <button wire:click="sortBy('employee_rfid')" class="w-full h-full flex items-center justify-center">
-                                    RFID No
-                                    @if ($sortField == 'employee_rfid')
-                                        @if ($sortDirection == 'asc')
-                                            &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                        @else
-                                            &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                        @endif
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="border border-gray-400 px-3 py-2">
                                 <button wire:click="sortBy('department_id')" class="w-full h-full flex items-center justify-center">
                                     Department
                                     @if ($sortField == 'department_id')
@@ -368,11 +364,11 @@
                         </tr>
                     </thead>
                     <tbody >
-                        
                         @foreach ($employees as $employee)
                             <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
                                 <td class="text-black border border-gray-400">{{ $employee->employee_id}}</td>
-                                <td class="text-black border border-gray-400 border-t-0 border-r-0 px-4 py-2 flex items-center justify-center" >
+                                <td class="text-black border border-gray-400">{{ $employee->employee_rfid}}</td>
+                                <td class="text-black border border-gray-400 border-t-0 border-r-0 border-l-0 px-2 py-1 flex items-center justify-center" >
                                     @if ($employee->employee_photo && Storage::exists('public/employee_photo/' . $employee->employee_photo))
                                         <a  href="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" 
                                             class="hover:border border-red-500 rounded-full" title="Click to view Picture"
@@ -383,25 +379,16 @@
                                         <img data-fancybox src="{{ asset('assets/img/user.png') }}" class="cursor-pointer w-9 h-9 hover:border hover:border-red-500 rounded-full" title="Click to view Picture" >
                                     @endif
                                 </td>
-
-                               
                                 <td class="text-black border border-gray-400">{{ $employee->employee_lastname}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->employee_firstname}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->employee_middlename}}</td>
-                                <td class="text-black border border-gray-400">{{ $employee->employee_rfid}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->department->department_id}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->school->school_name}}</td>
-                                <td class="text-black border border-gray-400 px-1 py-1">
+                                <td class="text-black border border-gray-400">
                                     <div class="flex justify-center items-center space-x-2">
-                                        <div x-data="{ open: false, 
-                                                id: '{{ $employee->employee_id }}', 
-                                                employee_id: '{{ $employee->employee_id }}',
-                                                employee_lastname: '{{ $employee->employee_lastname }}',
-                                                employee_firstname: '{{ $employee->employee_firstname }}',
-                                                employee_middlename: '{{ $employee->employee_middlename }}',
-                                                employee_rfid: '{{ $employee->employee_rfid }}',
+                                        <div x-data="{ open: false
                                                 }">
-                                            <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
+                                            <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-[5px] rounded hover:bg-blue-700">
                                                 <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i>
                                             </a>
                                             <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -411,62 +398,64 @@
                                                         <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                     </div>
                                                     <div class="mb-4">
-                                                        <form id="updateStaffForm" action="{{ route('admin.employee.update', $employee->employee_id, $employee->department_id, $employee->school_id )}}" method="POST" class="">
+                                                        <form action="{{ route('admin.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
                                                             <x-caps-lock-detector />
                                                             @csrf
                                                             @method('PUT')
+
                                                                 <div class="mb-4">
-                                                                    <input type="file" name="employee_photo" id="teacher_photo" class="hidden" accept="image/*" onchange="previewImage(event)">
+                                                                    <input type="file" name="employee_photo" id="employee_photo" class="hidden" accept="image/*" onchange="previewImage(event)">
                                                                     <label for="employee_photo" class="cursor-pointer flex flex-col items-center">
                                                                         <div id="imagePreviewContainer" class="mb-2 text-center">
                                                                             <img id="imagePreview" src="{{ $employee->employee_photo ? asset('storage/employee_photo/' . $employee->employee_photo) : asset('assets/img/user.png') }}"
                                                                             class="rounded-lg w-48 h-auto" onerror="handleImageError(this)">
                                                                         </div>
                                                                         <span class="text-sm text-gray-500">Select Photo</span>
-                                                                        <span id="errorMessage" class="text-sm" style="display: none; color: red;">Failed to load image from database, default photo displayed.</span>
+                                                                        <span id="errorMessage" class="text-sm" style="display: none; color: red;"></span>
                                                                         
                                                                     </label>
                                                                     <x-input-error :messages="$errors->get('employee_photo')" class="mt-2" />
                                                                 </div>
                                                                 <div class="mb-4">
-                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee School ID</label>
-                                                                    <input type="text" readonly name="school_id" id="school_id" x-model="employee_id" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required autofocus>
-                                                                    <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                                                    <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee School ID</label>
+                                                                    <input type="text"  name="employee_id" id="employee_id" value="{{ $employee->employee_id }}"  class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required autofocus>
+                                                                    <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="employee_rfid" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee RFID No</label>
+                                                                    <input type="text" name="employee_rfid" id="employee_rfid" value="{{ $employee->employee_rfid }}"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_middlename') is-invalid @enderror" required>
+                                                                    <x-input-error :messages="$errors->get('employee_rfid')" class="mt-2" />
                                                                 </div>
                                                                 <div class="mb-4">
                                                                     <label for="employee_lastname" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Lastname</label>
-                                                                    <input type="text" name="employee_lastname" id="employee_lastname" x-model="employee_lastname" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_lastname') is-invalid @enderror" required>
+                                                                    <input type="text" name="employee_lastname" id="employee_lastname" value="{{ $employee->employee_lastname }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_lastname') is-invalid @enderror" required>
                                                                     <x-input-error :messages="$errors->get('employee_lastname')" class="mt-2" />
                                                                 </div>
 
                                                                 <div class="mb-4">
                                                                     <label for="employee_firstname" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Firstname</label>
-                                                                    <input type="text" name="employee_firstname" id="employee_firstname" x-model="employee_firstname" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_firstname') is-invalid @enderror" required>
+                                                                    <input type="text" name="employee_firstname" id="employee_firstname"  value="{{ $employee->employee_firstname }}"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_firstname') is-invalid @enderror" required>
                                                                     <x-input-error :messages="$errors->get('employee_firstname')" class="mt-2" />
                                                                 </div>
                                                                 <div class="mb-4">
                                                                     <label for="employee_middlename" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Middlename</label>
-                                                                    <input type="text" name="employee_middlename" id="employee_middlename" x-model="employee_middlename" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_middlename') is-invalid @enderror" required>
+                                                                    <input type="text" name="employee_middlename" id="employee_middlename" value="{{ $employee->employee_middlename }}"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_middlename') is-invalid @enderror" required>
                                                                     <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                                                 </div>
-                                                                <div class="mb-4">
-                                                                    <label for="employee_rfid" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee RFID No</label>
-                                                                    <input type="text" name="employee_rfid" id="employee_rfid" x-model="employee_rfid" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_middlename') is-invalid @enderror" required>
-                                                                    <x-input-error :messages="$errors->get('employee_rfid')" class="mt-2" />
-                                                                </div>
-                                                                <div class="mb-4">
+                                                                <div class="mb-2">
                                                                     <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School:</label>
-                                                                    <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
-                                                                        <option value="{{ $departmentToShow->school_id }}">{{ $departmentToShow->school_id }} | {{ $departmentToShow->school->school_name }}</option>
+                                                                    <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                                                        <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }}</option>
                                                                     </select>
-                                                                    <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
+                                                                    <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                                                 </div>
-                                                                <div class="mb-4">
+
+                                                                <div class="mb-2">
                                                                     <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department:</label>
                                                                     <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
-                                                                        <option value="{{ $departmentToShow->department_id }}">{{ $departmentToShow->department_id }} | {{ $departmentToShow->department_name }}</option>
+                                                                        <option value="{{ $departmentToShow->id }}">{{ $employee->department->id }}</option>
                                                                     </select>
-                                                                    <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
+                                                                    <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                                                 </div>
                                                             <div class="flex mb-4 mt-10 justify-center">
                                                                 <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
@@ -478,10 +467,10 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <form id="deleteSelected" action="{{ route('admin.employee.destroy', [':id', ':employee_id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $employee->id }}', '{{ $employee->employee_id }}', '{{ $employee->employee_abbreviation }}', '{{ $employee->employee_name }}');">
+                                        <form id="deleteSelected" action="{{ route('admin.employee.destroy', [':id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $employee->id }}', '{{ $employee->employee_lastname }}', '{{ $employee->employee_firstname }}', '{{ $employee->employee_middlename }}');">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="bg-red-500 text-white text-sm px-3 py-2 rounded hover:bg-red-700" id="hehe">
+                                            <button class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700" id="hehe">
                                                 <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i>
                                             </button>
                                         </form>
@@ -516,6 +505,8 @@
     @endif
    
 </div>
+
+
 
 <script>
     function confirmUpdate(event) {
@@ -601,11 +592,12 @@
         Swal.fire({
             title: 'Select Employee to Delete All Records',
             html: `
-                <select id="school_id_select" class="cursor-pointer hover:border-red-500 swal2-select">
-                    <option value="">Select School</option>
-                    @foreach($schools as $school)
-                        <option value="{{ $school->id }}">{{ $school->abbreviation }} - {{ $school->school_name }}</option>
-                    @endforeach
+            
+                <select id="department_id_select" class="cursor-pointer hover:border-red-500 swal2-select">
+                    <option value="">Select Department</option>
+                     @foreach($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->department_id }} | {{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
+                        @endforeach
                 </select>
             `,
             showCancelButton: true,
@@ -613,16 +605,16 @@
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, delete all!',
             preConfirm: () => {
-                const schoolId = Swal.getPopup().querySelector('#school_id_select').value;
-                if (!schoolId) {
-                    Swal.showValidationMessage(`Please select a school`);
+                const departmentId = Swal.getPopup().querySelector('#department_id_select').value;
+                if (!departmentId) {
+                    Swal.showValidationMessage(`Please select a department`);
                 }
-                return { schoolId: schoolId };
+                return { departmentId: departmentId };
             }
         }).then((result) => {
             if (result.isConfirmed) {
                 const schoolId = result.value.schoolId;
-                document.getElementById('school_id_to_delete').value = schoolId;
+                document.getElementById('department_id_to_delete').value = schoolId;
                 document.getElementById('deleteAll').submit();
             }
         });
@@ -643,7 +635,7 @@
             if (result.isConfirmed) {
                 const form = document.getElementById('deleteSelected');
                 // Replace the placeholders with the actual rowId and employeeId
-                const actionUrl = form.action.replace(':id', rowId).replace(':employee_id', employeeId);
+                const actionUrl = form.action.replace(':id', rowId);
                 form.action = actionUrl;
                 form.submit();
             }
@@ -663,4 +655,13 @@
         };
         reader.readAsDataURL(event.target.files[0]);
     }
+</script>
+<script>
+function handleImageError(image) {
+    // Set the default image
+    image.src = "{{ asset('assets/img/user.png') }}";
+    
+    // Display the error message
+    document.getElementById('errorMessage').style.display = 'block';
+}
 </script>
