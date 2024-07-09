@@ -13,7 +13,7 @@ class ShowEmployeeTable extends Component
 {
     use WithPagination; 
     public $search = '';
-    public $sortField = 'employee_id';
+    public $sortField = 'employee_lastname';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
     public $selectedDepartment = null;
