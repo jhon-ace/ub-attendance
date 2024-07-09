@@ -403,19 +403,11 @@
                                                             @csrf
                                                             @method('PUT')
 
-                                                                <div class="mb-4">
-                                                                    <input type="file" name="employee_photo" id="employee_photo" class="hidden" accept="image/*" onchange="previewImage(event)">
-                                                                    <label for="employee_photo" class="cursor-pointer flex flex-col items-center">
-                                                                        <div id="imagePreviewContainer" class="mb-2 text-center">
-                                                                            <img id="imagePreview" src="{{ $employee->employee_photo ? asset('storage/employee_photo/' . $employee->employee_photo) : asset('assets/img/user.png') }}"
-                                                                            class="rounded-full w-48 h-auto" onerror="handleImageError(this)">
-                                                                        </div>
-                                                                        <span class="text-sm text-gray-500">Select Photo</span>
-                                                                        <span id="errorMessage" class="text-sm" style="display: none; color: red;">Failed to load image from database, default photo displayed.</span>
-                                                                        
-                                                                    </label>
-                                                                    <x-input-error :messages="$errors->get('employee_photo')" class="mt-2" />
+                                                                <div class="mb-4 text-center flex flex-col items-center">
+                                                                    <img id="blah" src="{{ $employee->employee_photo ? asset('storage/employee_photo/' . $employee->employee_photo) : asset('assets/img/user.png') }}" alt="Default photo Icon" class="max-w-xs mb-2" />
+                                                                    <input type="file" onchange="readURL(this);" name="employee_photo" id="employee_photo" class="p-2 bg-gray-800 text-white" accept="image/*" />
                                                                 </div>
+
                                                                 <div class="mb-4">
                                                                     <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee School ID</label>
                                                                     <input type="text"  name="employee_id" id="employee_id" value="{{ $employee->employee_id }}"  class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required autofocus>
@@ -453,7 +445,7 @@
                                                                 <div class="mb-2">
                                                                     <label for="department_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department ID:</label>
                                                                     <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
-                                                                        <option value="{{ $departmentToShow->id }}">{{ $employee->department->id }}</option>
+                                                                        <option value="{{ $departmentToShow->id }}">{{ $employee->department->department_id }}</option>
                                                                     </select>
                                                                     <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                                                 </div>
@@ -667,4 +659,19 @@ function handleImageError(image) {
     // Display the error message
     document.getElementById('errorMessage').style.display = 'block';
 }
+</script>
+
+<script>
+         function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#blah')
+                        .attr('src', e.target.result);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
 </script>

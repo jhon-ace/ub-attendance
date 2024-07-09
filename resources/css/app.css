@@ -36,3 +36,12 @@ input[disabled] {
     z-index: 1000;
     white-space: nowrap;
 }
+
+#blah {
+    max-width: 180px;
+}
+
+input[type="file"] {
+    padding: 10px;
+    background: #2d2d2d;
+}
