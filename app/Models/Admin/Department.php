@@ -17,6 +17,7 @@ class Department extends Model
         'department_id',
         'department_abbreviation',
         'department_name',
+        'dept_identifier',
     ];
 
     //each department belongs to one school

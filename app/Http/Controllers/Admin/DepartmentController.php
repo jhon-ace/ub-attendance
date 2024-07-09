@@ -45,6 +45,7 @@ class DepartmentController extends Controller
             ],
             'department_abbreviation' => 'required|string|max:255',
             'department_name' => 'required|string|max:255',
+            'dept_identifier' => 'required|string|max:255',
         ], [
             'department_id.unique' => 'The department ID is not valid.',
         ]);
@@ -106,13 +107,15 @@ class DepartmentController extends Controller
                     }),
                 ],
                 'department_name' => 'required|string|max:255',
+                'dept_identifier' => 'required|string|max:255',
             ]);
             
             $hasChanges = false;
             if ($request->school_id !== $department->school_id ||
                 $request->department_id !== $department->department_id ||
                 $request->department_abbreviation !== $department->department_abbreviation ||
-                $request->department_name !== $department->department_name) 
+                $request->department_name !== $department->department_name ||
+                $request->dept_identifier !== $department->dept_identifier) 
             {
                 $hasChanges = true;
             }

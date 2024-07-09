@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\SchoolController;
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\AttendanceController;
@@ -41,6 +42,14 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'department.update'
         ]);
         Route::delete('department', [DepartmentController::class, 'deleteAll'])->name('department.deleteAll');
+        
+        // course routes
+        Route::get('/courses', [CourseController::class, 'index'])->name('course.index');
+        Route::post('/courses', [CourseController::class, 'store'])->name('course.store');
+        Route::get('/courses/{course_id}/edit', [CourseController::class, 'edit'])->name('course.edit');
+        Route::put('courses/{id}', [CourseController::class, 'update'])->name('course.update');
+        Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('course.destroy');
+        Route::delete('courses', [CourseController::class, 'deleteAll'])->name('course.deleteAll');
 
         //staff routes
         Route::resource('staff', AdminStaffController::class)->names([

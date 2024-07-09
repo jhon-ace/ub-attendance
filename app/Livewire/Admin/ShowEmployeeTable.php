@@ -85,7 +85,11 @@ class ShowEmployeeTable extends Component
             ->paginate(10);
 
         $schools = School::all();
-        $departments = Department::where('school_id', $this->selectedSchool)->get();
+        // $departments = Department::where('school_id', $this->selectedSchool)->get();
+        $departments = Department::where('school_id', $this->selectedSchool)
+        ->where('dept_identifier', '!=', 'student')
+        ->get();
+
 
         // Count employees by department
         $departmentCounts = Employee::select('department_id', \DB::raw('count(*) as employee_count'))

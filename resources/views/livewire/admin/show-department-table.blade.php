@@ -91,7 +91,16 @@
                                     <label for="department_name" class="block text-gray-700 text-md font-bold mb-2">Department Name</label>
                                     <input type="text" name="department_name" id="department_name" value="{{ old('department_name') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_name') is-invalid @enderror" required>
                                     <x-input-error :messages="$errors->get('department_name')" class="mt-2" />
-                                </div> 
+                                </div>
+                                <div class="mb-2">
+                                    <label for="dept_identifier" class="block text-gray-700 text-md font-bold mb-2">This department is for: </label>
+                                    <select id="dept_identifier" name="dept_identifier" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('dept_identifier') is-invalid @enderror" required>
+                                            <option value="">Select Option</option>
+                                            <option value="employee">Employee</option>
+                                            <option value="student">Student</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                </div>
                             <div class="flex mb-4 mt-10 justify-center">
                                 <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
                                     Save
@@ -111,7 +120,7 @@
     @elseif(!$search && $departments->isEmpty())
         <p class="text-black mt-8 text-center uppercase">No data available in school <text class="text-red-500">
             @if($schoolToShow)
-            {{ $schoolToShow->abbreviation}}
+            {{ $schoolToShow->school_name}}
         @endif</text></p>
     @else
 
@@ -169,9 +178,9 @@
                                 </button>
                             </th>
                             <th class="border border-gray-400 px-3 py-2">
-                                <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                                    School
-                                    @if ($sortField == 'school_id')
+                                <button wire:click="sortBy('dept_identifier')" class="w-full h-full flex items-center justify-center">
+                                    Department for
+                                    @if ($sortField == 'dept_identifier')
                                         @if ($sortDirection == 'asc')
                                             &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
                                         @else
@@ -190,7 +199,7 @@
                                 <td class="text-black border border-gray-400">{{ $department->department_abbreviation}}</td>
                                 <td class="text-black border border-gray-400">{{ $department->department_name}}</td>
                                 <td class="text-black border border-gray-400">{{ $department->school->id}}</td>
-                                <td class="text-black border border-gray-400">{{ $department->school->abbreviation }} - {{ $department->school->school_name }}</td>
+                                <td class="text-black border border-gray-400">{{ ucfirst($department->dept_identifier) }}</td>
                                 <td class="text-black border border-gray-400 px-1 py-1">
                                     <div class="flex justify-center items-center space-x-2">
                                         @if($schoolToShow && $department)
@@ -216,15 +225,10 @@
                                                             <x-caps-lock-detector />
                                                             @csrf
                                                             @method('PUT')
-                                                                <div class="mb-4">
-                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department belongs to:</label>
-                                                                    <select id="school_id" name="school_id" x-model="school" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                                                        
-                                                                        @foreach($schools as $school)
-                                                                            <option value="{{ $school->id }}" {{ $department->school_id == $school->id ? 'selected' : '' }}>
-                                                                                {{ $school->abbreviation }} - {{ $school->school_name }}
-                                                                            </option>
-                                                                        @endforeach
+                                                                <div class="mb-2">
+                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School where department belong: </label>
+                                                                    <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                                                            <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->id }} - {{ $schoolToShow->school_name }}</option>
                                                                     </select>
                                                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                                                 </div>
@@ -243,6 +247,19 @@
                                                                     <label for="department_name" class="block text-gray-700 text-md font-bold mb-2 text-left">Department Name</label>
                                                                     <input type="text" name="department_name" id="department_name" x-model="department_name" value="{{ $department->department_name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_name') is-invalid @enderror" required>
                                                                     <x-input-error :messages="$errors->get('department_name')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label for="dept_identifier" class="block text-gray-700 text-md font-bold mb-2 text-left">This department is for: </label>
+                                                                    <select id="dept_identifier" name="dept_identifier" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('dept_identifier') is-invalid @enderror" required>
+                                                                       @if($department->dept_identifier === 'employee')  
+                                                                            <option value="{{ $department->dept_identifier }}">{{ ucfirst($department->dept_identifier) }}</option>
+                                                                            <option value="student">Student</option>
+                                                                        @else
+                                                                            <option value="{{ $department->dept_identifier }}">{{ ucfirst($department->dept_identifier) }}</option>
+                                                                            <option value="employee">Employee</option>
+                                                                        @endif
+                                                                    </select>
+                                                                    <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                                                 </div>
                                                             <div class="flex mb-4 mt-10 justify-center">
                                                                 <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
@@ -271,7 +288,19 @@
                 @if($schoolToShow)
                     <tr>
                         <td colspan="2">
-                            <p class="text-black text-right mt-2 text-sm mb-4 mr-10">Total: {{ $departmentCounts[$schoolToShow->id]->department_count ?? 0 }}</p>
+                            <div class="flex justify-between">
+                                <div class="uppercase text-black mt-2 text-sm mb-4">
+                                    @if($search)
+                                        {{ $departments->total() }} Search results 
+                                    @endif                                    
+                                </div>
+                                <div class="justify-end">
+                                    <p class="text-black mt-2 text-sm mb-4 uppercase">Total # of departments: <text class="ml-2">{{ $departmentCounts[$schoolToShow->id]->department_count ?? 0 }}</text></p>
+                                    @if($search)
+                                        <p><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
+                                    @endif
+                                </div>
+                            </div> 
                         </td>
                     </tr>
                 @endif

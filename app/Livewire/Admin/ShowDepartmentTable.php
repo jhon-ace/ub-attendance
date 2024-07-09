@@ -14,7 +14,7 @@ class ShowDepartmentTable extends Component
     use WithPagination;
 
     public $search = '';
-    public $sortField = 'department_id';
+    public $sortField = 'dept_identifier';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
     public $selectedDepartment = null;
@@ -104,6 +104,7 @@ public function render()
         $query->where('department_id', 'like', '%' . $this->search . '%')
             ->orWhere('department_abbreviation', 'like', '%' . $this->search . '%')
             ->orWhere('department_name', 'like', '%' . $this->search . '%')
+            ->orWhere('dept_identifier', 'like', '%' . $this->search . '%')
             ->orWhereHas('school', function (Builder $query) {
                 $query->where('abbreviation', 'like', '%' . $this->search . '%')
                     ->orWhere('school_name', 'like', '%' . $this->search . '%');

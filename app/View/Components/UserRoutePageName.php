@@ -38,6 +38,7 @@ class UserRoutePageName extends Component
                 'admin.staff.index' => __('Admin - Manage Admin Staff'),
                 'admin.employee.index' => __('Admin - Manage Employee'),
                 'admin.student.index' => __('Admin - Manage Student'),
+                'admin.course.index' => __('Admin - Manage Courses'),
             ];
 
             $this->title = $titles[$routeName] ?? __('University of Bohol Attendance System');
