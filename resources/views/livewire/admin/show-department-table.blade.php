@@ -116,8 +116,13 @@
         
     @endif
     @if($search && $departments->isEmpty())
-     <p class="text-black mt-8 text-center">No employee/s found in {{ $schoolToShow->school_name }} for matching "{{ $search }}"</p>  
-    @elseif(!$search && $departments->isEmpty())
+     <p class="text-black mt-8 text-center">No employee/s found in <text class="text-red-500">{{ $schoolToShow->school_name }}</text> for matching "{{ $search }}"</p>  
+    <div class="flex justify-center mt-2">
+        @if($search)
+            <p><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
+        @endif
+    </div>
+     @elseif(!$search && $departments->isEmpty())
         <p class="text-black mt-8 text-center uppercase">No data available in school <text class="text-red-500">
             @if($schoolToShow)
             {{ $schoolToShow->school_name}}
@@ -296,16 +301,21 @@
                                 </div>
                                 <div class="justify-end">
                                     <p class="text-black mt-2 text-sm mb-4 uppercase">Total # of departments: <text class="ml-2">{{ $departmentCounts[$schoolToShow->id]->department_count ?? 0 }}</text></p>
-                                    @if($search)
-                                        <p><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
-                                    @endif
+                                    
                                 </div>
                             </div> 
                         </td>
+                        <td>
+                            {{ $departments->links() }}
+                        </td>
+                        <div class="flex justify-center mt-2">
+                            @if($search)
+                                <p><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
+                            @endif
+                        </div>
                     </tr>
                 @endif
             </div>
-             {{ $departments->links() }}
         @else
             <p class="text-black mt-10  text-center">Select table to show data</p>
         @endif

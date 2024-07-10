@@ -29,6 +29,13 @@ class School extends Model
         return $this->hasMany(Department::class);
     }
 
+    // A school has many course
+    public function course()
+    {
+        return $this->hasMany(Course::class);
+    }
+    
+
         // A school has many employees
     public function employee()
     {
