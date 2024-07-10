@@ -71,7 +71,7 @@
                 wire:change="updateStudentsByCourse"
                 class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
                 required>
-            @if($departments->isEmpty())
+            @if($courses->isEmpty())
                 <option value="0">No Departments</option>
             @else
                 <option value="">Select Department</option>
@@ -95,7 +95,7 @@
                     <div x-data="{ open: false }">
                         <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                             <!-- <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> {{$departmentToShow->department_id}} - {{$departmentToShow->department_name}} -->
-                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Employee in {{$departmentToShow->department_name}} department
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Student in {{$selectedCourseToShow->course_name}} Course
                         </button>
                         <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                             <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
@@ -318,9 +318,9 @@
                                     </button>
                                 </th>
                                 <th class="border border-gray-400 px-3 py-2">
-                                    <button wire:click="sortBy('student_year/grade')" class="w-full h-full flex items-center justify-center">
+                                    <button wire:click="sortBy('student_year_grade')" class="w-full h-full flex items-center justify-center">
                                         Student Year/Grade Level
-                                        @if ($sortField == 'student_year/grade')
+                                        @if ($sortField == 'student_year_grade')
                                             @if ($sortDirection == 'asc')
                                                 &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
                                             @else
@@ -398,7 +398,12 @@
                 <text  class="font-bold uppercase">{{ $students->links() }}</text>
             @endif
         @else
-            <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected Course</p>
+            @if($courses->isEmpty())
+                <p class="text-black text-sm mt-11 mb-4 uppercase text-center">Add Course first in the department</p>
+            @else
+                <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected Course</p>
+            @endif
+            
         @endif
 
     @endif
