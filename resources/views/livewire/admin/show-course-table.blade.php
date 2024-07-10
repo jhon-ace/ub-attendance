@@ -283,6 +283,18 @@
                                     @endif
                                 </button>
                             </th>
+                            <th class="border border-gray-400 px-3 py-2">
+                                <button wire:click="sortBy('department_id')" class="w-full h-full flex items-center justify-center">
+                                    Course Department
+                                    @if ($sortField == 'department_id')
+                                        @if ($sortDirection == 'asc')
+                                            &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                        @else
+                                            &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                        @endif
+                                    @endif
+                                </button>
+                            </th>
                             <th class="border border-gray-400 px-3 py-2">Action</th>
                         </tr>
                     </thead>
@@ -303,6 +315,7 @@
                                 </td>
                                 <td class="text-black border border-gray-400">{{ $course->course_abbreviation}}</td>
                                 <td class="text-black border border-gray-400">{{ $course->course_name}}</td>
+                                <td class="text-black border border-gray-400">{{ $course->department->department_name}}</td>
                                 <td class="text-black border border-gray-400">
                                     <div class="flex justify-center items-center space-x-2">
                                         <div x-data="{ open: false

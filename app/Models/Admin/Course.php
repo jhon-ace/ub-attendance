@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Admin\School; 
 use \App\Models\Admin\Department; 
+use \App\Models\Admin\Employee; 
 
 class Course extends Model
 {
@@ -32,6 +33,12 @@ class Course extends Model
     public function department()
     {
         return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    // A course has many student
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'course_id');
     }
 
     

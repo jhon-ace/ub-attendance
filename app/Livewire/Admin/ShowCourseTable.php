@@ -139,7 +139,10 @@ public function updateEmployeesByDepartment()
                 ->orWhere('course_logo', 'like', '%' . $this->search . '%')
                 ->orWhere('course_abbreviation', 'like', '%' . $this->search . '%')
                 ->orWhere('course_name', 'like', '%' . $this->search . '%')
-                ;
+                ->orWhereHas('department', function (Builder $query) {
+                $query->where('department_abbreviation', 'like', '%' . $this->search . '%')
+                    ->orWhere('department_name', 'like', '%' . $this->search . '%');
+            });
         });
     }
     

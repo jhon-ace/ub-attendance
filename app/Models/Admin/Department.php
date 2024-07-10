@@ -30,8 +30,10 @@ class Department extends Model
     // A department has many course
     public function course()
     {
-        return $this->hasMany(Course::class);
+         return $this->hasMany(Course::class, 'department_id');
     }
+
+    
 
     public function employees()
     {
