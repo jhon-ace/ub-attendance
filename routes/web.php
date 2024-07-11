@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\StudentController;
-use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\EmployeeAttendanceController;
 
 
 Route::get('/', function () {
@@ -59,6 +59,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
         Route::delete('employee', [EmployeeController::class, 'deleteAll'])->name('employee.deleteAll');
 
+        // Employee Attendance routes
+        Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'index'])->name('attendance.employee_attendance');
+
+
         // Student routes
         Route::get('/students', [StudentController::class, 'index'])->name('student.index');
         Route::post('/students', [StudentController::class, 'store'])->name('student.store');
@@ -67,7 +71,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/students/{id}', [StudentController::class, 'destroy'])->name('student.destroy');
         Route::delete('students', [StudentController::class, 'deleteAll'])->name('student.deleteAll');
 
-                //staff routes
+        
+        //staff routes
         Route::resource('staff', AdminStaffController::class)->names([
             'index' => 'staff.index',
             'create' => 'staff.create',
@@ -76,18 +81,6 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'staff.update'
         ]);
         Route::delete('staff', [AdminStaffController::class, 'deleteAll'])->name('staff.deleteAll');
-
-        // Attendance routes
-        Route::resource('attendance', AttendanceController::class)->names([
-            'index' => 'attendance.index',
-            'create' => 'attendance.create',
-            'store' => 'attendance.store',
-            'edit' => 'attendance.edit',
-            'update' => 'attendance.update'
-        ]);
-        Route::delete('attendance', [AttendanceController::class, 'deleteAll'])->name('attendance.deleteAll');
-
-
 
 
 

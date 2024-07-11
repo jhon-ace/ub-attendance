@@ -497,7 +497,11 @@
                                     <div class="justify-end">
                                         <p class="text-black mt-2 text-sm mb-4 uppercase">Total # of Student: <text class="ml-2">{{ $studentsCounts[$selectedCourseToShow->id]->student_count ?? 0 }}</text></p>
                                         @if($search)
-                                            <p><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
+                                            <p>
+                                                <button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="clearSearch">
+                                                    <i class="fa-solid fa-remove"></i> Clear Search
+                                                </button>
+                                            </p>
                                         @endif
                                     </div>
                                 </div> 

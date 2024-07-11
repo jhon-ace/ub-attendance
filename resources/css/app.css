@@ -45,3 +45,43 @@ input[type="file"] {
     padding: 10px;
     background: #2d2d2d;
 }
+
+.scrollable-dropdown {
+    max-height: 200px; /* Adjust this height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.custom-select {
+    /* Customize the appearance of the select dropdown */
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+.custom-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Limited customization for option elements */
+.custom-option {
+    background-color: #ffffff;
+    color: #333333;
+    padding: 8px;
+}
+
+/* More advanced styling for option elements in modern browsers */
+.custom-select option {
+    background-color: #ffffff;
+    color: #333333;
+    padding: 8px;
+}
+
+/* Hover effect for options (not supported in all browsers) */
+.custom-select option:hover {
+    background-color: #f0f0f0;
+}
