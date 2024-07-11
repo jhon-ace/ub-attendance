@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
+use Illuminate\Validation\ValidationException;
 use \App\Models\Admin\Student;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
@@ -29,20 +34,69 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-         $validatedData = $request->validate([
-            'school_id' => 'required|exists:schools,id',
-            'student_id' => 'required|string|max:255|unique:students', 
-            'student_firstname' => 'required|string|max:255',
-            'student_middlename' => 'required|string|max:255',
-            'student_lastname' => 'required|string|max:255',
-            'student_rfid' => 'required|string|max:255|unique:students',
+        // Validate input data
+            $request->validate([
+                'course_id' => 'required|exists:courses,id',
+                'student_id' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
+                'student_lastname' => 'required|string|max:255',
+                'student_firstname' => 'required|string|max:255',
+                'student_middlename' => 'required|string|max:255',
+                'student_year_grade' => 'required|string|max:255',
+                'student_rfid' => 'required|string|max:255',
+                'student_status' => 'required|string|max:255',
+                'student_photo' => 'image|max:2048', // Example: validation for image upload
+            ]);
 
-        ]);
+            // Handle file upload if 'course_photo' is present
+            if ($request->hasFile('student_photo')) {
+                $fileNameWithExt = $request->file('student_photo')->getClientOriginalName();
+                $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+                $extension = $request->file('student_photo')->getClientOriginalExtension();
+                $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+                $path = $request->file('student_photo')->storeAs('public/student_photo', $fileNameToStore);
+            } else {
+                $fileNameToStore = 'user.png'; // Default file if no photo is uploaded
+            }
 
-        Student::create($validatedData);
+            // Check if an course with the same course_id or course_rfid already exists
+            $existingStudentById = Student::where('student_id', $request->input('student_id'))->first();
+             $existingStudentByRfid = Student::where('student_rfid', $request->input('student_rfid'))->first();
 
-        return redirect()->route('admin.student.index')
-                        ->with('success', 'Student created successfully.');
+            if (!$existingStudentById && !$existingStudentByRfid) {
+                $student = new Student();
+                $student->course_id = $request->input('course_id');
+                $student->student_id = $request->input('student_id');
+                $student->student_firstname = $request->input('student_firstname');
+                $student->student_middlename = $request->input('student_middlename');
+                $student->student_lastname = $request->input('student_middlename');
+                $student->student_rfid = $request->input('student_rfid');
+                $student->student_year_grade = $request->input('student_year_grade');
+                $student->student_status = $request->input('student_status');
+                $student->student_photo = $fileNameToStore;
+                $student->save();
+
+                return redirect()->route('admin.student.index')
+                    ->with('success', 'Student created successfully.');
+            } else {
+                $errorMessage = '';
+                if ($existingStudentById) {
+                    $StudentName = $existingStudentById->student_lastname .' ' . $existingStudentById->student_firstname ;
+                    $errorMessage .= 'Student ID ' . $request->input('student_id') . ' is already taken by ' . $StudentName . '. ';
+                }
+
+                if ($existingStudentByRfid) {
+                    $StudentName = $existingStudentByRfid->student_lastname .' ' . $existingStudentByRfid->student_firstname ;
+                    $errorMessage .= 'Student RFID No ' . $request->input('student_rfid') . ' is already taken by ' . $StudentName . '. ';
+                }
+
+
+                return redirect()->route('admin.student.index')
+                    ->with('error', $errorMessage . 'Try again.');
+            }
     }
 
     /**
@@ -64,46 +118,92 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Student $student)
+    public function update(Request $request, $id)
     {
-            $validatedData = $request->validate([
-            'school_id' => 'required|exists:schools,id',
-            'student_id' => 'required|string|max:255|unique:students,student_id,' . $student->id,
-            'student_firstname' => 'required|string|max:255',
-            'student_middlename' => 'required|string|max:255',
-            'student_lastname' => 'required|string|max:255',
-            'student_rfid' => 'required|string|max:255|unique:students,student_rfid,' . $student->id,
-        ]);
+            $request->validate([
+                'course_id' => 'required|exists:courses,id',
+                'student_id' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
+                'student_lastname' => 'required|string|max:255',
+                'student_firstname' => 'required|string|max:255',
+                'student_middlename' => 'required|string|max:255',
+                'student_year_grade' => 'required|string|max:255',
+                'student_rfid' => 'required|string|max:255',
+                'student_status' => 'required|string|max:255',
+                'student_photo' => 'image|max:2048', // Example: validation for image upload
+            ]);
 
-        $hasChanges = false;
-        if ($request->school_id !== $student->school_id ||
-            $request->student_id !== $student->student_id ||
-            $request->student_firstname !== $student->student_firstname ||
-            $request->student_middlename !== $student->student_middlename ||
-            $request->student_lastname !== $student->student_lastname ||
-            $request->student_rfid !== $student->student_rfid) 
-        {
-            $hasChanges = true;
+
+        
+        // Find the existing student record
+        $student = Student::findOrFail($id);
+
+        // Handle file upload if 'student_photo' is present
+        if ($request->hasFile('student_photo')) {
+            // Delete the old photo if it exists
+            if ($student->student_photo && Storage::exists('public/student_photo/' . $student->student_photo)) {
+                Storage::delete('public/student_photo/' . $student->student_photo);
+            }
+
+            $fileNameWithExt = $request->file('student_photo')->getClientOriginalName();
+            $filename = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+            $extension = $request->file('student_photo')->getClientOriginalExtension();
+            $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+            $path = $request->file('student_photo')->storeAs('public/student_photo', $fileNameToStore);
+        } else {
+            $fileNameToStore = $student->student_photo; // Keep the current photo if no new photo is uploaded
         }
 
-        if (!$hasChanges) {
-            return redirect()->route('admin.student.index')->with('info', 'No changes were made.');
+        // Check if an student with the same student_id or student_rfid already exists, excluding the current student
+        $existingStudentById = student::where('student_id', $request->input('student_id'))->where('id', '!=', $id)->first();
+        $existingStudentByRfid = student::where('student_rfid', $request->input('student_rfid'))->where('id', '!=', $id)->first();
+
+         if (!$existingStudentById && !$existingStudentByRfid) 
+         {
+            $student->course_id = $request->input('course_id');
+            $student->student_id = $request->input('student_id');
+            $student->student_firstname = $request->input('student_firstname');
+            $student->student_middlename = $request->input('student_middlename');
+            $student->student_lastname = $request->input('student_middlename');
+            $student->student_rfid = $request->input('student_rfid');
+            $student->student_year_grade = $request->input('student_year_grade');
+            $student->student_status = $request->input('student_status');
+            $student->student_photo = $fileNameToStore;
+            $student->save();
+
+            return redirect()->route('admin.student.index')
+                ->with('success', 'Student updated successfully.');
+        } else {
+            $errorMessage = '';
+            if ($existingStudentById) {
+                $StudentName = $existingStudentById->student_lastname .' ' . $existingStudentById->student_firstname ;
+                $errorMessage .= 'Student ID ' . $request->input('student_id') . ' is already taken by ' . $StudentName . '. ';
+            }
+
+            if ($existingStudentByRfid) {
+                $StudentName = $existingStudentByRfid->student_lastname .' ' . $existingStudentByRfid->student_firstname ;
+                $errorMessage .= 'Student RFID No ' . $request->input('student_rfid') . ' is already taken by ' . $StudentName . '. ';
+            }
+
+
+            return redirect()->route('admin.student.index')
+                ->with('error', $errorMessage . 'Try again.');
         }
-
-        // Update the student record
-        $student->update($validatedData);
-
-        return redirect()->route('admin.student.index')->with('success', 'Student updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Student $student)
+    public function destroy(string $id)
     {
-         $student->delete();
+          $student = Student::findOrFail($id);
 
-        return redirect()->route('admin.student.index')->with('success', 'student deleted successfully.');
+        $student->delete();
+
+        return redirect()->route('admin.student.index')->with('success', 'Student deleted successfully.');
     }
 
     public function deleteAll(Request $request)

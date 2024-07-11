@@ -51,7 +51,23 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/courses/{id}', [CourseController::class, 'destroy'])->name('course.destroy');
         Route::delete('courses', [CourseController::class, 'deleteAll'])->name('course.deleteAll');
 
-        //staff routes
+        // Employee routes
+        Route::get('/employees', [EmployeeController::class, 'index'])->name('employee.index');
+        Route::post('/employees', [EmployeeController::class, 'store'])->name('employee.store');
+        // Route::get('/employees/{employee_id}/edit', [EmployeeController::class, 'edit'])->name('employee.edit');
+        Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employee.update');
+        Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
+        Route::delete('employee', [EmployeeController::class, 'deleteAll'])->name('employee.deleteAll');
+
+        // Student routes
+        Route::get('/students', [StudentController::class, 'index'])->name('student.index');
+        Route::post('/students', [StudentController::class, 'store'])->name('student.store');
+        // Route::get('/students/{student_id}/edit', [StudentController::class, 'edit'])->name('student.edit');
+        Route::put('/students/{id}', [StudentController::class, 'update'])->name('student.update');
+        Route::delete('/students/{id}', [StudentController::class, 'destroy'])->name('student.destroy');
+        Route::delete('students', [StudentController::class, 'deleteAll'])->name('student.deleteAll');
+
+                //staff routes
         Route::resource('staff', AdminStaffController::class)->names([
             'index' => 'staff.index',
             'create' => 'staff.create',
@@ -60,25 +76,6 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'staff.update'
         ]);
         Route::delete('staff', [AdminStaffController::class, 'deleteAll'])->name('staff.deleteAll');
-
-        // Employee routes
-        Route::get('/employees', [EmployeeController::class, 'index'])->name('employee.index');
-        Route::post('/employees', [EmployeeController::class, 'store'])->name('employee.store');
-        Route::get('/employees/{employee_id}/edit', [EmployeeController::class, 'edit'])->name('employee.edit');
-        Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employee.update');
-        Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
-        Route::delete('employee', [EmployeeController::class, 'deleteAll'])->name('employee.deleteAll');
-
-        // Student routes
-        Route::resource('student', StudentController::class)->names([
-            'index' => 'student.index',
-            'create' => 'student.create',
-            'store' => 'student.store',
-            'edit' => 'student.edit',
-            'update' => 'student.update'
-        ]);
-        Route::delete('student', [StudentController::class, 'deleteAll'])->name('student.deleteAll');
-
 
         // Attendance routes
         Route::resource('attendance', AttendanceController::class)->names([

@@ -112,16 +112,16 @@ class ShowStudentTable extends Component
             ->where('dept_identifier', 'student')
             ->get();
 
-        $departmentCounts = Course::select('department_id', \DB::raw('count(*) as employee_count'))
-            ->groupBy('department_id')
+        $studentsCounts = Student::select('course_id', \DB::raw('count(*) as student_count'))
+            ->groupBy('course_id')
             ->get()
-            ->keyBy('department_id');
+            ->keyBy('course_id');
 
         return view('livewire.admin.show-student-table', [
             'students' => $students,
             'schools' => $schools,
             'departments' => $departments,
-            'departmentCounts' => $departmentCounts,
+            'studentsCounts' => $studentsCounts,
             'schoolToShow' => $this->schoolToShow,
             'departmentToShow' => $this->departmentToShow,
             'selectedCourseToShow' => $this->selectedCourseToShow,

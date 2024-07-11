@@ -93,7 +93,7 @@ class EmployeeController extends Controller
                 }
                 if ($existingEmployeeByRfid) {
                     $employeeName = $existingEmployeeByRfid->employee_firstname . ' ' . $existingEmployeeByRfid->employee_lastname;
-                    $errorMessage .= 'RFID ' . $request->input('employee_rfid') . ' is already taken by ' . $employeeName . '. ';
+                    $errorMessage .= 'Employee RFID No. ' . $request->input('employee_rfid') . ' is already taken by ' . $employeeName . '. ';
                 }
 
                 return redirect()->route('admin.employee.index')
