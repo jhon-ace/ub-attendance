@@ -184,7 +184,8 @@
                         <div x-data="{ open: false }">
                             <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                                 <!-- <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> {{$departmentToShow->department_id}} - {{$departmentToShow->department_name}} -->
-                                <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Student {{$selectedCourseToShow->course_id}} {{$selectedCourseToShow->course_name}} 
+                                 <!-- {{$selectedCourseToShow->course_id}} {{$selectedCourseToShow->course_name}}  -->
+                                <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Student 
                             </button>
                             <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                 <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
