@@ -11,17 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('employee_attendance', function (Blueprint $table) {
-            $table->id();
+        Schema::create('employees_time_in_attendance', function (Blueprint $table) {
+            $table->id();            
             $table->unsignedBigInteger('employee_id');
-            $table->date('date_of_attendance');
             $table->timestamp('check_in_time')->nullable();
-            $table->timestamp('check_out_time')->nullable();
-            $table->string('status')->nullable(); // Define status once and make it nullable
-            $table->timestamp('shift_start')->nullable();
-            $table->timestamp('shift_end')->nullable();
-            $table->decimal('overtime_hours', 8, 2)->nullable();
-            $table->timestamp('last_tap_time')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
 
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('restrict');
@@ -33,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('employee_attendance');
+        Schema::dropIfExists('employees_time_in_attendance');
     }
 };

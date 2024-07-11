@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\Admin\EmployeeAttendance;
+use App\Models\Admin\EmployeeAttendanceTimeIn;
+use App\Models\Admin\EmployeeAttendanceTimeOut;
 use App\Models\Admin\School;
 use App\Models\Admin\Department;
 use App\Models\Admin\Employee;
@@ -73,10 +74,15 @@ class ShowEmployeeAttendance extends Component
 
    public function render()
     {
-        $query = EmployeeAttendance::query()->with(['employee.school', 'employee.department']);
-
-        // // Apply search filters
-        // $query = $this->applySearchFilters($query);
+        // Base query for EmployeeAttendanceTimeIn with left join to EmployeeAttendanceTimeOut
+        $query = EmployeeAttendanceTimeIn::query()
+            ->leftJoin('employees_time_out_attendance', 'employees_time_in_attendance.employee_id', '=', 'employees_time_out_attendance.employee_id')
+            ->select(
+                'employees_time_in_attendance.employee_id',
+                'employees_time_in_attendance.check_in_time as check_in_time',
+                'employees_time_out_attendance.check_out_time as check_out_time'
+            )
+            ->with(['employee.school', 'employee.department']);
 
         // Apply selected school filter
         if ($this->selectedSchool) {
@@ -95,16 +101,16 @@ class ShowEmployeeAttendance extends Component
             });
             $this->departmentToShow = Department::find($this->selectedDepartment);
 
-            // Fetch courses for the selected department
+            // Fetch employees for the selected department
             $employees = Employee::where('department_id', $this->selectedDepartment)->get();
         } else {
             $this->departmentToShow = null;
-            $employees = Employee::all(); // Fetch all courses if no department selected
+            $employees = Employee::all(); // Fetch all employees if no department selected
         }
 
-        // Apply selected course filter
+        // Apply selected employee filter
         if ($this->selectedEmployee) {
-            $query->where('employee_id', $this->selectedEmployee);
+            $query->where('employees_time_in_attendance.employee_id', $this->selectedEmployee);
             $this->selectedEmployeeToShow = Employee::find($this->selectedEmployee);
         } else {
             $this->selectedEmployeeToShow = null;
@@ -118,22 +124,18 @@ class ShowEmployeeAttendance extends Component
             ->where('dept_identifier', 'employee')
             ->get();
 
-        $studentsCounts = EmployeeAttendance::select('employee_id', \DB::raw('count(*) as student_count'))
-            ->groupBy('employee_id')
-            ->get()
-            ->keyBy('employee_id');
-
+    
         return view('livewire.admin.show-employee-attendance', [
             'attendances' => $attendances,
             'schools' => $schools,
             'departments' => $departments,
-            'studentsCounts' => $studentsCounts,
             'schoolToShow' => $this->schoolToShow,
             'departmentToShow' => $this->departmentToShow,
             'selectedEmployeeToShow' => $this->selectedEmployeeToShow,
-            'employees' => $employees, // Pass the courses to the view
+            'employees' => $employees, // Pass the employees to the view
         ]);
     }
+
 
 
 
@@ -164,7 +166,7 @@ class ShowEmployeeAttendance extends Component
     public function updateAttendanceByEmployee()
     {
         if ($this->selectedEmployee) {
-            $this->attendancesToShow = EmployeeAttendance::where('employee_id', $this->selectedEmployee)->get();
+            $this->attendancesToShow = EmployeeAttendanceTimeIn::where('employee_id', $this->selectedEmployee)->get();
         } else {
             $this->attendancesToShow = collect();
         }

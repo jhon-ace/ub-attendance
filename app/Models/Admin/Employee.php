@@ -39,8 +39,15 @@ class Employee extends Model
     }
 
      // Each employee can have many attendance records
-    public function attendance()
+    public function attendanceTimeIn()
     {
-        return $this->hasMany(EmployeeAttendance::class);
+        return $this->hasMany(EmployeeAttendanceTimeIn::class);
     }
+
+     // Each employee can have many attendance records
+    public function attendanceTimeOut()
+    {
+        return $this->hasMany(EmployeeAttendanceTimeOut::class);
+    }
+
 }

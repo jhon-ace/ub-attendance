@@ -80,11 +80,6 @@
                     @endforeach
                 @endif
             </select>
-            @if($selectedEmployeeToShow)
-                <p>Selected Employee: {{ $selectedEmployeeToShow->employee_id }} | {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</p>
-            @else
-
-            @endif
 
             @if($selectedEmployeeToShow)
                 @if($search && $attendances->isEmpty())
@@ -97,247 +92,80 @@
                         <div class="mt-2 text-sm font-bold ">
                             <text class="uppercase">Attendance of Employee: {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}
                         </div>
-                        <div>
+                        <div class="flex flex-col">
+                            <div class="flex justify-end mb-2">
+                                <button class="w-32 bg-blue-500 text-white text-sm px-2 py-2 rounded hover:bg-blue-700"><i class="fa-solid fa-file"></i> Generate DTR</button>
+                            </div>
                             <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-full md:w-64" placeholder="Search..." autofocus>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
-                            <thead class="bg-gray-200 text-black">
-                                <!-- <tr >
-                                    <th colspan="9" class="border-none bg-white border border-gray-400 px-3 py-2 uppercase"></th>
-                                </tr> -->
-                                <tr>
-                                    <th class="border border-gray-400 px-3 py-2">
-
-                                        <button wire:click="sortBy('student_id')" class="w-full h-full flex items-center justify-center">
-                                            Student ID
-                                            @if ($sortField == 'student_id')
-                                                @if ($sortDirection == 'asc')
-                                                    &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                                @else
-                                                    &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                                @endif
-                                            @endif
-                                        </button>
-                                    </th>
-                                    <th class="border border-gray-400 px-3 py-2">
-                                        <button wire:click="sortBy('student_rfid')" class="w-full h-full flex items-center justify-center">
-                                            Student RFID No
-                                            @if ($sortField == 'student_rfid')
-                                                @if ($sortDirection == 'asc')
-                                                    &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                                @else
-                                                    &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                                @endif
-                                            @endif
-                                        </button>
-                                    </th>
-                                    <th class="border border-gray-400 px-3 py-2">Student Photo</th>
-                                    <th class="border border-gray-400 px-3 py-2">
-                                        <button wire:click="sortBy('student_lastname')" class="w-full h-full flex items-center justify-center">
-                                            Student Lastname
-                                            @if ($sortField == 'student_lastname')
-                                                @if ($sortDirection == 'asc')
-                                                    &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                                @else
-                                                    &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                                @endif
-                                            @endif
-                                        </button>
-                                    </th>
-                                    <th class="border border-gray-400 px-3 py-2">
-                                        <button wire:click="sortBy('student_firstname')" class="w-full h-full flex items-center justify-center">
-                                            Student Firstname
-                                            @if ($sortField == 'student_firstname')
-                                                @if ($sortDirection == 'asc')
-                                                    &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                                @else
-                                                    &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                                @endif
-                                            @endif
-                                        </button>
-                                    </th>
-                                    <th class="border border-gray-400 px-3 py-2">
-                                        <button wire:click="sortBy('student_middlename')" class="w-full h-full flex items-center justify-center">
-                                            Student Middlename
-                                            @if ($sortField == 'student_middlename')
-                                                @if ($sortDirection == 'asc')
-                                                    &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                                @else
-                                                    &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                                @endif
-                                            @endif
-                                        </button>
-                                    </th>
-                                    <th class="border border-gray-400 px-3 py-2">
-                                        <button wire:click="sortBy('student_year_grade')" class="w-full h-full flex items-center justify-center">
-                                            Student Year/Grade Level
-                                            @if ($sortField == 'student_year_grade')
-                                                @if ($sortDirection == 'asc')
-                                                    &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                                @else
-                                                    &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                                @endif
-                                            @endif
-                                        </button>
-                                    </th>
-                                    <th class="border border-gray-400 px-3 py-2">
-                                        <button wire:click="sortBy('student_status')" class="w-full h-full flex items-center justify-center">
-                                            Student Status
-                                            @if ($sortField == 'student_status')
-                                                @if ($sortDirection == 'asc')
-                                                    &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                                @else
-                                                    &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                                @endif
-                                            @endif
-                                        </button>
-                                    </th>
-                                    <th class="border border-gray-400 px-3 py-2">Course ID</th>
-                                    <th class="border border-gray-400 px-3 py-2">Course Name</th>
-                                    <th class="border border-gray-400 px-3 py-2">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody >
-                                @foreach ($attendances as $attendance)
-                                    <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
-                                        <td class="text-black border border-gray-400">{{ $attendance->employee_id}}</td>
-                                        <td class="text-black border border-gray-400">{{ $attendance->date_of_attendance}}</td>
-                                        <td class="text-black border border-gray-400 border-t-0 border-r-0 border-l-0 px-2 py-1 flex items-center justify-center" >
-                                            @if ($student->student_photo && Storage::exists('public/student_photo/' . $student->student_photo))
-                                                <a  href="{{ asset('storage/student_photo/' . $student->student_photo) }}" 
-                                                    class="hover:border border-red-500 rounded-full" title="Click to view Picture"
-                                                    data-fancybox data-caption="Student: {{ $student->student_lastname }}, {{ $student->student_firstname }} {{ucfirst($student->student_middlename)}}">
-                                                    <img src="{{ asset('storage/student_photo/' . $student->student_photo) }}" class="rounded-full w-9 h-9">
-                                                </a>
-                                            @else
-                                                <img data-fancybox src="{{ asset('assets/img/user.png') }}" class="cursor-pointer w-9 h-9 hover:border hover:border-red-500 rounded-full" title="Click to view Picture" >
-                                            @endif
-                                        </td>
-                                        <td class="text-black border border-gray-400">{{ $student->student_lastname }}</td>
-                                        <td class="text-black border border-gray-400">{{ $student->student_firstname }}</td>
-                                        <td class="text-black border border-gray-400">{{ $student->student_middlename }}</td>
-                                        <td class="text-black border border-gray-400">{{ $student->student_year_grade }}</td>
-                                        <td class="text-black border border-gray-400">{{ $student->student_status }}</td>
-                                        <td class="text-black border border-gray-400 text-xs">{{ $student->course->course_id}}</td>
-                                        <td class="text-black border border-gray-400 text-xs">{{ $student->course->course_name}}</td>
-                                        <td class="text-black border border-gray-400">
-                                            <div class="flex justify-center items-center space-x-2">
-                                                <div x-data="{ open: false
-                                                        }">
-                                                    <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-[5px] rounded hover:bg-blue-700">
-                                                        <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i>
-                                                    </a>
-                                                    <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                        <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto  mx-auto">
-                                                            <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
-                                                                <p class="text-xl font-bold">Edit Course</p>
-                                                                <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
-                                                            </div>
-                                                            <div class="mb-4">
-                                                                <form action="{{ route('admin.student.update', $student->id) }}" method="POST" class="" enctype="multipart/form-data">
-                                                                    <x-caps-lock-detector />
-                                                                    @csrf
-                                                                    @method('PUT')
-
-                                                                    <div class="mb-4 text-center flex flex-col items-center">
-                                                                        <img id="blah2" src="{{ $student->student_photo ? asset('storage/student_photo/' . $student->student_photo) : asset('assets/img/user.png') }}" alt="Default photo Icon" class="max-w-xs mb-2" />
-                                                                        <input type="file" onchange="readURL2(this);" name="student_photo" id="student_photo" class="p-2 bg-gray-800 text-white" accept="image/*" />
-                                                                    </div>
-                                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                                                        <div class="mb-2">
-                                                                            <label for="student_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Student ID</label>
-                                                                            <input type="text" name="student_id" id="student_id" value="{{ $student->student_id }}"  class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_id') is-invalid @enderror" required autofocus>
-                                                                            <x-input-error :messages="$errors->get('student_id')" class="mt-2" />
-                                                                        </div>
-                                                                        <div class="mb-2">
-                                                                            <label for="student_lastname" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Lastname</label>
-                                                                            <input type="text" name="student_lastname" id="student_lastname" value="{{ $student->student_lastname }}" class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_lastname') is-invalid @enderror" required autofocus>
-                                                                            <x-input-error :messages="$errors->get('student_lastname')" class="mt-2" />
-                                                                        </div>
-                                                                        <div class="mb-2">
-                                                                            <label for="student_firstname" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Firstname</label>
-                                                                            <input type="text" name="student_firstname" id="student_firstname" value="{{ $student->student_firstname }}" class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_firstname') is-invalid @enderror" required autofocus>
-                                                                            <x-input-error :messages="$errors->get('student_firstname')" class="mt-2" />
-                                                                        </div>
-                                                                        <div class="mb-2">
-                                                                            <label for="student_middlename" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Middlename</label>
-                                                                            <input type="text" name="student_middlename" id="student_middlename" value="{{ $student->student_middlename }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_middlename') is-invalid @enderror" required>
-                                                                            <x-input-error :messages="$errors->get('student_middlename')" class="mt-2" />
-                                                                        </div>
-                                                                        <div class="mb-2">
-                                                                            <label for="student_rfid" class="block text-gray-700 text-md font-bold mb-2 text-left">Student RFID No</label>
-                                                                            <input type="text" name="student_rfid" id="student_rfid" value="{{ $student->student_rfid }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_rfid') is-invalid @enderror" required>
-                                                                            <x-input-error :messages="$errors->get('student_rfid')" class="mt-2" />
-                                                                        </div>
-                                                                        <div class="mb-2">
-                                                                            <label for="student_year_grade" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Year/Grade</label>
-                                                                            <input type="text" name="student_year_grade" id="student_year_grade" value="{{ $student->student_year_grade }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_year_grade') is-invalid @enderror" required>
-                                                                            <x-input-error :messages="$errors->get('student_year_grade')" class="mt-2" />
-                                                                        </div>
-                                                                        <div class="mb-2">
-                                                                            <label for="student_status" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Status</label>
-                                                                            <input type="text" name="student_status" id="student_status" value="{{ $student->student_status }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_status') is-invalid @enderror" required>
-                                                                            <x-input-error :messages="$errors->get('student_status')" class="mt-2" />
-                                                                        </div>
-                                                                        <div class="mb-2">
-                                                                            <label for="course_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Course ID</label>
-                                                                            <select id="course_id" name="course_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('course_id') is-invalid @enderror" required>
-                                                                                <option value="{{ $selectedCourseToShow->id }}">{{ $selectedCourseToShow->course_id }}</option>
-                                                                            </select>
-                                                                            <x-input-error :messages="$errors->get('course_id')" class="mt-2" />
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="flex mb-4 mt-10 justify-center">
-                                                                        <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
-                                                                            Save
-                                                                        </button>
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <form id="deleteSelected" action="{{ route('admin.student.destroy', [':id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $student->id }}', '{{ $student->student_lastname }}', '{{ $student->student_firstname }}', '{{ $student->student_middlename }}');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700" id="hehe">
-                                                        <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        @if($departmentToShow)
-                            <tr>
-                                <td colspan="2">
-                                    <div class="flex justify-between">
-                                        <div class="uppercase text-black mt-2 text-sm mb-4">
-                                            @if($search)
-                                                {{ $students->total() }} Search results 
-                                            @endif                                    
-                                        </div>
-                                        <div class="justify-end">
-                                            <p class="text-black mt-2 text-sm mb-4 uppercase">Total # of Student: <text class="ml-2">{{ $studentsCounts[$selectedCourseToShow->id]->student_count ?? 0 }}</text></p>
-                                            @if($search)
-                                                <p>
-                                                    <button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="clearSearch">
-                                                        <i class="fa-solid fa-remove"></i> Clear Search
-                                                    </button>
-                                                </p>
-                                            @endif
-                                        </div>
-                                    </div> 
-                                </td>
-                            </tr>
-                        @endif
+                        <div class="flex">
+                            <!-- Table for Time In -->
+                            <div class="w-1/2">
+                                <h3 class="text-center">Time In</h3>
+                                <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                                    <thead class="bg-gray-200 text-black">
+                                        <tr>
+                                            <th class="border border-gray-400 px-3 py-2">
+                                                Employee ID
+                                            </th>
+                                            <th class="border border-gray-400 px-3 py-2">
+                                                Date
+                                            </th>
+                                            <th class="border border-gray-400 px-3 py-2">
+                                                Check-In Time
+                                            </th>
+                                            <!-- Add other columns as needed -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($attendances as $attendance)
+                                        <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
+                                            <td class="text-black border border-gray-400">{{ $attendance->employee_id }}</td>
+                                            <td class="text-black border border-gray-400">{{ \Carbon\Carbon::parse($attendance->check_in_time)->format('m-d Y') }}</td>
+                                            <td class="text-black border border-gray-400">{{ $attendance->check_in_time }}</td>
+                                            <!-- Add other columns as needed -->
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="w-1/12"></div>
+                            <!-- Table for Time Out -->
+                            <div class="w-1/2">
+                                <h3>Time Out</h3>
+                                <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                                    <thead class="bg-gray-200 text-black">
+                                        <tr>
+                                            <th class="border border-gray-400 px-3 py-2">
+                                                Employee ID
+                                            </th>
+                                            <th class="border border-gray-400 px-3 py-2">
+                                                Date
+                                            </th>
+                                            <th class="border border-gray-400 px-3 py-2">
+                                                Check-Out Time
+                                            </th>
+                                            <!-- Add other columns as needed -->
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($attendances as $attendance)
+                                        <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
+                                            <td class="text-black border border-gray-400">{{ $attendance->employee_id }}</td>
+                                            <td class="text-black border border-gray-400">{{ \Carbon\Carbon::parse($attendance->check_out_time)->format('m-d Y') }}</td>
+                                            <td class="text-black border border-gray-400">{{ $attendance->check_out_time }}</td>
+                                            <!-- Add other columns as needed -->
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
-                    <text  class="font-bold uppercase">{{ $students->links() }}</text>
+
+                    <text  class="font-bold uppercase">{{ $attendances->links() }}</text>
                 @endif
             @else
                 @if($employees->isEmpty())

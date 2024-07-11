@@ -61,7 +61,9 @@ Route::middleware(['auth'])->group(function () {
 
         // Employee Attendance routes
         Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'index'])->name('attendance.employee_attendance');
-
+        Route::get('/employees/attendance/portal', [EmployeeAttendanceController::class, 'portal'])->name('attendance.employee_attendance.portal');
+        Route::post('/employees/attendance/portal', [EmployeeAttendanceController::class, 'portalSubmit'])->name('employee_attendance.store');
+        
 
         // Student routes
         Route::get('/students', [StudentController::class, 'index'])->name('student.index');

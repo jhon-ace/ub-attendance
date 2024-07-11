@@ -5,25 +5,18 @@ namespace App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Admin\School; 
-use \App\Models\Admin\Employee; 
+use \App\Models\Admin\Employee;
+use \App\Models\Admin\Department; 
 
-class EmployeeAttendance extends Model
+class EmployeeAttendanceTimeOut extends Model
 {
     use HasFactory;
-    protected $table = 'employee_attendance';
+    protected $table = 'employees_time_out_attendance';
 
     protected $fillable = [
         'employee_id', //FK
-        'date_of_atttendance',
-        'check_in_time',
         'check_out_time',
         'status',
-        'notes',
-        'shift_start',
-        'shift_end',
-        'overtime_hours',
-        'last_tap_time',
-
     ];
 
     // //each employee attenandance record belongs to one school
@@ -48,3 +41,4 @@ class EmployeeAttendance extends Model
         return $this->belongsTo(Employee::class, 'employee_id');
     }
 }
+
