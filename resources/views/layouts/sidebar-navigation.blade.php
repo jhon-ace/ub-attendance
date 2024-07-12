@@ -1,5 +1,5 @@
 @if (Auth::user()->hasRole('admin'))
-    <div x-data="{ isFullScreen: (window.innerHeight === screen.height) }" x-init="
+    <div x-cloak x-data="{ isFullScreen: (window.innerHeight === screen.height) }" x-init="
                         window.addEventListener('resize', () => {
                             isFullScreen = (window.innerHeight === screen.height);
                         });

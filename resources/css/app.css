@@ -85,3 +85,8 @@ input[type="file"] {
 .custom-select option:hover {
     background-color: #f0f0f0;
 }
+
+#my-time {
+    font-size: 24px;
+    font-weight: bold;
+}
