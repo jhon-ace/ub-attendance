@@ -1,5 +1,4 @@
-<x-app-layout>
-    <x-user-route-page-name :routeName="'admin.attendance.employee_attendance.portal'" />
+ 
     @if (session('success'))
         <x-sweetalert type="success" :message="session('success')" />
         <script>
@@ -18,9 +17,9 @@
         <!-- Logo Section -->
         <div class="flex-grow flex flex-col justify-center items-center">
             <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class=" w-[600px]"> <!-- Replace with your logo URL -->
-            <div class="mt-4 text-white text-lg font-semibold" id="my-time"></div> <!-- Date and Time Display -->
+            <div class="mt-10 text-white text-lg font-semibold" id="my-time"></div> <!-- Date and Time Display -->
         </div>
-        <div class="w-full -z-10">
+        <div class="w-full">
             <form id="attendanceForm" action="{{ route('admin.employee_attendance.store') }}" method="POST">
                 @csrf
                 <div class="mb-4 z-10">
@@ -57,4 +56,4 @@
         });
     </script>
     @endpush
-</x-app-layout>
+

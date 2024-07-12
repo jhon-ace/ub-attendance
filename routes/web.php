@@ -14,6 +14,11 @@ use App\Http\Controllers\Admin\EmployeeAttendanceController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/attendance/portal', [EmployeeAttendanceController::class, 'portal'])->name('attendance.portal');
+Route::post('/attendance/portal', [EmployeeAttendanceController::class, 'openPortal'])->name('attendance.store');
+        
+
 // Admin Routes
 Route::middleware(['auth'])->group(function () {
 
@@ -61,8 +66,6 @@ Route::middleware(['auth'])->group(function () {
 
         // Employee Attendance routes
         Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'index'])->name('attendance.employee_attendance');
-        Route::get('/employees/attendance/portal', [EmployeeAttendanceController::class, 'portal'])->name('attendance.employee_attendance.portal');
-        Route::post('/employees/attendance/portal', [EmployeeAttendanceController::class, 'portalSubmit'])->name('employee_attendance.store');
         
 
         // Student routes
