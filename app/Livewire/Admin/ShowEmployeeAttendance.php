@@ -178,6 +178,8 @@ class ShowEmployeeAttendance extends Component
             ->paginate(50);
 
         $attendanceData = [];
+        $overallTotalHours = 0;
+
         foreach ($attendanceTimeIn as $attendance) {
             // Initialize AM and PM hours worked
             $hoursWorkedAM = 0;
@@ -238,6 +240,9 @@ class ShowEmployeeAttendance extends Component
                             'remarks' => 'Present', // Assuming it's always present when hours are recorded
                         ];
                     }
+
+                    // Add total hours worked to overall total
+                    $overallTotalHours += $totalHoursWorked;
                 } else {
                     // Dates do not match, mark as absent
                     $attendanceData[] = (object) [
@@ -263,6 +268,9 @@ class ShowEmployeeAttendance extends Component
             }
         }
 
+// Now $overallTotalHours contains the sum of all total hours worked
+
+
 
         $schools = School::all();
         $departments = Department::where('school_id', $this->selectedSchool)
@@ -270,6 +278,7 @@ class ShowEmployeeAttendance extends Component
             ->get();
 
         return view('livewire.admin.show-employee-attendance', [
+            'overallTotalHours' => $overallTotalHours,
             'attendanceData' =>$attendanceData,
             'attendanceTimeIn' => $attendanceTimeIn,
             'attendanceTimeOut' => $attendanceTimeOut,
@@ -370,6 +379,8 @@ class ShowEmployeeAttendance extends Component
 
 
             $attendanceData = [];
+            $overallTotalHours = 0;
+
             foreach ($attendanceTimeIn as $attendance) {
                 // Initialize AM and PM hours worked
                 $hoursWorkedAM = 0;
@@ -430,6 +441,9 @@ class ShowEmployeeAttendance extends Component
                                 'remarks' => 'Present', // Assuming it's always present when hours are recorded
                             ];
                         }
+
+                        // Add total hours worked to overall total
+                        $overallTotalHours += $totalHoursWorked;
                     } else {
                         // Dates do not match, mark as absent
                         $attendanceData[] = (object) [
@@ -456,6 +470,7 @@ class ShowEmployeeAttendance extends Component
             }
 
                 $pdf = \PDF::loadView('generate-pdf', [
+                'overallTotalHours' => $overallTotalHours,
                 'selectedStartDate' => $this->startDate,
                 'selectedEndDate' => $this->endDate,
                 'attendanceData' => $attendanceData,

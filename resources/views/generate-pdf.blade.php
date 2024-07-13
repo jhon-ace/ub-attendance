@@ -48,11 +48,15 @@
 <body>
     <h4>Attendance Report</h4>
     <span>Employee: {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</span>
-
+    @if ($selectedStartDate && $selectedEndDate)
         <div class="date-range">
-            <span>Selected Date: {{ $selectedStartDate }} to {{ $selectedEndDate }}</span>
+            <span>Selected Date: {{ date('F d, Y', strtotime($selectedStartDate)) }} to {{ date('F d, Y', strtotime($selectedEndDate)) }}</span>
         </div>
-
+    @else
+        <div class="date-range">
+            <span>Selected Date: No date range selected</span>
+        </div>
+    @endif
     <div class="table-container">
         <table>
             <thead>
@@ -122,6 +126,7 @@
                 @endforeach
             </tbody>
         </table>
+        <p>Overall Total Hours: {{ round($overallTotalHours,3) }}</p>
     </div>
 
 </body>
