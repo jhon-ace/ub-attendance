@@ -224,14 +224,14 @@
                                             <tr>
                                                 <td class="text-black border border-gray-400">{{ $attendance->worked_date }}</td>
                                                 <td class="text-black border border-gray-400">
-                                                    {{ floor($attendance->hours_workedAM) }} hrs. {{ ($attendance->hours_workedAM - floor($attendance->hours_workedAM)) * 60 }} min.
+                                                    {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min.
                                                 </td>
                                                 <td class="text-black border border-gray-400">
-                                                    {{ floor($attendance->hours_workedPM) }} hrs. {{ ($attendance->hours_workedPM - floor($attendance->hours_workedPM)) * 60 }} min.
+                                                    {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min.
                                                 </td>
 
                                                 <td class="text-black border border-gray-400">
-                                                    {{ floor($attendance->total_hours_worked) }} hrs. {{ ($attendance->total_hours_worked - floor($attendance->total_hours_worked)) * 60 }} min.
+                                                    {{ floor($attendance->total_hours_worked) }} hrs. {{ round($attendance->total_hours_worked - floor($attendance->total_hours_worked), 1) * 60 }} min.
                                                 </td>
 
                                                 <td class="text-black border border-gray-400">{{ $attendance->remarks }}</td>
@@ -243,9 +243,9 @@
                         </div>
                     </div>
                     <div class="flex justify-items-end justify-end">
-                        <p>Overall Total Hours: {{ round($overallTotalHours,3) }}</p>
+                        
                     </div>
-                    
+                    <p>Overall Total Hours: {{ $overallTotalHours }}</p>
                 @endif
             @else
                 @if($employees->isEmpty())
