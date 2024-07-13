@@ -96,7 +96,7 @@
                             <div class="flex justify-between items-center mb-2">
                                 <div class="grid grid-rows-2 grid-flow-col -mt-10">
                                     <div class="text-center uppercase ml-16">
-                                        Select Date
+                                        Select Specific Date
                                     </div>
                                     <div class="flex items-center space-x-4">
                                         <label for="startDate" class="text-gray-600">Start Date:</label>
@@ -121,27 +121,24 @@
                                     <i class="fa-solid fa-file"></i> Print DTR
                                 </button>
                             </div>
-                            <div class="self-end">
-                                <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-full md:w-64" placeholder="Search..." autofocus>
-                            </div>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
                         <div class="flex">
                             <!-- Table for Time In -->
-                            <div class="w-1/2">
+                            <div class="w-[30%]">
                                 <h3 class="text-center">Time In</h3>
                                 <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                                     <thead class="bg-gray-200 text-black">
                                         <tr>
                                             <th class="border border-gray-400 px-3 py-2">
-                                                Employee ID
+                                                Emp ID
                                             </th>
                                             <th class="border border-gray-400 px-3 py-2">
                                                 Date
                                             </th>
                                             <th class="border border-gray-400 px-3 py-2">
-                                                Check-In Time
+                                                Check-In
                                             </th>
                                             <!-- Add other columns as needed -->
                                         </tr>
@@ -150,7 +147,9 @@
                                         @foreach ($attendanceTimeIn as $attendanceIn)
                                             <tr class="hover:bg-gray-100">
                                                 <td class="text-black border border-gray-400">{{ $attendanceIn->employee->employee_id }}</td>
-                                                <td class="text-black border border-gray-400">{{ date('m-d-Y, (l)', strtotime($attendanceIn->check_in_time)) }}</td>
+                                                <td class="text-black border border-gray-400">
+                                                    {{ date('m-d-Y (l)', strtotime($attendanceIn->check_in_time)) }}
+                                                </td>
                                                 <td class="text-black border border-gray-400">{{ date('g:i:s A', strtotime($attendanceIn->check_in_time)) }}</td>
                                                 <!-- Add other columns as needed -->
                                             </tr>
@@ -159,21 +158,21 @@
                                 </table>
                             </div>
                             <text  class="font-bold uppercase">{{ $attendanceTimeIn->links() }}</text>
-                            <div class="w-[2%]"></div>
+                            <div class="w-[1%]"></div>
                             <!-- Table for Time Out -->
-                            <div class="w-1/2">
+                            <div class="w-[30%]">
                                 <h3 class="text-center">Time Out</h3>
                                     <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                                         <thead class="bg-gray-200 text-black">
                                             <tr>
                                                 <th class="border border-gray-400 px-3 py-2">
-                                                    Employee ID
+                                                    Emp ID
                                                 </th>
                                                 <th class="border border-gray-400 px-3 py-2">
                                                     Date
                                                 </th>
                                                 <th class="border border-gray-400 px-3 py-2">
-                                                    Check-Out Time
+                                                    Check-Out
                                                 </th>
                                                 <!-- Add other columns as needed -->
                                             </tr>
@@ -197,8 +196,8 @@
                                     </table>
                                     <text  class="font-bold uppercase">{{ $attendanceTimeOut->links() }}</text>
                             </div>
-                            <div class="w-[2%]"></div>
-                            <div class="w-1/2">
+                            <div class="w-[1%]"></div>
+                            <div class="w-[38%]">
                                 <h3 class="text-center">Computed Working Hours</h3>
                                 <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                                     <thead class="bg-gray-200 text-black">
@@ -207,7 +206,13 @@
                                                 Date
                                             </th>
                                             <th class="border border-gray-400 px-3 py-2">
-                                                Total Hours
+                                                AM
+                                            </th>
+                                            <th class="border border-gray-400 px-3 py-2">
+                                                PM
+                                            </th>
+                                            <th class="border border-gray-400 px-3 py-2">
+                                                Total
                                             </th>
                                            <th class="border border-gray-400 px-3 py-2">
                                                 Remarks
@@ -215,14 +220,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                         @foreach ($attendanceTimeIn as $attendance)
+                                         @foreach ($attendanceData as $attendance)
                                             <tr>
                                                 <td class="text-black border border-gray-400">{{ $attendance->worked_date }}</td>
                                                 <td class="text-black border border-gray-400">
-                                                    {{ floor($attendance->hours_worked) }} hrs, {{ ($attendance->hours_worked - floor($attendance->hours_worked)) * 60 }} mins
+                                                    {{ floor($attendance->hours_workedAM) }} hrs. {{ ($attendance->hours_workedAM - floor($attendance->hours_workedAM)) * 60 }} min.
                                                 </td>
+                                                <td class="text-black border border-gray-400">
+                                                    {{ floor($attendance->hours_workedPM) }} hrs. {{ ($attendance->hours_workedPM - floor($attendance->hours_workedPM)) * 60 }} min.
+                                                </td>
+
+                                                <td class="text-black border border-gray-400">
+                                                    {{ floor($attendance->total_hours_worked) }} hrs. {{ ($attendance->total_hours_worked - floor($attendance->total_hours_worked)) * 60 }} min.
+                                                </td>
+
                                                 <td class="text-black border border-gray-400">{{ $attendance->remarks }}</td>
-                                                <!-- <td class="text-black border border-gray-400">{{ $attendance->hours_worked }}</td> -->
                                             </tr>
                                         @endforeach
                                     </tbody>

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 
 
@@ -33,6 +34,8 @@ class ShowEmployeeAttendance extends Component
     public $selectedEmployeeToShow;
     public $startDate = null;
     public $endDate = null;
+    public $selectedStartDate = null;
+    public $selectedEndDate = null;
     public $selectedAttendanceByDate;
 
 
@@ -174,44 +177,91 @@ class ShowEmployeeAttendance extends Component
         $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
             ->paginate(50);
 
-        // Calculate hours worked for each attendance record in $attendanceTimeIn
+        $attendanceData = [];
         foreach ($attendanceTimeIn as $attendance) {
+            // Initialize AM and PM hours worked
+            $hoursWorkedAM = 0;
+            $hoursWorkedPM = 0;
+
             // Find corresponding check_out_time
             $checkOut = $attendanceTimeOut->where('employee_id', $attendance->employee_id)
                                         ->where('check_out_time', '>=', $attendance->check_in_time)
                                         ->first();
 
+            // Calculate hours worked
             if ($checkOut) {
                 // Extract dates from check_in_time and check_out_time
-                $checkInDate = date('m-d-Y', strtotime($attendance->check_in_time));
-                $checkOutDate = date('m-d-Y', strtotime($checkOut->check_out_time));
+                $checkInDate = date('Y-m-d', strtotime($attendance->check_in_time));
+                $checkOutDate = date('Y-m-d', strtotime($checkOut->check_out_time));
 
                 // Check if dates match
                 if ($checkInDate === $checkOutDate) {
                     // Calculate hours worked
                     $checkIn = strtotime($attendance->check_in_time);
                     $checkOutTime = strtotime($checkOut->check_out_time);
-                    $hoursWorked = ($checkOutTime - $checkIn) / 3600; // Calculate hours difference
 
-                    // Round to two decimal places
-                    $attendance->hours_worked = round($hoursWorked, 2);
-                    $attendance->worked_date = $checkInDate; // Store the worked date
-                    $attendance->remarks = 'Present'; // No remark needed if hours worked is recorded
+                    // Split hours into AM and PM
+                    if ($checkIn < strtotime($checkInDate . ' 12:00 PM')) {
+                        if ($checkOutTime <= strtotime($checkInDate . ' 1:00 PM')) {
+                            // Both check-in and check-out are in the AM
+                            $hoursWorkedAM = ($checkOutTime - $checkIn) / 3600;
+                        } else {
+                            // Check-in is in AM and check-out is in PM
+                            $hoursWorkedAM = (strtotime($checkInDate . ' 12:00 PM') - $checkIn) / 3600;
+                            $hoursWorkedPM = ($checkOutTime - strtotime($checkInDate . ' 01:00 PM')) / 3600;
+                        }
+                    } else {
+                        // Both check-in and check-out are in the PM
+                        $hoursWorkedPM = ($checkOutTime - $checkIn) / 3600;
+                    }
+
+                    // Calculate total hours worked
+                    $totalHoursWorked = $hoursWorkedAM + $hoursWorkedPM;
+
+                    // Prepare the key for $attendanceData
+                    $key = $attendance->employee_id . '-' . $checkInDate;
+
+                    // Check if this entry already exists in $attendanceData
+                    if (isset($attendanceData[$key])) {
+                        // Update existing entry
+                        $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
+                        $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
+                        $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
+                    } else {
+                        // Create new entry
+                        $attendanceData[$key] = (object) [
+                            'employee_id' => $attendance->employee_id,
+                            'worked_date' => $checkInDate,
+                            'hours_workedAM' => $hoursWorkedAM,
+                            'hours_workedPM' => $hoursWorkedPM,
+                            'total_hours_worked' => $totalHoursWorked,
+                            'remarks' => 'Present', // Assuming it's always present when hours are recorded
+                        ];
+                    }
                 } else {
                     // Dates do not match, mark as absent
-                    $attendance->hours_worked = 0; // Mark as absent
-                    $attendance->worked_date = $checkInDate; // Use check_in_time date as worked date
-                    $attendance->remarks = 'Absent'; // Add remark for absence
+                    $attendanceData[] = (object) [
+                        'employee_id' => $attendance->employee_id,
+                        'worked_date' => $checkInDate,
+                        'hours_workedAM' => 0,
+                        'hours_workedPM' => 0,
+                        'total_hours_worked' => 0,
+                        'remarks' => 'Absent',
+                    ];
                 }
             } else {
                 // No check_out_time found, mark as absent
-                $attendance->hours_worked = 0; // Mark as absent
-                $attendance->worked_date = date('m-d-Y', strtotime($attendance->check_in_time)); // Use check_in_time date as worked date
-                $attendance->remarks = 'Absent'; // Add remark for absence
+                $checkInDate = date('Y-m-d', strtotime($attendance->check_in_time));
+                $attendanceData[] = (object) [
+                    'employee_id' => $attendance->employee_id,
+                    'worked_date' => $checkInDate,
+                    'hours_workedAM' => 0,
+                    'hours_workedPM' => 0,
+                    'total_hours_worked' => 0,
+                    'remarks' => 'Absent',
+                ];
             }
         }
-
-
 
 
         $schools = School::all();
@@ -220,6 +270,7 @@ class ShowEmployeeAttendance extends Component
             ->get();
 
         return view('livewire.admin.show-employee-attendance', [
+            'attendanceData' =>$attendanceData,
             'attendanceTimeIn' => $attendanceTimeIn,
             'attendanceTimeOut' => $attendanceTimeOut,
             'schools' => $schools,
@@ -236,7 +287,23 @@ class ShowEmployeeAttendance extends Component
 
     public function generatePDF()
     {
+        $savePath = storage_path('app/'); // Default save path (storage/app/)
+
         try {
+
+           // Determine the filename dynamically with date included if both startDate and endDate are selected
+            if ($this->startDate && $this->endDate) {
+                $selectedStartDate = date('jS F Y', strtotime($this->startDate));
+                $selectedEndDate = date('jS F Y', strtotime($this->endDate));
+                $dateRange = $selectedStartDate . ' to ' . $selectedEndDate;
+            } else {
+                $dateRange = 'No Date Selected'; // Default text if no date range is selected
+            }
+
+            // Construct the filename with the date range if available
+            $filename = $this->selectedEmployeeToShow->employee_lastname . ', ' . $this->selectedEmployeeToShow->employee_firstname . ' ' . $this->selectedEmployeeToShow->employee_middlename . ' - ' . $dateRange . '.pdf';
+
+
             // Base query for EmployeeAttendanceTimeIn with left join to EmployeeAttendanceTimeOut
             $queryTimeIn = EmployeeAttendanceTimeIn::query()
                 ->with(['employee.school', 'employee.department']);
@@ -302,60 +369,112 @@ class ShowEmployeeAttendance extends Component
                 ->paginate(50);
 
 
-            // Calculate hours worked for each attendance record in $attendanceTimeIn
+            $attendanceData = [];
             foreach ($attendanceTimeIn as $attendance) {
+                // Initialize AM and PM hours worked
+                $hoursWorkedAM = 0;
+                $hoursWorkedPM = 0;
+
                 // Find corresponding check_out_time
                 $checkOut = $attendanceTimeOut->where('employee_id', $attendance->employee_id)
                                             ->where('check_out_time', '>=', $attendance->check_in_time)
                                             ->first();
 
+                // Calculate hours worked
                 if ($checkOut) {
                     // Extract dates from check_in_time and check_out_time
-                    $checkInDate = date('m-d-Y', strtotime($attendance->check_in_time));
-                    $checkOutDate = date('m-d-Y', strtotime($checkOut->check_out_time));
+                    $checkInDate = date('Y-m-d', strtotime($attendance->check_in_time));
+                    $checkOutDate = date('Y-m-d', strtotime($checkOut->check_out_time));
 
                     // Check if dates match
                     if ($checkInDate === $checkOutDate) {
                         // Calculate hours worked
                         $checkIn = strtotime($attendance->check_in_time);
                         $checkOutTime = strtotime($checkOut->check_out_time);
-                        $hoursWorked = ($checkOutTime - $checkIn) / 3600; // Calculate hours difference
 
-                        // Round to two decimal places
-                        $attendance->hours_worked = round($hoursWorked, 2);
-                        $attendance->worked_date = $checkInDate; // Store the worked date
-                        $attendance->remarks = 'Present'; // No remark needed if hours worked is recorded
+                        // Split hours into AM and PM
+                        if ($checkIn < strtotime($checkInDate . ' 12:00 PM')) {
+                            if ($checkOutTime <= strtotime($checkInDate . ' 1:00 PM')) {
+                                // Both check-in and check-out are in the AM
+                                $hoursWorkedAM = ($checkOutTime - $checkIn) / 3600;
+                            } else {
+                                // Check-in is in AM and check-out is in PM
+                                $hoursWorkedAM = (strtotime($checkInDate . ' 12:00 PM') - $checkIn) / 3600;
+                                $hoursWorkedPM = ($checkOutTime - strtotime($checkInDate . ' 01:00 PM')) / 3600;
+                            }
+                        } else {
+                            // Both check-in and check-out are in the PM
+                            $hoursWorkedPM = ($checkOutTime - $checkIn) / 3600;
+                        }
+
+                        // Calculate total hours worked
+                        $totalHoursWorked = $hoursWorkedAM + $hoursWorkedPM;
+
+                        // Prepare the key for $attendanceData
+                        $key = $attendance->employee_id . '-' . $checkInDate;
+
+                        // Check if this entry already exists in $attendanceData
+                        if (isset($attendanceData[$key])) {
+                            // Update existing entry
+                            $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
+                            $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
+                            $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
+                        } else {
+                            // Create new entry
+                            $attendanceData[$key] = (object) [
+                                'employee_id' => $attendance->employee_id,
+                                'worked_date' => $checkInDate,
+                                'hours_workedAM' => $hoursWorkedAM,
+                                'hours_workedPM' => $hoursWorkedPM,
+                                'total_hours_worked' => $totalHoursWorked,
+                                'remarks' => 'Present', // Assuming it's always present when hours are recorded
+                            ];
+                        }
                     } else {
                         // Dates do not match, mark as absent
-                        $attendance->hours_worked = 0; // Mark as absent
-                        $attendance->worked_date = $checkInDate; // Use check_in_time date as worked date
-                        $attendance->remarks = 'Absent'; // Add remark for absence
+                        $attendanceData[] = (object) [
+                            'employee_id' => $attendance->employee_id,
+                            'worked_date' => $checkInDate,
+                            'hours_workedAM' => 0,
+                            'hours_workedPM' => 0,
+                            'total_hours_worked' => 0,
+                            'remarks' => 'Absent',
+                        ];
                     }
                 } else {
                     // No check_out_time found, mark as absent
-                    $attendance->hours_worked = 0; // Mark as absent
-                    $attendance->worked_date = date('m-d-Y', strtotime($attendance->check_in_time)); // Use check_in_time date as worked date
-                    $attendance->remarks = 'Absent'; // Add remark for absence
+                    $checkInDate = date('Y-m-d', strtotime($attendance->check_in_time));
+                    $attendanceData[] = (object) [
+                        'employee_id' => $attendance->employee_id,
+                        'worked_date' => $checkInDate,
+                        'hours_workedAM' => 0,
+                        'hours_workedPM' => 0,
+                        'total_hours_worked' => 0,
+                        'remarks' => 'Absent',
+                    ];
                 }
             }
 
-            // Generate PDF using the 'generate-pdf' view and data
-            $pdf = \PDF::loadView('generate-pdf', [
+                $pdf = \PDF::loadView('generate-pdf', [
+                'selectedStartDate' => $this->startDate,
+                'selectedEndDate' => $this->endDate,
+                'attendanceData' => $attendanceData,
                 'attendanceTimeIn' => $attendanceTimeIn,
                 'attendanceTimeOut' => $attendanceTimeOut,
                 'selectedEmployeeToShow' => $this->selectedEmployeeToShow,
-            ])->setPaper('a4', 'portrait'); // Set paper size and orientation
+            ])->setPaper('letter', 'landscape'); // Set paper size and orientation
 
+             $pdf->save($savePath . '/' . $filename);
 
             // Download the PDF file with the given filename
-            return response()->streamDownload(function () use ($pdf) {
-                echo $pdf->stream();
-                }, 'name.pdf');
+            return response()->download($savePath . '/' . $filename, $filename);
         } catch (\Exception $e) {
             // Log or handle the exception as needed
             dd($e->getMessage()); // Output the error for debugging
         }
     }
+    
+    
 
 
 
