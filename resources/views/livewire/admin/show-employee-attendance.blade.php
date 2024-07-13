@@ -13,7 +13,7 @@
     <div class="flex justify-between mb-4 sm:-mt-4">
         <div class="font-bold text-md tracking-tight text-md text-black  mt-2">Admin / Employee Attendance</div>
     </div>
-
+    
         <div class="flex flex-column overflow-x-auto -mb-5">
             <div class="col-span-3 p-4">
                 <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display employee by school:</label>
@@ -82,10 +82,10 @@
             </select>
 
             @if($selectedEmployeeToShow)
-                @if($search && $attendances->isEmpty())
+                @if($search && $attendanceTimeIn->isEmpty() && $attendanceTimeOut->isEmpty() && !$selectedAttendanceByDate->isEmpty())
                     <p class="text-black mt-8 text-center">No attendance/s found in <span class="text-red-500">{{ $selectedEmployeeToShow->employee_id }} | {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }} </span> for matching "{{ $search }}"</p>
                     <p class="text-center mt-5"><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
-                @elseif(!$search && $attendances->isEmpty())
+                @elseif(!$search && $attendanceTimeIn->isEmpty() && $attendanceTimeOut->isEmpty() && !$selectedAttendanceByDate->isEmpty())
                     <p class="text-black mt-8 text-center uppercase">No data available in employee <text class="text-red-500">{{ $selectedEmployeeToShow->employee_id }} | {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</text></p>
                 @else
                     <div class="flex justify-between mt-1 mb-2">
@@ -93,10 +93,37 @@
                             <text class="uppercase">Attendance of Employee: {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}
                         </div>
                         <div class="flex flex-col">
-                            <div class="flex justify-end mb-2">
-                                <button class="w-32 bg-blue-500 text-white text-sm px-2 py-2 rounded hover:bg-blue-700"><i class="fa-solid fa-file"></i> Generate DTR</button>
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="grid grid-rows-2 grid-flow-col -mt-10">
+                                    <div class="text-center uppercase ml-16">
+                                        Select Date
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <label for="startDate" class="text-gray-600">Start Date:</label>
+                                        <input 
+                                            id="startDate" 
+                                            type="date" 
+                                            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                            wire:model="startDate"
+                                            wire:change="updateAttendanceByDateRange"
+                                        >
+                                        <label for="endDate" class="text-gray-600">End Date:</label>
+                                        <input 
+                                            id="endDate" 
+                                            type="date" 
+                                            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                            wire:model="endDate"
+                                            wire:change="updateAttendanceByDateRange"
+                                        >
+                                    </div>
+                                </div>
+                                <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
+                                    <i class="fa-solid fa-file"></i> Print DTR
+                                </button>
                             </div>
-                            <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-full md:w-64" placeholder="Search..." autofocus>
+                            <div class="self-end">
+                                <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 py-1.5 w-full md:w-64" placeholder="Search..." autofocus>
+                            </div>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
@@ -120,52 +147,89 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($attendances as $attendance)
-                                        <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
-                                            <td class="text-black border border-gray-400">{{ $attendance->employee_id }}</td>
-                                            <td class="text-black border border-gray-400">{{ \Carbon\Carbon::parse($attendance->check_in_time)->format('m-d Y') }}</td>
-                                            <td class="text-black border border-gray-400">{{ $attendance->check_in_time }}</td>
-                                            <!-- Add other columns as needed -->
-                                        </tr>
+                                        @foreach ($attendanceTimeIn as $attendanceIn)
+                                            <tr class="hover:bg-gray-100">
+                                                <td class="text-black border border-gray-400">{{ $attendanceIn->employee->employee_id }}</td>
+                                                <td class="text-black border border-gray-400">{{ date('m-d-Y, (l)', strtotime($attendanceIn->check_in_time)) }}</td>
+                                                <td class="text-black border border-gray-400">{{ date('g:i:s A', strtotime($attendanceIn->check_in_time)) }}</td>
+                                                <!-- Add other columns as needed -->
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="w-1/12"></div>
+                            <text  class="font-bold uppercase">{{ $attendanceTimeIn->links() }}</text>
+                            <div class="w-[2%]"></div>
                             <!-- Table for Time Out -->
                             <div class="w-1/2">
-                                <h3>Time Out</h3>
+                                <h3 class="text-center">Time Out</h3>
+                                    <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                                        <thead class="bg-gray-200 text-black">
+                                            <tr>
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    Employee ID
+                                                </th>
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    Date
+                                                </th>
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    Check-Out Time
+                                                </th>
+                                                <!-- Add other columns as needed -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($attendanceTimeOut as $attendanceOut)
+                                                <tr class="hover:bg-gray-100">
+                                                    <td class="text-black border border-gray-400">{{ $attendanceOut->employee->employee_id }}</td>
+                                                    <td class="text-black border border-gray-400">
+                                                        @if ($attendanceOut->check_out_time)
+                                                            {{ date('m-d-Y, (l)', strtotime($attendanceOut->check_out_time)) }}
+                                                        @else
+                                                            No time out recorded
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-black border border-gray-400">{{ date('g:i:s A', strtotime($attendanceOut->check_out_time)) }}</td>
+                                                    <!-- Add other columns as needed -->
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                    <text  class="font-bold uppercase">{{ $attendanceTimeOut->links() }}</text>
+                            </div>
+                            <div class="w-[2%]"></div>
+                            <div class="w-1/2">
+                                <h3 class="text-center">Computed Working Hours</h3>
                                 <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                                     <thead class="bg-gray-200 text-black">
                                         <tr>
                                             <th class="border border-gray-400 px-3 py-2">
-                                                Employee ID
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2">
                                                 Date
                                             </th>
                                             <th class="border border-gray-400 px-3 py-2">
-                                                Check-Out Time
+                                                Total Hours
                                             </th>
-                                            <!-- Add other columns as needed -->
+                                           <th class="border border-gray-400 px-3 py-2">
+                                                Remarks
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($attendances as $attendance)
-                                        <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
-                                            <td class="text-black border border-gray-400">{{ $attendance->employee_id }}</td>
-                                            <td class="text-black border border-gray-400">{{ \Carbon\Carbon::parse($attendance->check_out_time)->format('m-d Y') }}</td>
-                                            <td class="text-black border border-gray-400">{{ $attendance->check_out_time }}</td>
-                                            <!-- Add other columns as needed -->
-                                        </tr>
+                                         @foreach ($attendanceTimeIn as $attendance)
+                                            <tr>
+                                                <td class="text-black border border-gray-400">{{ $attendance->worked_date }}</td>
+                                                <td class="text-black border border-gray-400">
+                                                    {{ floor($attendance->hours_worked) }} hrs, {{ ($attendance->hours_worked - floor($attendance->hours_worked)) * 60 }} mins
+                                                </td>
+                                                <td class="text-black border border-gray-400">{{ $attendance->remarks }}</td>
+                                                <!-- <td class="text-black border border-gray-400">{{ $attendance->hours_worked }}</td> -->
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-
-                    <text  class="font-bold uppercase">{{ $attendances->links() }}</text>
                 @endif
             @else
                 @if($employees->isEmpty())
@@ -180,6 +244,90 @@
     
    
 </div>
+@push('scripts')
+<script>
+    Livewire.on('livewire:load', () => {
+        flatpickr("#date_start", {
+            dateFormat: "Y-m-d",
+            onChange: function(selectedDates, dateStr, instance) {
+                @this.set('dateStart', dateStr);
+            }
+        });
+
+        flatpickr("#date_end", {
+            dateFormat: "Y-m-d",
+            onChange: function(selectedDates, dateStr, instance) {
+                @this.set('dateEnd', dateStr);
+            }
+        });
+    });
+</script>
+@endpush
+
+<script>
+    function downloadPDF() {
+        // Initialize jsPDF
+        const pdf = new jspdf.jsPDF('l', 'px', 'a4');
+
+        // Set margins (adjust as needed)
+        const margins = { top: 30, bottom: 10, left: 30, width: 800 };
+
+        // Define position variables
+        let posY = margins.top;
+
+        // Add title
+        pdf.setFontSize(16);
+
+
+        pdf.text('Time In', margins.left, posY);
+        posY += 10; // Increase posY for spacing
+
+        // Define column widths
+        const col1Width = 60;
+        const col2Width = 120;
+        const col3Width = 120;
+
+        // Add table headers without background
+        pdf.setFontSize(12);
+
+        // Employee ID column header
+        pdf.rect(margins.left, posY - 7, col1Width, 20); // Border around cell
+        pdf.text('Employee ID', margins.left + 5, posY); // Add text with adjusted position
+
+        // Date column header
+        pdf.rect(margins.left + col1Width, posY - 7, col2Width, 20); // Border around cell
+        pdf.text('Date', margins.left + col1Width + 5, posY); // Add text with adjusted position
+
+        // Check-In Time column header
+        pdf.rect(margins.left + col1Width + col2Width, posY - 7, col3Width, 20); // Border around cell
+        pdf.text('Check-In Time', margins.left + col1Width + col2Width + 5, posY); // Add text with adjusted position
+
+        posY += 18; // Increase posY for table header row
+
+        // Iterate through table rows and add data with borders and padding
+        @foreach ($attendanceTimeIn as $attendanceIn)
+            pdf.setFontSize(11);
+
+            // Employee ID data
+            pdf.rect(margins.left, posY - 5, col1Width, 15); // Border around cell, adjusted height to 15px
+            pdf.text('{{ $attendanceIn->employee_id }}', margins.left + 5, posY + 5); // Text alignment with padding
+
+            // Date data
+            pdf.rect(margins.left + col1Width, posY - 5, col2Width, 15); // Border around cell, adjusted height to 15px
+            pdf.text('{{ date('m-d-Y, (l)', strtotime($attendanceIn->check_in_time)) }}', margins.left + col1Width + 5, posY + 5); // Text alignment with padding
+
+            // Check-In Time data
+            pdf.rect(margins.left + col1Width + col2Width, posY - 5, col3Width, 15); // Border around cell, adjusted height to 15px
+            pdf.text('{{ date('g:i:s A', strtotime($attendanceIn->check_in_time)) }}', margins.left + col1Width + col2Width + 5, posY + 5); // Text alignment with padding
+
+            posY += 15; // Increase posY for next row, adjusted to 15px height
+        @endforeach
+        // Save the PDF
+        pdf.save('attendance.pdf');
+    }
+</script>
+
+
 
 
 
@@ -210,7 +358,14 @@
         });
     }
 </script>
-
+<script>
+    document.addEventListener('livewire:load', function () {
+        flatpickr("#rangeDate", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+        });
+    });
+</script>
 <script>
 
     function cancelEdit() {

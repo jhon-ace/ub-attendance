@@ -16,7 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('employee_id');
             $table->timestamp('check_in_time')->nullable();
             $table->string('status')->nullable();
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->nullable();
 
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('restrict');
         });

@@ -66,7 +66,8 @@ Route::middleware(['auth'])->group(function () {
 
         // Employee Attendance routes
         Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'index'])->name('attendance.employee_attendance');
-        
+        Route::get('/generate-pdf', [EmployeeAttendanceController::class, 'generatePDF'])->name('generate.pdf');
+
 
         // Student routes
         Route::get('/students', [StudentController::class, 'index'])->name('student.index');

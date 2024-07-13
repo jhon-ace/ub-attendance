@@ -60,7 +60,7 @@ public function openPortal(Request $request)
 
                     $attendance = new EmployeeAttendanceTimeIn();
                     $attendance->employee_id = $employees2->id;
-                    $attendance->check_in_time = Carbon::now(); // Current timestamp
+                    $attendance->check_in_time = Carbon::now('Asia/Kuala_Lumpur');
                     $attendance->status = $status; 
                     $attendance->save();
 
@@ -80,6 +80,10 @@ public function openPortal(Request $request)
         return redirect()->back()->with('error', 'Invalid email or password.');
     }
 }
+
+
+
+
 
 
         // $employeeRfid = $request->input('employee_rfid');
