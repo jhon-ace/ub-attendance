@@ -46,4 +46,16 @@ class Student extends Model
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
+
+         // Each student can have many attendance records
+    public function attendanceTimeInStudent()
+    {
+        return $this->hasMany(StudentAttendanceTimeIn::class);
+    }
+
+     // Each student can have many attendance records
+    public function attendanceTimeOutStudent()
+    {
+        return $this->hasMany(StudentAttendanceTimeOut::class);
+    }
 }

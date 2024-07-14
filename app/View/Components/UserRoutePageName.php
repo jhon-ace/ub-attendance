@@ -40,6 +40,7 @@ class UserRoutePageName extends Component
                 'admin.student.index' => __('Admin - Manage Student'),
                 'admin.course.index' => __('Admin - Manage Courses'),
                 'admin.attendance.employee_attendance' => __('Admin - Employee Attendance'),
+                'admin.attendance.student_attendance' => __('Admin - Student Attendance'),
                 'admin.attendance.employee_attendance.portal' => __('Employee Attendance Portal'),
             ];
 

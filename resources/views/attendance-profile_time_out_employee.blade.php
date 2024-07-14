@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Employee Profile</title>
+    <title>Employee Profile Out</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* Styles for input fields */

@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Time In Portal</title>
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        /* Example of custom focus styles */
+        /* Styles for input fields */
         input[type=password] {
             display: block;
             outline: none;
@@ -28,55 +27,58 @@
             
         }
 
+        /* General body styles */
         body {
             margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
             font-family: sans-serif;
             background: linear-gradient(to right, #FBBF24, #EF4444);
             color: #000; /* Adjust text color as needed */
-            overflow: hidden; /* Prevent scrolling */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 100vh;
         }
 
-        .content {
-            flex: 1; /* Fill remaining vertical space */
+        /* Container styles */
+        .container {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            flex: 1; /* Fill remaining vertical space */
         }
 
-        .footer {
-            background: linear-gradient(to right, #FBBF24, #EF4444);
-            color: white;
-            text-align: center;
+        /* Footer styles */
+        footer {
             padding: 1rem;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+            position: sticky;
+            bottom: 0;
         }
     </style>
 </head>
 <body>
-    <div class="content" >
-        <!-- Logo Section -->
-        <div class="flex flex-col items-center justify-center">
-            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[600px]" >
-            <div class="mt-10 text-white text-lg font-semibold" id="my-time"></div> <!-- Date and Time Display -->
-        </div>
-
-        <!-- Form Section -->
-        
-    </div>
-    <form id="attendanceForm" action="{{ route('admin.attendance.time-in.store') }}" method="POST" class="mt-10">
-            @csrf
-            <div class="mb-4">
-                <input type="password" id="inputField" name="user_rfid"
-                    class="bg-gradient-to-r from-yellow-400 to-red-500 mt-1 p-2 w-full text-[#F9C915]"
-                    autocomplete="off" autofocus>
+    <div class="container">
+        <div class="flex w-full">
+            <div class="flex flex-1 flex-col w-full -pl-8 mt-5">
+                <div class="font-bold uppercase flex justify-center">
+                    <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[500px]">
+                </div>
             </div>
-        </form>
-
-    <!-- Footer Section -->
+        </div>
+    </div>
+    <div class="w-full z-10">
+            <form id="attendanceForm" action="{{ route('admin.attendance.time-in.store') }}" method="POST">
+                @csrf
+                <div class="z-10">
+                    <input type="password" id="inputField" name="user_rfid"
+                        class="bg-gradient-to-r from-yellow-400 to-red-500 mt-1 p-2 text-[#F9C915] w-full"
+                        autocomplete="off" autofocus>
+                </div>
+            </form>
+        </div>
     <footer class="bg-gradient-to-r from-yellow-400 to-red-500 text-white text-center py-3 tracking-wide">
         <div class="max-w-screen-lg mx-auto">
             A premier university transforming lives for a great future. Anchored on: SCHOLARSHIP, CHARACTER, SERVICE
@@ -95,17 +97,5 @@
         });
     </script>
     @endpush
-    <script>
-         // Update time function
-        var timeDisplayElement = document.querySelector('#my-time');
-        function printTime() {
-            var now = new Date();
-            var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            var date = now.toLocaleDateString(undefined, options);
-            var time = now.toLocaleTimeString();
-            timeDisplayElement.innerHTML = date + ' ' + time;
-        }
-        setInterval(printTime, 1000);
-    </script>
 </body>
 </html>

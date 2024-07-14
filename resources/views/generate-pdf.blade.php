@@ -126,7 +126,7 @@
                 @endforeach
             </tbody>
         </table>
-        <p>Overall Total Hours: {{ round($overallTotalHours,3) }}</p>
+        <p style="text-align:right">Overall Total Hours: {{ round($overallTotalHours,3) }}</p>
     </div>
 
 </body>

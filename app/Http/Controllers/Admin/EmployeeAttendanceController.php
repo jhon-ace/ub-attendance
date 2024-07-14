@@ -18,9 +18,14 @@ class EmployeeAttendanceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function employee()
     {
         return view('Admin.attendance.employee_attendance');
+    }
+
+    public function student()
+    {
+        return view('Admin.attendance.student_attendance');
     }
 
     public function portalTimeIn()

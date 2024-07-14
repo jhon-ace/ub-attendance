@@ -1,0 +1,351 @@
+<?php
+
+namespace App\Livewire\Admin;
+
+use App\Models\Admin\Student;
+use App\Models\Admin\School;
+use App\Models\Admin\Department;
+use App\Models\Admin\Course;
+use Livewire\Component;
+use Livewire\WithPagination;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\Admin\StudentAttendanceTimeIn;
+use App\Models\Admin\StudentAttendanceTimeOut;
+
+class ShowStudentAttendance extends Component
+{
+    use WithPagination;
+
+    public $search = '';
+    public $sortField = 'id';
+    public $sortDirection = 'asc';
+    public $selectedSchool = null;
+    public $selectedDepartment = null;
+    public $selectedCourse = null;
+    public $departmentsToShow;
+    public $schoolToShow;
+    public $departmentToShow;
+    public $studentsToShow;
+    public $selectedCourseToShow;
+    public $selectedStudent = null;
+    public $selectedAttendanceToShow;
+    public $selectedStudentToShow;
+
+
+    protected $listeners = ['updateEmployees', 'updateEmployeesByDepartment', 'updateStudentsByCourse', 'updateAttendanceByStudent'];
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function clearSearch()
+    {
+        $this->search = '';
+    }
+
+    public function mount()
+    {
+        $this->departmentsToShow = collect([]);
+        $this->schoolToShow = collect([]);
+        $this->departmentToShow = collect([]);
+        $this->studentsToShow = collect([]);
+        $this->selectedCourseToShow = collect([]);
+        $this->selectedAttendanceToShow = collect([]);
+        $this->selectedStudentToShow = collect([]);
+    }
+
+    public function updatingSelectedSchool()
+    {
+        $this->resetPage();
+        $this->updateEmployees();
+    }
+
+    public function updatingSelectedDepartment()
+    {
+        $this->resetPage();
+        $this->selectedCourse = null;
+        $this->departmentToShow = null;
+        $this->updateEmployeesByDepartment();
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+
+        $this->sortField = $field;
+    }
+
+   public function render()
+    {
+        $query = Student::query()->with(['course.school', 'course.department']);
+
+        // Apply search filters
+        // $query = $this->applySearchFilters($query);
+
+        // Apply selected school filter
+        if ($this->selectedSchool) {
+            $query->whereHas('course', function (Builder $query) {
+                $query->where('school_id', $this->selectedSchool);
+            });
+            $this->schoolToShow = School::find($this->selectedSchool);
+        } else {
+            $this->schoolToShow = null;
+        }
+
+        // Apply selected department filter
+        if ($this->selectedDepartment) {
+            $query->whereHas('course', function (Builder $query) {
+                $query->where('department_id', $this->selectedDepartment);
+            });
+            $this->departmentToShow = Department::find($this->selectedDepartment);
+
+            // Fetch courses for the selected department
+            $courses = Course::where('department_id', $this->selectedDepartment)->get();
+        } else {
+            $this->departmentToShow = null;
+            $courses = Course::all(); // Fetch all courses if no department selected
+        }
+
+        // Apply selected course filter
+        if ($this->selectedCourse) {
+            $query->where('course_id', $this->selectedCourse);
+            $this->selectedCourseToShow = Course::find($this->selectedCourse);
+
+            $students = Student::where('course_id', $this->selectedCourse)->get();
+        } else {
+            $this->selectedCourseToShow = null;
+            $students = Student::all();
+        }
+
+        if ($this->selectedCourse) {
+            $query->where('course_id', $this->selectedCourse);
+            $this->selectedCourseToShow = Course::find($this->selectedCourse);
+
+            $students = Student::where('course_id', $this->selectedCourse)->get();
+        } else {
+            $this->selectedCourseToShow = null;
+            $students = Student::all();
+        }
+
+        if ($this->selectedStudent) {
+            $query->where('id', $this->selectedStudent);
+            $this->selectedStudentToShow = Student::find($this->selectedStudent);
+        } else {
+            $this->selectedStudentToShow = null;
+        }
+
+         $queryTimeIn = StudentAttendanceTimeIn::query()
+            ->with(['student.course']);
+
+        $queryTimeOut = StudentAttendanceTimeOut::query()
+            ->with(['student.course']);
+
+        if ($this->selectedStudent) {
+            $queryTimeIn->where('student_id', $this->selectedStudent);
+            $this->selectedAttendanceToShow = StudentAttendanceTimeIn::find($this->selectedStudent);
+
+            $queryTimeOut->where('student_id', $this->selectedStudent);
+            $this->selectedAttendanceToShow = StudentAttendanceTimeOut::find($this->selectedStudent);
+        } else {
+            $this->selectedAttendanceToShow = null;
+        }
+
+        $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(50);
+
+        $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(50);
+
+
+        $attendanceData = [];
+        $overallTotalHours = 0;
+
+        foreach ($attendanceTimeIn as $attendance) {
+            // Initialize AM and PM hours worked
+            $hoursWorkedAM = 0;
+            $hoursWorkedPM = 0;
+
+            // Find corresponding check_out_time
+            $checkOut = $attendanceTimeOut->where('student_id', $attendance->student_id)
+                                        ->where('check_out_time', '>=', $attendance->check_in_time)
+                                        ->first();
+
+            // Calculate hours worked
+            if ($checkOut) {
+                // Extract dates from check_in_time and check_out_time
+                $checkInDate = date('Y-m-d', strtotime($attendance->check_in_time));
+                $checkOutDate = date('Y-m-d', strtotime($checkOut->check_out_time));
+
+                // Check if dates match
+                if ($checkInDate === $checkOutDate) {
+                    // Calculate hours worked
+                    $checkIn = strtotime($attendance->check_in_time);
+                    $checkOutTime = strtotime($checkOut->check_out_time);
+
+                    // Split hours into AM and PM
+                    if ($checkIn < strtotime($checkInDate . ' 12:00 PM')) {
+                        if ($checkOutTime <= strtotime($checkInDate . ' 1:00 PM')) {
+                            // Both check-in and check-out are in the AM
+                            $hoursWorkedAM = ($checkOutTime - $checkIn) / 3600;
+                        } else {
+                            // Check-in is in AM and check-out is in PM
+                            $hoursWorkedAM = (strtotime($checkInDate . ' 12:00 PM') - $checkIn) / 3600;
+                            $hoursWorkedPM = ($checkOutTime - strtotime($checkInDate . ' 01:00 PM')) / 3600;
+                        }
+                    } else {
+                        // Both check-in and check-out are in the PM
+                        $hoursWorkedPM = ($checkOutTime - $checkIn) / 3600;
+                    }
+
+                    // Calculate total hours worked
+                    $totalHoursWorked = $hoursWorkedAM + $hoursWorkedPM;
+
+                    // Prepare the key for $attendanceData
+                    $key = $attendance->student_id . '-' . $checkInDate;
+
+                    // Check if this entry already exists in $attendanceData
+                    if (isset($attendanceData[$key])) {
+                        // Update existing entry
+                        $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
+                        $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
+                        $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
+                    } else {
+                        // Create new entry
+                        $attendanceData[$key] = (object) [
+                            'student_id' => $attendance->student_id,
+                            'worked_date' => $checkInDate,
+                            'hours_workedAM' => $hoursWorkedAM,
+                            'hours_workedPM' => $hoursWorkedPM,
+                            'total_hours_worked' => $totalHoursWorked,
+                            'remarks' => 'Present', // Assuming it's always present when hours are recorded
+                        ];
+                    }
+
+                    // Add total hours worked to overall total
+                    $overallTotalHours += $totalHoursWorked;
+                } else {
+                    // Dates do not match, mark as absent
+                    $attendanceData[] = (object) [
+                        'student_id' => $attendance->student_id,
+                        'worked_date' => $checkInDate,
+                        'hours_workedAM' => 0,
+                        'hours_workedPM' => 0,
+                        'total_hours_worked' => 0,
+                        'remarks' => 'Absent',
+                    ];
+                }
+            } else {
+                // No check_out_time found, mark as absent
+                $checkInDate = date('Y-m-d', strtotime($attendance->check_in_time));
+                $attendanceData[] = (object) [
+                    'student_id' => $attendance->student_id,
+                    'worked_date' => $checkInDate,
+                    'hours_workedAM' => 0,
+                    'hours_workedPM' => 0,
+                    'total_hours_worked' => 0,
+                    'remarks' => 'Absent',
+                ];
+            }
+        }
+
+        $schools = School::all();
+        $departments = Department::where('school_id', $this->selectedSchool)
+            ->where('dept_identifier', 'student')
+            ->get();
+
+        $studentsCounts = Student::select('course_id', \DB::raw('count(*) as student_count'))
+            ->groupBy('course_id')
+            ->get()
+            ->keyBy('course_id');
+
+        return view('livewire.admin.show-student-attendance', [
+            'overallTotalHours' => $overallTotalHours,
+            'attendanceData' =>$attendanceData,
+            'attendanceTimeIn' => $attendanceTimeIn,
+            'attendanceTimeOut' => $attendanceTimeOut,
+            'students' => $students,
+            'schools' => $schools,
+            'departments' => $departments,
+            'studentsCounts' => $studentsCounts,
+            'schoolToShow' => $this->schoolToShow,
+            'departmentToShow' => $this->departmentToShow,
+            'selectedCourseToShow' => $this->selectedCourseToShow,
+            'selectedStudentToShow' => $this->selectedStudentToShow,
+            'selectedAttendanceToShow' => $this->selectedAttendanceToShow,
+            'courses' => $courses, // Pass the courses to the view
+        ]);
+    }
+
+
+
+
+    public function updateEmployees()
+    {
+        if ($this->selectedSchool) {
+            $this->departmentsToShow = Department::where('school_id', $this->selectedSchool)->get();
+        } else {
+            $this->departmentsToShow = collect();
+        }
+
+        $this->selectedDepartment = null;
+        $this->departmentToShow = null;
+    }
+
+    public function updateEmployeesByDepartment()
+    {
+        if ($this->selectedDepartment && $this->selectedSchool) {
+            $this->departmentToShow = Department::where('id', $this->selectedDepartment)
+                ->where('school_id', $this->selectedSchool)
+                ->first();
+        } else {
+            $this->departmentToShow = null;
+        }
+    }
+
+    public function updateStudentsByCourse()
+    {
+        if ($this->selectedCourse) {
+            $this->studentsToShow = Student::where('course_id', $this->selectedCourse)->get();
+        } else {
+            $this->studentsToShow = collect();
+        }
+    }
+
+    public function updateAttendanceByStudent()
+    {
+        if ($this->selectedStudent) {
+            $this->selectedAttendanceToShow = StudentAttendanceTimeIn::where('student_id', $this->selectedStudent)->get();
+            $this->selectedAttendanceToShow = StudentAttendanceTimeOut::where('student_id', $this->selectedStudent)->get();
+        } else {
+            $this->selectedAttendanceToShow = collect();
+            // $this->startDate = null; // Reset start date
+            // $this->endDate = null; // Reset end date
+        }
+    }
+
+    // protected function applySearchFilters($query)
+    // {
+    //     return $query->where(function (Builder $query) {
+    //         $query->where('student_id', 'like', '%' . $this->search . '%')
+    //             ->orWhere('student_lastname', 'like', '%' . $this->search . '%')
+    //             ->orWhere('student_firstname', 'like', '%' . $this->search . '%')
+    //             ->orWhere('student_middlename', 'like', '%' . $this->search . '%')
+    //             ->orWhere('student_year_grade', 'like', '%' . $this->search . '%')
+    //             ->orWhere('student_rfid', 'like', '%' . $this->search . '%')
+    //             ->orWhere('student_status', 'like', '%' . $this->search . '%')
+    //             ->orWhereHas('course', function (Builder $query) {
+    //                 $query->where('course_abbreviation', 'like', '%' . $this->search . '%')
+    //                     ->orWhere('course_name', 'like', '%' . $this->search . '%');
+    //             })
+    //             ->orWhereHas('course.department', function (Builder $query) {
+    //                 $query->where('department_abbreviation', 'like', '%' . $this->search . '%')
+    //                     ->orWhere('department_name', 'like', '%' . $this->search . '%');
+    //             });
+    //     });
+    // }
+}

@@ -84,7 +84,7 @@
                         </li>
                     </ul>
                 </li>
-                <li x-data="{ open: {{ request()->routeIs('admin.attendance.employee_attendance') ? 'true'  : 'false' }} }">
+                <li x-data="{ open: {{ request()->routeIs('admin.attendance.employee_attendance') || request()->routeIs('admin.attendance.student_attendance') ? 'true'  : 'false' }} }">
                     <a @click="open = !open" class="cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
                         <span class="inline-flex justify-center items-center ml-3">
                             <i class="fa-solid fa-users fa-sm text-gray-200"></i>
@@ -98,11 +98,6 @@
                         </span>
                     </a>
                     <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1">
-                        <!-- <li>
-                            <a href="{{ route('admin.staff.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.staff.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
-                            <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Admin Staff
-                            </a>
-                        </li> -->
                         <li>
                             <a href="{{ route('admin.attendance.employee_attendance') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.attendance.employee_attendance') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Employee
@@ -110,13 +105,18 @@
                         </li>
                         
                         <li>
-                            <a href="{{ route('admin.student.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.student.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                            <a href="{{ route('admin.attendance.student_attendance') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.attendance.student_attendance') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Student
+                            </a>
+                        </li>
+                        <li>
+                            <a  class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white ">
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Daily Monitor
                             </a>
                         </li>
                     </ul>
                 </li>
-                <li x-data="{ open: false }">
+                <!-- <li x-data="{ open: false }">
                     <a @click="open = !open" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
                         <span class="inline-flex justify-center items-center ml-4">
                             <i class="fa-solid fa-file-lines fa-sm text-gray-200"></i>
@@ -146,7 +146,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> -->
 
                 <li>
                     <form id="logout" method="POST" action="{{ route('logout') }}" onsubmit="return confirmLogout(event)">

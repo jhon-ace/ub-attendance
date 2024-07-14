@@ -63,14 +63,17 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('employee', [EmployeeController::class, 'deleteAll'])->name('employee.deleteAll');
 
         // Employee Attendance routes
-        Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'index'])->name('attendance.employee_attendance');
+        Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'employee'])->name('attendance.employee_attendance');
         Route::get('/generate-pdf', [EmployeeAttendanceController::class, 'generatePDF'])->name('generate.pdf');
-        
+
         Route::get('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'portalTimeIn'])->name('attendance.time-in.portal');
         Route::get('/attendance/time-out/portal', [EmployeeAttendanceController::class, 'portalTimeOut'])->name('attendance.time-out.portal');
 
         Route::post('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'submitPortalTimeIn'])->name('attendance.time-in.store');
         Route::post('/attendance/time-out/portal', [EmployeeAttendanceController::class, 'submitPortalTimeOut'])->name('attendance.time-out.store');       
+
+        //Student Attendance routes
+        Route::get('/students/attendance', [EmployeeAttendanceController::class, 'student'])->name('attendance.student_attendance');
 
         // Student routes
         Route::get('/students', [StudentController::class, 'index'])->name('student.index');
