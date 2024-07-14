@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Time In Portal</title>
+    <title>Time Out Portal</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -57,17 +57,17 @@
     </style>
 </head>
 <body>
-    <div class="content" >
+    <div class="content">
         <!-- Logo Section -->
         <div class="flex flex-col items-center justify-center">
-            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[600px]" >
+            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[600px]" style="margin-top:20px">
             <div class="mt-10 text-white text-lg font-semibold" id="my-time"></div> <!-- Date and Time Display -->
         </div>
 
         <!-- Form Section -->
         
     </div>
-    <form id="attendanceForm" action="{{ route('admin.attendance.time-in.store') }}" method="POST" class="mt-10">
+    <form id="attendanceForm" action="{{ route('admin.attendance.time-out.store') }}" method="POST" class="mt-10">
             @csrf
             <div class="mb-4">
                 <input type="password" id="inputField" name="user_rfid"

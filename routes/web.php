@@ -15,9 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/attendance/portal', [EmployeeAttendanceController::class, 'portal'])->name('attendance.portal');
-Route::post('/attendance/portal', [EmployeeAttendanceController::class, 'openPortal'])->name('attendance.store');
-        
+
 
 // Admin Routes
 Route::middleware(['auth'])->group(function () {
@@ -67,7 +65,12 @@ Route::middleware(['auth'])->group(function () {
         // Employee Attendance routes
         Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'index'])->name('attendance.employee_attendance');
         Route::get('/generate-pdf', [EmployeeAttendanceController::class, 'generatePDF'])->name('generate.pdf');
+        
+        Route::get('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'portalTimeIn'])->name('attendance.time-in.portal');
+        Route::get('/attendance/time-out/portal', [EmployeeAttendanceController::class, 'portalTimeOut'])->name('attendance.time-out.portal');
 
+        Route::post('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'submitPortalTimeIn'])->name('attendance.time-in.store');
+        Route::post('/attendance/time-out/portal', [EmployeeAttendanceController::class, 'submitPortalTimeOut'])->name('attendance.time-out.store');       
 
         // Student routes
         Route::get('/students', [StudentController::class, 'index'])->name('student.index');

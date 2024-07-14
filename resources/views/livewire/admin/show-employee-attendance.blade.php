@@ -243,9 +243,8 @@
                         </div>
                     </div>
                     <div class="flex justify-items-end justify-end">
-                        
+                        <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p>
                     </div>
-                    <p>Overall Total Hours: {{ $overallTotalHours }}</p>
                 @endif
             @else
                 @if($employees->isEmpty())

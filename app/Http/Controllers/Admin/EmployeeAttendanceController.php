@@ -23,34 +23,39 @@ class EmployeeAttendanceController extends Controller
         return view('Admin.attendance.employee_attendance');
     }
 
-    public function portal()
+    public function portalTimeIn()
     {
         return view('attendance_time_in');
     }
+
+    public function portalTimeOut()
+    {
+        return view('attendance_time_out');
+    }
     // Adjust this according to your User model namespace
 
-public function openPortal(Request $request)
+public function submitPortalTimeIn(Request $request)
 {
     // Hardcoded credentials for validation (not from user input)
-    $validEmail = 'jacasabuena@cec.edu.ph';
-    $validPassword = 'administrator';
+    // $validEmail = 'jacasabuena@cec.edu.ph';
+    // $validPassword = 'administrator';
 
     // Validate incoming request data
     $request->validate([
-        'employee_rfid' => 'required',
+        'user_rfid' => 'required',
     ]);
 
-    // Attempt to retrieve user from database based on hardcoded email
-    $user = User::where('email', $validEmail)->first();
+    // // Attempt to retrieve user from database based on hardcoded email
+    // $user = User::where('email', $validEmail)->first();
 
-    // Check if retrieved user exists and validate password
-    if ($user) {
-        // Use the check method on the retrieved user's hashed password
-        if (password_verify($validPassword, $user->password)) {
-            // Check if user has admin role (assuming you have a hasRole method)
-            if ($user->hasRole('admin')) {
-                // Check if employee with the specified RFID exists
-                $employeeRfid = $request->input('employee_rfid');
+    // // Check if retrieved user exists and validate password
+    // if ($user) {
+    //     // Use the check method on the retrieved user's hashed password
+    //     if (password_verify($validPassword, $user->password)) {
+    //         // Check if user has admin role (assuming you have a hasRole method)
+    //         if ($user->hasRole('admin')) {
+    //             // Check if employee with the specified RFID exists
+                $employeeRfid = $request->input('user_rfid');
                 $employees = Employee::where('employee_rfid', $employeeRfid)->get();
                 $employees2 = Employee::where('employee_rfid', $employeeRfid)->first();
                 
@@ -64,24 +69,74 @@ public function openPortal(Request $request)
                     $attendance->status = $status; 
                     $attendance->save();
 
-                    return view('attendance-profile_time_in', compact('employees'));
+                    return view('attendance-profile_time_in_employee', compact('employees'));
                 } else {
-                    return redirect()->route('attendance.portal')->with('error', 'Employee not found.');
+                    return redirect()->route('admin.attendance.time-in.portal')->with('error', 'Employee not found.');
                 }
-            } else {
-                return redirect()->back()->with('error', 'Unauthorized access.');
-            }
-        } else {
-            // Invalid password
-            return redirect()->back()->with('error', 'Invalid email or password.');
-        }
-    } else {
-        // User not found
-        return redirect()->back()->with('error', 'Invalid email or password.');
-    }
+    //         } else {
+    //             return redirect()->back()->with('error', 'Unauthorized access.');
+    //         }
+    //     } else {
+    //         // Invalid password
+    //         return redirect()->back()->with('error', 'Invalid email or password.');
+    //     }
+    // } else {
+    //     // User not found
+    //     return redirect()->back()->with('error', 'Invalid email or password.');
+    // }
 }
 
+public function submitPortalTimeOut(Request $request)
+{
+    // Hardcoded credentials for validation (not from user input)
+    // $validEmail = 'jacasabuena@cec.edu.ph';
+    // $validPassword = 'administrator';
 
+    // Validate incoming request data
+    $request->validate([
+        'user_rfid' => 'required',
+    ]);
+
+    // Attempt to retrieve user from database based on hardcoded email
+    // $user = User::where('email', $validEmail)->first();
+
+    // // Check if retrieved user exists and validate password
+    // if ($user) {
+    //     // Use the check method on the retrieved user's hashed password
+    //     if (password_verify($validPassword, $user->password)) {
+    //         // Check if user has admin role (assuming you have a hasRole method)
+    //         if ($user->hasRole('admin')) {
+                // Check if employee with the specified RFID exists
+                $employeeRfid = $request->input('user_rfid');
+                $employees = Employee::where('employee_rfid', $employeeRfid)->get();
+                $employees2 = Employee::where('employee_rfid', $employeeRfid)->first();
+                
+                if ($employees2) {
+                    // Insert attendance record
+                    $status ="Inside the campus";
+
+                    $attendance = new EmployeeAttendanceTimeOut();
+                    $attendance->employee_id = $employees2->id;
+                    $attendance->check_out_time = Carbon::now('Asia/Kuala_Lumpur');
+                    $attendance->status = $status; 
+                    $attendance->save();
+                    
+                    return view('attendance-profile_time_out_employee', compact('employees'));
+                } else {
+                    return redirect()->route('admin.attendance.time-out.portal')->with('error', 'Employee not found.');
+                }
+    //         } else {
+    //             return redirect()->back()->with('error', 'Unauthorized access.');
+    //         }
+    //     } else {
+    //         // Invalid password
+    //         return redirect()->back()->with('error', 'Invalid email or password.');
+    //     }
+    // } else {
+    //     // User not found
+    //     return redirect()->back()->with('error', 'Invalid email or password.');
+    // }
+}
 
 
 
