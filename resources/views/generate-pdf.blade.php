@@ -57,6 +57,7 @@
             <span>Selected Date: No date range selected</span>
         </div>
     @endif
+    <p style="text-align:right">Overall Total Hours: {{ round($overallTotalHours,3) }}</p>
     <div class="table-container">
         <table>
             <thead>
@@ -126,8 +127,6 @@
                 @endforeach
             </tbody>
         </table>
-        <p style="text-align:right">Overall Total Hours: {{ round($overallTotalHours,3) }}</p>
     </div>
-
 </body>
 </html>

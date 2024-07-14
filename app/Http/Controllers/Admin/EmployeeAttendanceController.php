@@ -7,8 +7,11 @@ use Illuminate\Http\Request;
 use \App\Models\Admin\School; 
 use \App\Models\Admin\Department;
 use \App\Models\Admin\Employee;
+use \App\Models\Admin\Student;
 use \App\Models\Admin\EmployeeAttendanceTimeIn;
 use \App\Models\Admin\EmployeeAttendanceTimeOut;
+use \App\Models\Admin\StudentAttendanceTimeIn;
+use \App\Models\Admin\StudentAttendanceTimeOut;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Carbon\Carbon;
@@ -60,13 +63,14 @@ public function submitPortalTimeIn(Request $request)
     //         // Check if user has admin role (assuming you have a hasRole method)
     //         if ($user->hasRole('admin')) {
     //             // Check if employee with the specified RFID exists
-                $employeeRfid = $request->input('user_rfid');
-                $employees = Employee::where('employee_rfid', $employeeRfid)->get();
-                $employees2 = Employee::where('employee_rfid', $employeeRfid)->first();
+                $rfid = $request->input('user_rfid');
+
+                $employees = Employee::where('employee_rfid', $rfid)->get();
+                $employees2 = Employee::where('employee_rfid', $rfid)->first();
                 
                 if ($employees2) {
                     // Insert attendance record
-                    $status ="Inside the campus";
+                    $status ="On-campus";
 
                     $attendance = new EmployeeAttendanceTimeIn();
                     $attendance->employee_id = $employees2->id;
@@ -75,9 +79,25 @@ public function submitPortalTimeIn(Request $request)
                     $attendance->save();
 
                     return view('attendance-profile_time_in_employee', compact('employees'));
-                } else {
-                    return redirect()->route('admin.attendance.time-in.portal')->with('error', 'Employee not found.');
+                } 
+
+                $students = Student::where('student_rfid', $rfid)->get();
+                $student_for_attendance_in = Student::where('student_rfid', $rfid)->first();
+
+                if ($student_for_attendance_in) {
+                        $status = "On-campus";
+
+                        $attendance = new StudentAttendanceTimeIn();
+                        $attendance->student_id = $student_for_attendance_in->id;
+                        $attendance->check_in_time = Carbon::now('Asia/Kuala_Lumpur');
+                        $attendance->status = $status; 
+                        $attendance->save();
+
+                        return view('attendance-profile_time_in_student', compact('students'));
                 }
+
+                 return redirect()->route('admin.attendance.time-in.portal')->with('error', 'User not found.');
+
     //         } else {
     //             return redirect()->back()->with('error', 'Unauthorized access.');
     //         }
@@ -112,13 +132,14 @@ public function submitPortalTimeOut(Request $request)
     //         // Check if user has admin role (assuming you have a hasRole method)
     //         if ($user->hasRole('admin')) {
                 // Check if employee with the specified RFID exists
-                $employeeRfid = $request->input('user_rfid');
-                $employees = Employee::where('employee_rfid', $employeeRfid)->get();
-                $employees2 = Employee::where('employee_rfid', $employeeRfid)->first();
+                $rfid = $request->input('user_rfid');
+
+                $employees = Employee::where('employee_rfid', $rfid)->get();
+                $employees2 = Employee::where('employee_rfid', $rfid)->first();
                 
                 if ($employees2) {
                     // Insert attendance record
-                    $status ="Inside the campus";
+                    $status ="Off-campus";
 
                     $attendance = new EmployeeAttendanceTimeOut();
                     $attendance->employee_id = $employees2->id;
@@ -127,9 +148,29 @@ public function submitPortalTimeOut(Request $request)
                     $attendance->save();
                     
                     return view('attendance-profile_time_out_employee', compact('employees'));
-                } else {
-                    return redirect()->route('admin.attendance.time-out.portal')->with('error', 'Employee not found.');
+                } 
+
+
+                $students = Student::where('student_rfid', $rfid)->get();
+                $student_for_attendance_out = Student::where('student_rfid', $rfid)->first();
+
+                if ($student_for_attendance_out) {
+                        $status = "Off-campus";
+ 
+                        $attendance = new StudentAttendanceTimeOut();
+                        $attendance->student_id = $student_for_attendance_out->id;
+                        $attendance->check_out_time = Carbon::now('Asia/Kuala_Lumpur');
+                        $attendance->status = $status; 
+                        $attendance->save();
+
+                        return view('attendance-profile_time_out_student', compact('students'));
                 }
+
+
+                return redirect()->route('admin.attendance.time-out.portal')->with('error', 'Employee not found.');
+
+
+
     //         } else {
     //             return redirect()->back()->with('error', 'Unauthorized access.');
     //         }

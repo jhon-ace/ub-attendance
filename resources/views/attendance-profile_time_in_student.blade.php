@@ -2,11 +2,9 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="refresh" content="30">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Time Out Portal</title>
+    <title>Student Profile In</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* Styles for input fields */
@@ -60,19 +58,56 @@
             bottom: 0;
         }
     </style>
+    <script>
+        setTimeout(function() {
+            window.location.href = "{{ route('admin.attendance.time-in.portal') }}";
+        }, 5000); // 5000 milliseconds = 5 seconds
+    </script>
 </head>
 <body>
     <div class="container">
+        @forelse ($students as $student)
         <div class="flex w-full">
+            <div style="width: 600px;" class="pl-16 ml-5">
+                @if ($student->student_photo && Storage::exists('public/student_photo/' . $student->student_photo))
+                <div class="flex justify-center mb-4 mt-5">
+                    <img src="{{ asset('storage/student_photo/' . $student->student_photo) }}" class="rounded-lg object-contain" alt="Student Photo">
+                </div>
+                @else
+                <div class="flex justify-center mb-4">
+                    <img data-fancybox src="{{ asset('assets/img/user.png') }}" class="cursor-pointer w-48 h-48 object-cover hover:border hover:border-red-500 rounded-sm" title="Click to view Picture" alt="Default User Photo">
+                </div>
+                @endif
+            </div>
             <div class="flex flex-1 flex-col w-full -pl-8 mt-5">
                 <div class="font-bold uppercase flex justify-center">
-                    <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[500px]">
+                    <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[230px]">
+                </div>
+                <div class="p-2 mb-2 mt-5 font-bold uppercase">
+                    <span class="text-sm">Student ID</span><br>
+                    <span style="font-size: 35px;" class="text-white shadow-sm">{{ $student->student_id }}</span>
+                </div>
+                <div class="p-2 mb-2 font-bold uppercase">
+                    <span class="text-sm">Student Full Name</span><br>
+                    <span style="font-size: 40px;" class="text-white shadow-sm">{{ $student->student_lastname }}, {{ $student->student_firstname }} {{ ucfirst($student->student_middlename[0]) }}</span>
+                </div>
+                <div class="p-2 font-bold uppercase">
+                    <span class="text-sm">Program</span><br>
+                    <span style="font-size: 20px;" class="text-white shadow-sm">{{ $student->course->course_name}}({{ $student->course->course_abbreviation}})</span>
+                </div>
+                <div class="p-2 font-bold uppercase">
+                    <span class="text-sm">Department/Office</span><br>
+                    <span style="font-size: 25px;" class="text-white shadow-sm">{{ $student->course->department->department_name }}</span>
                 </div>
             </div>
         </div>
+        
+        @empty
+        <p>No employee found.</p>
+        @endforelse
     </div>
     <div class="w-full z-10">
-            <form id="attendanceForm" action="{{ route('admin.attendance.time-out.store') }}" method="POST">
+            <form id="attendanceForm" action="{{ route('admin.attendance.time-in.store') }}" method="POST">
                 @csrf
                 <div class="z-10">
                     <input type="password" id="inputField" name="user_rfid"

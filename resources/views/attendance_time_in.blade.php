@@ -2,7 +2,9 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="refresh" content="30">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Time In Portal</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -58,13 +60,14 @@
             bottom: 0;
         }
     </style>
+
 </head>
 <body>
     <div class="container">
         <div class="flex w-full">
             <div class="flex flex-1 flex-col w-full -pl-8 mt-5">
                 <div class="font-bold uppercase flex justify-center">
-                    <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[500px]">
+                    <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class=" w-[500px]">
                 </div>
             </div>
         </div>
