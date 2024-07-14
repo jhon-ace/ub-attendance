@@ -10,10 +10,10 @@
     @if (session('error'))
         <x-sweetalert type="error" :message="session('error')" />
     @endif
+
     <div class="flex justify-between mb-4 sm:-mt-4">
         <div class="font-bold text-md tracking-tight text-md text-black  mt-2">Admin / Manage Employee</div>
     </div>
-
         <div class="flex flex-column overflow-x-auto -mb-5">
             <div class="col-span-3 p-4">
                 <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display employee by school:</label>
@@ -57,6 +57,16 @@
     </div>
     <hr class="border-gray-200 my-4">
         @if(!$schoolToShow)
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+        <br>
             <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected school</p>
         @endif
         @if(!empty($selectedSchool))
@@ -157,23 +167,21 @@
             </div>
         @else
             <div class="flex justify-between">
-                <div class="">
-                    @if($departmentToShow)
-                    <!-- <form id="deleteAll" action="{{ route('admin.employee.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);" class="flex ml-4">
-                        @csrf
-                        @method('DELETE')
-                        <input type="hidden" name="department_id" value="{{$departmentToShow->id }}" id="department_id_to_delete">
-                        
-                        <button type="submit" class="text-xs lg:text-sm bg-red-500 text-white px-3 py-2 -ml-3 -mt-1 rounded-md hover:bg-red-700
-                            @if(empty($selectedSchool) || empty($selectedDepartment)) cursor-not-allowed opacity-50 @endif"
-                            @if(empty($selectedSchool) || empty($selectedDepartment)) disabled @endif>
-                            <i class="fa-solid fa-trash fa-sm"></i> Delete All Records
+                <form action="{{ route('admin.csv.import') }}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <div class="flex items-center space-x-2">
+                        <label for="csv_file" class="text-sm font-medium text-gray-700">Choose CSV file:</label>
+                        <div class="relative">
+                            <input id="csv_file" type="file" name="csv_file" accept=".csv,.txt" class="hidden">
+                            <label for="csv_file" class="cursor-pointer bg-white border border-gray-300 text-gray-700 rounded-md py-1 px-3 inline-block text-sm hover:bg-gray-50 hover:border-blue-500">
+                                <i class="fa-solid fa-file-import mr-1"></i> Browse
+                            </label>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white text-sm px-3 py-1 rounded hover:bg-blue-700">
+                            Import
                         </button>
-                    </form> -->
-                    @else
-
-                    @endif
-                </div>
+                    </div>
+                </form>
                 <div class="flex justify-center items-center">
                     <div x-data="{ open: false }">
                         <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">

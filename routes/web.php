@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\EmployeeAttendanceController;
+use App\Http\Controllers\Admin\CSVImportController;
 
 
 Route::get('/', function () {
@@ -61,6 +62,11 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employee.update');
         Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
         Route::delete('employee', [EmployeeController::class, 'deleteAll'])->name('employee.deleteAll');
+
+        // CSV Route
+        // routes/web.php
+        Route::post('/import-csv', [CSVImportController::class, 'import'])->name('csv.import');
+
 
         // Employee Attendance routes
         Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'employee'])->name('attendance.employee_attendance');
