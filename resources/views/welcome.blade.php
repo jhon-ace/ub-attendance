@@ -49,7 +49,7 @@
     
                 <!-- Email Address -->
                 <div class="mb-4">
-                    <x-input-label for="email" :value="__('Email')" />
+                    <x-input-label for="email" :value="__('Enter your work email')" />
                     <x-text-input id="email" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
                                   type="email"
                                   name="email"

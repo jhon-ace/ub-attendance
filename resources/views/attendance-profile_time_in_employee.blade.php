@@ -61,7 +61,7 @@
     <script>
         setTimeout(function() {
             window.location.href = "{{ route('admin.attendance.time-in.portal') }}";
-        }, 5000); // 5000 milliseconds = 5 seconds
+        }, 1000); // 5000 milliseconds = 5 seconds
     </script>
 </head>
 <body>

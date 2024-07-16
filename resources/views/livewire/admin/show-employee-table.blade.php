@@ -172,7 +172,7 @@
                     <div class="flex items-center space-x-2">
                         <label for="csv_file" class="text-sm font-medium text-gray-700">Choose CSV file:</label>
                         <div class="relative">
-                            <input id="csv_file" type="file" name="csv_file" accept=".csv,.txt" class="hidden">
+                            <input id="csv_file" type="file" name="csv_file" accept=".csv,.txt" class="hidden" required>
                             <label for="csv_file" class="cursor-pointer bg-white border border-gray-300 text-gray-700 rounded-md py-1 px-3 inline-block text-sm hover:bg-gray-50 hover:border-blue-500">
                                 <i class="fa-solid fa-file-import mr-1"></i> Browse
                             </label>
