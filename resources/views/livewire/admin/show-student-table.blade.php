@@ -1,4 +1,9 @@
 <div class="mb-4">
+        @php
+            session(['selectedSchool' => $selectedSchool]);
+            session(['selectedDepartment3' => $selectedDepartment3]);
+            session(['selectedCourse' => $selectedCourse]);
+        @endphp
     @if (session('success'))
         <x-sweetalert type="success" :message="session('success')" />
     @endif
@@ -16,25 +21,25 @@
 
         <div class="flex flex-column overflow-x-auto -mb-5">
             <div class="col-span-3 p-4">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Select School:</label>
+                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">School Year:</label>
                 <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                         required>
-                    <option value="">Select School</option>
+                    <option value="">Select School Year</option>
                     @foreach($schools as $school)
-                        <option value="{{ $school->id }}">{{ $school->id }} | {{ $school->abbreviation }} - {{ $school->school_name }}</option>
+                        <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
                     @endforeach
                 </select>
                 @if($schoolToShow)
-                    <p class="text-black mt-2 text-sm mb-1 ">Selected School ID: <span class="text-red-500 ml-2">{{ $schoolToShow->id }}</span></p>
-                    <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p>
+                    <p class="text-black mt-2 text-sm mb-1 ">Selected School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
+                    <!-- <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p> -->
                 @endif
             </div>
 
             <div class="col-span-1 p-4">
                 @if(!empty($selectedSchool))
-                    <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display courses by department:</label>
-                    <select wire:model="selectedDepartment" id="department_id" name="department_id"
+                    <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Department:</label>
+                    <select wire:model="selectedDepartment3" id="department_id" name="department_id"
                             wire:change="updateEmployeesByDepartment"
                             class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
                             required>
@@ -43,13 +48,13 @@
                         @else
                             <option value="">Select Department</option>
                             @foreach($departments as $department)
-                                <option value="{{ $department->id }}">{{ $department->department_id }} | {{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
+                                <option value="{{ $department->id }}">{{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
                             @endforeach
                         @endif
                     </select>
                     @if($departmentToShow)
-                        <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p>
-                        <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p>
+                        <p class="text-black mt-2 text-sm mb-1">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_abbreviation }}</span></p>
+                        <!-- <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p> -->
                     @endif
                 @endif
             </div>
@@ -66,23 +71,23 @@
     <!--  -->
     
     @if($departmentToShow)
-        <label for="course_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display student by courses:</label>
+        <label for="course_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Course:</label>
         <select wire:model="selectedCourse" id="course_id" name="course_id"
                 wire:change="updateStudentsByCourse"
                 class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
                 required>
             @if($courses->isEmpty())
-                <option value="0">No Departments</option>
+                <option value="0">No Course</option>
             @else
-                <option value="">Select Department</option>
+                <option value="">Select Course</option>
                 @foreach ($courses as $course)
-                    <option value="{{ $course->id }}">{{ $course->course_id }} | {{ $course->course_name }}({{ $course->course_abbreviation }})</option>
+                    <option value="{{ $course->id }}">{{ $course->course_name }}({{ $course->course_abbreviation }})</option>
                 @endforeach
             @endif
         </select>
 
         @if($selectedCourseToShow)
-            <p>Selected Course: {{ $selectedCourseToShow->course_id }} - {{ $selectedCourseToShow->course_name }}({{ $selectedCourseToShow->course_abbreviation}})</p>
+            <p>Selected Course: {{ $selectedCourseToShow->course_name }}({{ $selectedCourseToShow->course_abbreviation}})</p>
         @endif
 
         @if($selectedCourseToShow)
@@ -90,7 +95,7 @@
                 <p class="text-black mt-8 text-center">No student/s found in <span class="text-red-500">{{ $selectedCourseToShow->course_id }} - {{ $selectedCourseToShow->course_name }}({{ $selectedCourseToShow->course_abbreviation}})</span> for matching "{{ $search }}"</p>
                 <p class="text-center mt-5"><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
             @elseif(!$search && $students->isEmpty())
-                <p class="text-black mt-8 text-center uppercase">No data available in <text class="text-red-500">{{ $selectedCourseToShow->course_id }} - {{ $selectedCourseToShow->course_name }}({{ $selectedCourseToShow->course_abbreviation}}) department.</text></p>
+                <p class="text-black mt-8 text-center uppercase">No data available in <text class="text-red-500">{{ $selectedCourseToShow->course_name }}({{ $selectedCourseToShow->course_abbreviation}}) course.</text></p>
                 <div class="flex justify-center items-center mt-5">
                     <div x-data="{ open: false }">
                         <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
@@ -155,9 +160,9 @@
                                                 <x-input-error :messages="$errors->get('student_status')" class="mt-2" />
                                             </div>
                                             <div class="mb-2">
-                                                <label for="course_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Course ID</label>
+                                                <label for="course_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Course:</label>
                                                 <select id="course_id" name="course_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('course_id') is-invalid @enderror" required>
-                                                    <option value="{{ $selectedCourseToShow->id }}">{{ $selectedCourseToShow->course_id }}</option>
+                                                    <option value="{{ $selectedCourseToShow->id }}">{{ $selectedCourseToShow->course_abbreviation }}</option>
                                                 </select>
                                                 <x-input-error :messages="$errors->get('course_id')" class="mt-2" />
                                             </div>
@@ -245,9 +250,9 @@
                                                     <x-input-error :messages="$errors->get('student_status')" class="mt-2" />
                                                 </div>
                                                 <div class="mb-2">
-                                                    <label for="course_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Course ID</label>
+                                                    <label for="course_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Course:</label>
                                                     <select id="course_id" name="course_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('course_id') is-invalid @enderror" required>
-                                                        <option value="{{ $selectedCourseToShow->id }}">{{ $selectedCourseToShow->course_id }}</option>
+                                                        <option value="{{ $selectedCourseToShow->id }}">{{ $selectedCourseToShow->course_abbreviation }}</option>
                                                     </select>
                                                     <x-input-error :messages="$errors->get('course_id')" class="mt-2" />
                                                 </div>
@@ -285,18 +290,6 @@
                                     <button wire:click="sortBy('student_id')" class="w-full h-full flex items-center justify-center">
                                         Student ID
                                         @if ($sortField == 'student_id')
-                                            @if ($sortDirection == 'asc')
-                                                &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                            @else
-                                                &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                            @endif
-                                        @endif
-                                    </button>
-                                </th>
-                                <th class="border border-gray-400 px-3 py-2">
-                                    <button wire:click="sortBy('student_rfid')" class="w-full h-full flex items-center justify-center">
-                                        Student RFID No
-                                        @if ($sortField == 'student_rfid')
                                             @if ($sortDirection == 'asc')
                                                 &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
                                             @else
@@ -343,6 +336,18 @@
                                     </button>
                                 </th>
                                 <th class="border border-gray-400 px-3 py-2">
+                                    <button wire:click="sortBy('student_rfid')" class="w-full h-full flex items-center justify-center">
+                                        Student RFID No
+                                        @if ($sortField == 'student_rfid')
+                                            @if ($sortDirection == 'asc')
+                                                &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                            @else
+                                                &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                            @endif
+                                        @endif
+                                    </button>
+                                </th>
+                                <th class="border border-gray-400 px-3 py-2">
                                     <button wire:click="sortBy('student_year_grade')" class="w-full h-full flex items-center justify-center">
                                         Student Year/Grade Level
                                         @if ($sortField == 'student_year_grade')
@@ -366,8 +371,8 @@
                                         @endif
                                     </button>
                                 </th>
-                                <th class="border border-gray-400 px-3 py-2">Course ID</th>
-                                <th class="border border-gray-400 px-3 py-2">Course Name</th>
+                                <!-- <th class="border border-gray-400 px-3 py-2">Course ID</th> -->
+                                <th class="border border-gray-400 px-3 py-2">Course</th>
                                 <th class="border border-gray-400 px-3 py-2">Action</th>
                             </tr>
                         </thead>
@@ -375,7 +380,6 @@
                             @foreach ($students as $student)
                                 <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
                                     <td class="text-black border border-gray-400">{{ $student->student_id}}</td>
-                                    <td class="text-black border border-gray-400">{{ $student->student_rfid}}</td>
                                     <td class="text-black border border-gray-400 border-t-0 border-r-0 border-l-0 px-2 py-1 flex items-center justify-center" >
                                         @if ($student->student_photo && Storage::exists('public/student_photo/' . $student->student_photo))
                                             <a  href="{{ asset('storage/student_photo/' . $student->student_photo) }}" 
@@ -390,10 +394,11 @@
                                     <td class="text-black border border-gray-400">{{ $student->student_lastname }}</td>
                                     <td class="text-black border border-gray-400">{{ $student->student_firstname }}</td>
                                     <td class="text-black border border-gray-400">{{ $student->student_middlename }}</td>
+                                    <td class="text-black border border-gray-400">{{ $student->student_rfid}}</td>
                                     <td class="text-black border border-gray-400">{{ $student->student_year_grade }}</td>
                                     <td class="text-black border border-gray-400">{{ $student->student_status }}</td>
-                                    <td class="text-black border border-gray-400 text-xs">{{ $student->course->course_id}}</td>
-                                    <td class="text-black border border-gray-400 text-xs">{{ $student->course->course_name}}</td>
+                                    <!-- <td class="text-black border border-gray-400 text-xs">{{ $student->course->course_id}}</td> -->
+                                    <td class="text-black border border-gray-400 text-xs">{{ $student->course->course_abbreviation}}</td>
                                     <td class="text-black border border-gray-400">
                                         <div class="flex justify-center items-center space-x-2">
                                             <div x-data="{ open: false

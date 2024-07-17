@@ -4,24 +4,29 @@ namespace App\Livewire\Admin;
 
 use \App\Models\Admin\School; 
 use \App\Models\Admin\Department; 
+use \App\Models\Admin\DepartmentWorkingHour; 
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
+use Carbon\Carbon;
 
-class ShowDepartmentTable extends Component
+class ShowDepartmentWorkingHours extends Component
 {
-    
     use WithPagination;
 
     public $search = '';
-    public $sortField = 'dept_identifier';
+    public $sortField = 'department_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
     public $selectedDepartment = null;
     public $departmentsToShow;
     public $schoolToShow;
+    public $scheduleToShow;
+    public $showSelectedDepartment;
+    // public $todayDayOfWeek;
+    // public $todayDayOfWeekNumber;
 
-    protected $listeners = ['updateDepartments'];
+    protected $listeners = ['updateDepartments', 'showDepartmentSchedule'];
 
     public function updatingSearch()
     {
@@ -29,15 +34,34 @@ class ShowDepartmentTable extends Component
     }
 
     public function mount()
-    {
+    {   
+        // $this->todayDayOfWeekNumber = Carbon::now()->dayOfWeek;
+        // $this->todayDayOfWeek = Carbon::now()->dayOfWeek;
         $this->selectedSchool = session('selectedSchool', null);
+        $this->selectedDepartment = session('selectedDepartment', null);
+        $this->showSelectedDepartment = session('showSelectedDepartment', null);
+
         $this->departmentsToShow = collect([]); // Initialize as an empty collection
-        $this->schoolToShow = collect([]); // Initialize as an empty collection
+        $this->schoolToShow = collect([]);
+        $this->scheduleToShow = collect([]); // Initialize as an empty collection
+
+        $this->selectedSchool = $this->selectedSchool ?? json_decode(request()->cookie('selectedSchool'), true);
     }
 
     public function updatingSelectedSchool()
     {
+        session(['selectedSchool' => $this->selectedSchool]);
+        // cookie()->queue('selectedSchool', json_encode($this->selectedSchool), 60*24*30); // Store for 30 days
         $this->resetPage();
+        
+    }
+
+    public function updatingSelectedDepartment()
+    {
+        session(['selectedDepartment' => $this->selectedDepartment]);
+        // cookie()->queue('selectedDepartment', json_encode($this->selectedDepartment), 60*24*30); // Store for 30 days
+        $this->resetPage();
+        
     }
     
 
@@ -53,7 +77,17 @@ class ShowDepartmentTable extends Component
         $this->sortField = $field;
     }
 
-public function render()
+    protected $daysOfWeek = [
+        0 => 'Sunday',
+        1 => 'Monday',
+        2 => 'Tuesday',
+        3 => 'Wednesday',
+        4 => 'Thursday',
+        5 => 'Friday',
+        6 => 'Saturday',
+    ];
+
+    public function render()
     {
         $query = Department::with('school');
 
@@ -68,18 +102,39 @@ public function render()
             $this->schoolToShow = null; // Reset schoolToShow if no school is selected
         }
 
+
+        $schedule = DepartmentWorkingHour::with('department');
+        if ($this->selectedDepartment) {
+
+            $schedule->where('department_id', $this->selectedDepartment);
+            $this->scheduleToShow = DepartmentWorkingHour::find($this->selectedDepartment);
+
+        } else {
+            $this->scheduleToShow = null;
+        }
+
+        $workingHour = $schedule->orderBy($this->sortField, $this->sortDirection)
+                             ->paginate(500);
         $departments = $query->orderBy($this->sortField, $this->sortDirection)
-                             ->paginate(10);
+                             ->paginate(500);
+
+        // $workingHour = $showSchedule->orderBy($this->sortField, $this->sortDirection)
+        //                      ->paginate(10);
 
         $schools = School::all();
+
+        
 
 
          $departmentCounts = Department::select('school_id', \DB::raw('count(*) as department_count'))
                                   ->groupBy('school_id')
                                   ->get()
                                   ->keyBy('school_id');
-
-        return view('livewire.admin.show-department-table', [
+        
+        return view('livewire.admin.show-department-working-hours', [
+            'daysOfWeek' => $this->daysOfWeek,
+            'workingHour' => $workingHour,
+            'showSelectedDepartment' => $this->showSelectedDepartment,
             'departments' => $departments,
             'schools' => $schools,
             'departmentCounts' => $departmentCounts,
@@ -95,6 +150,19 @@ public function render()
         } else {
             $this->departmentsToShow = collect(); // Reset to empty collection if no school is selected
         }
+
+        
+    }
+    
+
+    public function showDepartmentSchedule()
+    {
+        if ($this->selectedDepartment) {
+            $this->showSelectedDepartment = Department::find($this->selectedDepartment);
+        } else {
+            $this->showSelectedDepartment = null;
+        }
+        
 
         
     }
@@ -115,4 +183,5 @@ public function render()
 }
 
     
+
 }

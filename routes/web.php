@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\SchoolController;
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\WorkingHourController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\StudentController;
@@ -47,6 +48,14 @@ Route::middleware(['auth'])->group(function () {
         ]);
         Route::delete('department', [DepartmentController::class, 'deleteAll'])->name('department.deleteAll');
         
+        //department_working_hours
+        Route::get('/department-working-hour', [WorkingHourController::class, 'index'])->name('workinghour.index');
+        Route::post('/department-working-hour', [WorkingHourController::class, 'store'])->name('workinghour.store');
+        Route::put('/department-working-hour/{id}', [WorkingHourController::class, 'update'])->name('workinghour.update');
+        Route::delete('/department-working-hour/{id}', [WorkingHourController::class, 'destroy'])->name('workinghour.delete');
+
+
+
         // course routes
         Route::get('/courses', [CourseController::class, 'index'])->name('course.index');
         Route::post('/courses', [CourseController::class, 'store'])->name('course.store');
@@ -73,6 +82,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/generate-pdf', [EmployeeAttendanceController::class, 'generatePDF'])->name('generate.pdf');
 
         Route::get('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'portalTimeIn'])->name('attendance.time-in.portal');
+        // Route::post('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'portalTimeIn'])->name('attendance.time-in.portal');
         Route::get('/attendance/time-out/portal', [EmployeeAttendanceController::class, 'portalTimeOut'])->name('attendance.time-out.portal');
 
         Route::post('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'submitPortalTimeIn'])->name('attendance.time-in.store');

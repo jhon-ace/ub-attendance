@@ -35,6 +35,7 @@ class UserRoutePageName extends Component
                 //route page name for managing school
                 'admin.school.index' => __('Admin - Manage School'),
                 'admin.department.index' => __('Admin - Manage Department'),
+                'admin.workinghour.index' => __('Admin - Manage Department Working Hour'),
                 'admin.staff.index' => __('Admin - Manage Admin Staff'),
                 'admin.employee.index' => __('Admin - Manage Employee'),
                 'admin.student.index' => __('Admin - Manage Student'),

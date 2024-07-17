@@ -16,7 +16,7 @@ class ShowCourseTable extends Component
     public $sortField = 'course_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
-    public $selectedDepartment = null;
+    public $selectedDepartment1 = null;
     public $departmentsToShow;
     public $schoolToShow;
     public $departmentToShow;
@@ -30,6 +30,8 @@ class ShowCourseTable extends Component
 
     public function mount()
     {
+        $this->selectedSchool = session('selectedSchool', null);
+        $this->selectedDepartment1 = session('selectedDepartment1', null);
         $this->departmentsToShow = collect([]); // Initialize as an empty collection
         $this->schoolToShow = collect([]); // Initialize as an empty collection
         $this->departmentToShow = collect([]);
@@ -74,9 +76,9 @@ class ShowCourseTable extends Component
         }
 
         // Apply selected department filter
-        if ($this->selectedDepartment) {
-            $query->where('department_id', $this->selectedDepartment);
-            $this->departmentToShow = Department::find($this->selectedDepartment);
+        if ($this->selectedDepartment1) {
+            $query->where('department_id', $this->selectedDepartment1);
+            $this->departmentToShow = Department::find($this->selectedDepartment1);
         } else {
             $this->departmentToShow = null; // Reset departmentToShow if no department is selected
         }
@@ -115,14 +117,14 @@ class ShowCourseTable extends Component
         }
 
         // Ensure departmentToShow is reset if the selected school changes
-        $this->selectedDepartment = null;
+        $this->selectedDepartment1 = null;
         $this->departmentToShow = null;
     }
 
 public function updateEmployeesByDepartment()
 {
-    if ($this->selectedDepartment && $this->selectedSchool) {
-        $this->departmentToShow = Department::where('department_id', $this->selectedDepartment)
+    if ($this->selectedDepartment1 && $this->selectedSchool) {
+        $this->departmentToShow = Department::where('department_id', $this->selectedDepartment1)
                                             ->where('school_id', $this->selectedSchool)
                                             ->first();
     } else {

@@ -47,8 +47,7 @@
         padding: 2rem;
         text-align: center;
         flex: 1;
-        overflow: hidden; Prevents container scroll
-        background-color:red;
+        overflow: hidden; /* Prevents container scroll */
     }
 
     /* Table and content styles */
@@ -59,105 +58,86 @@
         width: 100%;
         margin: 2px;
         overflow: hidden; /* Prevents container scroll */
-        
+        margin-top:-50px;
     }
 
     .table-container {
-        border-radius: 3px;
+        border-radius: 4px;
         background-color: rgba(255, 255, 255, 0.8);
         overflow: hidden; /* Prevents container scroll */
         margin-bottom: 2rem; /* Adds space between tables */
+        height:70vh;
     }
 
     table {
         border-collapse: collapse;
-        width: 100%; /* Adjust width as needed */
-        background-color: rgba(255, 255, 255, 0.8);
+        width: 400px; /* Adjust width as needed */
+        background-color: rgba(255, 255, 255, 0.8); 
         padding: 1rem;
-        margin: 0.5rem;
+        margin: 0.5rem; /* Adjusted margin */
+        table-layout:fixed;
+
+        
     }
+
 
     tbody {
         display: block;
-        max-height: 360px; /* Adjust maximum height */
+        width: 100%;
         overflow-y: auto;
+        overflow-x: hidden;
+        height:500px;
+        scrollbar-width: none; 
+        -ms-overflow-style: none; 
     }
 
-        footer {
-            padding: 2rem;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.8);
-            position: sticky;
-            bottom: 0;
-        }
+    td, th {
+        padding: 5px;
+        width: 350px; /* Adjust width as needed */
+        border-right: 1px solid #ccc;
+        border: 1px solid;
+        text-align:left;
+        color:black;
+    }
 
-        #my-time {
-            font-size: 90px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 50px; /* Adjust margin to fit design */
-            color: white;
-            position: absolute;
-            bottom: 20px; /* Position below the logo */
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 20px; /* Padding to make time more visible */
-            z-index: 1000;
-        }
+    thead tr {
+        background: #FBBF24;
+        color: #eee;
+        display: block;
+        position: relative;
+        width: 100%;
+        border:1px solid black;
+    }
 
+    footer {
+        padding: 2rem;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.8);
+        position: sticky;
+        bottom: 0;
+    }
 
-        .table-container {
-            border-radius: 3px;
-            background-color: rgba(255, 255, 255, 0.8);
-        }
+    h2 {
+        font-weight: bold;
+        font-size: 2rem;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        color: #fff; /* Ensure contrast against background */
+    }
 
-        table {
-            border-collapse: collapse;
-            width: 400px; /* Adjust width as needed */
-            background-color: rgba(255, 255, 255, 0.8); 
-            padding: 1rem;
-            margin: 0.5rem; /* Adjusted margin */
-            
-        }
-        
-        td, th {
-            padding: 5px;
-            width: 250px; /* Adjust width as needed */
-            border-right: 1px solid #ccc;
-            border: 1px solid;
-            text-align:left;
-            color:black;
-        }
-
-        thead tr {
-            background: #FBBF24;
-            color: #eee;
-            display: block;
-            position: relative;
-            width: 100%;
-            border:1px solid black;
-        }
-        
-        tbody {
-            display: block;
-            width: 100%;
-            height:100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
-
-        }
-
-        h2 {
-            font-weight: bold;
-            font-size: 2rem;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-            color: #fff; /* Ensure contrast against background */
-        }
-
-       
+    #my-time {
+        font-size: 105px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px; /* Adjust margin to fit design */
+        color: white;
+        position: absolute;
+        bottom: 20px; /* Position below the logo */
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 20px; /* Padding to make time more visible */
+        z-index: 1000;
+    }
 
     </style>
 </head>
@@ -174,96 +154,15 @@
                     </tr>
                 </thead>
                 <tbody  id="timeInTable" >
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width: 118px;">
-                            <text>RECITAS, EMMANUEL KENNETH dcdscsdcds</text>
-                        </td>
-                        <td class="font-bold text-md uppercase text-center tracking-wider">07-15 :: 08:33 AM</td>
-                    </tr>
-                    <!-- Repeat the above <tr> structure for each row as needed -->
+                    @foreach($curdateDataIn as $data)
+                        <tr>
+                            <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
+                                <text>{{ $data->employee->employee_lastname}}, {{ $data->employee->employee_firstname}} {{ $data->employee->employee_middlename}}</text>
+                            </td>
+                            <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($data->check_in_time)) }}</td>
+                        </tr>
+                    @endforeach
+                    <!-- Repeat the above <tr> structure for each row as needed    date('g:i:s A', strtotime($attendanceIn->check_in_time)) -->
                 </tbody>
             </table>
         </div>
@@ -280,101 +179,37 @@
                     </tr>
                 </thead>
                 <tbody  id="timeOutTable" >
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr><tr>
-                        <td>Content</td>
-                        <td>Content</td>
-                    </tr>
-                    <tr>
-                        <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width: 118px;">
-                            <text>RECITAS, EMMANUEL KENNETH dcdscsdcds</text>
-                        </td>
-                        <td class="font-bold text-md uppercase text-center tracking-wider">07-15 :: 08:33 AM</td>
-                    </tr>
+                    @foreach($curdateDataOut as $dataOut)
+                        <tr>
+                            <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
+                                <text>{{ $dataOut->employee->employee_lastname}}, {{ $dataOut->employee->employee_firstname}} {{ $dataOut->employee->employee_middlename}}</text>
+                            </td>
+                            <td class="font-bold text-md uppercase text-center tracking-wider">{{ $dataOut->check_out_time }}</td>
+                        </tr>
+                    @endforeach
                     <!-- Repeat the above <tr> structure for each row as needed -->
                 </tbody>
             </table>
         </div>
     </div>
+    @if (session('error'))
+        <div id="session-error" class="alert alert-danger -mt-[90px] bg-white">
+            <ul>
+                <li class="text-red-500 font-bold text-[30px] shadow-md">&nbsp;{{ session('error') }}&nbsp;</li>
+            </ul>
+        </div>
+    @endif
 
+    @if ($errors->any())
+        <div id="validation-errors" class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li class="text-black">{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    <div id="my-time" class="tracking-wide"></div> <!-- Date and Time Display -->
 </div>
 
     <div class="w-full z-10">
@@ -392,6 +227,7 @@
             A premier university transforming lives for a great future. Anchored on: SCHOLARSHIP, CHARACTER, SERVICE
         </div>
     </footer>
+    
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -407,7 +243,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
             var timeDisplayElement = document.querySelector('#my-time');
+            
             function printTime() {
                 var now = new Date();
                 var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -466,6 +304,21 @@
                 }
                 prevScrollpos = currentScrollPos;
             });
+        });
+    </script>
+     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                var sessionError = document.getElementById('session-error');
+                if (sessionError) {
+                    sessionError.style.display = 'none';
+                }
+
+                var validationErrors = document.getElementById('validation-errors');
+                if (validationErrors) {
+                    validationErrors.style.display = 'none';
+                }
+            }, 5000); // 5000 milliseconds = 5 seconds
         });
     </script>
 </body>

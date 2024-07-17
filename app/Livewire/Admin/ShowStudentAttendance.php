@@ -20,14 +20,14 @@ class ShowStudentAttendance extends Component
     public $sortField = 'id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
-    public $selectedDepartment = null;
-    public $selectedCourse = null;
+    public $selectedDepartment5 = null;
+    public $selectedCourse5 = null;
     public $departmentsToShow;
     public $schoolToShow;
     public $departmentToShow;
     public $studentsToShow;
     public $selectedCourseToShow;
-    public $selectedStudent = null;
+    public $selectedStudent5 = null;
     public $selectedAttendanceToShow;
     public $selectedStudentToShow;
 
@@ -46,6 +46,11 @@ class ShowStudentAttendance extends Component
 
     public function mount()
     {
+
+        $this->selectedSchool = session('selectedSchool', null);
+        $this->selectedDepartment5 = session('selectedDepartment5', null);
+        $this->selectedCourse5 = session('selectedCourse5', null);
+        $this->selectedStudent5 = session('selectedStudent5', null);
         $this->departmentsToShow = collect([]);
         $this->schoolToShow = collect([]);
         $this->departmentToShow = collect([]);
@@ -98,43 +103,43 @@ class ShowStudentAttendance extends Component
         }
 
         // Apply selected department filter
-        if ($this->selectedDepartment) {
+        if ($this->selectedDepartment5) {
             $query->whereHas('course', function (Builder $query) {
-                $query->where('department_id', $this->selectedDepartment);
+                $query->where('department_id', $this->selectedDepartment5);
             });
-            $this->departmentToShow = Department::find($this->selectedDepartment);
+            $this->departmentToShow = Department::find($this->selectedDepartment5);
 
             // Fetch courses for the selected department
-            $courses = Course::where('department_id', $this->selectedDepartment)->get();
+            $courses = Course::where('department_id', $this->selectedDepartment5)->get();
         } else {
             $this->departmentToShow = null;
             $courses = Course::all(); // Fetch all courses if no department selected
         }
 
-        // Apply selected course filter
-        if ($this->selectedCourse) {
-            $query->where('course_id', $this->selectedCourse);
-            $this->selectedCourseToShow = Course::find($this->selectedCourse);
+        //Apply selected course filter
+        if ($this->selectedCourse5) {
+            $query->where('course_id', $this->selectedCourse5);
+            $this->selectedCourseToShow = Course::find($this->selectedCourse5);
 
-            $students = Student::where('course_id', $this->selectedCourse)->get();
+            $students = Student::where('course_id', $this->selectedCourse5)->get();
         } else {
             $this->selectedCourseToShow = null;
             $students = Student::all();
         }
 
-        if ($this->selectedCourse) {
-            $query->where('course_id', $this->selectedCourse);
-            $this->selectedCourseToShow = Course::find($this->selectedCourse);
+        if ($this->selectedCourse5) {
+            $query->where('course_id', $this->selectedCourse5);
+            $this->selectedCourseToShow = Course::find($this->selectedCourse5);
 
-            $students = Student::where('course_id', $this->selectedCourse)->get();
+            $students = Student::where('course_id', $this->selectedCourse5)->get();
         } else {
             $this->selectedCourseToShow = null;
             $students = Student::all();
         }
 
-        if ($this->selectedStudent) {
-            $query->where('id', $this->selectedStudent);
-            $this->selectedStudentToShow = Student::find($this->selectedStudent);
+        if ($this->selectedStudent5) {
+            $query->where('id', $this->selectedStudent5);
+            $this->selectedStudentToShow = Student::find($this->selectedStudent5);
         } else {
             $this->selectedStudentToShow = null;
         }
@@ -145,12 +150,12 @@ class ShowStudentAttendance extends Component
         $queryTimeOut = StudentAttendanceTimeOut::query()
             ->with(['student.course']);
 
-        if ($this->selectedStudent) {
-            $queryTimeIn->where('student_id', $this->selectedStudent);
-            $this->selectedAttendanceToShow = StudentAttendanceTimeIn::find($this->selectedStudent);
+        if ($this->selectedStudent5) {
+            $queryTimeIn->where('student_id', $this->selectedStudent5);
+            $this->selectedAttendanceToShow = StudentAttendanceTimeIn::find($this->selectedStudent5);
 
-            $queryTimeOut->where('student_id', $this->selectedStudent);
-            $this->selectedAttendanceToShow = StudentAttendanceTimeOut::find($this->selectedStudent);
+            $queryTimeOut->where('student_id', $this->selectedStudent5);
+            $this->selectedAttendanceToShow = StudentAttendanceTimeOut::find($this->selectedStudent5);
         } else {
             $this->selectedAttendanceToShow = null;
         }
@@ -298,8 +303,8 @@ class ShowStudentAttendance extends Component
 
     public function updateEmployeesByDepartment()
     {
-        if ($this->selectedDepartment && $this->selectedSchool) {
-            $this->departmentToShow = Department::where('id', $this->selectedDepartment)
+        if ($this->selectedDepartment5 && $this->selectedSchool) {
+            $this->departmentToShow = Department::where('id', $this->selectedDepartment5)
                 ->where('school_id', $this->selectedSchool)
                 ->first();
         } else {
@@ -309,8 +314,8 @@ class ShowStudentAttendance extends Component
 
     public function updateStudentsByCourse()
     {
-        if ($this->selectedCourse) {
-            $this->studentsToShow = Student::where('course_id', $this->selectedCourse)->get();
+        if ($this->selectedCourse5) {
+            $this->studentsToShow = Student::where('course_id', $this->selectedCourse5)->get();
         } else {
             $this->studentsToShow = collect();
         }
@@ -318,9 +323,9 @@ class ShowStudentAttendance extends Component
 
     public function updateAttendanceByStudent()
     {
-        if ($this->selectedStudent) {
-            $this->selectedAttendanceToShow = StudentAttendanceTimeIn::where('student_id', $this->selectedStudent)->get();
-            $this->selectedAttendanceToShow = StudentAttendanceTimeOut::where('student_id', $this->selectedStudent)->get();
+        if ($this->selectedStudent5) {
+            $this->selectedAttendanceToShow = StudentAttendanceTimeIn::where('student_id', $this->selectedStudent5)->get();
+            $this->selectedAttendanceToShow = StudentAttendanceTimeOut::where('student_id', $this->selectedStudent5)->get();
         } else {
             $this->selectedAttendanceToShow = collect();
             // $this->startDate = null; // Reset start date

@@ -33,41 +33,59 @@ class EmployeeAttendanceController extends Controller
 
     public function portalTimeIn()
     {
-        return view('attendance_time_in');
+        $current_date = now()->setTimezone('Asia/Kuala_Lumpur')->format('Y-m-d');
+
+        $checkDateIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)->first();
+        $checkDateOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)->first();
+
+        if ($checkDateIn && $checkDateOut) 
+        {
+            $curdateDataIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)->get();
+            $curdateDataOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)->get();
+            
+            return view('attendance_time_in', compact('curdateDataIn', 'curdateDataOut'));
+
+        } else {
+           
+            return view('attendance_time_in', [
+                'curdateDataIn' => [],
+                'curdateDataOut' => [],
+            ]);
+        }
+
     }
 
     public function portalTimeOut()
     {
         return view('attendance_time_out');
     }
-    // Adjust this according to your User model namespace
+
 
 public function submitPortalTimeIn(Request $request)
 {
-    // Hardcoded credentials for validation (not from user input)
-    // $validEmail = 'jacasabuena@cec.edu.ph';
-    // $validPassword = 'administrator';
 
-    // Validate incoming request data
     $request->validate([
         'user_rfid' => 'required',
     ]);
 
-    // // Attempt to retrieve user from database based on hardcoded email
-    // $user = User::where('email', $validEmail)->first();
 
-    // // Check if retrieved user exists and validate password
-    // if ($user) {
-    //     // Use the check method on the retrieved user's hashed password
-    //     if (password_verify($validPassword, $user->password)) {
-    //         // Check if user has admin role (assuming you have a hasRole method)
-    //         if ($user->hasRole('admin')) {
-    //             // Check if employee with the specified RFID exists
                 $rfid = $request->input('user_rfid');
+                $dept_identifier = "employee";
 
-                $employees = Employee::where('employee_rfid', $rfid)->get();
-                $employees2 = Employee::where('employee_rfid', $rfid)->first();
-                
+                // Query to get employees matching the RFID and department identifier
+                $employees = Employee::where('employee_rfid', $rfid)
+                                    ->whereHas('department', function ($query) use ($dept_identifier) {
+                                        $query->where('dept_identifier', $dept_identifier);
+                                    })
+                                    ->get();
+
+                // Query to get the first employee matching the RFID and department identifier
+                $employees2 = Employee::where('employee_rfid', $rfid)
+                                        ->whereHas('department', function ($query) use ($dept_identifier) {
+                                            $query->where('dept_identifier', $dept_identifier);
+                                        })
+                                        ->first();
+
                 if ($employees2) {
                     // Insert attendance record
                     $status ="On-campus";
@@ -96,7 +114,8 @@ public function submitPortalTimeIn(Request $request)
                         return view('attendance-profile_time_in_student', compact('students'));
                 }
 
-                 return redirect()->route('admin.attendance.time-in.portal')->with('error', 'User not found.');
+                 return redirect()->route('admin.attendance.time-in.portal')->with('error', 'User not found. Tap again');
+                 
 
     //         } else {
     //             return redirect()->back()->with('error', 'Unauthorized access.');
@@ -110,6 +129,9 @@ public function submitPortalTimeIn(Request $request)
     //     return redirect()->back()->with('error', 'Invalid email or password.');
     // }
 }
+
+
+
 
 public function submitPortalTimeOut(Request $request)
 {

@@ -57,15 +57,20 @@
             position: sticky;
             bottom: 0;
         }
+        .hehe{
+            font-size:70px;
+            
+        }
     </style>
     <script>
         setTimeout(function() {
             window.location.href = "{{ route('admin.attendance.time-in.portal') }}";
-        }, 1000); // 5000 milliseconds = 5 seconds
+        }, 500); // 5000 milliseconds = 5 seconds
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="hehe uppercase font-bold text-3xl text-center mt-16 text-white tracking-widest">Time - In</div>
+    <div class="container mt-5">
         @forelse ($employees as $employee)
         <div class="flex w-full">
             <div style="width: 600px;" class="pl-16 ml-5">

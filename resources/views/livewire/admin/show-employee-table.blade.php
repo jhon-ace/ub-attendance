@@ -1,4 +1,8 @@
 <div class="mb-4">
+    @php
+        session(['selectedSchool' => $selectedSchool]);
+        session(['selectedDepartment2' => $selectedDepartment2]);
+    @endphp
     @if (session('success'))
         <x-sweetalert type="success" :message="session('success')" />
     @endif
@@ -16,25 +20,25 @@
     </div>
         <div class="flex flex-column overflow-x-auto -mb-5">
             <div class="col-span-3 p-4">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display employee by school:</label>
+                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">School Year:</label>
                 <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                         required>
-                    <option value="">Select School</option>
+                    <option value="">Select School Year</option>
                     @foreach($schools as $school)
-                        <option value="{{ $school->id }}">{{ $school->id }} | {{ $school->abbreviation }} - {{ $school->school_name }}</option>
+                        <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
                     @endforeach
                 </select>
                 @if($schoolToShow)
-                    <p class="text-black mt-2 text-sm mb-1 ">Selected School ID: <span class="text-red-500 ml-2">{{ $schoolToShow->id }}</span></p>
-                    <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p>
+                    <p class="text-black mt-2 text-sm mb-1 ">Selected School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
+                    <!-- <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p> -->
                 @endif
             </div>
 
         <div class="col-span-1 p-4">
             @if(!empty($selectedSchool))
-                <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display by department:</label>
-                <select wire:model="selectedDepartment" id="department_id" name="department_id"
+                <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Department:</label>
+                <select wire:model="selectedDepartment2" id="department_id" name="department_id"
                         wire:change="updateEmployeesByDepartment"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
                         required>
@@ -43,13 +47,13 @@
                     @else
                         <option value="">Select Department</option>
                         @foreach($departments as $department)
-                            <option value="{{ $department->id }}">{{ $department->department_id }} | {{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
+                            <option value="{{ $department->id }}">{{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
                         @endforeach
                     @endif
                 </select>
                 @if($departmentToShow)
-                    <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p>
-                    <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p>
+                    <p class="text-black mt-2 text-sm mb-1">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_abbreviation }}</span></p>
+                    <!-- <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p> -->
                 @endif
             @endif
         </div>
@@ -140,9 +144,9 @@
                                     </div>
 
                                     <div class="mb-2">
-                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School ID:</label>
+                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                            <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }}</option>
+                                            <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                         </select>
                                         <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                     </div>
@@ -150,7 +154,7 @@
                                     <div class="mb-2">
                                         <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department ID:</label>
                                         <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
-                                            <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }}</option>
+                                            <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_abbreviation }}</option>
                                         </select>
                                         <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                     </div>
@@ -237,19 +241,19 @@
                                             <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                         </div>
                                         <div class="mb-2">
-                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School ID:</label>
+                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
                                             <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                 <!-- <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }} | {{ $departmentToShow->school->school_name }}</option> -->
-                                                 <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }}</option>
+                                                 <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                             </select>
                                             <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                         </div>
 
                                         <div class="mb-2">
-                                            <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department ID:</label>
+                                            <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department:</label>
                                             <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
                                                 <!-- <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }} | {{ $departmentToShow->department_name }}</option> -->
-                                                <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }}</option>
+                                                <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_abbreviation }}</option>
                                             </select>
                                             <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                         </div>
@@ -285,18 +289,6 @@
                                 <button wire:click="sortBy('employee_id')" class="w-full h-full flex items-center justify-center">
                                     Emp ID
                                     @if ($sortField == 'employee_id')
-                                        @if ($sortDirection == 'asc')
-                                            &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                        @else
-                                            &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                        @endif
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="border border-gray-400 px-3 py-2">
-                                <button wire:click="sortBy('employee_rfid')" class="w-full h-full flex items-center justify-center">
-                                    RFID No
-                                    @if ($sortField == 'employee_rfid')
                                         @if ($sortDirection == 'asc')
                                             &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
                                         @else
@@ -345,8 +337,20 @@
                                 </button>
                             </th>
                             <th class="border border-gray-400 px-3 py-2">
+                                <button wire:click="sortBy('employee_rfid')" class="w-full h-full flex items-center justify-center">
+                                    RFID No
+                                    @if ($sortField == 'employee_rfid')
+                                        @if ($sortDirection == 'asc')
+                                            &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                        @else
+                                            &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                        @endif
+                                    @endif
+                                </button>
+                            </th>
+                            <th class="border border-gray-400 px-3 py-2">
                                 <button wire:click="sortBy('department_id')" class="w-full h-full flex items-center justify-center">
-                                    Dept ID
+                                    Department
                                     @if ($sortField == 'department_id')
                                         @if ($sortDirection == 'asc')
                                             &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -358,7 +362,7 @@
                             </th>
                             <th class="border border-gray-400 px-3 py-2">
                                 <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                                    School
+                                    School Year
                                     @if ($sortField == 'school_id')
                                         @if ($sortDirection == 'asc')
                                             &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -375,7 +379,6 @@
                         @foreach ($employees as $employee)
                             <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
                                 <td class="text-black border border-gray-400">{{ $employee->employee_id}}</td>
-                                <td class="text-black border border-gray-400">{{ $employee->employee_rfid}}</td>
                                 <td class="text-black border border-gray-400 border-t-0 border-r-0 border-l-0 px-2 py-1 flex items-center justify-center" >
                                     @if ($employee->employee_photo && Storage::exists('public/employee_photo/' . $employee->employee_photo))
                                         <a  href="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" 
@@ -390,8 +393,9 @@
                                 <td class="text-black border border-gray-400">{{ $employee->employee_lastname}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->employee_firstname}}</td>
                                 <td class="text-black border border-gray-400">{{ $employee->employee_middlename}}</td>
-                                <td class="text-black border border-gray-400">{{ $employee->department->department_id}}</td>
-                                <td class="text-black border border-gray-400">{{ $employee->school->id}}</td>
+                                <td class="text-black border border-gray-400">{{ $employee->employee_rfid}}</td>
+                                <td class="text-black border border-gray-400">{{ $employee->department->department_abbreviation}}</td>
+                                <td class="text-black border border-gray-400">{{ $employee->school->abbreviation}}</td>
                                 <td class="text-black border border-gray-400">
                                     <div class="flex justify-center items-center space-x-2">
                                         <div x-data="{ open: false
@@ -443,17 +447,17 @@
                                                                     <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                                                 </div>
                                                                 <div class="mb-2">
-                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School ID:</label>
+                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Year:</label>
                                                                     <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                                                        <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }}</option>
+                                                                        <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                                                     </select>
                                                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                                                 </div>
 
                                                                 <div class="mb-2">
-                                                                    <label for="department_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department ID:</label>
+                                                                    <label for="department_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department:</label>
                                                                     <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
-                                                                        <option value="{{ $departmentToShow->id }}">{{ $employee->department->department_id }}</option>
+                                                                        <option value="{{ $departmentToShow->id }}">{{ $employee->department->department_abbreviation }}</option>
                                                                     </select>
                                                                     <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                                                 </div>

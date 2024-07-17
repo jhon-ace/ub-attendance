@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \App\Models\Admin\School; 
 use \App\Models\Admin\Employee; 
-use \App\Models\Admin\Course; 
+use \App\Models\Admin\Course;
+use \App\Models\Admin\DepartmentWorkingHour; 
 
 class Department extends Model
 {
@@ -33,6 +34,11 @@ class Department extends Model
          return $this->hasMany(Course::class, 'department_id');
     }
 
+    //A department has many working hour
+    public function working_hour()
+    {
+         return $this->hasMany(DepartmentWorkingHour::class, 'department_id');
+    }
     
 
     public function employees()

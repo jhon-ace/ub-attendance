@@ -1,4 +1,8 @@
 <div class="mb-4">
+        @php
+            session(['selectedSchool' => $selectedSchool]);
+            session(['selectedDepartment1' => $selectedDepartment1]);
+        @endphp
     @if (session('success'))
         <x-sweetalert type="success" :message="session('success')" />
     @endif
@@ -22,19 +26,19 @@
                         required>
                     <option value="">Select School</option>
                     @foreach($schools as $school)
-                        <option value="{{ $school->id }}">{{ $school->id }} | {{ $school->abbreviation }} - {{ $school->school_name }}</option>
+                        <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
                     @endforeach
                 </select>
                 @if($schoolToShow)
-                    <p class="text-black mt-2 text-sm mb-1 ">Selected School ID: <span class="text-red-500 ml-2">{{ $schoolToShow->id }}</span></p>
-                    <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p>
+                    <p class="text-black mt-2 text-sm mb-1 ">Selected School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
+                    <!-- <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p> -->
                 @endif
             </div>
 
         <div class="col-span-1 p-4">
             @if(!empty($selectedSchool))
                 <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display courses by department:</label>
-                <select wire:model="selectedDepartment" id="department_id" name="department_id"
+                <select wire:model="selectedDepartment1" id="department_id" name="department_id"
                         wire:change="updateEmployeesByDepartment"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
                         required>
@@ -43,13 +47,13 @@
                     @else
                         <option value="">Select Department</option>
                         @foreach($departments as $department)
-                            <option value="{{ $department->id }}">{{ $department->department_id }} | {{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
+                            <option value="{{ $department->id }}">{{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
                         @endforeach
                     @endif
                 </select>
                 @if($departmentToShow)
-                    <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p>
-                    <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p>
+                    <!-- <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p> -->
+                    <p class="text-black text-sm ml-4 mt-2">Selected Department: <span class="text-red-500 ml-2 mt">{{ $departmentToShow->department_abbreviation }}</span></p>
                 @endif
             @endif
         </div>
@@ -115,19 +119,19 @@
                                         <x-input-error :messages="$errors->get('course_name')" class="mt-2" />
                                     </div>
                                     <div class="mb-2">
-                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School ID:</label>
+                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                             <!-- <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }} | {{ $departmentToShow->school->school_name }}</option> -->
-                                                <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }}</option>
+                                                <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                         </select>
                                         <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                     </div>
 
                                     <div class="mb-2">
-                                        <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department ID:</label>
+                                        <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department:</label>
                                         <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
                                             <!-- <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }} | {{ $departmentToShow->department_name }}</option> -->
-                                            <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }}</option>
+                                            <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_abbreviation }}</option>
                                         </select>
                                         <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                     </div>
@@ -191,10 +195,10 @@
                                             <x-input-error :messages="$errors->get('course_name')" class="mt-2" />
                                         </div>
                                         <div class="mb-2">
-                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School ID:</label>
+                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
                                             <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                 <!-- <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }} | {{ $departmentToShow->school->school_name }}</option> -->
-                                                 <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }}</option>
+                                                 <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                             </select>
                                             <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                         </div>
@@ -203,7 +207,7 @@
                                             <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department ID:</label>
                                             <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
                                                 <!-- <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }} | {{ $departmentToShow->department_name }}</option> -->
-                                                <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }}</option>
+                                                <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_abbreviation }}</option>
                                             </select>
                                             <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                         </div>
@@ -355,18 +359,18 @@
                                                                 <x-input-error :messages="$errors->get('course_name')" class="mt-2" />
                                                             </div>
                                                             <div class="mb-2">
-                                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School ID:</label>
+                                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
                                                                 <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                                     <!-- <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }} | {{ $departmentToShow->school->school_name }}</option> -->
-                                                                    <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }}</option>
+                                                                    <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                                                 </select>
                                                                 <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                                             </div>
                                                             <div class="mb-2">
-                                                                <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department ID:</label>
+                                                                <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department:</label>
                                                                 <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
                                                                     <!-- <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }} | {{ $departmentToShow->department_name }}</option> -->
-                                                                    <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }}</option>
+                                                                    <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_abbreviation }}</option>
                                                                 </select>
                                                                 <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                                             </div>

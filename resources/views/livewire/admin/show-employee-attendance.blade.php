@@ -1,4 +1,9 @@
 <div class="mb-4">
+        @php
+            session(['selectedSchool' => $selectedSchool]);
+            session(['selectedDepartment4' => $selectedDepartment4]);
+            session(['selectedEmployee' => $selectedEmployee])
+        @endphp
     @if (session('success'))
         <x-sweetalert type="success" :message="session('success')" />
     @endif
@@ -16,25 +21,25 @@
     
         <div class="flex flex-column overflow-x-auto -mb-5">
             <div class="col-span-3 p-4">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display employee by school:</label>
+                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">School Year:</label>
                 <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                         required>
-                    <option value="">Select School</option>
+                    <option value="">Select School Year</option>
                     @foreach($schools as $school)
-                        <option value="{{ $school->id }}">{{ $school->id }} | {{ $school->abbreviation }} - {{ $school->school_name }}</option>
+                        <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
                     @endforeach
                 </select>
                 @if($schoolToShow)
-                    <p class="text-black mt-2 text-sm mb-1 ">Selected School ID: <span class="text-red-500 ml-2">{{ $schoolToShow->id }}</span></p>
-                    <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p>
+                    <p class="text-black mt-2 text-sm mb-1 ">Selected School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
+                    <!-- <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p> -->
                 @endif
             </div>
 
         <div class="col-span-1 p-4">
             @if(!empty($selectedSchool))
-                <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display by department:</label>
-                <select wire:model="selectedDepartment" id="department_id" name="department_id"
+                <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Department:</label>
+                <select wire:model="selectedDepartment4" id="department_id" name="department_id"
                         wire:change="updateEmployeesByDepartment"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
                         required>

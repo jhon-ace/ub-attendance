@@ -16,7 +16,7 @@ class ShowEmployeeTable extends Component
     public $sortField = 'employee_lastname';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
-    public $selectedDepartment = null;
+    public $selectedDepartment2 = null;
     public $departmentsToShow;
     public $schoolToShow;
     public $departmentToShow;
@@ -30,6 +30,9 @@ class ShowEmployeeTable extends Component
 
     public function mount()
     {
+
+        $this->selectedSchool = session('selectedSchool', null);
+        $this->selectedDepartment2 = session('selectedDepartment2', null);
         $this->departmentsToShow = collect([]); // Initialize as an empty collection
         $this->schoolToShow = collect([]); // Initialize as an empty collection
         $this->departmentToShow = collect([]);
@@ -74,9 +77,9 @@ class ShowEmployeeTable extends Component
         }
 
         // Apply selected department filter
-        if ($this->selectedDepartment) {
-            $query->where('department_id', $this->selectedDepartment);
-            $this->departmentToShow = Department::find($this->selectedDepartment);
+        if ($this->selectedDepartment2) {
+            $query->where('department_id', $this->selectedDepartment2);
+            $this->departmentToShow = Department::find($this->selectedDepartment2);
         } else {
             $this->departmentToShow = null; // Reset departmentToShow if no department is selected
         }
@@ -115,14 +118,14 @@ class ShowEmployeeTable extends Component
         }
 
         // Ensure departmentToShow is reset if the selected school changes
-        $this->selectedDepartment = null;
+        $this->selectedDepartment2 = null;
         $this->departmentToShow = null;
     }
 
 public function updateEmployeesByDepartment()
 {
-    if ($this->selectedDepartment && $this->selectedSchool) {
-        $this->departmentToShow = Department::where('department_id', $this->selectedDepartment)
+    if ($this->selectedDepartment2 && $this->selectedSchool) {
+        $this->departmentToShow = Department::where('department_id', $this->selectedDepartment2)
                                             ->where('school_id', $this->selectedSchool)
                                             ->first();
     } else {

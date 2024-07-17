@@ -11,7 +11,7 @@
         <x-sweetalert type="error" :message="session('error')" />
     @endif
     <div class="flex justify-between mb-4 sm:-mt-4">
-        <div class="font-bold text-md tracking-tight text-black  mt-2">Admin / Manage School</div>
+        <div class="font-bold text-md tracking-tight text-black  mt-2">Admin / Manage School Year</div>
         <div x-data="{ open: false }">
             <button @click="open = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                 <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add School
@@ -74,7 +74,7 @@
                 <tr>
                     <th class="border border-gray-400 px-3 py-2">
                         <button wire:click="sortBy('id')" class="w-full h-full flex items-center justify-center">
-                            School ID
+                            ID #
                             @if ($sortField == 'id')
                                 @if ($sortDirection == 'asc')
                                     &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -86,7 +86,7 @@
                     </th>
                     <th class="border border-gray-400 px-3 py-2">
                         <button wire:click="sortBy('abbreviation')" class="w-full h-full flex items-center justify-center">
-                            School Abbreviation
+                            Shool Year
                             @if ($sortField == 'abbreviation')
                                 @if ($sortDirection == 'asc')
                                     &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -98,7 +98,7 @@
                     </th>
                     <th class="border border-gray-400 px-3 py-2">
                         <button wire:click="sortBy('school_name')" class="w-full h-full flex items-center justify-center">
-                            School Name
+                            Description
                             @if ($sortField == 'school_name')
                                 @if ($sortDirection == 'asc')
                                     &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>

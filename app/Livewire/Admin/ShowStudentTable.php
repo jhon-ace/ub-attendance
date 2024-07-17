@@ -17,7 +17,7 @@ class ShowStudentTable extends Component
     public $sortField = 'course_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
-    public $selectedDepartment = null;
+    public $selectedDepartment3 = null;
     public $selectedCourse = null;
     public $departmentsToShow;
     public $schoolToShow;
@@ -39,6 +39,10 @@ class ShowStudentTable extends Component
 
     public function mount()
     {
+
+        $this->selectedSchool = session('selectedSchool', null);
+        $this->selectedDepartment3 = session('selectedDepartment3', null);
+        $this->selectedCourse = session('selectedCourse', null);
         $this->departmentsToShow = collect([]);
         $this->schoolToShow = collect([]);
         $this->departmentToShow = collect([]);
@@ -51,12 +55,14 @@ class ShowStudentTable extends Component
         $this->updateEmployees();
     }
 
-    public function updatingSelectedDepartment()
+    public function updatingselectedDepartment1()
     {
         $this->resetPage();
         $this->selectedCourse = null;
         $this->departmentToShow = null;
+        $this->selectedCourseToShow = null;
         $this->updateEmployeesByDepartment();
+        $this-$studentsToShow = null;
     }
 
     public function sortBy($field)
@@ -88,14 +94,14 @@ class ShowStudentTable extends Component
         }
 
         // Apply selected department filter
-        if ($this->selectedDepartment) {
+        if ($this->selectedDepartment3) {
             $query->whereHas('course', function (Builder $query) {
-                $query->where('department_id', $this->selectedDepartment);
+                $query->where('department_id', $this->selectedDepartment3);
             });
-            $this->departmentToShow = Department::find($this->selectedDepartment);
+            $this->departmentToShow = Department::find($this->selectedDepartment3);
 
             // Fetch courses for the selected department
-            $courses = Course::where('department_id', $this->selectedDepartment)->get();
+            $courses = Course::where('department_id', $this->selectedDepartment3)->get();
         } else {
             $this->departmentToShow = null;
             $courses = Course::all(); // Fetch all courses if no department selected
@@ -145,14 +151,14 @@ class ShowStudentTable extends Component
             $this->departmentsToShow = collect();
         }
 
-        $this->selectedDepartment = null;
+        $this->selectedDepartment3 = null;
         $this->departmentToShow = null;
     }
 
     public function updateEmployeesByDepartment()
     {
-        if ($this->selectedDepartment && $this->selectedSchool) {
-            $this->departmentToShow = Department::where('id', $this->selectedDepartment)
+        if ($this->selectedDepartment3 && $this->selectedSchool) {
+            $this->departmentToShow = Department::where('id', $this->selectedDepartment3)
                 ->where('school_id', $this->selectedSchool)
                 ->first();
         } else {

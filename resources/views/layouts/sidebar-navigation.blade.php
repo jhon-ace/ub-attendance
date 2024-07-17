@@ -32,17 +32,42 @@
                         <span class="inline-flex justify-center items-center ml-4">
                             <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
                         </span>
-                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">School</span>
+                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">School Year</span>
                     </a>
                 </li>
-                <li>
-                    <a href="{{ route('admin.department.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
-                    {{ request()->routeIs('admin.department.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
-                        <span class="inline-flex justify-center items-center ml-4">
-                            <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                <li x-data="{ open: {{ request()->routeIs('admin.department.index')  || request()->routeIs('admin.workinghour.index') ? 'true'  : 'false' }} }">
+                    <a @click="open = !open" class="cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
+                        <span class="inline-flex justify-center items-center ml-3">
+                            <i class="fa-solid fa-users fa-sm text-gray-200"></i>
                         </span>
-                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Department</span>
+                        <span class="text-sm tracking-wide truncate text-gray-200 ml-2">Department</span>
+                        <span class="ml-auto">
+                            <svg fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
+                                <path x-show="!open" fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                <path x-show="open" fill-rule="evenodd" d="M14.707 10.707a1 1 0 01-1.414 0L10 7.414 6.707 10.707a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
                     </a>
+                    <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1">
+                        <li>
+                            <a href="{{ route('admin.department.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                            {{ request()->routeIs('admin.department.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <span class="inline-flex justify-center items-center ml-4">
+                                    <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                                </span>
+                                <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Department</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.workinghour.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                            {{ request()->routeIs('admin.workinghour.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <span class="inline-flex justify-center items-center ml-4">
+                                    <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                                </span>
+                                <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Working Hour</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     <a href="{{ route('admin.course.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 

@@ -72,7 +72,7 @@ class StudentController extends Controller
                 $student->student_id = $request->input('student_id');
                 $student->student_firstname = $request->input('student_firstname');
                 $student->student_middlename = $request->input('student_middlename');
-                $student->student_lastname = $request->input('student_middlename');
+                $student->student_lastname = $request->input('student_lastname');
                 $student->student_rfid = $request->input('student_rfid');
                 $student->student_year_grade = $request->input('student_year_grade');
                 $student->student_status = $request->input('student_status');
@@ -167,7 +167,7 @@ class StudentController extends Controller
             $student->student_id = $request->input('student_id');
             $student->student_firstname = $request->input('student_firstname');
             $student->student_middlename = $request->input('student_middlename');
-            $student->student_lastname = $request->input('student_middlename');
+            $student->student_lastname = $request->input('student_lastname');
             $student->student_rfid = $request->input('student_rfid');
             $student->student_year_grade = $request->input('student_year_grade');
             $student->student_status = $request->input('student_status');

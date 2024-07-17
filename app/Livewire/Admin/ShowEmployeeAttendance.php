@@ -25,7 +25,7 @@ class ShowEmployeeAttendance extends Component
     public $sortField = 'employee_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
-    public $selectedDepartment = null;
+    public $selectedDepartment4 = null;
     public $selectedEmployee = null;
     public $departmentsToShow;
     public $schoolToShow;
@@ -57,6 +57,10 @@ class ShowEmployeeAttendance extends Component
 
     public function mount()
     {
+
+        $this->selectedSchool = session('selectedSchool', null);
+        $this->selectedDepartment4 = session('selectedDepartment4', null);
+        $this->selectedEmployee = session('selectedEmployee', null);
         $this->departmentsToShow = collect([]);
         $this->schoolToShow = collect([]);
         $this->departmentToShow = collect([]);
@@ -132,15 +136,15 @@ class ShowEmployeeAttendance extends Component
         }
 
         // Apply selected department filter
-        if ($this->selectedDepartment) {
+        if ($this->selectedDepartment4) {
             $queryTimeIn->whereHas('employee', function (Builder $query) {
-                $query->where('department_id', $this->selectedDepartment);
+                $query->where('department_id', $this->selectedDepartment4);
             });
             $queryTimeOut->whereHas('employee', function (Builder $query) {
-                $query->where('department_id', $this->selectedDepartment);
+                $query->where('department_id', $this->selectedDepartment4);
             });
-            $this->departmentToShow = Department::find($this->selectedDepartment);
-            $employees = Employee::where('department_id', $this->selectedDepartment)->get();
+            $this->departmentToShow = Department::find($this->selectedDepartment4);
+            $employees = Employee::where('department_id', $this->selectedDepartment4)->get();
         } else {
             $this->departmentToShow = null;
             $employees = Employee::all();
@@ -171,11 +175,11 @@ class ShowEmployeeAttendance extends Component
         
 
         $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(50);
+            ->paginate(500);
 
 
         $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(50);
+            ->paginate(500);
 
         $attendanceData = [];
         $overallTotalHours = 0;
@@ -333,15 +337,15 @@ class ShowEmployeeAttendance extends Component
             }
 
             // Apply selected department filter
-            if ($this->selectedDepartment) {
+            if ($this->selectedDepartment4) {
                 $queryTimeIn->whereHas('employee', function (Builder $query) {
-                    $query->where('department_id', $this->selectedDepartment);
+                    $query->where('department_id', $this->selectedDepartment4);
                 });
                 $queryTimeOut->whereHas('employee', function (Builder $query) {
-                    $query->where('department_id', $this->selectedDepartment);
+                    $query->where('department_id', $this->selectedDepartment4);
                 });
-                $this->departmentToShow = Department::find($this->selectedDepartment);
-                $employees = Employee::where('department_id', $this->selectedDepartment)->get();
+                $this->departmentToShow = Department::find($this->selectedDepartment4);
+                $employees = Employee::where('department_id', $this->selectedDepartment4)->get();
             } else {
                 $this->departmentToShow = null;
                 $employees = Employee::all();
@@ -502,7 +506,7 @@ class ShowEmployeeAttendance extends Component
             $this->departmentsToShow = collect();
         }
 
-        $this->selectedDepartment = null;
+        $this->selectedDepartment4 = null;
         $this->departmentToShow = null;
         $this->startDate = null; // Reset start date
         $this->endDate = null; // Reset end date
@@ -510,8 +514,8 @@ class ShowEmployeeAttendance extends Component
 
     public function updateEmployeesByDepartment()
     {
-        if ($this->selectedDepartment && $this->selectedSchool) {
-            $this->departmentToShow = Department::where('id', $this->selectedDepartment)
+        if ($this->selectedDepartment4 && $this->selectedSchool) {
+            $this->departmentToShow = Department::where('id', $this->selectedDepartment4)
                 ->where('school_id', $this->selectedSchool)
                 ->first();
         } else {

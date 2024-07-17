@@ -17,13 +17,13 @@
     <div class="flex flex-col md:flex-row items-start md:items-center md:justify-start">
         <!-- Dropdown and Delete Button -->
         <div class="flex items-center w-full md:w-auto">
-            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display department by school:</label>
+            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Select School Year:</label>
             <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments"
                     class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                     required>
-                <option value="">Select School</option>
+                <option value="">Select Year</option>
                 @foreach($schools as $school)
-                    <option value="{{ $school->id }}">{{ $school->id }} | {{ $school->abbreviation }} - {{ $school->school_name }}</option>
+                    <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
                 @endforeach
             </select>
             
@@ -52,13 +52,13 @@
     <hr class="border-gray-200 my-4">
     @if($schoolToShow)
     <div class="flex justify-between">
-        <p class="text-black mt-2 text-sm mb-4">Selected School: <text class="uppercase text-red-500">{{ $schoolToShow->school_name }}</text></p>
+        <p class="text-black mt-2 text-sm mb-4">Selected School Year: <text class="uppercase text-red-500">{{ $schoolToShow->abbreviation }}</text></p>
         <div x-data="{ open: false }">
             <button @click="open = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                 <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Department
             </button>
             <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
+                <div @click.away="open = true" class="w-[30%] max-h-[90%]  bg-white p-6 rounded-lg shadow-lg  mx-auto overflow-y-auto">
                     <div class="flex justify-between items-center pb-3">
                         <p class="text-xl font-bold">Add Department</p>
                         <button @click="open = false" class=" text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
@@ -69,9 +69,9 @@
                             @csrf
 
                                 <div class="mb-2">
-                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School where department belong: </label>
+                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year: </label>
                                     <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                            <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->id }} - {{ $schoolToShow->school_name }}</option>
+                                            <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option>
                                     </select>
                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                 </div>
@@ -92,6 +92,36 @@
                                     <input type="text" name="department_name" id="department_name" value="{{ old('department_name') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_name') is-invalid @enderror" required>
                                     <x-input-error :messages="$errors->get('department_name')" class="mt-2" />
                                 </div>
+                                <div class="mb-2">
+                                    <label class="block text-gray-700 text-md font-bold mb-2">Set Working Hours</label>
+                                    
+                                    <div class="flex mb-2">
+                                        <div class="w-1/2 pr-2">
+                                            <label for="morning_start_time" class="block text-gray-700 text-sm font-bold mb-1">Morning Start Time</label>
+                                            <input type="time" name="morning_start_time" id="morning_start_time" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_start_time') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('morning_start_time')" class="mt-2" />
+                                        </div>
+                                        <div class="w-1/2 pl-2">
+                                            <label for="morning_end_time" class="block text-gray-700 text-sm font-bold mb-1">Morning End Time</label>
+                                            <input type="time" name="morning_end_time" id="morning_end_time" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_end_time') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('morning_end_time')" class="mt-2" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex">
+                                        <div class="w-1/2 pr-2">
+                                            <label for="afternoon_start_time" class="block text-gray-700 text-sm font-bold mb-1">Afternoon Start Time</label>
+                                            <input type="time" name="afternoon_start_time" id="afternoon_start_time" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_start_time') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('afternoon_start_time')" class="mt-2" />
+                                        </div>
+                                        <div class="w-1/2 pl-2">
+                                            <label for="afternoon_end_time" class="block text-gray-700 text-sm font-bold mb-1">Afternoon End Time</label>
+                                            <input type="time" name="afternoon_end_time" id="afternoon_end_time" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_end_time') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('afternoon_end_time')" class="mt-2" />
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-2">
                                     <label for="dept_identifier" class="block text-gray-700 text-md font-bold mb-2">This department is for: </label>
                                     <select id="dept_identifier" name="dept_identifier" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('dept_identifier') is-invalid @enderror" required>
@@ -135,6 +165,18 @@
                     <thead class="bg-gray-200 text-black">
                         <tr>
                             <th class="border border-gray-400 px-3 py-2">
+                                <button wire:click="sortBy('id')" class="w-full h-full flex items-center justify-center">
+                                    Count #
+                                    @if ($sortField == 'id')
+                                        @if ($sortDirection == 'asc')
+                                            &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                        @else
+                                            &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                        @endif
+                                    @endif
+                                </button>
+                            </th>
+                            <th class="border border-gray-400 px-3 py-2">
                                 <button wire:click="sortBy('department_id')" class="w-full h-full flex items-center justify-center">
                                     Department ID
                                     @if ($sortField == 'department_id')
@@ -172,7 +214,7 @@
                             </th>
                             <th class="border border-gray-400 px-3 py-2">
                                 <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                                    School ID
+                                    School Year
                                     @if ($sortField == 'school_id')
                                         @if ($sortDirection == 'asc')
                                             &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -200,10 +242,11 @@
                     <tbody >
                         @foreach ($departments as $department)
                             <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
+                                <td class="text-black border border-gray-400  ">{{ $department->id }}</td>
                                 <td class="text-black border border-gray-400  ">{{ $department->department_id }}</td>
                                 <td class="text-black border border-gray-400">{{ $department->department_abbreviation}}</td>
                                 <td class="text-black border border-gray-400">{{ $department->department_name}}</td>
-                                <td class="text-black border border-gray-400">{{ $department->school->id}}</td>
+                                <td class="text-black border border-gray-400">{{ $department->school->abbreviation}}</td>
                                 <td class="text-black border border-gray-400">{{ ucfirst($department->dept_identifier) }}</td>
                                 <td class="text-black border border-gray-400 px-1 py-1">
                                     <div class="flex justify-center items-center space-x-2">
@@ -231,9 +274,9 @@
                                                             @csrf
                                                             @method('PUT')
                                                                 <div class="mb-2">
-                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School where department belong: </label>
+                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Year: </label>
                                                                     <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                                                            <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->id }} - {{ $schoolToShow->school_name }}</option>
+                                                                            <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option>
                                                                     </select>
                                                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                                                 </div>
@@ -321,7 +364,45 @@
         @endif
     @endif
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Restrict morning times to 12:00 AM to 11:59 AM
+        var morningStartTime = document.getElementById('morning_start_time');
+        var morningEndTime = document.getElementById('morning_end_time');
 
+        morningStartTime.addEventListener('input', function() {
+            if (this.value.split(':')[0] >= 12) {
+                this.value = '';
+                alert('Please select a time between 12:00 AM and 11:59 AM');
+            }
+        });
+
+        morningEndTime.addEventListener('input', function() {
+            if (this.value.split(':')[0] >= 12) {
+                this.value = '';
+                alert('Please select a time between 12:00 AM and 11:59 AM');
+            }
+        });
+
+        // Restrict afternoon times to 12:00 PM to 11:59 PM
+        var afternoonStartTime = document.getElementById('afternoon_start_time');
+        var afternoonEndTime = document.getElementById('afternoon_end_time');
+
+        afternoonStartTime.addEventListener('input', function() {
+            if (this.value.split(':')[0] < 12) {
+                this.value = '';
+                alert('Please select a time between 12:00 PM and 11:59 PM');
+            }
+        });
+
+        afternoonEndTime.addEventListener('input', function() {
+            if (this.value.split(':')[0] < 12) {
+                this.value = '';
+                alert('Please select a time between 12:00 PM and 11:59 PM');
+            }
+        });
+    });
+</script>
 
 <script>
 
