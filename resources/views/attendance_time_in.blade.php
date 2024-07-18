@@ -36,6 +36,7 @@
         font-family: sans-serif;
         background: linear-gradient(to right, #FBBF24, #EF4444);
         color: #000;
+        overflow:hidden;
     }
 
     /* Container styles */
@@ -126,7 +127,7 @@
     }
 
     #my-time {
-        font-size: 105px;
+        font-size: 120px;
         font-weight: bold;
         text-align: center;
         margin-top: 20px; /* Adjust margin to fit design */
@@ -209,7 +210,7 @@
     @endif
 
 
-    <div id="my-time" class="tracking-wide"></div> <!-- Date and Time Display -->
+    <div id="my-time" class="text-center tracking-wide w-full flex justify-center"></div> <!-- Date and Time Display -->
 </div>
 
     <div class="w-full z-10">
@@ -242,21 +243,31 @@
     @endpush
 
     <script>
-        // document.addEventListener('DOMContentLoaded', function () {
-
+    //    document.addEventListener('DOMContentLoaded', function () {
             var timeDisplayElement = document.querySelector('#my-time');
             
             function printTime() {
                 var now = new Date();
-                var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                var options = { 
+                    year: '2-digit', 
+                    month: '2-digit', 
+                    day: '2-digit'
+                };
                 var date = now.toLocaleDateString(undefined, options);
+
+                // Manually format the date to match the desired format "Fri, 2024-06-14"
+                var dateParts = date.split('/');
+                var formattedDate = `${dateParts[0]}-${dateParts[1]}`;//-${dateParts[2]}
+                
                 var time = now.toLocaleTimeString();
                 time = time.replace('AM', 'A.M.').replace('PM', 'P.M.');
-                timeDisplayElement.innerHTML = time;
-                // date + ' ' 
+                
+                timeDisplayElement.innerHTML = `${now.toLocaleDateString(undefined, { weekday: 'short' })}, ${formattedDate} | ${time}`;
             }
+            
             setInterval(printTime, 1000);
         // });
+
     </script>
 
     <script>
@@ -271,21 +282,6 @@
             scrollToBottom('timeInTable');
              scrollToBottom('timeOutTable');
 
-            // Example of adding a row and scrolling to bottom
-            // function addRowToTable() {
-            //     var table = document.getElementById('timeInTable').getElementsByTagName('tbody')[0];
-            //     var newRow = table.insertRow();
-            //     var cell1 = newRow.insertCell(0);
-            //     var cell2 = newRow.insertCell(1);
-            //     cell1.textContent = 'New Employee';
-            //     cell2.textContent = '07-16 :: 09:00 AM';
-
-            //     // After adding a row, scroll to the bottom of the timeInTable
-            //     scrollToBottom('timeInTable');
-            // }
-
-            // // Example: Call addRowToTable after 3 seconds (simulate new data arrival)
-            // setTimeout(addRowToTable, 3000);
         });
     </script>
     <script>

@@ -36,6 +36,7 @@
             font-family: sans-serif;
             background: linear-gradient(to right, #FBBF24, #EF4444);
             color: #000; /* Adjust text color as needed */
+            overflow:hidden;
         }
 
         /* Container styles */
@@ -94,11 +95,11 @@
                 </div>
                 <div class="p-2 mb-2 font-bold uppercase">
                     <span class="text-sm">Employee Name</span><br>
-                    <span style="font-size: 40px;" class="text-white shadow-sm">{{ $employee->employee_lastname }}, {{ $employee->employee_firstname }}, {{ ucfirst($employee->employee_middlename[0]) }}</span>
+                    <span style="font-size: 40px;" class="text-white tracking-wide shadow-sm">{{ $employee->employee_lastname }}, {{ $employee->employee_firstname }}, {{ ucfirst($employee->employee_middlename[0]) }}</span>
                 </div>
                 <div class="p-2 font-bold uppercase">
                     <span class="text-sm">Department/Office</span><br>
-                    <span style="font-size: 35px;" class="text-white shadow-sm">{{ $employee->department->department_abbreviation }}</span>
+                    <span style="font-size: 35px;" class="text-white shadow-sm tracking-wide">{{ $employee->department->department_abbreviation }}</span>
                 </div>
             </div>
         </div>

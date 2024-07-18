@@ -188,116 +188,141 @@ class ShowEmployeeAttendance extends Component
 
                     
         $attendanceData = [];
-$overallTotalHours = 0;
+        $overallTotalHours = 0;
 
-foreach ($attendanceTimeIn as $attendance) {
-    // Initialize AM and PM hours worked
-    $hoursWorkedAM = 0;
-    $hoursWorkedPM = 0;
-    $lateDuration = 0; // Initialize late duration
+        foreach ($attendanceTimeIn as $attendance) {
+            // Initialize AM and PM hours worked
+            $hoursWorkedAM = 0;
+            $hoursWorkedPM = 0;
+            $lateDurationAM = 0; // Initialize late duration
+            $lateDurationPM = 0; // Initialize late duration for PM
+            $totalHoursLate = 0;
 
-    // Extract the day of the week from the check-in time
-    $checkInDateTime = new DateTime($attendance->check_in_time);
+            // Extract the day of the week from the check-in time
+            $checkInDateTime = new DateTime($attendance->check_in_time);
 
-    $dayOfWeek = $checkInDateTime->format('w'); // 0 (for Sunday) through 6 (for Saturday)
+            $dayOfWeek = $checkInDateTime->format('w'); // 0 (for Sunday) through 6 (for Saturday)
 
-    // Find corresponding check_out_time
-    $checkOut = $attendanceTimeOut->where('employee_id', $attendance->employee_id)
-                                  ->where('check_out_time', '>=', $attendance->check_in_time)
-                                  ->first();
+            // Find corresponding check_out_time
+            $checkOut = $attendanceTimeOut->where('employee_id', $attendance->employee_id)
+                                        ->where('check_out_time', '>=', $attendance->check_in_time)
+                                        ->first();
 
-    // Fetch department working hours for the specific day of the week
-    $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $attendance->employee->department_id)
-                                                  ->where('day_of_week', $dayOfWeek)
-                                                  ->first();
+            // Fetch department working hours for the specific day of the week
+            $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $attendance->employee->department_id)
+                                                        ->where('day_of_week', $dayOfWeek)
+                                                        ->first();
 
-    if ($departmentWorkingHour && $checkOut) {
-        // Create DateTime objects for check-out time
-        $checkOutDateTime = new DateTime($checkOut->check_out_time);
+            if ($departmentWorkingHour && $checkOut) {
+                
+                // Create DateTime objects for check-out time
+                $checkOutDateTime = new DateTime($checkOut->check_out_time);
 
-        // Fetch working hours from the department's schedule
-        $morningStartTime = new DateTime($departmentWorkingHour->morning_start_time);
-        $morningEndTime = new DateTime($departmentWorkingHour->morning_end_time);
-        $afternoonStartTime = new DateTime($departmentWorkingHour->afternoon_start_time);
-        $afternoonEndTime = new DateTime($departmentWorkingHour->afternoon_end_time);
+                // Fetch working hours from the department's schedule
+                $morningStartTime = new DateTime($departmentWorkingHour->morning_start_time);
+                $morningEndTime = new DateTime($departmentWorkingHour->morning_end_time);
+                $afternoonStartTime = new DateTime($departmentWorkingHour->afternoon_start_time);
+                $afternoonEndTime = new DateTime($departmentWorkingHour->afternoon_end_time);
 
-        // Calculate the effective AM working hours
-        if ($checkInDateTime < $morningEndTime) {
-            $effectiveCheckInTime = max($checkInDateTime, $morningStartTime);
-            $effectiveCheckOutTime = min($checkOutDateTime, $morningEndTime);
-            $intervalAM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
-            $hoursWorkedAM = $intervalAM->h + ($intervalAM->i / 60);
+                // Calculate the effective AM working hours
+                if ($checkInDateTime < $morningEndTime) {
+                    $effectiveCheckInTime = max($checkInDateTime, $morningStartTime);
+                    $effectiveCheckOutTime = min($checkOutDateTime, $morningEndTime);
+                    $intervalAM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
+                    $hoursWorkedAM = $intervalAM->h + ($intervalAM->i / 60);
+                }
+        
+                // Calculate the latest allowed check-in time (scheduled time + 15 minutes)
+                $latestAllowedCheckIn = clone $morningStartTime;
+                $latestAllowedCheckIn->add(new DateInterval('PT15M'));
+
+                // dd($latestAllowedCheckIn);
+
+                // Calculate late duration
+                if ($checkInDateTime > $latestAllowedCheckIn) {
+                    $lateInterval = $checkInDateTime->diff($latestAllowedCheckIn);
+                    $lateDurationAM = $lateInterval->h * 60 + $lateInterval->i; // Convert to minutes
+                }
+
+                // Calculate the PM working hours
+                if ($checkInDateTime < $afternoonEndTime && $checkOutDateTime > $afternoonStartTime) {
+                    $effectiveCheckInTime = max($checkInDateTime, $afternoonStartTime);
+                    $effectiveCheckOutTime = min($checkOutDateTime, $afternoonEndTime);
+                    $intervalPM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
+                    $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60);
+                }
+
+                $latestAllowedCheckInPM = clone $afternoonStartTime;
+                $latestAllowedCheckInPM->add(new DateInterval('PT15M'));
+
+                // Calculate late duration for PM
+                if ($checkInDateTime > $latestAllowedCheckInPM) {
+                    $lateIntervalPM = $checkInDateTime->diff($latestAllowedCheckInPM);
+                    $lateDurationPM = $lateIntervalPM->h * 60 + $lateIntervalPM->i; // Convert to minutes
+                    session()->put('late_duration_pm', $lateDurationPM);
+                }
+                
+                
+
+                // Calculate total hours worked
+                $totalHoursWorked = $hoursWorkedAM + $hoursWorkedPM;
+                $totalHoursLate = $lateDurationAM + $lateDurationPM;
+                session()->put('total_late', $totalHoursLate);
+                // dd($totalHoursLate);
+                // Determine the remark based on lateness
+                // $remark = $lateDurationAM > 0 ? 'Late' : 'Present';
+
+                $remark = ($lateDurationAM > 0 || $lateDurationPM > 0) ? 'Late' : 'Present';
+
+                // Prepare the key for $attendanceData
+                $key = $attendance->employee_id . '-' . $checkInDateTime->format('Y-m-d');
+
+                // Check if this entry already exists in $attendanceData
+                if (isset($attendanceData[$key])) {
+                    // Update existing entry
+                    $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
+                    $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
+                    $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
+                    $attendanceData[$key]->late_duration += $lateDurationAM; // Update late duration
+                    $attendanceData[$key]->late_durationPM += $lateDurationPM; // Update late duration
+                    $attendanceData[$key]->remarks = $remark; // Update remark
+
+                    
+                } else {
+                    // Create new entry
+                    $attendanceData[$key] = (object) [
+                        'employee_id' => $attendance->employee_id,
+                        'worked_date' => $checkInDateTime->format('Y-m-d'),
+                        'hours_workedAM' => $hoursWorkedAM,
+                        'hours_workedPM' => $hoursWorkedPM,
+                        'total_hours_worked' => $totalHoursWorked,
+                        'late_duration' => $lateDurationAM, // Store late duration
+                        'late_durationPM' => $lateDurationPM, // Update late duration
+                        'remarks' => $remark, // Set remark based on lateness
+                    ];
+
+                    session()->put('late_duration', $lateDurationAM);
+                    
+                }
+
+                // Add total hours worked to overall total
+                $overallTotalHours += $totalHoursWorked;
+
+
+            } else {
+                // No check_out_time found, mark as absent
+                $checkInDate = $checkInDateTime->format('Y-m-d');
+                $attendanceData[$checkInDate] = (object) [
+                    'employee_id' => $attendance->employee_id,
+                    'worked_date' => $checkInDate,
+                    'hours_workedAM' => 0,
+                    'hours_workedPM' => 0,
+                    'total_hours_worked' => 0,
+                    'late_duration' => 0, // No late duration if absent
+                    'remarks' => 'Absent',
+                ];
+            }
         }
-
-        // Calculate the latest allowed check-in time (scheduled time + 15 minutes)
-        $latestAllowedCheckIn = clone $morningStartTime;
-        $latestAllowedCheckIn->add(new DateInterval('PT15M'));
-
-        // dd($latestAllowedCheckIn);
-
-        // Calculate late duration
-        if ($checkInDateTime > $latestAllowedCheckIn) {
-            $lateInterval = $checkInDateTime->diff($latestAllowedCheckIn);
-            $lateDuration = $lateInterval->h * 60 + $lateInterval->i; // Convert to minutes
-        }
-
-        // Calculate the PM working hours
-        if ($checkInDateTime < $afternoonEndTime && $checkOutDateTime > $afternoonStartTime) {
-            $effectiveCheckInTime = max($checkInDateTime, $afternoonStartTime);
-            $effectiveCheckOutTime = min($checkOutDateTime, $afternoonEndTime);
-            $intervalPM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
-            $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60);
-        }
-
-        // Calculate total hours worked
-        $totalHoursWorked = $hoursWorkedAM + $hoursWorkedPM;
-
-        // Determine the remark based on lateness
-        $remark = $lateDuration > 0 ? 'Late' : 'Present';
-
-        // Prepare the key for $attendanceData
-        $key = $attendance->employee_id . '-' . $checkInDateTime->format('Y-m-d');
-
-        // Check if this entry already exists in $attendanceData
-        if (isset($attendanceData[$key])) {
-            // Update existing entry
-            $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
-            $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
-            $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
-            $attendanceData[$key]->late_duration += $lateDuration; // Update late duration
-            $attendanceData[$key]->remarks = $remark; // Update remark
-        } else {
-            // Create new entry
-            $attendanceData[$key] = (object) [
-                'employee_id' => $attendance->employee_id,
-                'worked_date' => $checkInDateTime->format('Y-m-d'),
-                'hours_workedAM' => $hoursWorkedAM,
-                'hours_workedPM' => $hoursWorkedPM,
-                'total_hours_worked' => $totalHoursWorked,
-                'late_duration' => $lateDuration, // Store late duration
-                'remarks' => $remark, // Set remark based on lateness
-            ];
-            session()->put('late_duration', $lateDuration);
-        }
-
-        // Add total hours worked to overall total
-        $overallTotalHours += $totalHoursWorked;
-
-
-    } else {
-        // No check_out_time found, mark as absent
-        $checkInDate = $checkInDateTime->format('Y-m-d');
-        $attendanceData[$checkInDate] = (object) [
-            'employee_id' => $attendance->employee_id,
-            'worked_date' => $checkInDate,
-            'hours_workedAM' => 0,
-            'hours_workedPM' => 0,
-            'total_hours_worked' => 0,
-            'late_duration' => 0, // No late duration if absent
-            'remarks' => 'Absent',
-        ];
-    }
-}
 
 
 

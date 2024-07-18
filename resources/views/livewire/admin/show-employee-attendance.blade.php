@@ -194,155 +194,314 @@
                             </div>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <div class="flex">
-                            <!-- Table for Time In -->
-                            <div class="w-[30%]">
-                                <h3 class="text-center">Time In</h3>
-                                <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
-                                    <thead class="bg-gray-200 text-black">
-                                        <tr>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                Emp ID
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                Date
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                Check-In
-                                            </th>
-                                            <!-- Add other columns as needed -->
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($attendanceTimeIn as $attendanceIn)
-                                            <tr class="hover:bg-gray-100">
-                                                <td class="text-black border border-gray-400">{{ $attendanceIn->employee->employee_id }}</td>
-                                                <td class="text-black border border-gray-400">
-                                                    {{ date('m-d-Y (l)', strtotime($attendanceIn->check_in_time)) }}
-                                                </td>
-                                                <td class="text-black border border-gray-400">{{ date('g:i:s A', strtotime($attendanceIn->check_in_time)) }}</td>
-                                                <!-- Add other columns as needed -->
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                    <div x-data="{ tab: 'time-in-time-out' }" class="p-4">
+                        <div class="overflow-x-auto">
+                            <!-- Tab buttons -->
+                            <div class="flex mb-4">
+                                <button 
+                                    @click="tab = 'time-in-time-out'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'time-in-time-out', 'bg-gray-200': tab !== 'time-in-time-out' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 focus:outline-none"
+                                >
+                                    Time In & Time Out
+                                </button>
+                                <!-- <button 
+                                    @click="tab = 'time-out'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'time-out', 'bg-gray-200': tab !== 'time-out' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 focus:outline-none"
+                                >
+                                    Time Out
+                                </button> -->
+                                <button 
+                                    @click="tab = 'computed-hours'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'computed-hours', 'bg-gray-200': tab !== 'computed-hours' }"
+                                    class="px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
+                                >
+                                    Calculation of Work Hours
+                                </button>
                             </div>
-                            <text  class="font-bold uppercase">{{ $attendanceTimeIn->links() }}</text>
-                            <div class="w-[1%]"></div>
-                            <!-- Table for Time Out -->
-                            <div class="w-[30%]">
-                                <h3 class="text-center">Time Out</h3>
+
+                            <!-- Tab content -->
+                            <div x-show="tab === 'time-in-time-out'" class="w-full">
+                                <!-- Table for Time In -->
+                                <div class="flex justify-between">
+                                    <div class="w-[49%]">
+                                        <h3 class="text-center">Time In</h3>
+                                        <!-- Assuming $attendanceTimeIn is sorted by check_in_time descending -->
+                                        @if ($attendanceTimeIn->isNotEmpty())
+                                            @php
+                                                $currentDate = null;
+                                            @endphp
+                                            @foreach ($attendanceTimeIn as $attendanceIn)
+                                                @php
+                                                    $checkInTime = strtotime($attendanceIn->check_in_time);
+                                                    $date = date('m-d-Y', $checkInTime);
+                                                    $category = date('A', $checkInTime); // AM or PM
+                                                @endphp
+                                                @if ($date !== $currentDate)
+                                                    @php
+                                                        $currentDate = $date;
+                                                        $firstRow = true;
+                                                    @endphp
+                                                    <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                                                        <thead class="bg-gray-200 text-black">
+                                                            <tr>
+                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                    Emp ID
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                    Date
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                    Check-In
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                    Time In
+                                                                </th>
+                                                                <!-- Add other columns as needed -->
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                @endif
+                                                <tr class="hover:bg-gray-100">
+                                                    <td class="text-black border border-gray-400">{{ $attendanceIn->employee->employee_id }}</td>
+                                                    <td class="text-black border border-gray-400">
+                                                        {{ date('m-d-Y (l)', strtotime($attendanceIn->check_in_time)) }}
+                                                    </td>
+                                                    <td class="text-black border border-gray-400">{{ date('g:i:s A', strtotime($attendanceIn->check_in_time)) }}</td>
+                                                    <td class="text-black border border-gray-400">
+                                                        {{ $category }}
+                                                    </td>
+                                                    <!-- Add other columns as needed -->
+                                                </tr>
+                                                @if ($loop->last)
+                                                        </tbody>
+                                                    </table>
+                                                @endif
+                                            @endforeach
+                                        @else
+                                            <p class="text-center">No Time In records found.</p>
+                                        @endif
+                                        <div class="text-center font-bold uppercase">{{ $attendanceTimeIn->links() }}</div>
+                                    </div>
+                                    
+                                    <div class="w-[49%]">
+                                        <h3 class="text-center">Time Out</h3>
+                                        @if ($attendanceTimeOut->isNotEmpty())
+                                            @php
+                                                $currentDate = null;
+                                                $firstRow = true;
+                                            @endphp
+                                            @foreach ($attendanceTimeOut as $attendanceOut)
+                                                @php
+                                                    $checkOutTime = strtotime($attendanceOut->check_out_time);
+                                                    $date = date('m-d-Y', $checkOutTime);
+                                                    $isFirstRow = ($date !== $currentDate);
+                                                    $category = $isFirstRow ? 'AM' : date('A', $checkOutTime);
+                                                @endphp
+                                                @if ($isFirstRow)
+                                                    @if ($loop->index > 0)
+                                                        </tbody></table>
+                                                    @endif
+                                                    <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                                                        <thead class="bg-gray-200 text-black">
+                                                            <tr>
+                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                    Emp ID
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                    Date
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                    Check-Out
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                    Time Out
+                                                                </th>
+                                                                <!-- Add other columns as needed -->
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                    @php
+                                                        $currentDate = $date;
+                                                    @endphp
+                                                @endif
+                                                <tr class="hover:bg-gray-100">
+                                                    <td class="text-black border border-gray-400">{{ $attendanceOut->employee->employee_id }}</td>
+                                                    <td class="text-black border border-gray-400">
+                                                        {{ date('m-d-Y (l)', $checkOutTime) }}
+                                                    </td>
+                                                    <td class="text-black border border-gray-400">{{ date('g:i:s A', $checkOutTime) }}</td>
+                                                    <td class="text-black border border-gray-400">
+                                                        {{ $category }}
+                                                    </td>
+                                                    <!-- Add other columns as needed -->
+                                                </tr>
+                                                @if ($loop->last)
+                                                    </tbody></table>
+                                                @endif
+                                            @endforeach
+                                        @else
+                                            <p class="text-center">No Time Out records found.</p>
+                                        @endif
+                                        <div class="text-center font-bold uppercase">{{ $attendanceTimeOut->links() }}</div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div x-show="tab === 'computed-hours'" class="w-full">
+                                <!-- Table for Computed Working Hours -->
+                                <div class="w-[100%]">
+                                    <h3 class="text-center">Calculation of Work Hours</h3>
                                     <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                                         <thead class="bg-gray-200 text-black">
                                             <tr>
                                                 <th class="border border-gray-400 px-3 py-2">
-                                                    Emp ID
-                                                </th>
-                                                <th class="border border-gray-400 px-3 py-2">
                                                     Date
                                                 </th>
                                                 <th class="border border-gray-400 px-3 py-2">
-                                                    Check-Out
+                                                    AM Late Time
                                                 </th>
-                                                <!-- Add other columns as needed -->
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    PM Late Time
+                                                </th>
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    AM UnderTime
+                                                </th>
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    PM UnderTime
+                                                </th>
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                   Total AM Hours
+                                                </th>
+                                                
+                                                
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    Total PM Hours
+                                                </th>
+
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    Total Late Hours
+                                                </th>
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    Total Hours Rendered
+                                                </th>
+                                                
+                                                <th class="border border-gray-400 px-3 py-2">
+                                                    Remarks
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($attendanceTimeOut as $attendanceOut)
-                                                <tr class="hover:bg-gray-100">
-                                                    <td class="text-black border border-gray-400">{{ $attendanceOut->employee->employee_id }}</td>
-                                                    <td class="text-black border border-gray-400">
-                                                        @if ($attendanceOut->check_out_time)
-                                                            {{ date('m-d-Y, (l)', strtotime($attendanceOut->check_out_time)) }}
-                                                        @else
-                                                            No time out recorded
-                                                        @endif
-                                                    </td>
-                                                    <td class="text-black border border-gray-400">{{ date('g:i:s A', strtotime($attendanceOut->check_out_time)) }}</td>
-                                                    <!-- Add other columns as needed -->
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                    <text  class="font-bold uppercase">{{ $attendanceTimeOut->links() }}</text>
-                            </div>
-                            <div class="w-[1%]"></div>
-                            <div class="w-[38%]">
-                                <h3 class="text-center">Computed Working Hours</h3>
-                                <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
-                                    <thead class="bg-gray-200 text-black">
-                                        <tr>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                Date
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                AM
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                PM
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                Total
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2 text-xs">
-                                                Late
-                                            </th>
-                                           <th class="border border-gray-400 px-3 py-2">
-                                                Remarks
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                         @foreach ($attendanceData as $attendance)
+                                            <!-- Example data using Blade templating -->
+                                            @foreach ($attendanceData as $attendance)
                                             <tr>
                                                 <td class="text-black border border-gray-400">{{ $attendance->worked_date }}</td>
                                                 <td class="text-black border border-gray-400">
-                                                    {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min.
+                                                    @php
+                                                    // Retrieve the late duration from session
+                                                    $lateDurationInMinutes = session('late_duration', 0);
+
+                                                    // Calculate hours and minutes
+                                                    $lateHours = intdiv($lateDurationInMinutes, 60);
+                                                    $lateMinutes = $lateDurationInMinutes % 60;
+
+                                                    // Format the late duration
+                                                    $lateDurationFormatted = '';
+
+                                                    if ($lateHours > 0) {
+                                                    $lateDurationFormatted .= "{$lateHours} hr ";
+                                                    }
+                                                    if ($lateMinutes > 0) {
+                                                    $lateDurationFormatted .= "{$lateMinutes} min";
+                                                    }
+                                                    // If no late duration
+                                                    if (empty($lateDurationFormatted)) {
+                                                    $lateDurationFormatted = 'No late';
+                                                    }
+                                                    @endphp
+
+                                                    {{ $lateDurationFormatted }}
                                                 </td>
                                                 <td class="text-black border border-gray-400">
+                                                    @php
+                                                    // Retrieve the late duration from session
+                                                    $lateDurationInMinutes = session('late_duration_pm', 0);
+
+                                                    // Calculate hours and minutes
+                                                    $lateHours = intdiv($lateDurationInMinutes, 60);
+                                                    $lateMinutes = $lateDurationInMinutes % 60;
+
+                                                    // Format the late duration
+                                                    $lateDurationFormatted = '';
+
+                                                    if ($lateHours > 0) {
+                                                    $lateDurationFormatted .= "{$lateHours} hr ";
+                                                    }
+                                                    if ($lateMinutes > 0) {
+                                                    $lateDurationFormatted .= "{$lateMinutes} min";
+                                                    }
+                                                    // If no late duration
+                                                    if (empty($lateDurationFormatted)) {
+                                                    $lateDurationFormatted = 'No late';
+                                                    }
+                                                    @endphp
+
+                                                    {{ $lateDurationFormatted }}
+                                                </td>
+                                                <td class="text-black border border-gray-400">
+                                                </td>
+                                                <td class="text-black border border-gray-400"></td>
+                                                <td class="text-black border border-gray-400">
+                                                    {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min.
+                                                </td>
+                                                
+
+                                                <td class="text-black border border-gray-400">
                                                     {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min.
+                                                </td>
+                                                <td class="text-black border border-gray-400">
+                                                     @php
+                                                        // Retrieve the late durations from the session
+                                                        $lateDurationPMInMinutes = session('late_duration_pm', 0);
+                                                        $lateDurationInMinutes = session('late_duration', 0);
+
+                                                        // Calculate total late duration in minutes
+                                                        $totalLateDurationInMinutes = $lateDurationPMInMinutes + $lateDurationInMinutes;
+
+                                                        // Calculate hours and minutes
+                                                        $totalLateHours = intdiv($totalLateDurationInMinutes, 60);
+                                                        $totalLateMinutes = $totalLateDurationInMinutes % 60;
+
+                                                        // Format the total late duration
+                                                        $totalLateDurationFormatted = '';
+
+                                                        if ($totalLateHours > 0) {
+                                                            $totalLateDurationFormatted .= "{$totalLateHours} hr ";
+                                                        }
+                                                        if ($totalLateMinutes > 0) {
+                                                            $totalLateDurationFormatted .= "{$totalLateMinutes} min";
+                                                        }
+                                                        // If no late duration
+                                                        if (empty($totalLateDurationFormatted)) {
+                                                            $totalLateDurationFormatted = 'No late';
+                                                        }
+                                                    @endphp
+
+                                                    {{ $totalLateDurationFormatted }}
                                                 </td>
 
                                                 <td class="text-black border border-gray-400">
                                                     {{ floor($attendance->total_hours_worked) }} hrs. {{ round($attendance->total_hours_worked - floor($attendance->total_hours_worked), 1) * 60 }} min.
                                                 </td>
-                                                <td class="text-black border border-gray-400">
-                                                    @php
-                                                        // Retrieve the late duration from session
-                                                        $lateDurationInMinutes = session('late_duration', 0);
-
-                                                        // Calculate hours and minutes
-                                                        $lateHours = intdiv($lateDurationInMinutes, 60);
-                                                        $lateMinutes = $lateDurationInMinutes % 60;
-
-                                                        // Format the late duration
-                                                        $lateDurationFormatted = '';
-
-                                                        if ($lateHours > 0) {
-                                                            $lateDurationFormatted .= "{$lateHours} hrs ";
-                                                        }
-                                                        if ($lateMinutes > 0) {
-                                                            $lateDurationFormatted .= "{$lateMinutes} mins";
-                                                        }
-                                                        // If no late duration
-                                                        if (empty($lateDurationFormatted)) {
-                                                            $lateDurationFormatted = 'No late';
-                                                        }
-                                                    @endphp
-
-                                                    {{ $lateDurationFormatted }}
-                                                </td>
-
-
-
-
-                                                <td class="text-black border border-gray-400">{{ $attendance->remarks }}</td>
                                                 
+                                                <td class="text-black border border-gray-400">{{ $attendance->remarks }}</td>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
