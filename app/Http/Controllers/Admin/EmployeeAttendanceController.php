@@ -79,6 +79,7 @@ public function submitPortalTimeIn(Request $request)
 
     // Query to get the employee based on the RFID
     $employee = Employee::where('employee_rfid', $rfid)->first();
+    $employees = Employee::where('employee_rfid', $rfid)->get();
 
     if ($employee) {
         // Get the current datetime in Kuala Lumpur timezone
@@ -113,6 +114,8 @@ public function submitPortalTimeIn(Request $request)
             ->latest('check_in_time')
             ->first();
 
+        
+
         $intervalAllowed = false;
         // Check interval for first check-out
         if ($firstTimeIn) {
@@ -124,7 +127,14 @@ public function submitPortalTimeIn(Request $request)
             }
         }
 
-        if ($timeInCount == 1 && $timeOutCount == 1) {
+        // Check if the employee has already checked out in the afternoon
+        if ($timeInCount == 2 && $timeOutCount == 2) {
+            return redirect()->route('admin.attendance.time-in.portal')->with('success', 'Attendance complete. Safe travels home!');
+            // return response()->json([
+            //     'message' => 'Already checked out in the afternoon. Go home safely!',
+            // ], 403);
+        }
+        else if ($timeInCount == 1 && $timeOutCount == 1) {
             
             $intervalAllowed = false;
 
@@ -146,15 +156,18 @@ public function submitPortalTimeIn(Request $request)
                 $attendanceIn->status = "On-campus";
                 $attendanceIn->save();
 
-                return response()->json([
-                    'message' => 'PM Time-in recorded successfully.',
-                    'employee' => $employee,
-                    'check_in_time' => $formattedDateTime,
-                ], 200);
+                // return response()->json([
+                //     'message' => 'PM Time-in recorded successfully.',
+                //     'employee' => $employee,
+                //     'check_in_time' => $formattedDateTime,
+                // ], 200);
+                return view('attendance-profile_time_in_employee', compact('employees'));
             } else {
-                return response()->json([
-                    'message' => 'Already Check-out in morning! Afternoon - Check-In not allowed yet. Please wait 45 minutes after check-out.',
-                ], 403);
+                // return response()->json([
+                //     'message' => 'Already Check-out in morning! Afternoon - Check-In not allowed yet. Please wait 45 minutes after check-out.',
+                // ], 403);
+                // return redirect()->route('admin.attendance.time-in.portal')->with('error', 'Already Check-out in morning! Afternoon - Check-In not allowed yet. Please wait 45 minutes after check-out!');
+                return redirect()->route('admin.attendance.time-in.portal')->with('error', 'Please wait 45 minutes for Afternoon time in!');
             }
         } elseif ($timeInCount == 1 && $timeOutCount == 0) {
                 if ($intervalAllowed) 
@@ -165,15 +178,17 @@ public function submitPortalTimeIn(Request $request)
                     $attendanceOut->check_out_time = $formattedDateTime; // Store formatted datetime
                     $attendanceOut->save();
 
-                    return response()->json([
-                        'message' => 'AM Time-out recorded successfully.',
-                        'employee' => $employee,
-                        'check_out_time' => $formattedDateTime,
-                    ], 200);
+                    // return response()->json([
+                    //     'message' => 'AM Time-out recorded successfully.',
+                    //     'employee' => $employee,
+                    //     'check_out_time' => $formattedDateTime,
+                    // ], 200);
+                    return view('attendance-profile_time_out_employee', compact('employees'));
                 } else {
-                    return response()->json([
-                        'message' => 'Already Time In Morning.',
-                    ], 403);
+                    // return response()->json([
+                    //     'message' => 'Already Time In Morning.',
+                    // ], 403);
+                    return redirect()->route('admin.attendance.time-in.portal')->with('success', 'Already Time In Morning!');
                 }
         } elseif ($timeInCount == 2 && $timeOutCount == 1) {
             // Check interval for second check-out
@@ -194,15 +209,17 @@ public function submitPortalTimeIn(Request $request)
                 $attendanceOut->check_out_time = $formattedDateTime; // Store formatted datetime
                 $attendanceOut->save();
 
-                return response()->json([
-                    'message' => 'PM Time-out recorded successfully.',
-                    'employee' => $employee,
-                    'check_out_time' => $formattedDateTime,
-                ], 200);
+                // return response()->json([
+                //     'message' => 'PM Time-out recorded successfully.',
+                //     'employee' => $employee,
+                //     'check_out_time' => $formattedDateTime,
+                // ], 200);
+                 return view('attendance-profile_time_out_employee', compact('employees'));
             } else {
-                return response()->json([
-                    'message' => 'Already Time-in Afternoon.',
-                ], 403);
+                // return response()->json([
+                //     'message' => 'Already Time-in Afternoon.',
+                // ], 403);
+                return redirect()->route('admin.attendance.time-in.portal')->with('success', 'Already Time In Afternoon!');
             }
 
         } else {
@@ -213,15 +230,17 @@ public function submitPortalTimeIn(Request $request)
             $attendanceIn->status = "On-campus";
             $attendanceIn->save();
 
-            return response()->json([
-                'message' => 'AM Time-in recorded successfully.',
-                'employee' => $employee,
-                'check_in_time' => $formattedDateTime,
-            ], 200);
+            return view('attendance-profile_time_in_employee', compact('employees'));
+            // return response()->json([
+            //     'message' => 'AM Time-in recorded successfully.',
+            //     'employee' => $employee,
+            //     'check_in_time' => $formattedDateTime,
+            // ], 200);
         }
     } else {
         // Handle case where employee with given RFID is not found
-        return response()->json(['error' => 'Employee not found.'], 404);
+        // return response()->json(['error' => 'Employee not found.'], 404);
+        return redirect()->route('admin.attendance.time-in.portal')->with('error', 'Invalid RFID!');
     }
 }
 

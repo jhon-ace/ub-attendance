@@ -57,15 +57,20 @@
             position: sticky;
             bottom: 0;
         }
+        .hehe{
+            font-size:70px;
+            
+        }
     </style>
     <script>
         setTimeout(function() {
             window.location.href = "{{ route('admin.attendance.time-in.portal') }}";
-        }, 500); // 5000 milliseconds = 5 seconds
+        }, 1000); // 5000 milliseconds = 5 seconds
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="hehe uppercase font-bold text-3xl text-center mt-16 text-white tracking-widest shadow-lg pb-8">Time - Out</div>
+    <div class="container mt-5">
         @forelse ($employees as $employee)
         <div class="flex w-full">
             <div style="width: 600px;" class="pl-16 ml-5">
@@ -93,7 +98,7 @@
                 </div>
                 <div class="p-2 font-bold uppercase">
                     <span class="text-sm">Department/Office</span><br>
-                    <span style="font-size: 25px;" class="text-white shadow-sm">{{ $employee->department->department_name }}</span>
+                    <span style="font-size: 35px;" class="text-white shadow-sm">{{ $employee->department->department_abbreviation }}</span>
                 </div>
             </div>
         </div>
@@ -103,7 +108,7 @@
         @endforelse
     </div>
     <div class="w-full z-10">
-            <form id="attendanceForm" action="{{ route('admin.attendance.time-out.store') }}" method="POST">
+            <form id="attendanceForm" action="{{ route('admin.attendance.time-in.store') }}" method="POST">
                 @csrf
                 <div class="z-10">
                     <input type="password" id="inputField" name="user_rfid"

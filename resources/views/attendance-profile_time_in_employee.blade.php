@@ -65,11 +65,11 @@
     <script>
         setTimeout(function() {
             window.location.href = "{{ route('admin.attendance.time-in.portal') }}";
-        }, 500); // 5000 milliseconds = 5 seconds
+        }, 1000); // 5000 milliseconds = 5 seconds
     </script>
 </head>
 <body>
-    <div class="hehe uppercase font-bold text-3xl text-center mt-16 text-white tracking-widest">Time - In</div>
+    <div class="hehe uppercase font-bold text-3xl text-center mt-16 text-white tracking-widest shadow-lg pb-8">Time - In</div>
     <div class="container mt-5">
         @forelse ($employees as $employee)
         <div class="flex w-full">
@@ -98,7 +98,7 @@
                 </div>
                 <div class="p-2 font-bold uppercase">
                     <span class="text-sm">Department/Office</span><br>
-                    <span style="font-size: 25px;" class="text-white shadow-sm">{{ $employee->department->department_name }}</span>
+                    <span style="font-size: 35px;" class="text-white shadow-sm">{{ $employee->department->department_abbreviation }}</span>
                 </div>
             </div>
         </div>

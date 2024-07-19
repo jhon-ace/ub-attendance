@@ -193,22 +193,22 @@
         </div>
     </div>
     @if (session('error'))
-        <div id="session-error" class="alert alert-danger -mt-[90px] bg-white">
+        <div id="session-error" class="alert alert-danger -mt-[90px] bg-white rounded-md">
             <ul>
-                <li class="text-red-500 font-bold text-[30px] shadow-md">&nbsp;{{ session('error') }}&nbsp;</li>
+                <li class="text-yellow-800  p-2 font-bold text-[20px] shadow-md tracking-widest">&nbsp;{{ session('error') }}&nbsp;</li>
+            </ul>
+        </div>
+    @endif
+    
+    @if (session('success'))
+        <div id="session-success" class="alert alert-success -mt-[90px] bg-white rounded-md">
+            <ul>
+                <li class="text-yellow-800 p-2 font-bold text-[30px] shadow-md tracking-widest">{{ session('success') }}</li>
             </ul>
         </div>
     @endif
 
-    @if ($errors->any())
-        <div id="validation-errors" class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li class="text-black">{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+
     <div id="my-time" class="tracking-wide"></div> <!-- Date and Time Display -->
 </div>
 
@@ -222,8 +222,8 @@
             </div>
         </form>
     </div>
-    <footer class="bg-gradient-to-r from-yellow-400 to-red-500 text-white text-center py-3 tracking-wide">
-        <div class="max-w-screen-lg mx-auto">
+    <footer class="w-full uppercase bg-gradient-to-r from-yellow-400 to-red-500 border-t border-red-800 text-white text-center py-3 tracking-wide">
+        <div class="w-full mx-auto">
             A premier university transforming lives for a great future. Anchored on: SCHOLARSHIP, CHARACTER, SERVICE
         </div>
     </footer>
@@ -321,5 +321,21 @@
             }, 5000); // 5000 milliseconds = 5 seconds
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                var sessionSuccess = document.getElementById('session-success');
+                if (sessionSuccess) {
+                    sessionSuccess.style.display = 'none';
+                }
+
+                var validationErrors = document.getElementById('validation-errors');
+                if (validationErrors) {
+                    validationErrors.style.display = 'none';
+                }
+            }, 5000); // 5000 milliseconds = 5 seconds
+        });
+    </script>
+
 </body>
 </html>
