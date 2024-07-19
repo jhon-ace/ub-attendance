@@ -203,7 +203,7 @@
     @if (session('success'))
         <div id="session-success" class="alert alert-success -mt-[90px] bg-white rounded-md">
             <ul>
-                <li class="text-yellow-800 p-2 font-bold text-[30px] shadow-md tracking-widest">{{ session('success') }}</li>
+                <li class="text-yellow-800 p-2 font-bold text-[20px] shadow-md tracking-widest">{{ session('success') }}</li>
             </ul>
         </div>
     @endif
@@ -242,7 +242,7 @@
     @endpush
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        // document.addEventListener('DOMContentLoaded', function () {
 
             var timeDisplayElement = document.querySelector('#my-time');
             
@@ -256,7 +256,7 @@
                 // date + ' ' 
             }
             setInterval(printTime, 1000);
-        });
+        // });
     </script>
 
     <script>

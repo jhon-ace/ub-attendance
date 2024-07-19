@@ -53,8 +53,9 @@
                     @endif
                 </select>
                 @if($departmentToShow)
-                    <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p>
+                    <!-- <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p> -->
                     <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p>
+                    
                 @endif
             @endif
         </div>
@@ -71,21 +72,85 @@
         @endif
         
         @if($departmentToShow)
-            <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display attendance:</label>
-            <select wire:model="selectedEmployee" id="department_id" name="department_id"
-                    wire:change="updateAttendanceByEmployee"
-                    class="cursor-pointer text-sm shadow appearance-none border  rounded text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
-                    required>
-                @if($departments->isEmpty())
-                    <option value="0">No Employees</option>
-                @else
-                    <option value="" selected>Select Employees</option>
-                    @foreach($employees as $employee)
-                        <option value="{{ $employee->id }}">{{ $employee->employee_id }} - {{ $employee->employee_lastname }}, {{ $employee->employee_firstname }} {{ ucfirst($employee->employee_middlename) }}</option>
-                    @endforeach
-                @endif
-            </select>
+            <div class="flex justify-start">
+                <div>
+                    <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display attendance:</label>
+                    <select wire:model="selectedEmployee" id="department_id" name="department_id"
+                            wire:change="updateAttendanceByEmployee"
+                            class="cursor-pointer text-sm shadow appearance-none border  rounded text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
+                            required>
+                        @if($departments->isEmpty())
+                            <option value="0">No Employees</option>
+                        @else
+                            <option value="" selected>Select Employees</option>
+                            @foreach($employees as $employee)
+                                <option value="{{ $employee->id }}">{{ $employee->employee_id }} - {{ $employee->employee_lastname }}, {{ $employee->employee_firstname }} {{ ucfirst($employee->employee_middlename) }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+                            <!-- Modal -->
+                <div x-data="{ open: false }" @keydown.window.escape="open = false" x-cloak>
+                    <!-- Modal Trigger Button -->
+                    <button @click="open = true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-2 mt-5"><i class="fa-solid fa-calendar-days"></i></button>
 
+                    <!-- Modal Background -->
+                    <div x-show="open" class="fixed inset-0 bg-black bg-opacity-50 z-50" @click="open = false"></div>
+
+                    <!-- Modal Content -->
+                    <div x-show="open" class="fixed inset-0 flex items-center justify-center z-50">
+                        <div class="bg-white p-8 rounded-lg shadow-lg max-w-7xl w-full ">
+                            <h2 class="text-lg font-semibold mb-4">Work Details</h2>
+
+                            <!-- Modal Body -->
+                            <div class="space-y-4">
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day Of Week</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Morning Hours</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Afternoon Hours</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            @foreach($departmentDisplayWorkingHour as $working_hour)
+                                                <tr>
+                                                    @php
+                                                        $daysOfWeek = [
+                                                            0 => 'Sunday',
+                                                            1 => 'Monday',
+                                                            2 => 'Tuesday',
+                                                            3 => 'Wednesday',
+                                                            4 => 'Thursday',
+                                                            5 => 'Friday',
+                                                            6 => 'Saturday',
+                                                        ];
+                                                    @endphp
+
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        {{ $daysOfWeek[$working_hour->day_of_week] }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                       {{ date('h:i A', strtotime($working_hour->morning_start_time)) }} - {{ date('h:i A', strtotime($working_hour->morning_end_time)) }}
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                       {{ date('h:i A', strtotime($working_hour->afternoon_start_time)) }} - {{ date('h:i A', strtotime($working_hour->afternoon_end_time)) }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                    <div class="mt-6 flex justify-end">
+                                    <button @click="open = false" class="btn btn-secondary">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             @if($selectedEmployeeToShow)
                 @if($search && $attendanceTimeIn->isEmpty() && $attendanceTimeOut->isEmpty() && !$selectedAttendanceByDate->isEmpty())
                     <p class="text-black mt-8 text-center">No attendance/s found in <span class="text-red-500">{{ $selectedEmployeeToShow->employee_id }} | {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }} </span> for matching "{{ $search }}"</p>
@@ -100,6 +165,7 @@
                         <div class="flex flex-col">
                             <div class="flex justify-between items-center mb-2">
                                 <div class="grid grid-rows-2 grid-flow-col -mt-10">
+                                  
                                     <div class="text-center uppercase ml-16">
                                         Select Specific Date
                                     </div>
@@ -219,6 +285,9 @@
                                             <th class="border border-gray-400 px-3 py-2">
                                                 Total
                                             </th>
+                                            <th class="border border-gray-400 px-3 py-2 text-xs">
+                                                Late
+                                            </th>
                                            <th class="border border-gray-400 px-3 py-2">
                                                 Remarks
                                             </th>
@@ -238,8 +307,38 @@
                                                 <td class="text-black border border-gray-400">
                                                     {{ floor($attendance->total_hours_worked) }} hrs. {{ round($attendance->total_hours_worked - floor($attendance->total_hours_worked), 1) * 60 }} min.
                                                 </td>
+                                                <td class="text-black border border-gray-400">
+                                                    @php
+                                                        // Retrieve the late duration from session
+                                                        $lateDurationInMinutes = session('late_duration', 0);
+
+                                                        // Calculate hours and minutes
+                                                        $lateHours = intdiv($lateDurationInMinutes, 60);
+                                                        $lateMinutes = $lateDurationInMinutes % 60;
+
+                                                        // Format the late duration
+                                                        $lateDurationFormatted = '';
+
+                                                        if ($lateHours > 0) {
+                                                            $lateDurationFormatted .= "{$lateHours} hrs ";
+                                                        }
+                                                        if ($lateMinutes > 0) {
+                                                            $lateDurationFormatted .= "{$lateMinutes} mins";
+                                                        }
+                                                        // If no late duration
+                                                        if (empty($lateDurationFormatted)) {
+                                                            $lateDurationFormatted = 'No late';
+                                                        }
+                                                    @endphp
+
+                                                    {{ $lateDurationFormatted }}
+                                                </td>
+
+
+
 
                                                 <td class="text-black border border-gray-400">{{ $attendance->remarks }}</td>
+                                                
                                             </tr>
                                         @endforeach
                                     </tbody>
