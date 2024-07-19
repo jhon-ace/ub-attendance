@@ -184,7 +184,7 @@
                             <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
                                 <text>{{ $dataOut->employee->employee_lastname}}, {{ $dataOut->employee->employee_firstname}} {{ $dataOut->employee->employee_middlename}}</text>
                             </td>
-                            <td class="font-bold text-md uppercase text-center tracking-wider">{{ $dataOut->check_out_time }}</td>
+                            <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($dataOut->check_out_time)) }}</td>
                         </tr>
                     @endforeach
                     <!-- Repeat the above <tr> structure for each row as needed -->

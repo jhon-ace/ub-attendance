@@ -60,8 +60,8 @@
     </style>
     <script>
         setTimeout(function() {
-            window.location.href = "{{ route('admin.attendance.time-out.portal') }}";
-        }, 5000); // 5000 milliseconds = 5 seconds
+            window.location.href = "{{ route('admin.attendance.time-in.portal') }}";
+        }, 500); // 5000 milliseconds = 5 seconds
     </script>
 </head>
 <body>

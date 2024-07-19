@@ -12,9 +12,12 @@ use \App\Models\Admin\EmployeeAttendanceTimeIn;
 use \App\Models\Admin\EmployeeAttendanceTimeOut;
 use \App\Models\Admin\StudentAttendanceTimeIn;
 use \App\Models\Admin\StudentAttendanceTimeOut;
+use \App\Models\Admin\DepartmentWorkingHour;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Carbon\Carbon;
+use DateTime;
+use DateTimeZone;
 
 class EmployeeAttendanceController extends Controller
 {
@@ -35,23 +38,25 @@ class EmployeeAttendanceController extends Controller
     {
         $current_date = now()->setTimezone('Asia/Kuala_Lumpur')->format('Y-m-d');
 
+        
         $checkDateIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)->first();
         $checkDateOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)->first();
 
-        if ($checkDateIn && $checkDateOut) 
+
+        if ($checkDateIn) 
         {
             $curdateDataIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)->get();
             $curdateDataOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)->get();
             
             return view('attendance_time_in', compact('curdateDataIn', 'curdateDataOut'));
 
-        } else {
-           
-            return view('attendance_time_in', [
-                'curdateDataIn' => [],
-                'curdateDataOut' => [],
-            ]);
         }
+
+        return view('attendance_time_in', [
+            'curdateDataIn' => [],
+            'curdateDataOut' => [],
+        ]);
+  
 
     }
 
@@ -61,74 +66,273 @@ class EmployeeAttendanceController extends Controller
     }
 
 
+
+
+
 public function submitPortalTimeIn(Request $request)
 {
-
     $request->validate([
         'user_rfid' => 'required',
     ]);
 
+    $rfid = $request->input('user_rfid');
 
-                $rfid = $request->input('user_rfid');
-                $dept_identifier = "employee";
+    // Query to get the employee based on the RFID
+    $employee = Employee::where('employee_rfid', $rfid)->first();
 
-                // Query to get employees matching the RFID and department identifier
-                $employees = Employee::where('employee_rfid', $rfid)
-                                    ->whereHas('department', function ($query) use ($dept_identifier) {
-                                        $query->where('dept_identifier', $dept_identifier);
-                                    })
-                                    ->get();
+    if ($employee) {
+        // Get the current datetime in Kuala Lumpur timezone
+        $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
 
-                // Query to get the first employee matching the RFID and department identifier
-                $employees2 = Employee::where('employee_rfid', $rfid)
-                                        ->whereHas('department', function ($query) use ($dept_identifier) {
-                                            $query->where('dept_identifier', $dept_identifier);
-                                        })
-                                        ->first();
+        // Format datetime for database insertion
+        $formattedDateTime = $now->format('Y-m-d H:i:s');
 
-                if ($employees2) {
-                    // Insert attendance record
-                    $status ="On-campus";
+        // Get the count of time-in records for today
+        $timeInCount = EmployeeAttendanceTimeIn::where('employee_id', $employee->id)
+            ->whereDate('check_in_time', $now->format('Y-m-d'))
+            ->count();
 
-                    $attendance = new EmployeeAttendanceTimeIn();
-                    $attendance->employee_id = $employees2->id;
-                    $attendance->check_in_time = Carbon::now('Asia/Kuala_Lumpur');
-                    $attendance->status = $status; 
-                    $attendance->save();
+        // Get the first time-in record for today
+        $firstTimeIn = EmployeeAttendanceTimeIn::where('employee_id', $employee->id)
+            ->whereDate('check_in_time', $now->format('Y-m-d'))
+            ->first();
 
-                    return view('attendance-profile_time_in_employee', compact('employees'));
-                } 
+        // Get the count of time-out records for today
+        $timeOutCount = EmployeeAttendanceTimeOut::where('employee_id', $employee->id)
+            ->whereDate('check_out_time', $now->format('Y-m-d'))
+            ->count();
 
-                $students = Student::where('student_rfid', $rfid)->get();
-                $student_for_attendance_in = Student::where('student_rfid', $rfid)->first();
+        // Get the first time-in record for today
+        $firstTimeOut = EmployeeAttendanceTimeOut::where('employee_id', $employee->id)
+            ->whereDate('check_out_time', $now->format('Y-m-d'))
+            ->first();
 
-                if ($student_for_attendance_in) {
-                        $status = "On-campus";
+        // Get the last time-in record for today
+        $lastTimeIn = EmployeeAttendanceTimeIn::where('employee_id', $employee->id)
+            ->whereDate('check_in_time', $now->format('Y-m-d'))
+            ->latest('check_in_time')
+            ->first();
 
-                        $attendance = new StudentAttendanceTimeIn();
-                        $attendance->student_id = $student_for_attendance_in->id;
-                        $attendance->check_in_time = Carbon::now('Asia/Kuala_Lumpur');
-                        $attendance->status = $status; 
-                        $attendance->save();
+        $intervalAllowed = false;
+        // Check interval for first check-out
+        if ($firstTimeIn) {
+            $checkInTime = new DateTime($firstTimeIn->check_in_time, new DateTimeZone('Asia/Kuala_Lumpur'));
+            $interval = $now->diff($checkInTime);
+            $minutes = $interval->i + ($interval->h * 60);
+            if ($minutes >= 45) {
+                $intervalAllowed = true;
+            }
+        }
 
-                        return view('attendance-profile_time_in_student', compact('students'));
+        if ($timeInCount == 1 && $timeOutCount == 1) {
+            
+            $intervalAllowed = false;
+
+            if ($firstTimeOut) {
+                $checkOutTime = new DateTime($firstTimeOut->check_out_time, new DateTimeZone('Asia/Kuala_Lumpur'));
+                $interval = $now->diff($checkOutTime);
+                $minutes = $interval->i + ($interval->h * 60);
+                if ($minutes >= 45) {
+                    $intervalAllowed = true;
                 }
+            }
 
-                 return redirect()->route('admin.attendance.time-in.portal')->with('error', 'User not found. Tap again');
-                 
+            if ($intervalAllowed) 
+            {
+                // Second time-in (PM), no second check-out
+                $attendanceIn = new EmployeeAttendanceTimeIn();
+                $attendanceIn->employee_id = $employee->id;
+                $attendanceIn->check_in_time = $formattedDateTime; // Store formatted datetime
+                $attendanceIn->status = "On-campus";
+                $attendanceIn->save();
 
-    //         } else {
-    //             return redirect()->back()->with('error', 'Unauthorized access.');
-    //         }
-    //     } else {
-    //         // Invalid password
-    //         return redirect()->back()->with('error', 'Invalid email or password.');
-    //     }
-    // } else {
-    //     // User not found
-    //     return redirect()->back()->with('error', 'Invalid email or password.');
-    // }
+                return response()->json([
+                    'message' => 'PM Time-in recorded successfully.',
+                    'employee' => $employee,
+                    'check_in_time' => $formattedDateTime,
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'Already Check-out in morning! Afternoon - Check-In not allowed yet. Please wait 45 minutes after check-out.',
+                ], 403);
+            }
+        } elseif ($timeInCount == 1 && $timeOutCount == 0) {
+                if ($intervalAllowed) 
+                {
+                    // First check-out (AM)
+                    $attendanceOut = new EmployeeAttendanceTimeOut();
+                    $attendanceOut->employee_id = $employee->id;
+                    $attendanceOut->check_out_time = $formattedDateTime; // Store formatted datetime
+                    $attendanceOut->save();
+
+                    return response()->json([
+                        'message' => 'AM Time-out recorded successfully.',
+                        'employee' => $employee,
+                        'check_out_time' => $formattedDateTime,
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message' => 'Already Time In Morning.',
+                    ], 403);
+                }
+        } elseif ($timeInCount == 2 && $timeOutCount == 1) {
+            // Check interval for second check-out
+            $intervalAllowed = false;
+            if ($lastTimeIn) {
+                $checkInTime = new DateTime($lastTimeIn->check_in_time, new DateTimeZone('Asia/Kuala_Lumpur'));
+                $interval = $now->diff($checkInTime);
+                $minutes = $interval->i + ($interval->h * 60);
+                if ($minutes >= 45) {
+                    $intervalAllowed = true;
+                }
+            }
+
+            if ($intervalAllowed) {
+                // Second check-out (PM)
+                $attendanceOut = new EmployeeAttendanceTimeOut();
+                $attendanceOut->employee_id = $employee->id;
+                $attendanceOut->check_out_time = $formattedDateTime; // Store formatted datetime
+                $attendanceOut->save();
+
+                return response()->json([
+                    'message' => 'PM Time-out recorded successfully.',
+                    'employee' => $employee,
+                    'check_out_time' => $formattedDateTime,
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'Already Time-in Afternoon.',
+                ], 403);
+            }
+
+        } else {
+            // First time-in (AM)
+            $attendanceIn = new EmployeeAttendanceTimeIn();
+            $attendanceIn->employee_id = $employee->id;
+            $attendanceIn->check_in_time = $formattedDateTime; // Store formatted datetime
+            $attendanceIn->status = "On-campus";
+            $attendanceIn->save();
+
+            return response()->json([
+                'message' => 'AM Time-in recorded successfully.',
+                'employee' => $employee,
+                'check_in_time' => $formattedDateTime,
+            ], 200);
+        }
+    } else {
+        // Handle case where employee with given RFID is not found
+        return response()->json(['error' => 'Employee not found.'], 404);
+    }
 }
+
+
+
+
+// public function submitPortalTimeIn(Request $request)
+// {
+//     // Get the current timestamp and date in Asia/Kuala_Lumpur timezone
+//     $current_time = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
+//     $current_timestamp = $current_time->getTimestamp();
+//     $current_date = $current_time->format('Y-m-d');
+//     $current_day = (int) $current_time->format('w'); // Numeric representation of the day of the week (0 for Sunday, 6 for Saturday)
+
+//     $rfid = $request->input('user_rfid');
+
+//     // Validate the employee's RFID
+//     $employee = Employee::where('employee_rfid', $rfid)->first();
+
+//     if ($employee) {
+//         // Adjust the current day to match the range of `day_of_week` in your `working_hour` table (0 to 6)
+//         $current_day_of_week = $current_day == 0 ? 7 : $current_day; // Convert 0 (Sunday) to 7 for consistency with your `day_of_week` values
+
+//         // Retrieve the department's working hours for the current day
+//         $workingHour = DepartmentWorkingHour::where('department_id', $employee->department_id)
+//             ->where('day_of_week', $current_day_of_week - 1) // Adjust to match the `day_of_week` range (0 to 6)
+//             ->first();
+
+//         if ($workingHour) {
+//             // Extract working hours for the morning and afternoon
+//             $morning_start_time = DateTime::createFromFormat('H:i:s', $workingHour->morning_start_time, new DateTimeZone('Asia/Kuala_Lumpur'))->getTimestamp();
+//             $morning_end_time = DateTime::createFromFormat('H:i:s', $workingHour->morning_end_time, new DateTimeZone('Asia/Kuala_Lumpur'))->getTimestamp();
+//             $afternoon_start_time = DateTime::createFromFormat('H:i:s', $workingHour->afternoon_start_time, new DateTimeZone('Asia/Kuala_Lumpur'))->getTimestamp();
+//             $afternoon_end_time = DateTime::createFromFormat('H:i:s', $workingHour->afternoon_end_time, new DateTimeZone('Asia/Kuala_Lumpur'))->getTimestamp();
+
+//             // Check if there are any attendance records for today
+//             $checkDateIn = EmployeeAttendanceTimeIn::where('employee_id', $employee->id)
+//                 ->whereDate('check_in_time', $current_date)
+//                 ->first();
+
+//             if ($checkDateIn) {
+//                 // Calculate the time difference since the last check-in
+//                 $last_check_in_time = DateTime::createFromFormat('Y-m-d H:i:s', $checkDateIn->check_in_time, new DateTimeZone('Asia/Kuala_Lumpur'))->getTimestamp();
+//                 $interval_minutes = ($current_timestamp - $last_check_in_time) / 60; // Convert seconds to minutes
+
+//                 // Check if the interval is less than 45 minutes
+//                 if ($interval_minutes < 45) {
+//                     return response()->json(['message' => 'Cannot check in within 45 minutes of last check-in.'], 400);
+//                 } else {
+//                     // Determine the session based on current time
+//                     $session = '';
+//                     if ($current_timestamp >= $morning_start_time && $current_timestamp <= $morning_end_time) {
+//                         $session = 'morning';
+//                     } elseif ($current_timestamp >= $afternoon_start_time && $current_timestamp <= $afternoon_end_time) {
+//                         $session = 'afternoon';
+//                     }
+
+//                     // Handle check-in based on session
+//                     if ($session === 'morning') {
+//                         // Record time-out for morning session
+//                         EmployeeAttendanceTimeOut::create([
+//                             'employee_id' => $employee->id,
+//                             'check_out_time' => $current_time->format('Y-m-d H:i:s'),
+//                             'status' => 'Checked Out'
+//                         ]);
+//                         return response()->json(['message' => 'Checked out successfully from morning session.']);
+//                     } elseif ($session === 'afternoon') {
+//                         // Check if it's within 45 minutes of afternoon session start
+//                         if ($current_timestamp <= $afternoon_start_time + 45 * 60) {
+//                             return response()->json(['message' => 'Wait for 45 minutes to check in for afternoon session.'], 400);
+//                         } else {
+//                             // Record time-in for afternoon session
+//                             EmployeeAttendanceTimeIn::create([
+//                                 'employee_id' => $employee->id,
+//                                 'check_in_time' => $current_time->format('Y-m-d H:i:s'),
+//                                 'status' => 'Checked In'
+//                             ]);
+//                             return response()->json(['message' => 'Checked in successfully for afternoon session.']);
+//                         }
+//                     } else {
+//                         // Allow check-out if current time is after morning_end_time
+//                         if ($current_timestamp >= $morning_end_time) {
+//                             EmployeeAttendanceTimeOut::create([
+//                                 'employee_id' => $employee->id,
+//                                 'check_out_time' => $current_time->format('Y-m-d H:i:s'),
+//                                 'status' => 'Checked Out'
+//                             ]);
+//                             return response()->json(['message' => 'Checked out successfully from morning session.']);
+//                         } else {
+//                             return response()->json(['message' => 'Cannot check in outside working hours.'], 400);
+//                         }
+//                     }
+//                 }
+//             } else {
+//                 // If there is no check-in for today, record the time-in for morning session
+//                 EmployeeAttendanceTimeIn::create([
+//                     'employee_id' => $employee->id,
+//                     'check_in_time' => $current_time->format('Y-m-d H:i:s'),
+//                     'status' => 'Checked In'
+//                 ]);
+//                 return response()->json(['message' => 'Checked in successfully for morning session.']);
+//             }
+//         } else {
+//             return response()->json(['message' => 'No working hours found for the current day.'], 404);
+//         }
+//     } else {
+//         return response()->json(['message' => 'RFID not found or invalid.'], 404);
+//     }
+// }
+
+
 
 
 
