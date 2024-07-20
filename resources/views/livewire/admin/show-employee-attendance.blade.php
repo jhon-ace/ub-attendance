@@ -421,7 +421,7 @@
                                                     }
                                                     // If no late duration
                                                     if (empty($lateDurationFormatted)) {
-                                                    $lateDurationFormatted = 'No late';
+                                                    $lateDurationFormatted = '0';
                                                     }
                                                     @endphp
 
@@ -447,15 +447,38 @@
                                                     }
                                                     // If no late duration
                                                     if (empty($lateDurationFormatted)) {
-                                                    $lateDurationFormatted = 'No late';
+                                                    $lateDurationFormatted = '0';
                                                     }
                                                     @endphp
 
                                                     {{ $lateDurationFormatted }}
                                                 </td>
                                                 <td class="text-black border border-gray-400">
+                                                    @php
+                                                        $undertimeAMMinutes = $attendance->undertimeAM;
+                                                        $undertimeAMHours = intdiv($undertimeAMMinutes, 60);
+                                                        $undertimeAMMinutes = $undertimeAMMinutes % 60;
+
+                                                        if ($undertimeAMMinutes > 0) {
+                                                            echo "{$undertimeAMHours} hr {$undertimeAMMinutes} mins";
+                                                        } else {
+                                                            echo "0";
+                                                        }
+                                                    @endphp
                                                 </td>
-                                                <td class="text-black border border-gray-400"></td>
+                                                <td class="text-black border border-gray-400">
+                                                    @php
+                                                        $undertimePMMinutes = $attendance->undertimePM;
+                                                        $undertimePMHours = intdiv($undertimePMMinutes, 60);
+                                                        $undertimePMMinutes = $undertimePMMinutes % 60;
+
+                                                        if ($undertimePMMinutes > 0) {
+                                                            echo "{$undertimePMHours} hr {$undertimePMMinutes} mins";
+                                                        } else {
+                                                            echo "0";
+                                                        }
+                                                    @endphp
+                                                </td>
                                                 <td class="text-black border border-gray-400">
                                                     {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min.
                                                 </td>
@@ -486,7 +509,7 @@
                                                     }
                                                     // If no total late duration
                                                     if (empty($totalLateDurationFormatted)) {
-                                                        $totalLateDurationFormatted = 'No late';
+                                                        $totalLateDurationFormatted = '0';
                                                     }
                                                 @endphp
 
@@ -534,6 +557,13 @@
                                                         $lateDurationAM = session('late_duration', 0);
                                                         $lateDurationPM = session('late_duration_pm', 0);
 
+                                                        // Retrieve undertime minutes
+                                                        $undertimeAMMinutes = $attendance->undertimeAM;
+
+                                                        // Convert undertime minutes to hours and minutes
+                                                        $undertimeAMHours = intdiv($undertimeAMMinutes, 60);
+                                                        $undertimeAMMinutes = $undertimeAMMinutes % 60;
+
                                                         // Determine the remark based on lateness
                                                         if ($lateDurationAM > 0 && $lateDurationPM > 0) {
                                                             $remarkss = 'Present - Late AM & PM';
@@ -544,8 +574,16 @@
                                                         } else {
                                                             $remarkss = 'Present';
                                                         }
-                                                    @endphp
 
+                                                        // Add a remark for undertime
+                                                        if ($undertimeAMMinutes > 0) {
+                                                            $remarkss .= ' - Undertime AM' ;
+                                                        }
+                                                        //. $undertimeAMHours . ' hr ' . $undertimeAMMinutes . ' mins'
+
+                                                        // Display the remark
+                                                        echo $remarkss;
+                                                    @endphp
                                                     <td class="text-black border uppercase border-gray-400 text-xs">{{ $remarkss }}</td>
                                             </tr>
                                             @endforeach
