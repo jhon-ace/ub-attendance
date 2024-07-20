@@ -259,15 +259,16 @@ class ShowEmployeeAttendance extends Component
                 if ($checkInDateTime > $latestAllowedCheckInPM) {
                     $lateIntervalPM = $checkInDateTime->diff($latestAllowedCheckInPM);
                     $lateDurationPM = $lateIntervalPM->h * 60 + $lateIntervalPM->i; // Convert to minutes
-                    // session()->put('late_duration_pm', $lateDurationPM);
+                    
                 }
                 
                 
 
                 // Calculate total hours worked
                 $totalHoursWorked = $hoursWorkedAM + $hoursWorkedPM;
-                // $totalHoursLate = $lateDurationAM + $lateDurationPM;
-                // session()->put('total_late', $totalHoursLate);
+                $totalHoursLate = $lateDurationAM + $lateDurationPM;
+                session()->put('late_duration_pm', $lateDurationPM);
+                session()->put('total_late', $totalHoursLate);
                 // dd($totalHoursLate);
                 // Determine the remark based on lateness
                 // $remark = $lateDurationAM > 0 ? 'Late' : 'Present';

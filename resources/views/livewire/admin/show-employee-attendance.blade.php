@@ -200,8 +200,8 @@
                             <div class="flex mb-4">
                                 <button 
                                     @click="tab = 'time-in-time-out'"
-                                    :class="{ 'bg-blue-500 text-white': tab === 'time-in-time-out', 'bg-gray-200': tab !== 'time-in-time-out' }"
-                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 focus:outline-none"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'time-in-time-out', 'border border-gray-500': tab !== 'time-in-time-out' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
                                 >
                                     Time In & Time Out
                                 </button>
@@ -214,8 +214,8 @@
                                 </button> -->
                                 <button 
                                     @click="tab = 'computed-hours'"
-                                    :class="{ 'bg-blue-500 text-white': tab === 'computed-hours', 'bg-gray-200': tab !== 'computed-hours' }"
-                                    class="px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'computed-hours', 'border border-gray-500': tab !== 'computed-hours' }"
+                                    class="px-4 py-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
                                 >
                                     Calculation of Work Hours
                                 </button>
@@ -397,9 +397,12 @@
                                             <!-- Example data using Blade templating -->
                                             @foreach ($attendanceData as $attendance)
                                             <tr>
-                                                <td class="text-black border border-gray-400">{{ $attendance->worked_date }}</td>
                                                 <td class="text-black border border-gray-400">
-                                                    <!-- @php
+                                                    {{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}
+                                                </td>
+
+                                                <td class="text-black border border-gray-400">
+                                                    @php
                                                     // Retrieve the late duration from session
                                                     $lateDurationInMinutes = session('late_duration', 0);
 
@@ -422,10 +425,10 @@
                                                     }
                                                     @endphp
 
-                                                    {{ $lateDurationFormatted }} -->
+                                                    {{ $lateDurationFormatted }}
                                                 </td>
                                                 <td class="text-black border border-gray-400">
-                                                    <!-- @php
+                                                    @php
                                                     // Retrieve the late duration from session
                                                     $lateDurationInMinutes = session('late_duration_pm', 0);
 
@@ -448,7 +451,7 @@
                                                     }
                                                     @endphp
 
-                                                    {{ $lateDurationFormatted }} -->
+                                                    {{ $lateDurationFormatted }}
                                                 </td>
                                                 <td class="text-black border border-gray-400">
                                                 </td>
@@ -461,12 +464,73 @@
                                                 <td class="text-black border border-gray-400">
                                                     {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min.
                                                 </td>
+                                                @php
+                                                    // Retrieve the late durations from the session
+                                                    $lateDurationPmInMinutes = session('late_duration_pm', 0);
+                                                    $lateDurationInMinutes = session('late_duration', 0);
+
+                                                    // Calculate the total late duration in minutes
+                                                    $totalLateDurationInMinutes = $lateDurationPmInMinutes + $lateDurationInMinutes;
+
+                                                    // Calculate hours and minutes
+                                                    $totalLateHours = intdiv($totalLateDurationInMinutes, 60);
+                                                    $totalLateMinutes = $totalLateDurationInMinutes % 60;
+
+                                                    // Format the total late duration
+                                                    $totalLateDurationFormatted = '';
+
+                                                    if ($totalLateHours > 0) {
+                                                        $totalLateDurationFormatted .= "{$totalLateHours} hrs ";
+                                                    }
+                                                    if ($totalLateMinutes > 0) {
+                                                        $totalLateDurationFormatted .= "{$totalLateMinutes} mins";
+                                                    }
+                                                    // If no total late duration
+                                                    if (empty($totalLateDurationFormatted)) {
+                                                        $totalLateDurationFormatted = 'No late';
+                                                    }
+                                                @endphp
+
                                                 <td class="text-black border border-gray-400">
-                                                    
+                                                    {{ $totalLateDurationFormatted }}
                                                 </td>
 
                                                 <td class="text-black border border-gray-400">
-                                                    {{ floor($attendance->total_hours_worked) }} hrs. {{ round($attendance->total_hours_worked - floor($attendance->total_hours_worked), 1) * 60 }} min.
+                                                    @php
+    // Calculate total hours and minutes for AM and PM
+    $totalHoursAM = floor($attendance->hours_workedAM);
+    $totalMinutesAM = round($attendance->hours_workedAM - $totalHoursAM, 1) * 60;
+    
+    $totalHoursPM = floor($attendance->hours_workedPM);
+    $totalMinutesPM = round($attendance->hours_workedPM - $totalHoursPM, 1) * 60;
+    
+    $totalHours = $totalHoursAM + $totalHoursPM;
+    $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+
+    // Retrieve late durations from session
+    $lateDurationInMinutes = session('late_duration', 0);
+    $lateDurationPmInMinutes = session('late_duration_pm', 0);
+
+    // Add 15 minutes if there is late duration in either AM or PM, but not both
+    if ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes === 0) {
+        $totalMinutes += 15;
+    } elseif ($lateDurationInMinutes === 0 && $lateDurationPmInMinutes > 0) {
+        $totalMinutes += 15;
+    }
+    else if($lateDurationInMinutes > 0 && $lateDurationPmInMinutes > 0){
+        $totalMinutes += 30;
+    }
+
+    // Convert total minutes to hours and minutes
+    $finalHours = floor($totalMinutes / 60);
+    $finalMinutes = $totalMinutes % 60;
+@endphp
+
+
+<!-- Display total hours and minutes -->
+{{ $totalHours }} hrs. {{ $totalMinutes }} min.<br>
+
+
                                                 </td>
                                                 
                                                 <td class="text-black border border-gray-400">{{ $attendance->remarks }}</td>
