@@ -553,37 +553,51 @@
 
                                                 </td>
                                                     @php
-                                                        // Retrieve late durations from session
-                                                        $lateDurationAM = session('late_duration', 0);
-                                                        $lateDurationPM = session('late_duration_pm', 0);
+    // Retrieve late durations from session
+    $lateDurationAM = session('late_duration', 0);
+    $lateDurationPM = session('late_duration_pm', 0);
 
-                                                        // Retrieve undertime minutes
-                                                        $undertimeAMMinutes = $attendance->undertimeAM;
+    // Retrieve undertime minutes for AM and PM
+    $undertimeAMMinutes = $attendance->undertimeAM;
+    $undertimePMMinutes = $attendance->undertimePM;
 
-                                                        // Convert undertime minutes to hours and minutes
-                                                        $undertimeAMHours = intdiv($undertimeAMMinutes, 60);
-                                                        $undertimeAMMinutes = $undertimeAMMinutes % 60;
+    // Convert undertime minutes to hours and minutes for AM
+    $undertimeAMHours = intdiv($undertimeAMMinutes, 60);
+    $undertimeAMMinutes = $undertimeAMMinutes % 60;
 
-                                                        // Determine the remark based on lateness
-                                                        if ($lateDurationAM > 0 && $lateDurationPM > 0) {
-                                                            $remarkss = 'Present - Late AM & PM';
-                                                        } elseif ($lateDurationAM > 0) {
-                                                            $remarkss = 'Present - Late AM';
-                                                        } elseif ($lateDurationPM > 0) {
-                                                            $remarkss = 'Present - Late PM';
-                                                        } else {
-                                                            $remarkss = 'Present';
-                                                        }
+    // Convert undertime minutes to hours and minutes for PM
+    $undertimePMHours = intdiv($undertimePMMinutes, 60);
+    $undertimePMMinutes = $undertimePMMinutes % 60;
 
-                                                        // Add a remark for undertime
-                                                        if ($undertimeAMMinutes > 0) {
-                                                            $remarkss .= ' - Undertime AM' ;
-                                                        }
-                                                        //. $undertimeAMHours . ' hr ' . $undertimeAMMinutes . ' mins'
+    // Determine the remark based on lateness
+    if ($lateDurationAM > 0 && $lateDurationPM > 0) {
+        $remarkss = 'Present - Late AM & PM';
+    } elseif ($lateDurationAM > 0) {
+        $remarkss = 'Present - Late AM';
+    } elseif ($lateDurationPM > 0) {
+        $remarkss = 'Present - Late PM';
+    } else {
+        $remarkss = 'Present';
+    }
 
-                                                        // Display the remark
-                                                        echo $remarkss;
-                                                    @endphp
+    // Add a remark for undertime
+    if ($undertimeAMMinutes > 0) {
+        $remarkss .= ' - Undertime AM ';
+    }
+
+    if ($undertimePMMinutes > 0) {
+        // Check if AM undertime is already added to the remark
+        if ($undertimeAMMinutes > 0) {
+            $remarkss .= ' & PM ';
+        } else {
+            $remarkss .= ' - Undertime PM ';
+        }
+    }
+
+    // Display the remark
+    echo $remarkss;
+@endphp
+
                                                     <td class="text-black border uppercase border-gray-400 text-xs">{{ $remarkss }}</td>
                                             </tr>
                                             @endforeach
