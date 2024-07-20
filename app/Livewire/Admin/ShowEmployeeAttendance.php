@@ -273,7 +273,10 @@ class ShowEmployeeAttendance extends Component
                 // Determine the remark based on lateness
                 // $remark = $lateDurationAM > 0 ? 'Late' : 'Present';
 
-                $remark = ($lateDurationAM > 0 || $lateDurationPM > 0) ? 'Late' : 'Present';
+
+                $remark = ($lateDurationAM > 0 || $lateDurationPM > 0) ? 'Late' : 
+                        (($lateDurationAM === 0 && $lateDurationPM === 0) ? 'Present' : '');
+
 
                 // Prepare the key for $attendanceData
                 $key = $attendance->employee_id . '-' . $checkInDateTime->format('Y-m-d');

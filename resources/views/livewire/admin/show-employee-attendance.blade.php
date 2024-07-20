@@ -361,10 +361,10 @@
                                                     Date
                                                 </th>
                                                 <th class="border border-gray-400 px-3 py-2">
-                                                    AM Late Time
+                                                    AM Late
                                                 </th>
                                                 <th class="border border-gray-400 px-3 py-2">
-                                                    PM Late Time
+                                                    PM Late
                                                 </th>
                                                 <th class="border border-gray-400 px-3 py-2">
                                                     AM UnderTime
@@ -459,8 +459,7 @@
                                                 <td class="text-black border border-gray-400">
                                                     {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min.
                                                 </td>
-                                                
-
+  
                                                 <td class="text-black border border-gray-400">
                                                     {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min.
                                                 </td>
@@ -497,43 +496,57 @@
 
                                                 <td class="text-black border border-gray-400">
                                                     @php
-    // Calculate total hours and minutes for AM and PM
-    $totalHoursAM = floor($attendance->hours_workedAM);
-    $totalMinutesAM = round($attendance->hours_workedAM - $totalHoursAM, 1) * 60;
-    
-    $totalHoursPM = floor($attendance->hours_workedPM);
-    $totalMinutesPM = round($attendance->hours_workedPM - $totalHoursPM, 1) * 60;
-    
-    $totalHours = $totalHoursAM + $totalHoursPM;
-    $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+                                                        // Calculate total hours and minutes for AM and PM
+                                                        $totalHoursAM = floor($attendance->hours_workedAM);
+                                                        $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                        
+                                                        $totalHoursPM = floor($attendance->hours_workedPM);
+                                                        $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                                                        
+                                                        // Combine AM and PM totals
+                                                        $totalHours = $totalHoursAM + $totalHoursPM;
+                                                        $totalMinutes = $totalMinutesAM + $totalMinutesPM;
 
-    // Retrieve late durations from session
-    $lateDurationInMinutes = session('late_duration', 0);
-    $lateDurationPmInMinutes = session('late_duration_pm', 0);
+                                                        // Retrieve late durations from session
+                                                        $lateDurationInMinutes = session('late_duration', 0);
+                                                        $lateDurationPmInMinutes = session('late_duration_pm', 0);
 
-    // Add 15 minutes if there is late duration in either AM or PM, but not both
-    if ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes === 0) {
-        $totalMinutes += 15;
-    } elseif ($lateDurationInMinutes === 0 && $lateDurationPmInMinutes > 0) {
-        $totalMinutes += 15;
-    }
-    else if($lateDurationInMinutes > 0 && $lateDurationPmInMinutes > 0){
-        $totalMinutes += 30;
-    }
+                                                        // Add 15 minutes if there is late duration in either AM or PM, but not both
+                                                        if ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes === 0) {
+                                                            $totalMinutes += 15;
+                                                        } elseif ($lateDurationInMinutes === 0 && $lateDurationPmInMinutes > 0) {
+                                                            $totalMinutes += 15;
+                                                        } elseif ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes > 0) {
+                                                            $totalMinutes += 30;
+                                                        }
 
-    // Convert total minutes to hours and minutes
-    $finalHours = floor($totalMinutes / 60);
-    $finalMinutes = $totalMinutes % 60;
-@endphp
+                                                        // Convert total minutes to hours and minutes
+                                                        $finalHours = $totalHours + floor($totalMinutes / 60);
+                                                        $finalMinutes = $totalMinutes % 60;
+                                                    @endphp
 
-
-<!-- Display total hours and minutes -->
-{{ $totalHours }} hrs. {{ $totalMinutes }} min.<br>
-
+                                                    <!-- Display total hours and minutes -->
+                                                    {{ $finalHours }} hrs. {{ $finalMinutes }} min.<br>
 
                                                 </td>
-                                                
-                                                <td class="text-black border border-gray-400">{{ $attendance->remarks }}</td>
+                                                    @php
+                                                        // Retrieve late durations from session
+                                                        $lateDurationAM = session('late_duration', 0);
+                                                        $lateDurationPM = session('late_duration_pm', 0);
+
+                                                        // Determine the remark based on lateness
+                                                        if ($lateDurationAM > 0 && $lateDurationPM > 0) {
+                                                            $remarkss = 'Present - Late AM & PM';
+                                                        } elseif ($lateDurationAM > 0) {
+                                                            $remarkss = 'Present - Late AM';
+                                                        } elseif ($lateDurationPM > 0) {
+                                                            $remarkss = 'Present - Late PM';
+                                                        } else {
+                                                            $remarkss = 'Present';
+                                                        }
+                                                    @endphp
+
+                                                    <td class="text-black border uppercase border-gray-400 text-xs">{{ $remarkss }}</td>
                                             </tr>
                                             @endforeach
                                         </tbody>
