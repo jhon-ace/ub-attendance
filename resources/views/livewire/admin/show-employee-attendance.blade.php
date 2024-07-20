@@ -399,7 +399,7 @@
                                             <tr>
                                                 <td class="text-black border border-gray-400">{{ $attendance->worked_date }}</td>
                                                 <td class="text-black border border-gray-400">
-                                                    @php
+                                                    <!-- @php
                                                     // Retrieve the late duration from session
                                                     $lateDurationInMinutes = session('late_duration', 0);
 
@@ -422,10 +422,10 @@
                                                     }
                                                     @endphp
 
-                                                    {{ $lateDurationFormatted }}
+                                                    {{ $lateDurationFormatted }} -->
                                                 </td>
                                                 <td class="text-black border border-gray-400">
-                                                    @php
+                                                    <!-- @php
                                                     // Retrieve the late duration from session
                                                     $lateDurationInMinutes = session('late_duration_pm', 0);
 
@@ -448,7 +448,7 @@
                                                     }
                                                     @endphp
 
-                                                    {{ $lateDurationFormatted }}
+                                                    {{ $lateDurationFormatted }} -->
                                                 </td>
                                                 <td class="text-black border border-gray-400">
                                                 </td>
@@ -462,34 +462,7 @@
                                                     {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min.
                                                 </td>
                                                 <td class="text-black border border-gray-400">
-                                                     @php
-                                                        // Retrieve the late durations from the session
-                                                        $lateDurationPMInMinutes = session('late_duration_pm', 0);
-                                                        $lateDurationInMinutes = session('late_duration', 0);
-
-                                                        // Calculate total late duration in minutes
-                                                        $totalLateDurationInMinutes = $lateDurationPMInMinutes + $lateDurationInMinutes;
-
-                                                        // Calculate hours and minutes
-                                                        $totalLateHours = intdiv($totalLateDurationInMinutes, 60);
-                                                        $totalLateMinutes = $totalLateDurationInMinutes % 60;
-
-                                                        // Format the total late duration
-                                                        $totalLateDurationFormatted = '';
-
-                                                        if ($totalLateHours > 0) {
-                                                            $totalLateDurationFormatted .= "{$totalLateHours} hr ";
-                                                        }
-                                                        if ($totalLateMinutes > 0) {
-                                                            $totalLateDurationFormatted .= "{$totalLateMinutes} min";
-                                                        }
-                                                        // If no late duration
-                                                        if (empty($totalLateDurationFormatted)) {
-                                                            $totalLateDurationFormatted = 'No late';
-                                                        }
-                                                    @endphp
-
-                                                    {{ $totalLateDurationFormatted }}
+                                                    
                                                 </td>
 
                                                 <td class="text-black border border-gray-400">
