@@ -16,12 +16,12 @@
         <x-sweetalert type="error" :message="session('error')" />
     @endif
     <div class="flex justify-between mb-4 sm:-mt-4">
-        <div class="font-bold text-md tracking-tight text-md text-black  mt-2">Admin / Employee Attendance</div>
+        <div class="font-bold text-md tracking-tight text-md text-black mt-2 uppercase">Admin / Employee Attendance</div>
     </div>
     
         <div class="flex flex-column overflow-x-auto -mb-5">
-            <div class="col-span-3 p-4">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">School Year:</label>
+            <div class="col-span-3 mb-2">
+                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Year:</label>
                 <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                         required>
@@ -36,9 +36,9 @@
                 @endif
             </div>
 
-        <div class="col-span-1 p-4">
+        <div class="col-span-1 ml-5">
             @if(!empty($selectedSchool))
-                <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Department:</label>
+                <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Department:</label>
                 <select wire:model="selectedDepartment4" id="department_id" name="department_id"
                         wire:change="updateEmployeesByDepartment"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
@@ -54,7 +54,7 @@
                 </select>
                 @if($departmentToShow)
                     <!-- <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p> -->
-                    <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p>
+                    <p class="text-black text-sm mt-2">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p>
                     
                 @endif
             @endif
@@ -74,7 +74,7 @@
         @if($departmentToShow)
             <div class="flex justify-start">
                 <div>
-                    <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Display attendance:</label>
+                    <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Display attendance:</label>
                     <select wire:model="selectedEmployee" id="department_id" name="department_id"
                             wire:change="updateAttendanceByEmployee"
                             class="cursor-pointer text-sm shadow appearance-none border  rounded text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
@@ -160,15 +160,15 @@
                 @else
                     <div class="flex justify-between mt-1 mb-2">
                         <div class="mt-2 text-sm font-bold ">
-                            <text class="uppercase">Attendance of Employee: {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}
+                            <text class="uppercase">Attendance of Employee: <text class="text-red-500">{{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</text>
                         </div>
                         <div class="flex flex-col">
                             <div class="flex justify-between items-center mb-2">
                                 <div class="grid grid-rows-2 grid-flow-col -mt-10">
                                   
-                                    <div class="text-center uppercase ml-16">
-                                        Select Specific Date
-                                    </div>
+                                        <div class="text-center uppercase ml-16">
+                                            Select Specific Date
+                                        </div>
                                     <div class="flex items-center space-x-4">
                                         <label for="startDate" class="text-gray-600">Start Date:</label>
                                         <input 
@@ -188,9 +188,17 @@
                                         >
                                     </div>
                                 </div>
-                                <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
-                                    <i class="fa-solid fa-file"></i> Print DTR
-                                </button>
+                                    <div class="flex flex-col -mt-10">
+                                        <div class="flex justify-end mb-2 -mt-2">
+                                            <a href="">
+                                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"><i class="fa-solid fa-arrows-rotate"></i></button>
+                                            </a>
+                                        </div>
+                                         <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
+                                        <i class="fa-solid fa-file"></i> Print DTR
+                                    </button>
+                                    </div>               
+                                   
                             </div>
                         </div>
                     </div>
@@ -215,9 +223,16 @@
                                 <button 
                                     @click="tab = 'computed-hours'"
                                     :class="{ 'bg-blue-500 text-white': tab === 'computed-hours', 'border border-gray-500': tab !== 'computed-hours' }"
-                                    class="px-4 py-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
                                 >
                                     Calculation of Work Hours
+                                </button>
+                                <button 
+                                    @click="tab = 'modify_date'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'modify_date', 'border border-gray-500': tab !== 'modify_date' }"
+                                    class="px-4 py-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                >
+                                    Modify Date
                                 </button>
                             </div>
 
@@ -226,7 +241,7 @@
                                 <!-- Table for Time In -->
                                 <div class="flex justify-between">
                                     <div class="w-[49%]">
-                                        <h3 class="text-center">Time In</h3>
+                                        <h3 class="text-center uppercase font-bold">Time In</h3>
                                         <!-- Assuming $attendanceTimeIn is sorted by check_in_time descending -->
                                         @if ($attendanceTimeIn->isNotEmpty())
                                             @php
@@ -280,13 +295,13 @@
                                                 @endif
                                             @endforeach
                                         @else
-                                            <p class="text-center">No Time In records found.</p>
+                                            <p class="text-center mt-8">No Time In records found.</p>
                                         @endif
                                         <div class="text-center font-bold uppercase">{{ $attendanceTimeIn->links() }}</div>
                                     </div>
                                     
                                     <div class="w-[49%]">
-                                        <h3 class="text-center">Time Out</h3>
+                                        <h3 class="text-center uppercase font-bold">Time Out</h3>
                                         @if ($attendanceTimeOut->isNotEmpty())
                                             @php
                                                 $currentDate = null;
@@ -342,7 +357,7 @@
                                                 @endif
                                             @endforeach
                                         @else
-                                            <p class="text-center">No Time Out records found.</p>
+                                            <p class="text-center mt-8">No Time Out records found.</p>
                                         @endif
                                         <div class="text-center font-bold uppercase">{{ $attendanceTimeOut->links() }}</div>
                                     </div>
@@ -352,189 +367,101 @@
 
                             <div x-show="tab === 'computed-hours'" class="w-full">
                                 <!-- Table for Computed Working Hours -->
-                                <div class="w-[100%]">
-                                    <h3 class="text-center">Calculation of Work Hours</h3>
-                                    <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                                <div class="w-full">
+                                    <h3 class="text-center text-lg font-semibold">Calculation of Work Hours</h3>
+                                    
+                                    <table class="table-auto min-w-full text-center text-xs mb-4 divide-y divide-gray-200">
                                         <thead class="bg-gray-200 text-black">
                                             <tr>
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    Date
-                                                </th>
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    AM Late
-                                                </th>
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    PM Late
-                                                </th>
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    AM UnderTime
-                                                </th>
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    PM UnderTime
-                                                </th>
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                   Total AM Hours
-                                                </th>
-                                                
-                                                
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    Total PM Hours
-                                                </th>
-
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    Total Late Hours
-                                                </th>
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    Total Hours Rendered
-                                                </th>
-                                                
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    Remarks
-                                                </th>
+                                                <th class="border border-gray-400 px-2 py-1">Date</th>
+                                                <th class="border border-gray-400 px-2 py-1">AM Late</th>
+                                                <th class="border border-gray-400 px-2 py-1">PM Late</th>
+                                                <th class="border border-gray-400 px-2 py-1">AM UnderTime</th>
+                                                <th class="border border-gray-400 px-2 py-1">PM UnderTime</th>
+                                                <th class="border border-gray-400 px-2 py-1">Total AM Hours</th>
+                                                <th class="border border-gray-400 px-2 py-1">Total PM Hours</th>
+                                                <th class="border border-gray-400 px-2 py-1">Total Late</th>
+                                                <th class="border border-gray-400 px-2 py-1">Total Undertime</th>
+                                                <th class="border border-gray-400 px-2 py-1">Total Hours Rendered</th>
+                                                <th class="border border-gray-400 px-2 py-1">Remarks</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <!-- Example data using Blade templating -->
                                             @foreach ($attendanceData as $attendance)
                                             <tr>
-                                                <td class="text-black border border-gray-400">
-                                                    {{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}
-                                                </td>
-
-                                                <td class="text-black border border-gray-400">
+                                                <td class="text-black border border-gray-400 px-2 py-1">{{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}</td>
+                                                <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
-                                                    // Retrieve the late duration from session
-                                                    $lateDurationInMinutes = session('late_duration', 0);
-
-                                                    // Calculate hours and minutes
-                                                    $lateHours = intdiv($lateDurationInMinutes, 60);
-                                                    $lateMinutes = $lateDurationInMinutes % 60;
-
-                                                    // Format the late duration
-                                                    $lateDurationFormatted = '';
-
-                                                    if ($lateHours > 0) {
-                                                    $lateDurationFormatted .= "{$lateHours} hr ";
-                                                    }
-                                                    if ($lateMinutes > 0) {
-                                                    $lateDurationFormatted .= "{$lateMinutes} min";
-                                                    }
-                                                    // If no late duration
-                                                    if (empty($lateDurationFormatted)) {
-                                                    $lateDurationFormatted = '0';
-                                                    }
+                                                        $lateDurationInMinutes = $attendance->late_duration;
+                                                        $lateHours = intdiv($lateDurationInMinutes, 60);
+                                                        $lateMinutes = $lateDurationInMinutes % 60;
+                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') . ($lateMinutes > 0 ? "{$lateMinutes} min" : '0');
                                                     @endphp
-
                                                     {{ $lateDurationFormatted }}
                                                 </td>
-                                                <td class="text-black border border-gray-400">
+                                                <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
-                                                    // Retrieve the late duration from session
-                                                    $lateDurationInMinutes = session('late_duration_pm', 0);
-
-                                                    // Calculate hours and minutes
-                                                    $lateHours = intdiv($lateDurationInMinutes, 60);
-                                                    $lateMinutes = $lateDurationInMinutes % 60;
-
-                                                    // Format the late duration
-                                                    $lateDurationFormatted = '';
-
-                                                    if ($lateHours > 0) {
-                                                    $lateDurationFormatted .= "{$lateHours} hr ";
-                                                    }
-                                                    if ($lateMinutes > 0) {
-                                                    $lateDurationFormatted .= "{$lateMinutes} min";
-                                                    }
-                                                    // If no late duration
-                                                    if (empty($lateDurationFormatted)) {
-                                                    $lateDurationFormatted = '0';
-                                                    }
+                                                        $lateDurationInMinutes = $attendance->late_durationPM;
+                                                        $lateHours = intdiv($lateDurationInMinutes, 60);
+                                                        $lateMinutes = $lateDurationInMinutes % 60;
+                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') . ($lateMinutes > 0 ? "{$lateMinutes} min" : '0');
                                                     @endphp
-
                                                     {{ $lateDurationFormatted }}
                                                 </td>
-                                                <td class="text-black border border-gray-400">
+                                                <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
-                                                        $undertimeAMMinutes = $attendance->undertimeAM;
-                                                        $undertimeAMHours = intdiv($undertimeAMMinutes, 60);
-                                                        $undertimeAMMinutes = $undertimeAMMinutes % 60;
-
-                                                        if ($undertimeAMMinutes > 0) {
-                                                            echo "{$undertimeAMHours} hr {$undertimeAMMinutes} mins";
-                                                        } else {
-                                                            echo "0";
-                                                        }
+                                                        $lateDurationInMinutes = $attendance->undertimeAM;
+                                                        $lateHours = intdiv($lateDurationInMinutes, 60);
+                                                        $lateMinutes = $lateDurationInMinutes % 60;
+                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') . ($lateMinutes > 0 ? "{$lateMinutes} min" : '0');
                                                     @endphp
+                                                    {{ $lateDurationFormatted }}
                                                 </td>
-                                                <td class="text-black border border-gray-400">
+                                                <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
-                                                        $undertimePMMinutes = $attendance->undertimePM;
-                                                        $undertimePMHours = intdiv($undertimePMMinutes, 60);
-                                                        $undertimePMMinutes = $undertimePMMinutes % 60;
-
-                                                        if ($undertimePMMinutes > 0) {
-                                                            echo "{$undertimePMHours} hr {$undertimePMMinutes} mins";
-                                                        } else {
-                                                            echo "0";
-                                                        }
+                                                        $lateDurationInMinutes = $attendance->undertimePM;
+                                                        $lateHours = intdiv($lateDurationInMinutes, 60);
+                                                        $lateMinutes = $lateDurationInMinutes % 60;
+                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') . ($lateMinutes > 0 ? "{$lateMinutes} min" : '0');
                                                     @endphp
+                                                    {{ $lateDurationFormatted }}
                                                 </td>
-                                                <td class="text-black border border-gray-400">
+                                                <td class="text-black border border-gray-400 px-2 py-1">
                                                     {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min.
                                                 </td>
-  
-                                                <td class="text-black border border-gray-400">
+                                                <td class="text-black border border-gray-400 px-2 py-1">
                                                     {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min.
                                                 </td>
-                                                @php
-                                                    // Retrieve the late durations from the session
-                                                    $lateDurationPmInMinutes = session('late_duration_pm', 0);
-                                                    $lateDurationInMinutes = session('late_duration', 0);
-
-                                                    // Calculate the total late duration in minutes
-                                                    $totalLateDurationInMinutes = $lateDurationPmInMinutes + $lateDurationInMinutes;
-
-                                                    // Calculate hours and minutes
-                                                    $totalLateHours = intdiv($totalLateDurationInMinutes, 60);
-                                                    $totalLateMinutes = $totalLateDurationInMinutes % 60;
-
-                                                    // Format the total late duration
-                                                    $totalLateDurationFormatted = '';
-
-                                                    if ($totalLateHours > 0) {
-                                                        $totalLateDurationFormatted .= "{$totalLateHours} hrs ";
-                                                    }
-                                                    if ($totalLateMinutes > 0) {
-                                                        $totalLateDurationFormatted .= "{$totalLateMinutes} mins";
-                                                    }
-                                                    // If no total late duration
-                                                    if (empty($totalLateDurationFormatted)) {
-                                                        $totalLateDurationFormatted = '0';
-                                                    }
-                                                @endphp
-
-                                                <td class="text-black border border-gray-400">
+                                                <td class="text-black border border-gray-400 px-2 py-1">
+                                                    @php
+                                                        $total_lates = $attendance->total_late;
+                                                        $totalLateHours = intdiv($total_lates, 60);
+                                                        $totalLateMinutes = $total_lates % 60;
+                                                        $totalLateDurationFormatted = ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') . ($totalLateMinutes > 0 ? "{$totalLateMinutes} mins" : '0');
+                                                    @endphp
                                                     {{ $totalLateDurationFormatted }}
                                                 </td>
-
-                                                <td class="text-black border border-gray-400">
+                                                <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
-                                                        // Calculate total hours and minutes for AM and PM
+                                                        $am = $attendance->undertimeAM;
+                                                        $pm = $attendance->undertimePM;
+                                                        $totalUndertime = $am + $pm;
+                                                        $totalLateHours = intdiv($totalUndertime, 60);
+                                                        $totalLateMinutes = $totalUndertime % 60;
+                                                        $totalLateDurationFormatted = ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') . ($totalLateMinutes > 0 ? "{$totalLateMinutes} mins" : '0');
+                                                    @endphp
+                                                    {{ $totalLateDurationFormatted }}
+                                                </td>
+                                                <td class="text-black border border-gray-400 px-2 py-1">
+                                                    @php
                                                         $totalHoursAM = floor($attendance->hours_workedAM);
                                                         $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
-                                                        
                                                         $totalHoursPM = floor($attendance->hours_workedPM);
                                                         $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
-                                                        
-                                                        // Combine AM and PM totals
                                                         $totalHours = $totalHoursAM + $totalHoursPM;
                                                         $totalMinutes = $totalMinutesAM + $totalMinutesPM;
-
-                                                        // Retrieve late durations from session
-                                                        $lateDurationInMinutes = session('late_duration', 0);
-                                                        $lateDurationPmInMinutes = session('late_duration_pm', 0);
-
-                                                        // Add 15 minutes if there is late duration in either AM or PM, but not both
+                                                        $lateDurationInMinutes = $attendance->late_duration;
+                                                        $lateDurationPmInMinutes = $attendance->late_durationPM;
                                                         if ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes === 0) {
                                                             $totalMinutes += 15;
                                                         } elseif ($lateDurationInMinutes === 0 && $lateDurationPmInMinutes > 0) {
@@ -542,68 +469,88 @@
                                                         } elseif ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes > 0) {
                                                             $totalMinutes += 30;
                                                         }
-
-                                                        // Convert total minutes to hours and minutes
                                                         $finalHours = $totalHours + floor($totalMinutes / 60);
                                                         $finalMinutes = $totalMinutes % 60;
                                                     @endphp
-
-                                                    <!-- Display total hours and minutes -->
-                                                    {{ $finalHours }} hrs. {{ $finalMinutes }} min.<br>
-
+                                                    {{ $finalHours }} hrs. {{ $finalMinutes }} min.
                                                 </td>
+                                                <td class="text-black border uppercase border-gray-400 text-xs">
                                                     @php
-    // Retrieve late durations from session
-    $lateDurationAM = session('late_duration', 0);
-    $lateDurationPM = session('late_duration_pm', 0);
-
-    // Retrieve undertime minutes for AM and PM
-    $undertimeAMMinutes = $attendance->undertimeAM;
-    $undertimePMMinutes = $attendance->undertimePM;
-
-    // Convert undertime minutes to hours and minutes for AM
-    $undertimeAMHours = intdiv($undertimeAMMinutes, 60);
-    $undertimeAMMinutes = $undertimeAMMinutes % 60;
-
-    // Convert undertime minutes to hours and minutes for PM
-    $undertimePMHours = intdiv($undertimePMMinutes, 60);
-    $undertimePMMinutes = $undertimePMMinutes % 60;
-
-    // Determine the remark based on lateness
-    if ($lateDurationAM > 0 && $lateDurationPM > 0) {
-        $remarkss = 'Present - Late AM & PM';
-    } elseif ($lateDurationAM > 0) {
-        $remarkss = 'Present - Late AM';
-    } elseif ($lateDurationPM > 0) {
-        $remarkss = 'Present - Late PM';
-    } else {
-        $remarkss = 'Present';
-    }
-
-    // Add a remark for undertime
-    if ($undertimeAMMinutes > 0) {
-        $remarkss .= ' - Undertime AM ';
-    }
-
-    if ($undertimePMMinutes > 0) {
-        // Check if AM undertime is already added to the remark
-        if ($undertimeAMMinutes > 0) {
-            $remarkss .= ' & PM ';
-        } else {
-            $remarkss .= ' - Undertime PM ';
-        }
-    }
-
-    // Display the remark
-    echo $remarkss;
-@endphp
-
-                                                    <td class="text-black border uppercase border-gray-400 text-xs">{{ $remarkss }}</td>
+                                                        $lateDurationAM = $attendance->late_duration;
+                                                        $lateDurationPM = $attendance->late_durationPM;
+                                                        $am = $attendance->undertimeAM ?? 0;
+                                                        $pm = $attendance->undertimePM ?? 0;
+                                                        $remarkss = '';
+                                                        if ($lateDurationAM > 0 && $lateDurationPM > 0) {
+                                                            $remarkss = 'Present - Late AM & PM';
+                                                        } elseif ($lateDurationAM > 0) {
+                                                            $remarkss = 'Present - Late AM';
+                                                        } elseif ($lateDurationPM > 0) {
+                                                            $remarkss = 'Present - Late PM';
+                                                        } else {
+                                                            $remarkss = 'Present';
+                                                        }
+                                                        $undertimeRemark = '';
+                                                        if ($am > 0) {
+                                                            $undertimeRemark .= 'Undertime AM';
+                                                        }
+                                                        if ($pm > 0) {
+                                                            if (!empty($undertimeRemark)) {
+                                                                $undertimeRemark .= ' & PM';
+                                                            } else {
+                                                                $undertimeRemark .= 'Undertime PM';
+                                                            }
+                                                        }
+                                                        if (!empty($undertimeRemark)) {
+                                                            $remarkss .= ' - ' . $undertimeRemark;
+                                                        }
+                                                           // if ($lateDurationAM > 0 && $lateDurationPM > 0 && $am > 0 && $pm > 0) {
+                                                             //   $remarkss .= ' - All values greater than 0';
+                                                            // }
+                                                    @endphp
+                                                    {{ $remarkss }}
+                                                </td>
                                             </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 </div>
+                                <!-- end -->
+                            </div>
+                            <div x-show="tab === 'modify_date'" class="w-full">
+                                <!-- Table for Computed Working Hours -->
+                                <div class="w-full">
+                                    <div class="w-[50%] flex justify-center mb-4 mx-auto">
+                                        <form action="{{ route('admin.department.store') }}" method="POST" class="">
+                                        <x-caps-lock-detector />
+                                            @csrf
+
+                                                
+                                                <div class="mb-2">
+                                                    <label for="selected-date" class="block  mb-2 text-left">Select a Date:</label>
+                                                    <input type="date" id="selected-date" name="selected_date" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full max-w-md">
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Status: </label>
+                                                    <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                                            <!-- <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option> -->
+                                                            <option value="">Select Status</option>
+                                                            <option value="On Leave">On Leave</option>
+                                                            <option value="Absent">Absent</option>
+                                                            <option value="awol">Absent w/out leave</option>
+                                                    </select>
+                                                    <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                                </div>
+
+                                            <div class="flex mb-4 mt-10 justify-center">
+                                                <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <!-- end -->
                             </div>
                         </div>
                     </div>

@@ -11,7 +11,7 @@
         <x-sweetalert type="error" :message="session('error')" />
     @endif
     <div class="flex justify-between mb-4 sm:-mt-4">
-        <div class="font-bold text-md tracking-tight text-black  mt-2">Admin / Manage School Year</div>
+        <div class="font-bold text-md tracking-tight text-black  mt-2 uppercase">Admin / Manage School Year</div>
         <div x-data="{ open: false }">
             <button @click="open = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                 <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add School

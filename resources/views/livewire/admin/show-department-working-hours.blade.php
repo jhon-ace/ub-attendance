@@ -17,12 +17,12 @@
     @endif
 
     <div class="flex justify-between mb-4 sm:-mt-4">
-        <div class="font-bold text-md tracking-tight text-md text-black  mt-2">Admin / Manage Department Work Schedule</div>
+        <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Admin / Manage Department Work Schedule</div>
     </div>
     <div class="flex flex-col md:flex-row items-start md:items-center md:justify-start">
         <!-- Dropdown and Delete Button -->
         <div class="flex items-center w-full md:w-auto">
-            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">School Year:</label>
+            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Year:</label>
             <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments"
                     class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                     required>
@@ -71,7 +71,7 @@
     @else
 
         @if($schoolToShow)
-            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Department:</label>
+            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Department:</label>
             <select wire:model="selectedDepartment" id="school_id" name="school_id" wire:change="showDepartmentSchedule"
                     class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                     required>

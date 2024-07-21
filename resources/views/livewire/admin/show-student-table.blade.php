@@ -16,12 +16,12 @@
         <x-sweetalert type="error" :message="session('error')" />
     @endif
     <div class="flex justify-between mb-4 sm:-mt-4">
-        <div class="font-bold text-md tracking-tight text-md text-black  mt-2">Admin / Manage Courses</div>
+        <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Admin / Manage Courses</div>
     </div>
 
         <div class="flex flex-column overflow-x-auto -mb-5">
             <div class="col-span-3 p-4">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">School Year:</label>
+                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Year:</label>
                 <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                         required>
@@ -38,7 +38,7 @@
 
             <div class="col-span-1 p-4">
                 @if(!empty($selectedSchool))
-                    <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Department:</label>
+                    <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Department:</label>
                     <select wire:model="selectedDepartment3" id="department_id" name="department_id"
                             wire:change="updateEmployeesByDepartment"
                             class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
@@ -71,7 +71,7 @@
     <!--  -->
     
     @if($departmentToShow)
-        <label for="course_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate">Course:</label>
+        <label for="course_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Course:</label>
         <select wire:model="selectedCourse" id="course_id" name="course_id"
                 wire:change="updateStudentsByCourse"
                 class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"

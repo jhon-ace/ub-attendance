@@ -19,6 +19,7 @@
             margin-bottom: 1px;
             box-shadow: none;
             background: linear-gradient(to right, #FBBF24, #EF4444);
+            z-index: 1000;
         }
 
         input[type=password]:focus {
@@ -257,12 +258,12 @@
 
                 // Manually format the date to match the desired format "Fri, 2024-06-14"
                 var dateParts = date.split('/');
-                var formattedDate = `${dateParts[0]}-${dateParts[1]}`;//-${dateParts[2]}
+                var formattedDate = `${dateParts[0]}`;//-${dateParts[2]}-${dateParts[1]}
                 
                 var time = now.toLocaleTimeString();
                 time = time.replace('AM', 'A.M.').replace('PM', 'P.M.');
                 
-                timeDisplayElement.innerHTML = `${now.toLocaleDateString(undefined, { weekday: 'short' })}, ${formattedDate} | ${time}`;
+                timeDisplayElement.innerHTML = `${now.toLocaleDateString(undefined, { weekday: 'short' })}, ${time}`; // ${formattedDate} 
             }
             
             setInterval(printTime, 1000);
