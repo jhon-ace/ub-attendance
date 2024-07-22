@@ -172,7 +172,6 @@
                         <table class="w-[20%] table-fixed min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                             <thead class="bg-gray-200 text-black">
                                 <tr>
-                                    <th class="border border-gray-400 px-3 py-2">Schedule #</th>
                                     <th class="border border-gray-400 px-3 py-2">Schedule of Work</th>
                                     <th class="border border-gray-400 px-3 py-2">Action</th>
                                 </tr>
@@ -180,7 +179,6 @@
                             <tbody >
                                 @foreach ($workingHour as $schedule)
                                     <tr class="hover:bg-gray-100">
-                                        <td class="text-black border border-gray-400 px-1 py-1">{{ $schedule->id }}</td>
                                         <td class="text-black border border-gray-400 text-left">&nbsp;&nbsp;{{ $daysOfWeek[$schedule->day_of_week] ?? 'Unknown' }} - {{ date('h:i A', strtotime($schedule->morning_start_time)) }} - {{ date('h:i A', strtotime($schedule->morning_end_time)) }} / {{ date('h:i A', strtotime($schedule->afternoon_start_time)) }} - {{ date('h:i A', strtotime($schedule->afternoon_end_time)) }}</td>                                 
                                         <td class="text-black border border-gray-400 px-1 py-1">
                                             <div class="flex justify-center items-center space-x-2">
