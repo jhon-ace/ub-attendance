@@ -242,7 +242,7 @@ public function submitPortalTimeIn(Request $request)
     } else {
         // Handle case where employee with given RFID is not found
         // return response()->json(['error' => 'Employee not found.'], 404);
-        return redirect()->route('admin.attendance.time-in.portal')->with('error', 'Invalid RFID!');
+        return redirect()->route('admin.attendance.time-in.portal')->with('error', 'RFID not Recognized!');
     }
 }
 
