@@ -14,7 +14,6 @@
             border: none;
             height: 2em;
             font-size: 16px;
-            margin-bottom: 1px;
             outline: none;
             box-shadow: none;
             background: linear-gradient(to right, #FBBF24, #EF4444);
@@ -81,25 +80,28 @@
                 </div>
                 @else
                 <div class="flex justify-center mb-4">
-                    <img data-fancybox src="{{ asset('assets/img/user.png') }}" class="cursor-pointer w-48 h-48 object-cover hover:border hover:border-red-500 rounded-sm" title="Click to view Picture" alt="Default User Photo">
+                    <img data-fancybox src="{{ asset('assets/img/user.png') }}" style="width: 890px;" class="cursor-pointer  object-contain hover:border hover:border-red-500 rounded-sm" title="Click to view Picture" alt="Default User Photo">
                 </div>
                 @endif
             </div>
-            <div class="flex flex-1 flex-col w-full -pl-8 mt-5">
+            <div class="flex flex-1 flex-col w-full -pl-8">
                 <div class="font-bold uppercase flex justify-center">
                     <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[230px]">
                 </div>
                 <div class="p-2 mb-2 mt-5 font-bold uppercase">
                     <span class="text-sm">Employee ID</span><br>
-                    <span style="font-size: 35px;" class="text-white shadow-sm">{{ $employee->employee_id }}</span>
+                    <span style="font-size: 35px;" class="text-white shadow-sm tracking-wide">{{ $employee->employee_id }}</span>
                 </div>
                 <div class="p-2 mb-2 font-bold uppercase">
                     <span class="text-sm">Employee Name</span><br>
-                    <span style="font-size: 40px;" class="text-white tracking-wide shadow-sm">{{ $employee->employee_lastname }}, {{ $employee->employee_firstname }}, {{ ucfirst($employee->employee_middlename[0]) }}</span>
+                    <span style="font-size: 40px;" class="text-white shadow-sm tracking-wide">{{ $employee->employee_lastname }}, {{ $employee->employee_firstname }}, {{ ucfirst($employee->employee_middlename[0]) }}</span>
                 </div>
                 <div class="p-2 font-bold uppercase">
                     <span class="text-sm">Department/Office</span><br>
-                    <span style="font-size: 35px;" class="text-white shadow-sm tracking-wide">{{ $employee->department->department_abbreviation }}</span>
+                    @php
+                        $abbreviation = str_replace(['- non-teaching', 'teaching'], '', $employee->department->department_abbreviation);
+                    @endphp
+                    <span style="font-size: 35px;" class="text-white shadow-sm tracking-wide">{{ $abbreviation }}</span>
                 </div>
             </div>
         </div>
