@@ -16,14 +16,15 @@
             font-size: 16px;
             outline: none;
             box-shadow: none;
-            background: linear-gradient(to right, #FBBF24, #EF4444);
+            /* background: linear-gradient(to right, #FBBF24, #EF4444); */
+            background: linear-gradient(to right, #1e3a8a, #1e3a8a);
         }
 
         input[type=password]:focus {
             outline: none;
             box-shadow: none;
-            background: linear-gradient(to right, #FBBF24, #EF4444);
-            
+            background: linear-gradient(to right, #1e3a8a, #1e3a8a);
+            text-align:center;            
         }
 
         /* General body styles */
@@ -33,7 +34,7 @@
             flex-direction: column;
             min-height: 100vh;
             font-family: sans-serif;
-            background: linear-gradient(to right, #FBBF24, #EF4444);
+            background: linear-gradient(to right, #1e3a8a, #1e3a8a);
             color: #000; /* Adjust text color as needed */
             overflow:hidden;
         }
@@ -51,11 +52,11 @@
 
         /* Footer styles */
         footer {
-            padding: 1rem;
+            padding: 2rem;
             text-align: center;
-            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
             position: sticky;
             bottom: 0;
+            background: linear-gradient(to right, #1e3a8a, #1e3a8a);
         }
         .hehe{
             font-size:70px;
@@ -64,13 +65,13 @@
     </style>
     <script>
         setTimeout(function() {
-            window.location.href = "{{ route('admin.attendance.time-in.portal') }}";
-        }, 1000); // 5000 milliseconds = 5 seconds
+            window.location.href = "{{ route('attendance.portal') }}";
+        }, 2000); // 5000 milliseconds = 5 seconds
     </script>
 </head>
 <body>
-    <div class="hehe uppercase font-bold text-3xl text-center mt-16 text-white tracking-widest shadow-lg pb-8">Time - In</div>
-    <div class="container mt-5">
+    <div class="hehe uppercase font-bold text-3xl text-center mt-11 text-white tracking-widest shadow-lg pb-8">Time - In</div>
+    <div class="container">
         @forelse ($employees as $employee)
         <div class="flex w-full">
             <div style="width: 600px;" class="pl-16 ml-5">
@@ -80,7 +81,7 @@
                 </div>
                 @else
                 <div class="flex justify-center mb-4">
-                    <img data-fancybox src="{{ asset('assets/img/user.png') }}" style="width: 890px;" class="cursor-pointer  object-contain hover:border hover:border-red-500 rounded-sm" title="Click to view Picture" alt="Default User Photo">
+                    <img data-fancybox src="{{ asset('assets/img/user.png') }}" style="width: 890px;" class="cursor-pointer  object-contain rounded-sm" title="Click to view Picture" alt="Default User Photo">
                 </div>
                 @endif
             </div>
@@ -88,16 +89,16 @@
                 <div class="font-bold uppercase flex justify-center">
                     <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[230px]">
                 </div>
-                <div class="p-2 mb-2 mt-5 font-bold uppercase">
-                    <span class="text-sm">Employee ID</span><br>
+                <div class="p-2 mb-2 mt-5 font-bold uppercase">       
+                     <span class="text-sm tracking-wider" style="color:#FBBF24;">Employee ID</span><br>
                     <span style="font-size: 35px;" class="text-white shadow-sm tracking-wide">{{ $employee->employee_id }}</span>
                 </div>
                 <div class="p-2 mb-2 font-bold uppercase">
-                    <span class="text-sm">Employee Name</span><br>
+                    <span class="text-sm tracking-wider" style="color:#FBBF24;">Employee Name</span><br>
                     <span style="font-size: 40px;" class="text-white shadow-sm tracking-wide">{{ $employee->employee_lastname }}, {{ $employee->employee_firstname }}, {{ ucfirst($employee->employee_middlename[0]) }}</span>
                 </div>
                 <div class="p-2 font-bold uppercase">
-                    <span class="text-sm">Department/Office</span><br>
+                     <span class="text-sm tracking-wider" style="color:#FBBF24;">Department/Office</span><br>
                     @php
                         $abbreviation = str_replace(['- non-teaching', 'teaching'], '', $employee->department->department_abbreviation);
                     @endphp
@@ -111,17 +112,17 @@
         @endforelse
     </div>
     <div class="w-full z-10">
-            <form id="attendanceForm" action="{{ route('admin.attendance.time-in.store') }}" method="POST">
+            <form id="attendanceForm" action="{{ route('admin.attendance.store') }}" method="POST">
                 @csrf
                 <div class="z-10">
                     <input type="password" id="inputField" name="user_rfid"
-                        class="bg-gradient-to-r from-yellow-400 to-red-500 mt-1 p-2 text-[#F9C915] w-full"
+                        class=" mt-1 p-2 text-[#F9C915] w-full"
                         autocomplete="off" autofocus>
                 </div>
             </form>
         </div>
-    <footer class="bg-gradient-to-r from-yellow-400 to-red-500 text-white text-center py-3 tracking-wide">
-        <div class="max-w-screen-lg mx-auto">
+    <footer class="w-full uppercase  border-t border-white text-white text-center py-3 tracking-widest">
+        <div class="w-full mx-auto">
             A premier university transforming lives for a great future. Anchored on: SCHOLARSHIP, CHARACTER, SERVICE
         </div>
     </footer>

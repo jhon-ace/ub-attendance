@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\SchoolController;
 use App\Http\Controllers\Admin\DepartmentController;
@@ -12,11 +13,15 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\EmployeeAttendanceController;
 use App\Http\Controllers\Admin\CSVImportController;
-
+use App\Http\Controllers\Admin\PublicPageController;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+Route::get('/attendance/portal', [PublicPageController::class, 'portalTimeIn'])->name('attendance.portal');
+Route::post('/attendance/portal', [PublicPageController::class, 'submitAttendance'])->name('admin.attendance.store');
 
 
 
@@ -25,9 +30,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
         //dashboard
-        Route::get('/dashboard', function () {
-            return view('dashboard');
-        })->name('dashboard');
+        // Route::get('/dashboard', function () {
+        //     return view('dashboard');
+        // })->name('dashboard');
+
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         //school  routes
         Route::resource('school', SchoolController::class)->names([

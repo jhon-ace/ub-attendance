@@ -43,11 +43,11 @@
         <div class="form-container"> <!-- Container for centering -->
             <!-- Session Status -->
             <x-auth-session-status class="mb-4" :status="session('status')" />
-            
-            <form method="POST" action="{{ route('login') }}" class="bg-white p-6 max-w-sm rounded-lg shadow-md">
+            <form method="POST" action="{{ route('login') }}" class="bg-white opacity-85 w-[340px] p-6 -mt-3 max-w-sm rounded-lg shadow-md">
                 @csrf
     
                 <!-- Email Address -->
+                             <h4 class="text-center mb-10 text-lg uppercase tracking-widest">University of Bohol Attendance System</h4>
                 <div class="mb-4">
                     <x-input-label for="email" :value="__('Enter your work email')" />
                     <x-text-input id="email" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
@@ -74,21 +74,22 @@
                 <!-- Remember Me -->
                 <div class="mb-4">
                     <label for="remember_me" class="inline-flex items-center">
-                        <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
+                        <input id="remember_me" type="checkbox" class="rounded dark:bg-white border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
                         <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
                     </label>
                 </div>
     
+                <div class="flex justify-center">
+                    <x-primary-button class="">
+                        {{ __('Log in') }}
+                    </x-primary-button>
+                </div>
                 <div class="flex items-center justify-end">
                     @if (Route::has('password.request'))
                         <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
                             {{ __('Forgot your password?') }}
                         </a>
                     @endif
-    
-                    <x-primary-button class="ml-3">
-                        {{ __('Log in') }}
-                    </x-primary-button>
                 </div>
             </form>
         </div> <!-- End .form-container -->

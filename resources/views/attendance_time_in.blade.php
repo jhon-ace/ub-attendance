@@ -18,14 +18,17 @@
             font-size: 16px;
             margin-bottom: 1px;
             box-shadow: none;
-            background: linear-gradient(to right, #FBBF24, #EF4444);
+            /* background: linear-gradient(to right, #FBBF24, #EF4444); */
+            background: linear-gradient(to right, #1e3a8a, #1e3a8a);
             z-index: 1000;
         }
 
         input[type=password]:focus {
             outline: none;
             box-shadow: none;
-            background: linear-gradient(to right, #FBBF24, #EF4444);
+            /* background: linear-gradient(to right, #FBBF24, #EF4444); */
+            background: linear-gradient(to right, #1e3a8a, #1e3a8a);
+            text-align:center;
         }
 
         /* General body styles */
@@ -35,7 +38,9 @@
         flex-direction: column;
         min-height: 100vh;
         font-family: sans-serif;
-        background: linear-gradient(to right, #FBBF24, #EF4444);
+        /* background: linear-gradient(to right, #FBBF24, #EF4444); */
+        /* background: linear-gradient(to right, #1e3a8a, #2563eb); */
+        background: linear-gradient(to right, #1e3a8a, #1e3a8a);
         color: #000;
         overflow:hidden;
     }
@@ -78,8 +83,6 @@
         padding: 1rem;
         margin: 0.5rem; /* Adjusted margin */
         table-layout:fixed;
-
-        
     }
 
 
@@ -114,9 +117,10 @@
     footer {
         padding: 2rem;
         text-align: center;
-        background-color: rgba(255, 255, 255, 0.8);
+        /* background-color: rgba(255, 255, 255, 0.8); */
         position: sticky;
         bottom: 0;
+        background: linear-gradient(to right, #1e3a8a, #1e3a8a);
     }
 
     h2 {
@@ -215,16 +219,24 @@
 </div>
 
     <div class="w-full z-10">
-        <form id="attendanceForm" action="{{ route('admin.attendance.time-in.store') }}" method="POST">
+        <form id="attendanceForm" action="{{ route('admin.attendance.store') }}" method="POST">
+            @csrf
+            <div class="z-10">
+                <input type="password" id="inputField" name="user_rfid"
+                    class=" mt-1 p-2 text-[#F9C915] w-full"
+                    autocomplete="off" autofocus>
+            </div>
+        </form>
+        <!-- <form id="attendanceForm" action="" method="POST">
             @csrf
             <div class="z-10">
                 <input type="password" id="inputField" name="user_rfid"
                     class="bg-gradient-to-r from-yellow-400 to-red-500 mt-1 p-2 text-[#F9C915] w-full"
                     autocomplete="off" autofocus>
             </div>
-        </form>
+        </form> -->
     </div>
-    <footer class="w-full uppercase bg-gradient-to-r from-yellow-400 to-red-500 border-t border-red-800 text-white text-center py-3 tracking-wide">
+    <footer class="w-full uppercase  border-t border-white text-white text-center py-3 tracking-widest">
         <div class="w-full mx-auto">
             A premier university transforming lives for a great future. Anchored on: SCHOLARSHIP, CHARACTER, SERVICE
         </div>

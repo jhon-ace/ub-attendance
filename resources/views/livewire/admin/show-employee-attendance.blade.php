@@ -427,115 +427,223 @@
                                                 <td class="text-black border border-gray-400 px-2 py-1">{{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}</td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
+                                                        // Calculate late duration in minutes
                                                         $lateDurationInMinutes = $attendance->late_duration;
+
+                                                        // Calculate late hours, minutes, and seconds
                                                         $lateHours = intdiv($lateDurationInMinutes, 60);
                                                         $lateMinutes = $lateDurationInMinutes % 60;
-                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') . ($lateMinutes > 0 ? "{$lateMinutes} min" : '0');
+                                                        $lateSeconds = ($lateDurationInMinutes - floor($lateDurationInMinutes)) * 60;
+
+                                                        // Round seconds to avoid precision issues
+                                                        $lateSeconds = round($lateSeconds);
+
+                                                        // Format the late duration string
+                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') 
+                                                                                . ($lateMinutes > 0 ? "{$lateMinutes} min " : '')
+                                                                                . ($lateSeconds > 0 ? "{$lateSeconds} sec" : '');
+
+                                                        // If the formatted string is empty, ensure we show "0"
+                                                        $lateDurationFormatted = $lateDurationFormatted ?: '0 sec';
                                                     @endphp
+
                                                     {{ $lateDurationFormatted }}
+
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
+                                                        // Calculate late duration in minutes
                                                         $lateDurationInMinutes = $attendance->late_durationPM;
+
+                                                        // Calculate late hours, minutes, and seconds
                                                         $lateHours = intdiv($lateDurationInMinutes, 60);
                                                         $lateMinutes = $lateDurationInMinutes % 60;
-                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') . ($lateMinutes > 0 ? "{$lateMinutes} min" : '0');
+                                                        $lateSeconds = ($lateDurationInMinutes - floor($lateDurationInMinutes)) * 60;
+
+                                                        // Round seconds to avoid precision issues
+                                                        $lateSeconds = round($lateSeconds);
+
+                                                        // Format the late duration string
+                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') 
+                                                                                . ($lateMinutes > 0 ? "{$lateMinutes} min " : '')
+                                                                                . ($lateSeconds > 0 ? "{$lateSeconds} sec" : '');
+
+                                                        // If the formatted string is empty, ensure we show "0"
+                                                        $lateDurationFormatted = $lateDurationFormatted ?: '0 sec';
                                                     @endphp
+
                                                     {{ $lateDurationFormatted }}
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
-                                                    @php
-                                                        $lateDurationInMinutes = $attendance->undertimeAM;
-                                                        $lateHours = intdiv($lateDurationInMinutes, 60);
-                                                        $lateMinutes = $lateDurationInMinutes % 60;
-                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') . ($lateMinutes > 0 ? "{$lateMinutes} min" : '0');
+                                                   @php
+                                                        // Assume $attendance->undertimeAM is in minutes
+                                                        $undertimeInMinutes = $attendance->undertimeAM;
+
+                                                        // Convert minutes to total seconds
+                                                        $undertimeInSeconds = $undertimeInMinutes * 60;
+
+                                                        // Convert total seconds to hours, minutes, and seconds
+                                                        $undertimeHours = intdiv($undertimeInSeconds, 3600); // Total hours
+                                                        $remainingSeconds = $undertimeInSeconds % 3600; // Remaining seconds after hours
+                                                        $undertimeMinutes = intdiv($remainingSeconds, 60); // Total minutes
+                                                        $undertimeSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
+
+                                                        // Format the duration string
+                                                        $undertimeFormatted = 
+                                                            ($undertimeHours > 0 ? "{$undertimeHours} hr " : '') .
+                                                            ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min ') .
+                                                            ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
                                                     @endphp
-                                                    {{ $lateDurationFormatted }}
+
+                                                    {{ $undertimeFormatted }}
+
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
-                                                        $lateDurationInMinutes = $attendance->undertimePM;
-                                                        $lateHours = intdiv($lateDurationInMinutes, 60);
-                                                        $lateMinutes = $lateDurationInMinutes % 60;
-                                                        $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') . ($lateMinutes > 0 ? "{$lateMinutes} min" : '0');
+                                                        // Assume $attendance->undertimePM is in minutes
+                                                        $undertimeInMinutes = $attendance->undertimePM;
+
+                                                        // Convert minutes to total seconds
+                                                        $undertimeInSeconds = $undertimeInMinutes * 60;
+
+                                                        // Convert total seconds to hours, minutes, and seconds
+                                                        $undertimeHours = intdiv($undertimeInSeconds, 3600); // Total hours
+                                                        $remainingSeconds = $undertimeInSeconds % 3600; // Remaining seconds after hours
+                                                        $undertimeMinutes = intdiv($remainingSeconds, 60); // Total minutes
+                                                        $undertimeSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
+
+                                                        // Format the duration string
+                                                        $undertimeFormatted = 
+                                                            ($undertimeHours > 0 ? "{$undertimeHours} hr " : '') .
+                                                            ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min ') .
+                                                            ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
                                                     @endphp
-                                                    {{ $lateDurationFormatted }}
+
+                                                    {{ $undertimeFormatted }}
+
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     <!-- {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min. -->
-                                                    @php
-                                                        // Calculate total hours and minutes for AM shift
-                                                        $totalHoursAM = floor($attendance->hours_workedAM);
-                                                        $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                   @php
+                                                    // Total hours worked in AM shift
+                                                    $totalHoursAM = floor($attendance->hours_workedAM);
+                                                    $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
 
-                                                        // Get late duration in minutes for AM shift
-                                                        $lateDurationInMinutes = $attendance->late_duration;
+                                                    // Convert minutes to seconds
+                                                    $totalSecondsAM = ($totalMinutesAM - floor($totalMinutesAM)) * 60;
+                                                    $totalMinutesAM = floor($totalMinutesAM);
 
-                                                        // Add 15 minutes based on late duration conditions
-                                                        if ($lateDurationInMinutes > 0) {
-                                                            $totalMinutesAM += 15;
-                                                        }
+                                                    // Get late duration in minutes for AM shift
+                                                    $lateDurationInMinutes = $attendance->late_duration;
 
-                                                        // Convert total minutes to hours and minutes for AM shift
-                                                        $finalHoursAM = $totalHoursAM + floor($totalMinutesAM / 60);
-                                                        $finalMinutesAM = $totalMinutesAM % 60;
-                                                    @endphp
+                                                    // Optional: Add 15 minutes based on late duration conditions
+                                                    // if ($lateDurationInMinutes > 0) {
+                                                    //    $totalMinutesAM += 15;
+                                                    // }
 
-                                                    {{ $finalHoursAM }} hrs. {{ $finalMinutesAM }} min.
+                                                    // Convert total minutes to hours and minutes for AM shift
+                                                    $finalHoursAM = $totalHoursAM + floor($totalMinutesAM / 60);
+                                                    $finalMinutesAM = $totalMinutesAM % 60;
 
+                                                    // Ensure final seconds is a whole number
+                                                    $finalSecondsAM = round($totalSecondsAM);
+
+                                                @endphp
+
+                                                {{ $finalHoursAM }} hrs. {{ $finalMinutesAM }} min. {{ $finalSecondsAM }} sec.
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     <!-- {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min. -->
                                                       @php
-                                                        // Calculate total hours and minutes for PM shift
-                                                        $totalHoursPM = floor($attendance->hours_workedPM);
-                                                        $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                                                    // Total hours worked in AM shift
+                                                    $totalHoursPM = floor($attendance->hours_workedPM);
+                                                    $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
 
-                                                        // Get late duration in minutes for PM shift
-                                                        $lateDurationInMinutes = $attendance->late_durationPM;
+                                                    // Convert minutes to seconds
+                                                    $totalSecondsPM = ($totalMinutesPM - floor($totalMinutesPM)) * 60;
+                                                    $totalMinutesPM = floor($totalMinutesPM);
 
-                                                        // Add 15 minutes based on late duration conditions
-                                                        if ($lateDurationInMinutes > 0) {
-                                                            $totalMinutesPM += 15;
-                                                        }
+                                                    // Get late duration in minutes for AM shift
+                                                   // $lateDurationInMinutes = $attendance->late_durationPM;
 
-                                                        // Convert total minutes to hours and minutes for AM shift
-                                                        $finalHoursPM = $totalHoursPM + floor($totalMinutesPM / 60);
-                                                        $finalMinutesPM = $totalMinutesPM % 60;
-                                                    @endphp
+                                                    // Optional: Add 15 minutes based on late duration conditions
+                                                    // if ($lateDurationInMinutes > 0) {
+                                                    //    $totalMinutesAM += 15;
+                                                    // }
 
-                                                    {{ $finalHoursPM }} hrs. {{ $finalMinutesPM }} min.
+                                                    // Convert total minutes to hours and minutes for AM shift
+                                                    $finalHoursPM = $totalHoursPM + floor($totalMinutesPM / 60);
+                                                    $finalMinutesPM = $totalMinutesPM % 60;
+
+                                                    // Ensure final seconds is a whole number
+                                                    $finalSecondsPM = round($totalSecondsPM);
+
+                                                @endphp
+
+                                                {{ $finalHoursPM }} hrs. {{ $finalMinutesPM }} min. {{ $finalSecondsPM }} sec.
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
-                                                        $total_lates = $attendance->total_late;
-                                                        $totalLateHours = intdiv($total_lates, 60);
-                                                        $totalLateMinutes = $total_lates % 60;
-                                                        $totalLateDurationFormatted = ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') . ($totalLateMinutes > 0 ? "{$totalLateMinutes} mins" : '0');
+                                                        // Total late time in minutes as a decimal
+                                                        $totalLateMinutesDecimal = $attendance->total_late;
+
+                                                        // Convert decimal minutes to total hours, minutes, and seconds
+                                                        $totalLateHours = intdiv($totalLateMinutesDecimal, 60); // Total hours
+                                                        $remainingMinutes = floor($totalLateMinutesDecimal % 60); // Remaining minutes
+                                                        $totalLateSeconds = round(($totalLateMinutesDecimal - floor($totalLateMinutesDecimal)) * 60); // Total seconds
+
+                                                        // Format the duration string
+                                                        $totalLateDurationFormatted = 
+                                                            ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') .
+                                                            ($remainingMinutes > 0 ? "{$remainingMinutes} mins " : '0 mins ') .
+                                                            ($totalLateSeconds > 0 ? "{$totalLateSeconds} secs" : '0 secs');
                                                     @endphp
+
                                                     {{ $totalLateDurationFormatted }}
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
                                                         $am = $attendance->undertimeAM;
                                                         $pm = $attendance->undertimePM;
-                                                        $totalUndertime = $am + $pm;
-                                                        $totalLateHours = intdiv($totalUndertime, 60);
-                                                        $totalLateMinutes = $totalUndertime % 60;
-                                                        $totalLateDurationFormatted = ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') . ($totalLateMinutes > 0 ? "{$totalLateMinutes} mins" : '0');
+                                                        $totalUndertimeInMinutes = $am + $pm;
+
+                                                        // Convert total minutes to total seconds
+                                                        $totalUndertimeInSeconds = $totalUndertimeInMinutes * 60;
+
+                                                        // Convert total seconds to hours, minutes, and seconds
+                                                        $totalLateHours = intdiv($totalUndertimeInSeconds, 3600); // Total hours
+                                                        $remainingSeconds = $totalUndertimeInSeconds % 3600; // Remaining seconds after hours
+                                                        $totalLateMinutes = intdiv($remainingSeconds, 60); // Total minutes
+                                                        $totalLateSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
+
+                                                        // Format the duration string
+                                                        $totalLateDurationFormatted = 
+                                                            ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') .
+                                                            ($totalLateMinutes > 0 ? "{$totalLateMinutes} mins " : '0 mins ') .
+                                                            ($totalLateSeconds > 0 ? "{$totalLateSeconds} secs" : '0 secs');
                                                     @endphp
+
                                                     {{ $totalLateDurationFormatted }}
+
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
+                                                        // Calculate hours and minutes for AM
                                                         $totalHoursAM = floor($attendance->hours_workedAM);
                                                         $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                        
+                                                        // Calculate hours and minutes for PM
                                                         $totalHoursPM = floor($attendance->hours_workedPM);
                                                         $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                                                        
+                                                        // Sum total hours and minutes
                                                         $totalHours = $totalHoursAM + $totalHoursPM;
                                                         $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+                                                        
+                                                        // Handle late durations
                                                         $lateDurationInMinutes = $attendance->late_duration;
                                                         $lateDurationPmInMinutes = $attendance->late_durationPM;
+                                                        
                                                         if ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes === 0) {
                                                             $totalMinutes += 15;
                                                         } elseif ($lateDurationInMinutes === 0 && $lateDurationPmInMinutes > 0) {
@@ -543,10 +651,19 @@
                                                         } elseif ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes > 0) {
                                                             $totalMinutes += 30;
                                                         }
-                                                        $finalHours = $totalHours + floor($totalMinutes / 60);
-                                                        $finalMinutes = $totalMinutes % 60;
+                                                        
+                                                        // Convert total minutes to total seconds
+                                                        $totalSeconds = $totalMinutes * 60;
+                                                        
+                                                        // Calculate final hours, minutes, and seconds
+                                                        $finalHours = $totalHours + floor($totalSeconds / 3600);
+                                                        $remainingSeconds = $totalSeconds % 3600;
+                                                        $finalMinutes = floor($remainingSeconds / 60);
+                                                        $finalSeconds = $remainingSeconds % 60;
                                                     @endphp
-                                                    {{ $finalHours }} hrs. {{ $finalMinutes }} min.
+
+                                                    {{ $finalHours }} hrs. {{ $finalMinutes }} min. {{ $finalSeconds }} sec.
+
                                                 </td>
                                                 <td class="text-black border uppercase border-gray-400 text-xs">
                                                     @php

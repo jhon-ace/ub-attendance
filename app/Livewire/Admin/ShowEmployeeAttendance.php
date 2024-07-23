@@ -288,23 +288,24 @@ $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $attendan
 
         
 
-        // AM Shift Calculation
+        // AM Shift Calculation  for 15 mins interval of declaring late
         if ($checkInDateTime < $morningEndTime) {
             $effectiveCheckInTime = max($checkInDateTime, $morningStartTime);
             $effectiveCheckOutTime = min($checkOutDateTime, $morningEndTime);
             if ($effectiveCheckInTime < $effectiveCheckOutTime) {
                 $intervalAM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
-                $hoursWorkedAM = $intervalAM->h + ($intervalAM->i / 60);
-                
+                // $hoursWorkedAM = $intervalAM->h + ($intervalAM->i / 60);
+                $hoursWorkedAM = $intervalAM->h + ($intervalAM->i / 60) + ($intervalAM->s / 3600);
                 // Calculate late duration for AM
-                $latestAllowedCheckInAM = clone $morningStartTime;
-                $latestAllowedCheckInAM->add(new DateInterval('PT15M'));
+                // $latestAllowedCheckInAM = clone $morningStartTime;
+                // $latestAllowedCheckInAM->add(new DateInterval('PT15M'));
 
-                if ($checkInDateTime > $latestAllowedCheckInAM) {
+                if ($checkInDateTime > $morningStartTime) {
 
-                    $lateIntervalAM = $checkInDateTime->diff($latestAllowedCheckInAM);
-                    $lateDurationAM = $lateIntervalAM->h * 60 + $lateIntervalAM->i;
-                  
+                    $lateIntervalAM = $checkInDateTime->diff($morningStartTime);
+                     $lateDurationAM = ($lateIntervalAM->h * 60) + $lateIntervalAM->i + ($lateIntervalAM->s / 60);
+                    // $lateDurationAM = $lateIntervalAM->h * 60 + $lateIntervalAM->i;
+
                     
                 }
 
@@ -315,20 +316,66 @@ $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $attendan
 
             }
             // Calculate scheduled AM minutes
-                $scheduledAMMinutes = ($morningStartTime->diff($morningEndTime)->h * 60) + $morningStartTime->diff($morningEndTime)->i;
+                // $scheduledAMMinutes = ($morningStartTime->diff($morningEndTime)->h * 60) + $morningStartTime->diff($morningEndTime)->i;
 
-                // Calculate actual minutes worked up to the morning end time
-                if ($effectiveCheckOutTime < $morningEndTime) {
-                    $actualMinutesUpToEnd = ($effectiveCheckOutTime->diff($morningStartTime)->h * 60) + $effectiveCheckOutTime->diff($morningStartTime)->i;
-                } else {
-                    $actualMinutesUpToEnd = ($morningEndTime->diff($morningStartTime)->h * 60) + $morningEndTime->diff($morningStartTime)->i;
-                }
+                // // Calculate actual minutes worked up to the morning end time
+                // if ($effectiveCheckOutTime < $morningEndTime) {
+                //     $actualMinutesUpToEnd = ($effectiveCheckOutTime->diff($morningStartTime)->h * 60) + $effectiveCheckOutTime->diff($morningStartTime)->i;
+                // } else {
+                //     $actualMinutesUpToEnd = ($morningEndTime->diff($morningStartTime)->h * 60) + $morningEndTime->diff($morningStartTime)->i;
+                // }
 
-                // Calculate undertime for AM
-                $undertimeAM = max(0, $scheduledAMMinutes - $actualMinutesUpToEnd);
+                // // Calculate undertime for AM
+                // $undertimeAM = max(0, $scheduledAMMinutes - $actualMinutesUpToEnd);
+
+                $scheduledDiff = $morningStartTime->diff($morningEndTime);
+                $scheduledAMMinutes = ($scheduledDiff->h * 60) + $scheduledDiff->i + ($scheduledDiff->s / 60);
+
+                    // Calculate actual worked time up to the morning end time including seconds
+                    if ($effectiveCheckOutTime < $morningEndTime) {
+                        $actualDiff = $effectiveCheckOutTime->diff($morningStartTime);
+                    } else {
+                        $actualDiff = $morningEndTime->diff($morningStartTime);
+                    }
+                    $actualMinutesUpToEnd = ($actualDiff->h * 60) + $actualDiff->i + ($actualDiff->s / 60);
+
+                    // Calculate undertime in minutes
+                    $undertimeAM = max(0, $scheduledAMMinutes - $actualMinutesUpToEnd);
+       
+        }  
 
 
-        }
+        //no interval, automatic late after the morning start time
+        // if ($checkInDateTime < $morningEndTime) {
+        //     $effectiveCheckInTime = max($checkInDateTime, $morningStartTime);
+        //     $effectiveCheckOutTime = min($checkOutDateTime, $morningEndTime);
+            
+        //     if ($effectiveCheckInTime < $effectiveCheckOutTime) {
+        //         $intervalAM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
+        //         $hoursWorkedAM = $intervalAM->h + ($intervalAM->i / 60);
+                
+        //         // Calculate late duration for AM
+        //         if ($checkInDateTime > $morningStartTime) {
+        //             $lateIntervalAM = $checkInDateTime->diff($morningStartTime);
+        //             $lateDurationAM = $lateIntervalAM->h * 60 + $lateIntervalAM->i;
+        //         } else {
+        //             $lateDurationAM = 0;
+        //         }
+
+        //         // Calculate scheduled AM minutes
+        //         $scheduledAMMinutes = ($morningStartTime->diff($morningEndTime)->h * 60) + $morningStartTime->diff($morningEndTime)->i;
+
+        //         // Calculate actual minutes worked up to the morning end time
+        //         if ($effectiveCheckOutTime < $morningEndTime) {
+        //             $actualMinutesUpToEnd = ($effectiveCheckOutTime->diff($morningStartTime)->h * 60) + $effectiveCheckOutTime->diff($morningStartTime)->i;
+        //         } else {
+        //             $actualMinutesUpToEnd = ($morningEndTime->diff($morningStartTime)->h * 60) + $morningEndTime->diff($morningStartTime)->i;
+        //         }
+
+        //         // Calculate undertime for AM
+        //         $undertimeAM = max(0, $scheduledAMMinutes - $actualMinutesUpToEnd);
+        //     }
+        // }
 
         // PM Shift Calculation
         if ($checkInDateTime < $afternoonEndTime && $checkOutDateTime > $afternoonStartTime) {
@@ -336,14 +383,14 @@ $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $attendan
             $effectiveCheckOutTime = min($checkOutDateTime, $afternoonEndTime);
             if ($effectiveCheckInTime < $effectiveCheckOutTime) {
                 $intervalPM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
-                $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60);
+                $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
 
                 // Calculate late duration for PM
-                $latestAllowedCheckInPM = clone $afternoonStartTime;
-                $latestAllowedCheckInPM->add(new DateInterval('PT15M'));
-                if ($checkInDateTime > $latestAllowedCheckInPM) {
-                    $lateIntervalPM = $checkInDateTime->diff($latestAllowedCheckInPM);
-                    $lateDurationPM = $lateIntervalPM->h * 60 + $lateIntervalPM->i;
+                // $latestAllowedCheckInPM = clone $afternoonStartTime;
+                // $latestAllowedCheckInPM->add(new DateInterval('PT15M'));
+                if ($checkInDateTime > $afternoonStartTime) {
+                    $lateIntervalPM = $checkInDateTime->diff($afternoonStartTime);
+                    $lateDurationPM = ($lateIntervalPM->h * 60) + $lateIntervalPM->i + ($lateIntervalPM->s / 60);
                 }
 
                 // // Calculate undertime for PM
@@ -352,22 +399,37 @@ $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $attendan
                 // $undertimePM = max(0, $scheduledPMMinutes - $actualMinutesWorkedPM);
             }
 
-            $scheduledPMMinutes = ($afternoonStartTime->diff($afternoonEndTime)->h * 60) + $afternoonStartTime->diff($afternoonEndTime)->i;
+            // $scheduledPMMinutes = ($afternoonStartTime->diff($afternoonEndTime)->h * 60) + $afternoonStartTime->diff($afternoonEndTime)->i;
 
-            // Calculate actual minutes worked up to the morning end time
+            // // Calculate actual minutes worked up to the morning end time
+            // if ($effectiveCheckOutTime < $afternoonEndTime) {
+            //     $actualMinutesUpToEnd = ($effectiveCheckOutTime->diff($afternoonStartTime)->h * 60) + $effectiveCheckOutTime->diff($afternoonStartTime)->i;
+            // } else {
+            //     $actualMinutesUpToEnd = ($afternoonEndTime->diff($afternoonStartTime)->h * 60) + $afternoonEndTime->diff($afternoonStartTime)->i;
+            // }
+
+            // // Calculate undertime for AM
+            // $undertimePM = max(0, $scheduledPMMinutes - $actualMinutesUpToEnd);
+
+            $scheduledPMDiff = $afternoonStartTime->diff($afternoonEndTime);
+            $scheduledPMMinutes = ($scheduledPMDiff->h * 60) + $scheduledPMDiff->i + ($scheduledPMDiff->s / 60);
+
+            // Calculate actual worked time up to the afternoon end time including seconds
             if ($effectiveCheckOutTime < $afternoonEndTime) {
-                $actualMinutesUpToEnd = ($effectiveCheckOutTime->diff($afternoonStartTime)->h * 60) + $effectiveCheckOutTime->diff($afternoonStartTime)->i;
+                $actualPMDiff = $effectiveCheckOutTime->diff($afternoonStartTime);
             } else {
-                $actualMinutesUpToEnd = ($afternoonEndTime->diff($afternoonStartTime)->h * 60) + $afternoonEndTime->diff($afternoonStartTime)->i;
+                $actualPMDiff = $afternoonEndTime->diff($afternoonStartTime);
             }
+            $actualMinutesUpToEndPM = ($actualPMDiff->h * 60) + $actualPMDiff->i + ($actualPMDiff->s / 60);
 
-            // Calculate undertime for AM
-            $undertimePM = max(0, $scheduledPMMinutes - $actualMinutesUpToEnd);
+            // Calculate undertime in minutes
+            $undertimePM = max(0, $scheduledPMMinutes - $actualMinutesUpToEndPM);
 
         }
 
         // Calculate total hours worked
         $totalHoursWorked = $hoursWorkedAM + $hoursWorkedPM;
+        
         $totalHoursLate = $lateDurationAM + $lateDurationPM;
         $totalUndertimeHours = $undertimeAM + $undertimePM;
 
