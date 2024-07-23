@@ -176,6 +176,7 @@ public function submitPortalTimeIn(Request $request)
                     $attendanceOut = new EmployeeAttendanceTimeOut();
                     $attendanceOut->employee_id = $employee->id;
                     $attendanceOut->check_out_time = $formattedDateTime; // Store formatted datetime
+                    $attendanceOut->status = "Outside Campus";
                     $attendanceOut->save();
 
                     // return response()->json([
@@ -207,6 +208,7 @@ public function submitPortalTimeIn(Request $request)
                 $attendanceOut = new EmployeeAttendanceTimeOut();
                 $attendanceOut->employee_id = $employee->id;
                 $attendanceOut->check_out_time = $formattedDateTime; // Store formatted datetime
+                $attendanceOut->status = "Outside Campus";
                 $attendanceOut->save();
 
                 // return response()->json([
@@ -483,5 +485,62 @@ public function submitPortalTimeOut(Request $request)
     public function destroy(string $id)
     {
         //
+    }
+
+
+    public function modifyAttendance(Request $request){
+
+        $validatedData = $request->validate([
+            'selected_date' => 'required|date',
+            'status' => 'required|string',
+        ]);
+
+
+        // $attendance = new \App\Models\Attendance();
+        // $attendance->selected_date = $validatedData['selected_date'];
+        // $attendance->status = $validatedData['status'];
+        // $attendance->save();
+
+       // $employees = Employee::where('employee_r', $rfid)->get();
+
+                $employee_id = $request->input('employee_id');
+                $employees = Employee::where('id', $employee_id)->first();
+
+                if ($employees) {
+                    
+                    $attendance = new EmployeeAttendanceTimeIn();
+                    $attendance->employee_id = $employees->id;
+                    $attendance->check_in_time = $validatedData['selected_date'];
+                    $attendance->status = $validatedData['status'];
+                    $attendance->save();
+
+                    $attendance = new EmployeeAttendanceTimeIn();
+                    $attendance->employee_id = $employees->id;
+                    $attendance->check_in_time = $validatedData['selected_date'];
+                    $attendance->status = $validatedData['status'];
+                    $attendance->save();
+
+                    $attendance = new EmployeeAttendanceTimeOut();
+                    $attendance->employee_id = $employees->id;
+                    $attendance->check_out_time = $validatedData['selected_date'];
+                    $attendance->status = $validatedData['status'];
+                    $attendance->save();
+
+                    $attendance = new EmployeeAttendanceTimeOut();
+                    $attendance->employee_id = $employees->id;
+                    $attendance->check_out_time = $validatedData['selected_date'];
+                    $attendance->status = $validatedData['status'];
+                    $attendance->save();
+
+                    
+
+                   
+                    
+                    return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Date Successfully modified!');
+                } 
+
+        // Optionally, you can redirect back with a success message
+        
+
     }
 }

@@ -100,8 +100,10 @@
                     <!-- Modal Content -->
                     <div x-show="open" class="fixed inset-0 flex items-center justify-center z-50">
                         <div class="bg-white p-8 rounded-lg shadow-lg max-w-7xl w-full ">
-                            <h2 class="text-lg font-semibold mb-4">Work Details</h2>
-
+                            <div class="mt-6 flex justify-between">
+                                <h2 class="text-lg font-semibold mb-4">Work Details</h2>
+                                <button @click="open = false" class="btn btn-secondary hover:text-blue-500">Close</button>
+                            </div>
                             <!-- Modal Body -->
                             <div class="space-y-4">
                                 <div class="overflow-x-auto">
@@ -142,9 +144,7 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                    <div class="mt-6 flex justify-end">
-                                    <button @click="open = false" class="btn btn-secondary">Close</button>
-                                </div>
+                                    
                             </div>
                         </div>
                     </div>
@@ -283,7 +283,24 @@
                                                     <td class="text-black border border-gray-400">
                                                         {{ date('m-d-Y (l)', strtotime($attendanceIn->check_in_time)) }}
                                                     </td>
-                                                    <td class="text-black border border-gray-400">{{ date('g:i:s A', strtotime($attendanceIn->check_in_time)) }}</td>
+                                                    <td class="text-black border border-gray-400">
+                                                        @php
+
+                                                            //$checkInTime = ($attendanceIn->check_in_time) * 60;
+                                                            $status = $attendanceIn->status;
+                                                            
+                                                            $display = "";
+                                                            if($status === "On Leave"){
+                                                                $display = "On Leave";
+                                                            } elseif($status === "Absent"){
+                                                                $display = "Absent";
+                                                            }
+                                                            else{
+                                                              $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
+                                                            }
+                                                        @endphp
+                                                        {{  $display }}
+                                                    </td>
                                                     <td class="text-black border border-gray-400">
                                                         {{ $category }}
                                                     </td>
@@ -427,7 +444,27 @@
                                                     {{ $lateDurationFormatted }}
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
-                                                    {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min.
+                                                    <!-- {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min. -->
+                                                    @php
+                                                        // Calculate total hours and minutes for AM shift
+                                                        $totalHoursAM = floor($attendance->hours_workedAM);
+                                                        $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+
+                                                        // Get late duration in minutes for AM shift
+                                                        $lateDurationInMinutes = $attendance->late_duration;
+
+                                                        // Add 15 minutes based on late duration conditions
+                                                        if ($lateDurationInMinutes > 0) {
+                                                            $totalMinutesAM += 15;
+                                                        }
+
+                                                        // Convert total minutes to hours and minutes for AM shift
+                                                        $finalHoursAM = $totalHoursAM + floor($totalMinutesAM / 60);
+                                                        $finalMinutesAM = $totalMinutesAM % 60;
+                                                    @endphp
+
+                                                    {{ $finalHoursAM }} hrs. {{ $finalMinutesAM }} min.
+
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min.
@@ -480,33 +517,54 @@
                                                         $lateDurationPM = $attendance->late_durationPM;
                                                         $am = $attendance->undertimeAM ?? 0;
                                                         $pm = $attendance->undertimePM ?? 0;
+
+                                                        $totalHoursAM = floor($attendance->hours_workedAM);
+                                                        $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                        $totalHoursPM = floor($attendance->hours_workedPM);
+                                                        $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                                                        $totalHours = $totalHoursAM + $totalHoursPM;
+                                                        $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+
                                                         $remarkss = '';
-                                                        if ($lateDurationAM > 0 && $lateDurationPM > 0) {
-                                                            $remarkss = 'Present - Late AM & PM';
-                                                        } elseif ($lateDurationAM > 0) {
-                                                            $remarkss = 'Present - Late AM';
-                                                        } elseif ($lateDurationPM > 0) {
-                                                            $remarkss = 'Present - Late PM';
-                                                        } else {
-                                                            $remarkss = 'Present';
-                                                        }
-                                                        $undertimeRemark = '';
-                                                        if ($am > 0) {
-                                                            $undertimeRemark .= 'Undertime AM';
-                                                        }
-                                                        if ($pm > 0) {
+
+                                                        if (
+                                                            $lateDurationAM == 0 &&
+                                                            $lateDurationPM == 0 &&
+                                                            $am == 0 &&
+                                                            $pm == 0 &&
+                                                            $totalHoursAM == 0 &&
+                                                            $totalMinutesAM == 0 &&
+                                                            $totalHoursPM == 0 &&
+                                                            $totalMinutesPM == 0
+                                                        ) {
+                                                            $remarkss = 'Absent';
+                                                        }else {
+                                                            if ($lateDurationAM > 0 && $lateDurationPM > 0) {
+                                                                $remarkss = 'Present - Late AM & PM';
+                                                            } elseif ($lateDurationAM > 0) {
+                                                                $remarkss = 'Present - Late AM';
+                                                            } elseif ($lateDurationPM > 0) {
+                                                                $remarkss = 'Present - Late PM';
+                                                            }
+                                                            else{
+                                                                $remarkss = "Present";
+                                                            }
+
+                                                            $undertimeRemark = '';
+                                                            if ($am > 0) {
+                                                                $undertimeRemark .= 'Undertime AM';
+                                                            }
+                                                            if ($pm > 0) {
+                                                                if (!empty($undertimeRemark)) {
+                                                                    $undertimeRemark .= ' & PM';
+                                                                } else {
+                                                                    $undertimeRemark .= 'Undertime PM';
+                                                                }
+                                                            }
                                                             if (!empty($undertimeRemark)) {
-                                                                $undertimeRemark .= ' & PM';
-                                                            } else {
-                                                                $undertimeRemark .= 'Undertime PM';
+                                                                $remarkss .= ' - ' . $undertimeRemark;
                                                             }
                                                         }
-                                                        if (!empty($undertimeRemark)) {
-                                                            $remarkss .= ' - ' . $undertimeRemark;
-                                                        }
-                                                           // if ($lateDurationAM > 0 && $lateDurationPM > 0 && $am > 0 && $pm > 0) {
-                                                             //   $remarkss .= ' - All values greater than 0';
-                                                            // }
                                                     @endphp
                                                     {{ $remarkss }}
                                                 </td>
@@ -521,22 +579,24 @@
                                 <!-- Table for Computed Working Hours -->
                                 <div class="w-full">
                                     <div class="w-[50%] flex justify-center mb-4 mx-auto">
-                                        <form action="{{ route('admin.department.store') }}" method="POST" class="">
+                                        <form action="{{ route('admin.attendance.modify') }}" method="POST" class="">
                                         <x-caps-lock-detector />
                                             @csrf
 
-                                                
+                                                <div class="mb-2 hidden">
+                                                    <label for="selected-date" class="block  mb-2 text-left">Employee:</label>
+                                                    <input type="text" name="employee_id" value="{{ $selectedEmployeeToShow->id }}" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full max-w-md">
+                                                </div>
                                                 <div class="mb-2">
                                                     <label for="selected-date" class="block  mb-2 text-left">Select a Date:</label>
                                                     <input type="date" id="selected-date" name="selected_date" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full max-w-md">
                                                 </div>
                                                 <div class="mb-2">
                                                     <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Status: </label>
-                                                    <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                                    <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                             <!-- <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option> -->
                                                             <option value="">Select Status</option>
                                                             <option value="On Leave">On Leave</option>
-                                                            <option value="Absent">Absent</option>
                                                             <option value="awol">Absent w/out leave</option>
                                                     </select>
                                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />

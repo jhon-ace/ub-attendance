@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\SchoolController;
 use App\Http\Controllers\Admin\DepartmentController;
@@ -87,7 +88,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'submitPortalTimeIn'])->name('attendance.time-in.store');
         Route::post('/attendance/time-out/portal', [EmployeeAttendanceController::class, 'submitPortalTimeOut'])->name('attendance.time-out.store');       
-
+         Route::post('/attendance/modify', [EmployeeAttendanceController::class, 'modifyAttendance'])->name('attendance.modify');       
         //Student Attendance routes
         Route::get('/students/attendance', [EmployeeAttendanceController::class, 'student'])->name('attendance.student_attendance');
 

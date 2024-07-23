@@ -186,6 +186,23 @@ class ShowEmployeeAttendance extends Component
             ->paginate(500);
 
 
+    //       $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
+    //       $missingTimeIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', '=', $now)->get();
+    //         $missingTimeOut = EmployeeAttendanceTimeOut::whereNull('check_out_time')->get();
+  
+    // if(!$missingTimeIn->isEmpty()){
+    //       $d ="it has data";
+    //     dd($d);
+
+    // }
+    // if($missingTimeIn->isEmpty()){
+    //       $d ="no data";
+    //     dd($d);
+
+    // }
+
+
+
 $attendanceData = [];
 $overallTotalHours = 0;
 
@@ -200,6 +217,8 @@ foreach ($attendanceTimeIn as $attendance) {
     $totalHoursLate = 0;
     $totalUndertimeHours = 0;
 
+
+    $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
     // Extract date and time from check-in
 
 
@@ -286,7 +305,7 @@ $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $attendan
                     $lateIntervalAM = $checkInDateTime->diff($latestAllowedCheckInAM);
                     $lateDurationAM = $lateIntervalAM->h * 60 + $lateIntervalAM->i;
                   
-      
+                    
                 }
 
                 // // Calculate undertime for AM
