@@ -28,7 +28,7 @@
         background-color: rgba(255, 255, 255, 0.8);
         overflow: hidden; /* Prevents container scroll */
         margin-bottom: 2rem; /* Adds space between tables */
-        height:70vh;
+        height:90vh;
     }
 
     table {
@@ -46,7 +46,7 @@
         width: 100%;
         overflow-y: auto;
         overflow-x: hidden;
-        height:500px;
+        height:400px;
         scrollbar-width: none; 
         -ms-overflow-style: none; 
     }
@@ -160,6 +160,38 @@
                 </div>
             </div>
         </div> -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to scroll to the bottom of a container
+            function scrollToBottom(containerId) {
+                var container = document.getElementById(containerId);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            // Example usage: scroll to bottom of timeInTable on page load
+            scrollToBottom('timeInTable');
+             scrollToBottom('timeOutTable');
+
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var prevScrollpos = window.pageYOffset;
+            // var header = document.querySelector('.table-container th');
+
+            window.addEventListener('scroll', function () {
+                var currentScrollPos = window.pageYOffset;
+                if (prevScrollpos > currentScrollPos) {
+                    // Scrolling up
+                    // header.classList.add('show');
+                } else {
+                    // Scrolling down
+                    // header.classList.remove('show');
+                }
+                prevScrollpos = currentScrollPos;
+            });
+        });
+    </script>
     </x-content-design>
 </x-app-layout>
 
