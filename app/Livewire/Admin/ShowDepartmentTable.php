@@ -69,7 +69,7 @@ public function render()
         }
 
         $departments = $query->orderBy($this->sortField, $this->sortDirection)
-                             ->paginate(10);
+                             ->paginate(25);
 
         $schools = School::all();
 
