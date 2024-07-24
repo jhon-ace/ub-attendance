@@ -43,12 +43,13 @@
             /* background: linear-gradient(to right, #1e3a8a, #1e3a8a); */
             text-align:center;
             background:none;
+            color:black;
         }
 
         /* General body styles */
         body {
         margin: 0;
-        display: flex;
+        display: flex; /* ds*/
         flex-direction: column;
         min-height: 100vh;
         font-family: sans-serif;
@@ -87,8 +88,8 @@
         background-color: rgba(255, 255, 255, 1);
         overflow: hidden; /* Prevents container scroll */
         /* margin-bottom: 2rem; Adds space between tables */
-        height:61vh;
-        margin-left:5rem;
+        height:56vh;
+        margin-left:-30px;
     }
 
     table {
@@ -223,7 +224,7 @@
     @endif
     
     @if (session('success'))
-        <div id="session-success" class="alert alert-success -mt-[90px] bg-white rounded-md">
+        <div id="session-success" class="alert alert-success mt-[20px] bg-white rounded-md shadow-xl">
             <ul>
                 <li class="text-yellow-800 p-2 font-bold text-[20px] shadow-md tracking-widest">{{ session('success') }}</li>
             </ul>
