@@ -9,6 +9,19 @@
     <title>Time In Portal</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        .logo-background {
+            background-image: url('{{ asset('assets/img/ublogo.jpg') }}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Ensure it's behind other content */
+            opacity: 0.2; /* Adjust opacity as needed */
+        }
         /* Styles for input fields */
         input[type=password] {
             display: block;
@@ -19,7 +32,7 @@
             margin-bottom: 1px;
             box-shadow: none;
             /* background: linear-gradient(to right, #FBBF24, #EF4444); */
-            background: linear-gradient(to right, #1e3a8a, #1e3a8a);
+            /* background: linear-gradient(to right, #1e3a8a, #1e3a8a); */
             z-index: 1000;
         }
 
@@ -27,8 +40,9 @@
             outline: none;
             box-shadow: none;
             /* background: linear-gradient(to right, #FBBF24, #EF4444); */
-            background: linear-gradient(to right, #1e3a8a, #1e3a8a);
+            /* background: linear-gradient(to right, #1e3a8a, #1e3a8a); */
             text-align:center;
+            background:none;
         }
 
         /* General body styles */
@@ -40,7 +54,7 @@
         font-family: sans-serif;
         /* background: linear-gradient(to right, #FBBF24, #EF4444); */
         /* background: linear-gradient(to right, #1e3a8a, #2563eb); */
-        background: linear-gradient(to right, #1e3a8a, #1e3a8a);
+        /* background: linear-gradient(to right, #1e3a8a, #1e3a8a); */
         color: #000;
         overflow:hidden;
     }
@@ -60,20 +74,21 @@
     /* Table and content styles */
     .flex-container {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-evenly;
         align-items: flex-start;
         width: 100%;
-        margin: 2px;
         overflow: hidden; /* Prevents container scroll */
-        margin-top:-50px;
+        margin-top:-100px;
+        /* background-color:red; */
     }
 
     .table-container {
         border-radius: 4px;
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: rgba(255, 255, 255, 1);
         overflow: hidden; /* Prevents container scroll */
-        margin-bottom: 2rem; /* Adds space between tables */
-        height:70vh;
+        /* margin-bottom: 2rem; Adds space between tables */
+        height:61vh;
+        margin-left:5rem;
     }
 
     table {
@@ -91,7 +106,7 @@
         width: 100%;
         overflow-y: auto;
         overflow-x: hidden;
-        height:500px;
+        height:400px;
         scrollbar-width: none; 
         -ms-overflow-style: none; 
     }
@@ -120,7 +135,7 @@
         /* background-color: rgba(255, 255, 255, 0.8); */
         position: sticky;
         bottom: 0;
-        background: linear-gradient(to right, #1e3a8a, #1e3a8a);
+        /* background: linear-gradient(to right, #1e3a8a, #1e3a8a); */
     }
 
     h2 {
@@ -136,7 +151,7 @@
         font-weight: bold;
         text-align: center;
         margin-top: 20px; /* Adjust margin to fit design */
-        color: white;
+        color: black;
         position: absolute;
         bottom: 20px; /* Position below the logo */
         left: 50%;
@@ -148,9 +163,10 @@
     </style>
 </head>
 <body>
+<div class="logo-background"></div> 
 <div class="container ">
     <div class="flex-container">
-        <div class="table-container">
+        <div class="table-container shadow-xl">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - In List</h2>
             <table>
                 <thead>
@@ -172,10 +188,10 @@
                 </tbody>
             </table>
         </div>
-        <div class="flex-col">
+        <!-- <div class="flex-col">
             <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[550px]">
-        </div>
-        <div class="table-container">
+        </div> -->
+        <div class="table-container shadow-xl">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - OUT List</h2>
             <table>
                 <thead>
@@ -199,7 +215,7 @@
         </div>
     </div>
     @if (session('error'))
-        <div id="session-error" class="alert alert-danger -mt-[90px] bg-white rounded-md">
+        <div id="session-error" class="alert alert-danger mt-[20px] bg-white rounded-md shadow-xl">
             <ul>
                 <li class="text-yellow-800  p-2 font-bold text-[20px] shadow-md tracking-widest">&nbsp;{{ session('error') }}&nbsp;</li>
             </ul>
@@ -236,7 +252,7 @@
             </div>
         </form> -->
     </div>
-    <footer class="w-full uppercase  border-t border-white text-white text-center py-3 tracking-widest">
+    <footer class="w-full uppercase  border-t border-black text-black text-center py-3 tracking-widest">
         <div class="w-full mx-auto">
             A premier university transforming lives for a great future. Anchored on: SCHOLARSHIP, CHARACTER, SERVICE
         </div>
