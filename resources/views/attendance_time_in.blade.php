@@ -139,7 +139,6 @@
         transform: translateX(-50%);
         padding: 20px; /* Padding to make time more visible */
         z-index: 1000;
-        text-transform: uppercase;
     }
 
     </style>
