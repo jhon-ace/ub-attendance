@@ -77,7 +77,7 @@
                     required>
                 <option value="">Select department</option>
                 @foreach($departments as $department)
-                    <option value="{{ $department->id }}">{{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
+                    <option value="{{ $department->id }}">{{ $department->department_abbreviation }}</option>
                 @endforeach
             </select>
 
