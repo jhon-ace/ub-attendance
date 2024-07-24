@@ -15,7 +15,7 @@ class ShowDepartmentWorkingHours extends Component
     use WithPagination;
 
     public $search = '';
-    public $sortField = 'department_abbreviation';
+    public $sortField = 'department_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
     public $selectedDepartment = null;
@@ -114,10 +114,10 @@ class ShowDepartmentWorkingHours extends Component
         }
 
         $workingHour = $schedule->orderBy($this->sortField, $this->sortDirection)
-                             ->paginate(500);
+                             ->paginate(200);
         $departments = $query->where('dept_identifier', '!=', 'student')
                      ->orderBy($this->sortField, $this->sortDirection)
-                     ->paginate(500);
+                     ->paginate(200);
 
         // $workingHour = $showSchedule->orderBy($this->sortField, $this->sortDirection)
         //                      ->paginate(10);

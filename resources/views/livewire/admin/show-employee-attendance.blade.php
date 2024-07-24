@@ -630,8 +630,7 @@
                                                 </div>
                                                 <div class="mb-2">
                                                     <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Status: </label>
-                                                    <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                                            <!-- <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option> -->
+                                                    <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline " required>
                                                             <option value="">Select Status</option>
                                                             <option value="On Leave">On Leave</option>
                                                             <option value="awol">Absent w/out leave</option>
