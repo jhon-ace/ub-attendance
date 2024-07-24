@@ -89,7 +89,8 @@
         overflow: hidden; /* Prevents container scroll */
         /* margin-bottom: 2rem; Adds space between tables */
         height:56vh;
-        margin-left:-30px;
+        margin-left:-30px; 
+        /*  */
     }
 
     table {
