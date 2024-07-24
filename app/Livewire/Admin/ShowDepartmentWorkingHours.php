@@ -15,7 +15,7 @@ class ShowDepartmentWorkingHours extends Component
     use WithPagination;
 
     public $search = '';
-    public $sortField = 'department_id';
+    public $sortField = 'department_abbreviation';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
     public $selectedDepartment = null;
