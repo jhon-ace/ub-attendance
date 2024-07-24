@@ -31,6 +31,7 @@
             border: none;
             height: 2em;
             font-size: 16px;
+            background:none;
             margin-bottom: 1px;
             box-shadow: none;
             /* background: linear-gradient(to right, #FBBF24, #EF4444); */
@@ -154,17 +155,20 @@
     }
 
     #my-time {
-        font-size: 120px;
+        font-family:"Let's go Digital";
+        font-size: 160px;
         font-weight: bold;
         text-align: center;
         margin-top: 20px; /* Adjust margin to fit design */
-        color: white;
+        color:   #318CE7;
         position: absolute;
         bottom: 20px; /* Position below the logo */
         left: 50%;
         transform: translateX(-50%);
         padding: 20px; /* Padding to make time more visible */
         z-index: 1000;
+        -webkit-text-stroke: 2px white; /* Text stroke for WebKit browsers (Safari, Chrome, etc.) */
+        
     }
     .s{
         z-index: 10;
@@ -227,7 +231,7 @@
     </div>
     
     @if (session('error'))
-        <div id="session-error" class="alert alert-danger mt-[50px] bg-white rounded-md shadow-xl s">
+        <div id="session-error" class="alert alert-danger mt-[30px] bg-white rounded-md shadow-xl s">
             <ul>
                 <li class="text-yellow-800  p-2 font-bold text-[20px] shadow-md tracking-widest">&nbsp;{{ session('error') }}&nbsp;</li>
             </ul>
@@ -235,7 +239,7 @@
     @endif
     
     @if (session('success'))
-        <div id="session-success" class="alert alert-success mt-[50px] -ml-90px bg-white rounded-md shadow-xl s">
+        <div id="session-success" class="alert alert-success mt-[30px] -ml-90px bg-white rounded-md shadow-xl s">
             <ul>
                 <li class="text-yellow-800 p-2 font-bold text-[20px] shadow-md tracking-widest">{{ session('success') }}</li>
             </ul>
@@ -243,7 +247,7 @@
     @endif
 
 
-    <div id="my-time" class="text-center tracking-wide w-full flex justify-center"></div> <!-- Date and Time Display -->
+    <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl"></div> <!-- Date and Time Display -->
 </div>
 
     <div class="w-full z-10">
@@ -255,16 +259,8 @@
                     autocomplete="off" autofocus>
             </div>
         </form>
-        <!-- <form id="attendanceForm" action="" method="POST">
-            @csrf
-            <div class="z-10">
-                <input type="password" id="inputField" name="user_rfid"
-                    class="bg-gradient-to-r from-yellow-400 to-red-500 mt-1 p-2 text-[#F9C915] w-full"
-                    autocomplete="off" autofocus>
-            </div>
-        </form> -->
     </div>
-    <footer class="w-full uppercase  border-t border-white text-white text-center py-3 tracking-widest">
+    <footer class="w-full uppercase  font-semibold border-t border-white text-white text-center py-3 tracking-widest">
         <div class="w-full mx-auto">
             A premier university transforming lives for a great future. Anchored on: SCHOLARSHIP, CHARACTER, SERVICE
         </div>
