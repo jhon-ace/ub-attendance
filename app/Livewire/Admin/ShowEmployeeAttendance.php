@@ -963,8 +963,9 @@ session()->put('overall_total_hours', $overallTotalHours);
 
         $schools = School::all();
         $departments = Department::where('school_id', $this->selectedSchool)
-            ->where('dept_identifier', 'employee')
+            ->whereIn('dept_identifier', ['employee', 'faculty'])
             ->get();
+
 
         $departmentDisplayWorkingHour = DepartmentWorkingHour::where('department_id', $this->selectedDepartment4)
                                                            ->get();

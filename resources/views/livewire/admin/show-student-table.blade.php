@@ -47,9 +47,13 @@
                             <option value="0">No Departments</option>
                         @else
                             <option value="">Select Department</option>
-                            @foreach($departments as $department)
-                                <option value="{{ $department->id }}">{{ $department->department_abbreviation }} - {{ $department->department_name }}</option>
+                           @foreach($departments as $department)
+                                @php
+                                    $cleanedAbbreviation = str_replace('- student', '', $department->department_abbreviation);
+                                @endphp
+                                <option value="{{ $department->id }}">{{ $cleanedAbbreviation }}</option>
                             @endforeach
+
                         @endif
                     </select>
                     @if($departmentToShow)
