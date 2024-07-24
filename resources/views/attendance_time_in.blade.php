@@ -19,8 +19,10 @@
             top: 0;
             width: 100%;
             height: 100%;
-            z-index: -1; /* Ensure it's behind other content */
-            opacity: 0.2; /* Adjust opacity as needed */
+            z-index:1;
+            opacity:.9;
+            /* z-index: -1; Ensure it's behind other content */
+            /* opacity: 0.2; Adjust opacity as needed */
         }
         /* Styles for input fields */
         input[type=password] {
@@ -43,7 +45,7 @@
             /* background: linear-gradient(to right, #1e3a8a, #1e3a8a); */
             text-align:center;
             background:none;
-            color:black;
+            color:white;
         }
 
         /* General body styles */
@@ -67,6 +69,7 @@
         align-items: center;
         justify-content: center;
         padding: 2rem;
+        margin-left:80px;
         text-align: center;
         flex: 1;
         overflow: hidden; /* Prevents container scroll */
@@ -91,6 +94,7 @@
         height:56vh;
         margin-left:-30px; 
         /*  */
+        z-index: 10;
     }
 
     table {
@@ -137,6 +141,7 @@
         /* background-color: rgba(255, 255, 255, 0.8); */
         position: sticky;
         bottom: 0;
+        z-index:1;
         /* background: linear-gradient(to right, #1e3a8a, #1e3a8a); */
     }
 
@@ -153,7 +158,7 @@
         font-weight: bold;
         text-align: center;
         margin-top: 20px; /* Adjust margin to fit design */
-        color: black;
+        color: white;
         position: absolute;
         bottom: 20px; /* Position below the logo */
         left: 50%;
@@ -161,12 +166,15 @@
         padding: 20px; /* Padding to make time more visible */
         z-index: 1000;
     }
+    .s{
+        z-index: 10;
+    }
 
     </style>
 </head>
 <body>
-<div class="logo-background"></div> 
 <div class="container ">
+<div class="logo-background"></div> 
     <div class="flex-container">
         <div class="table-container shadow-xl">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - In List</h2>
@@ -190,9 +198,7 @@
                 </tbody>
             </table>
         </div>
-        <!-- <div class="flex-col">
-            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[550px]">
-        </div> -->
+
         <div class="table-container shadow-xl">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - OUT List</h2>
             <table>
@@ -215,9 +221,13 @@
                 </tbody>
             </table>
         </div>
+        <div class="flex-col z-50">
+            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[250px]">
+        </div>
     </div>
+    
     @if (session('error'))
-        <div id="session-error" class="alert alert-danger mt-[20px] bg-white rounded-md shadow-xl">
+        <div id="session-error" class="alert alert-danger mt-[50px] bg-white rounded-md shadow-xl s">
             <ul>
                 <li class="text-yellow-800  p-2 font-bold text-[20px] shadow-md tracking-widest">&nbsp;{{ session('error') }}&nbsp;</li>
             </ul>
@@ -225,7 +235,7 @@
     @endif
     
     @if (session('success'))
-        <div id="session-success" class="alert alert-success mt-[20px] bg-white rounded-md shadow-xl">
+        <div id="session-success" class="alert alert-success mt-[50px] -ml-90px bg-white rounded-md shadow-xl s">
             <ul>
                 <li class="text-yellow-800 p-2 font-bold text-[20px] shadow-md tracking-widest">{{ session('success') }}</li>
             </ul>
@@ -254,7 +264,7 @@
             </div>
         </form> -->
     </div>
-    <footer class="w-full uppercase  border-t border-black text-black text-center py-3 tracking-widest">
+    <footer class="w-full uppercase  border-t border-white text-white text-center py-3 tracking-widest">
         <div class="w-full mx-auto">
             A premier university transforming lives for a great future. Anchored on: SCHOLARSHIP, CHARACTER, SERVICE
         </div>
