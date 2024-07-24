@@ -283,7 +283,7 @@
                                                     <td class="text-black border border-gray-400">
                                                         {{ date('m-d-Y (l)', strtotime($attendanceIn->check_in_time)) }}
                                                     </td>
-                                                    <td class="text-black border border-gray-400">
+                                                    <td class="text-black border border-gray-400 uppercase">
                                                         @php
 
                                                             //$checkInTime = ($attendanceIn->check_in_time) * 60;
@@ -363,7 +363,25 @@
                                                     <td class="text-black border border-gray-400">
                                                         {{ date('m-d-Y (l)', $checkOutTime) }}
                                                     </td>
-                                                    <td class="text-black border border-gray-400">{{ date('g:i:s A', $checkOutTime) }}</td>
+                                                    <td class="text-black border border-gray-400 uppercase">
+                                                        <!-- {{ date('g:i:s A', $checkOutTime) }} -->
+                                                        @php
+
+                                                            //$checkInTime = ($attendanceOut->check_out_time) * 60;
+                                                            $status = $attendanceOut->status;
+                                                            
+                                                            $display = "";
+                                                            if($status === "On Leave"){
+                                                                $display = "On Leave";
+                                                            } elseif($status === "Absent"){
+                                                                $display = "Absent";
+                                                            }
+                                                            else{
+                                                              $display = date('g:i:s A', strtotime($attendanceOut->check_out_time));
+                                                            }
+                                                        @endphp
+                                                        {{  $display }}
+                                                    </td>
                                                     <td class="text-black border border-gray-400">
                                                         {{ $category }}
                                                     </td>
@@ -467,7 +485,26 @@
 
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
-                                                    {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min.
+                                                    <!-- {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min. -->
+                                                      @php
+                                                        // Calculate total hours and minutes for PM shift
+                                                        $totalHoursPM = floor($attendance->hours_workedPM);
+                                                        $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+
+                                                        // Get late duration in minutes for PM shift
+                                                        $lateDurationInMinutes = $attendance->late_durationPM;
+
+                                                        // Add 15 minutes based on late duration conditions
+                                                        if ($lateDurationInMinutes > 0) {
+                                                            $totalMinutesPM += 15;
+                                                        }
+
+                                                        // Convert total minutes to hours and minutes for AM shift
+                                                        $finalHoursPM = $totalHoursPM + floor($totalMinutesPM / 60);
+                                                        $finalMinutesPM = $totalMinutesPM % 60;
+                                                    @endphp
+
+                                                    {{ $finalHoursPM }} hrs. {{ $finalMinutesPM }} min.
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
