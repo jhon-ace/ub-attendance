@@ -76,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
         // CSV Route
         // routes/web.php
         Route::post('/import-csv', [CSVImportController::class, 'import'])->name('csv.import');
+        Route::post('/import-csv/department', [CSVImportController::class, 'importDepartment'])->name('csv.import.department');
 
 
         // Employee Attendance routes

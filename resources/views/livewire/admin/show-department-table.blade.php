@@ -51,6 +51,21 @@
     </div>
     <hr class="border-gray-200 my-4">
     @if($schoolToShow)
+    <form action="{{ route('admin.csv.import.department') }}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <div class="flex items-center space-x-2 mb-2">
+                        <label for="csv_file" class="text-sm font-medium text-gray-700">Import CSV file:</label>
+                        <div class="relative">
+                            <input id="csv_file" type="file" name="csv_file" accept=".csv,.txt" class="hidden" required>
+                            <label for="csv_file" class="cursor-pointer bg-white border border-gray-300 text-gray-700 rounded-md py-1 px-3 inline-block text-sm hover:bg-gray-50 hover:border-blue-500">
+                                <i class="fa-solid fa-file-import mr-1"></i> Browse
+                            </label>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white text-sm px-3 py-1 rounded hover:bg-blue-700">
+                            Import
+                        </button>
+                    </div>
+                </form>
     <div class="flex justify-between">
         <p class="text-black mt-2 text-sm mb-4">Selected School Year: <text class="uppercase text-red-500">{{ $schoolToShow->abbreviation }}</text></p>
         <div x-data="{ open: false }">
@@ -153,6 +168,7 @@
         @endif
     </div>
      @elseif(!$search && $departments->isEmpty())
+        
         <p class="text-black mt-8 text-center uppercase">No data available in school <text class="text-red-500">
             @if($schoolToShow)
             {{ $schoolToShow->school_name}}
@@ -160,6 +176,7 @@
     @else
 
         @if($schoolToShow)
+            
             <div class="overflow-x-auto">
                 <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                     <thead class="bg-gray-200 text-black">
