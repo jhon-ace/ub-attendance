@@ -11,7 +11,6 @@
 
     <!-- Styles -->
     <style>
-        /* Your existing styles here */
         .logo-background {
             background-image: url('{{ asset('assets/img/bg.jpg') }}');
             background-size: cover;
@@ -26,24 +25,15 @@
             opacity: .9; /* Adjust opacity as needed */
         }
 
-        /* Container for layout with margins */
         .container {
             max-width: 1200px; /* Adjust as needed */
             margin: 0 auto; /* Center the container */
             padding: 0 1rem; /* Add padding to the left and right */
-        }
-
-        /* Flex container to center content */
-        .layout-container {
+            min-height: 100vh; /* Ensure full viewport height */
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh; /* Ensure full viewport height */
-            gap: 2rem; /* Space between form and text */
         }
 
-        /* Style for the form section */
         .form-section {
             padding: 2rem;
             background: rgba(255, 255, 255, 0.85);
@@ -51,10 +41,12 @@
             border-radius: 8px;
             width: 100%;
             max-width: 400px; /* Adjust width as needed */
+            margin: 2rem auto; /* Center the form horizontally and add top and bottom margin */
         }
 
-        /* Style for the text section */
         .text-section {
+            display:flex;
+            justify-content: center;
             padding: 1rem;
             background: rgba(255, 255, 255, 0.8);
             color: #333;
@@ -62,10 +54,9 @@
             text-align: center;
             width: 100%;
             max-width: 1000px; /* Adjust width as needed */
-             margin-top: auto; 
+            margin-top: auto; /* Push text section to the bottom */
         }
 
-        /* Enlarged text */
         .motto {
             font-size: 1.5rem;
             font-weight: bold;
@@ -77,69 +68,67 @@
 <div class="relative min-h-screen">
     <div class="logo-background"></div> <!-- Add this div for the logo background -->
     <div class="container">
-        <div class="layout-container">
-            <!-- Form Section -->
-            <div class="form-section">
-                <!-- Session Status -->
-                <x-auth-session-status class="mb-4" :status="session('status')" />
+        <!-- Form Section -->
+        <div class="form-section">
+            <!-- Session Status -->
+            <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
 
-                    <!-- Email Address -->
-                    <img src="{{ asset('assets/img/logo.png')}}" alt="" class="w-24 mx-auto mb-4">
-                    <h4 class="text-center mb-10 text-lg uppercase tracking-widest">University of Bohol Attendance System</h4>
+                <!-- Email Address -->
+                <img src="{{ asset('assets/img/logo.png')}}" alt="" class="w-24 mx-auto mb-4">
+                <h4 class="text-center mb-10 text-lg uppercase tracking-widest">University of Bohol Attendance System</h4>
 
-                    <div class="mb-4">
-                        <x-input-label for="email" :value="__('Enter your work email')" />
-                        <x-text-input id="email" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                                      type="email"
-                                      name="email"
-                                      :value="old('email')"
-                                      required
-                                      autofocus
-                                      autocomplete="username" />
-                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                    </div>
-        
-                    <!-- Password -->
-                    <div class="mb-4">
-                        <x-input-label for="password" :value="__('Password')" />
-                        <x-text-input id="password" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                                      type="password"
-                                      name="password"
-                                      required
-                                      autocomplete="current-password" />
-                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                    </div>
-        
-                    <!-- Remember Me -->
-                    <div class="mb-4">
-                        <label for="remember_me" class="inline-flex items-center">
-                            <input id="remember_me" type="checkbox" class="rounded dark:bg-white border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-                        </label>
-                    </div>
-        
-                    <div class="flex justify-center">
-                        <x-primary-button class="">
-                            {{ __('Log in') }}
-                        </x-primary-button>
-                    </div>
-                    <div class="flex items-center justify-end">
-                        @if (Route::has('password.request'))
-                            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                                {{ __('Forgot your password?') }}
-                            </a>
-                        @endif
-                    </div>
-                </form>
-            </div>
+                <div class="mb-4">
+                    <x-input-label for="email" :value="__('Enter your work email')" />
+                    <x-text-input id="email" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+                                  type="email"
+                                  name="email"
+                                  :value="old('email')"
+                                  required
+                                  autofocus
+                                  autocomplete="username" />
+                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                </div>
+    
+                <!-- Password -->
+                <div class="mb-4">
+                    <x-input-label for="password" :value="__('Password')" />
+                    <x-text-input id="password" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+                                  type="password"
+                                  name="password"
+                                  required
+                                  autocomplete="current-password" />
+                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                </div>
+    
+                <!-- Remember Me -->
+                <div class="mb-4">
+                    <label for="remember_me" class="inline-flex items-center">
+                        <input id="remember_me" type="checkbox" class="rounded dark:bg-white border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
+                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
+                    </label>
+                </div>
+    
+                <div class="flex justify-center">
+                    <x-primary-button class="">
+                        {{ __('Log in') }}
+                    </x-primary-button>
+                </div>
+                <div class="flex items-center justify-end">
+                    @if (Route::has('password.request'))
+                        <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
+                            {{ __('Forgot your password?') }}
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </div>
 
-            <!-- Text Section -->
-            <div class="text-section">
-                <p class="motto">A premier university transforming lives for a great future.</p>
-            </div>
+        <!-- Text Section -->
+        <div class="text-section mx-auto">
+            <p class="motto">A premier university transforming lives for a great future.</p>
         </div>
     </div>
 </div>
