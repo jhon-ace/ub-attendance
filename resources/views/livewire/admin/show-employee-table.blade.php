@@ -72,7 +72,8 @@
 
     @if($search && $employees->isEmpty())
         @if ($search)
-            <!-- <p class="text-black mt-8 text-center">No employee/s found for matching "{{ $search }}"</p> -->
+       
+              <p class="text-black mt-8 text-center">No employee/s found for matching "{{ $search }}"</p>
         @else
             <p class="text-black mt-8 text-center">No employee/s found for matching "{{ $search }}"</p>
         @endif
@@ -232,7 +233,7 @@
     <!--  -->
     @if($departmentToShow)
         @if($search && $employees->isEmpty())
-        <p class="text-black mt-8 text-center">No employee/s found in <text class="text-red-500">{{ $departmentToShow->department_name }}</text> for matching "{{ $search }}"</p>
+        <p class="text-black mt-8 text-center">No employee/s found in <text class="text-red-500">{{ $departmentToShow->department_abbreviation }}</text> for matching "{{ $search }}"</p>
         <p class="text-center mt-5"><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
         @elseif(!$search && $employees->isEmpty())
             <p class="text-black mt-8 text-center uppercase">No data available in <text class="text-red-500">{{$departmentToShow->department_abbreviation}} - {{ $departmentToShow->department_name }} department.</text></p>
