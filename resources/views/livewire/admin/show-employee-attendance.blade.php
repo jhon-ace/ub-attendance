@@ -268,10 +268,7 @@
                                                                     Date
                                                                 </th>
                                                                 <th class="border border-gray-400 px-3 py-2">
-                                                                    Check-In
-                                                                </th>
-                                                                <th class="border border-gray-400 px-3 py-2">
-                                                                    Time In
+                                                                    Time - In
                                                                 </th>
                                                                 <!-- Add other columns as needed -->
                                                             </tr>
@@ -301,9 +298,7 @@
                                                         @endphp
                                                         {{  $display }}
                                                     </td>
-                                                    <td class="text-black border border-gray-400">
-                                                        {{ $category }}
-                                                    </td>
+                                                    
                                                     <!-- Add other columns as needed -->
                                                 </tr>
                                                 @if ($loop->last)
@@ -345,10 +340,7 @@
                                                                     Date
                                                                 </th>
                                                                 <th class="border border-gray-400 px-3 py-2">
-                                                                    Check-Out
-                                                                </th>
-                                                                <th class="border border-gray-400 px-3 py-2">
-                                                                    Time Out
+                                                                    Time - Out
                                                                 </th>
                                                                 <!-- Add other columns as needed -->
                                                             </tr>
@@ -381,9 +373,6 @@
                                                             }
                                                         @endphp
                                                         {{  $display }}
-                                                    </td>
-                                                    <td class="text-black border border-gray-400">
-                                                        {{ $category }}
                                                     </td>
                                                     <!-- Add other columns as needed -->
                                                 </tr>
@@ -534,13 +523,7 @@
                                                     $totalMinutesAM = floor($totalMinutesAM);
 
                                                     // Get late duration in minutes for AM shift
-                                                    $lateDurationInMinutes = $attendance->late_duration;
-
-                                                    // Optional: Add 15 minutes based on late duration conditions
-                                                    // if ($lateDurationInMinutes > 0) {
-                                                    //    $totalMinutesAM += 15;
-                                                    // }
-
+                                                 
                                                     // Convert total minutes to hours and minutes for AM shift
                                                     $finalHoursAM = $totalHoursAM + floor($totalMinutesAM / 60);
                                                     $finalMinutesAM = $totalMinutesAM % 60;
@@ -555,7 +538,7 @@
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     <!-- {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min. -->
                                                       @php
-                                                    // Total hours worked in AM shift
+                                                    // Total hours worked in AM PM shift
                                                     $totalHoursPM = floor($attendance->hours_workedPM);
                                                     $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
 
@@ -563,13 +546,7 @@
                                                     $totalSecondsPM = ($totalMinutesPM - floor($totalMinutesPM)) * 60;
                                                     $totalMinutesPM = floor($totalMinutesPM);
 
-                                                    // Get late duration in minutes for AM shift
-                                                   // $lateDurationInMinutes = $attendance->late_durationPM;
-
-                                                    // Optional: Add 15 minutes based on late duration conditions
-                                                    // if ($lateDurationInMinutes > 0) {
-                                                    //    $totalMinutesAM += 15;
-                                                    // }
+                                                   
 
                                                     // Convert total minutes to hours and minutes for AM shift
                                                     $finalHoursPM = $totalHoursPM + floor($totalMinutesPM / 60);
@@ -639,18 +616,6 @@
                                                         // Sum total hours and minutes
                                                         $totalHours = $totalHoursAM + $totalHoursPM;
                                                         $totalMinutes = $totalMinutesAM + $totalMinutesPM;
-                                                        
-                                                        // Handle late durations
-                                                        $lateDurationInMinutes = $attendance->late_duration;
-                                                        $lateDurationPmInMinutes = $attendance->late_durationPM;
-                                                        
-                                                        if ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes === 0) {
-                                                            $totalMinutes += 15;
-                                                        } elseif ($lateDurationInMinutes === 0 && $lateDurationPmInMinutes > 0) {
-                                                            $totalMinutes += 15;
-                                                        } elseif ($lateDurationInMinutes > 0 && $lateDurationPmInMinutes > 0) {
-                                                            $totalMinutes += 30;
-                                                        }
                                                         
                                                         // Convert total minutes to total seconds
                                                         $totalSeconds = $totalMinutes * 60;
