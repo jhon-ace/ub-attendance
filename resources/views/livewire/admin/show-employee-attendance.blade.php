@@ -292,6 +292,9 @@
                                                             } elseif($status === "Absent"){
                                                                 $display = "Absent";
                                                             }
+                                                            elseif($status === "awol"){
+                                                                $display = "Absent without leave";
+                                                            }
                                                             else{
                                                               $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
                                                             }
@@ -367,6 +370,9 @@
                                                                 $display = "On Leave";
                                                             } elseif($status === "Absent"){
                                                                 $display = "Absent";
+                                                            }
+                                                            elseif($status === "awol"){
+                                                                $display = "Absent without leave";
                                                             }
                                                             else{
                                                               $display = date('g:i:s A', strtotime($attendanceOut->check_out_time));

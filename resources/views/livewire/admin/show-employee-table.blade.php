@@ -18,29 +18,29 @@
     <div class="flex justify-between mb-4 sm:-mt-4">
         <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Admin / Manage Employee</div>
     </div>
-        <div class="flex flex-column overflow-x-auto -mb-5">
-            <div class="col-span-3 p-4">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Year:</label>
-                <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
-                        class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
-                        required>
-                    <option value="">Select School Year</option>
-                    @foreach($schools as $school)
-                        <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
-                    @endforeach
-                </select>
-                @if($schoolToShow)
-                    <p class="text-black mt-2 text-sm mb-1 ">Selected School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
-                    <!-- <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p> -->
-                @endif
-            </div>
+    <div class="flex flex-column overflow-x-auto -mb-5">
+        <div class="col-span-3 pt-4">
+            <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Year:</label>
+            <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
+                    class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
+                    required>
+                <option value="">Select School Year</option>
+                @foreach($schools as $school)
+                    <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
+                @endforeach
+            </select>
+            @if($schoolToShow)
+                <p class="text-black mt-2 text-sm mb-1 ">Selected School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
+                <!-- <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p> -->
+            @endif
+        </div>
 
         <div class="col-span-1 p-4">
             @if(!empty($selectedSchool))
                 <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Department:</label>
                 <select wire:model="selectedDepartment2" id="department_id" name="department_id"
                         wire:change="updateEmployeesByDepartment"
-                        class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
+                        class="cursor-pointer text-sm mr-2 shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
                         required>
                     @if($departments->isEmpty())
                         <option value="0">No Departments</option>
@@ -57,8 +57,156 @@
                 @endif
             @endif
         </div>
-
+        <div class="col-span-1 -ml-2 pt-4 mt-6 "> or </div>
+         <div class="col-span-1 p-4 mt-5">
+            <div class="justify-end">
+                <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 ml-2 py-1.5 w-full md:w-64" placeholder="Search Employee directly..." autofocus>
+            </div>
+        </div>
+        <div class="justify-end mt-9">
+            @if($search)
+                <p><button class="ml-2 border rounded-md border-gray-600 px-3 py-1 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
+            @endif
+        </div>
     </div>
+
+    @if($search && $employees->isEmpty())
+        @if ($search)
+            
+        @else
+            <p class="text-black mt-8 text-center">No employee/s found for matching "{{ $search }}"</p>
+        @endif
+    @elseif(!$search && $employees->isEmpty())
+        @if ($search)
+            <p class="text-black mt-8 text-center uppercase">No data available in d<text class="text-red-500">{{$departmentToShow->department_abbreviation}} - {{ $departmentToShow->department_name }} department.</text></p>
+        @else
+
+        @endif
+    @elseif($search && $employees->isNotEmpty())
+        <div class="overflow-x-auto mt-10">
+            <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                <thead class="bg-gray-200 text-black">
+                    <tr>
+                        <th class="border border-gray-400 px-3 py-2">
+                            <button wire:click="sortBy('employee_id')" class="w-full h-full flex items-center justify-center">
+                                Emp ID
+                                @if ($sortField == 'employee_id')
+                                    @if ($sortDirection == 'asc')
+                                        &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                    @else
+                                        &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                        <th class="border border-gray-400 px-3 py-2">Photo</th>
+                        <th class="border border-gray-400 px-3 py-2">
+                            <button wire:click="sortBy('employee_lastname')" class="w-full h-full flex items-center justify-center">
+                                Lastname
+                                @if ($sortField == 'employee_lastname')
+                                    @if ($sortDirection == 'asc')
+                                        &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                    @else
+                                        &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                        <th class="border border-gray-400 px-3 py-2">
+                            <button wire:click="sortBy('employee_firstname')" class="w-full h-full flex items-center justify-center">
+                                Firstname
+                                @if ($sortField == 'employee_firstname')
+                                    @if ($sortDirection == 'asc')
+                                        &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                    @else
+                                        &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                        <th class="border border-gray-400 px-3 py-2">
+                            <button wire:click="sortBy('employee_middlename')" class="w-full h-full flex items-center justify-center">
+                                Middlename
+                                @if ($sortField == 'employee_middlename')
+                                    @if ($sortDirection == 'asc')
+                                        &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                    @else
+                                        &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                        <th class="border border-gray-400 px-3 py-2">
+                            <button wire:click="sortBy('employee_rfid')" class="w-full h-full flex items-center justify-center">
+                                RFID No
+                                @if ($sortField == 'employee_rfid')
+                                    @if ($sortDirection == 'asc')
+                                        &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                    @else
+                                        &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                        <th class="border border-gray-400 px-3 py-2">
+                            <button wire:click="sortBy('department_id')" class="w-full h-full flex items-center justify-center">
+                                Department
+                                @if ($sortField == 'department_id')
+                                    @if ($sortDirection == 'asc')
+                                        &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                    @else
+                                        &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                        <th class="border border-gray-400 px-3 py-2">
+                            <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
+                                School Year
+                                @if ($sortField == 'school_id')
+                                    @if ($sortDirection == 'asc')
+                                        &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                    @else
+                                        &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($employees as $employee)
+                        <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
+                            <td class="text-black border border-gray-400">{{ $employee->employee_id}}</td>
+                            <td class="text-black border border-gray-400 border-t-0 border-r-0 border-l-0 px-2 py-1 flex items-center justify-center">
+                                @if ($employee->employee_photo && Storage::exists('public/employee_photo/' . $employee->employee_photo))
+                                    <a href="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" class="hover:border border-red-500 rounded-full" title="Click to view Picture" data-fancybox data-caption="{{ $employee->employee_lastname}}, {{ $employee->employee_firstname }} {{ ucfirst(substr($employee->employee_middlename, 0, 1)) }}">
+                                        <img src="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" class="rounded-full w-9 h-9">
+                                    </a>
+                                @else
+                                    <img data-fancybox src="{{ asset('assets/img/user.png') }}" class="cursor-pointer w-9 h-9 hover:border hover:border-red-500 rounded-full" title="Click to view Picture">
+                                @endif
+                            </td>
+                            <td class="text-black border border-gray-400">{{ $employee->employee_lastname}}</td>
+                            <td class="text-black border border-gray-400">{{ $employee->employee_firstname}}</td>
+                            <td class="text-black border border-gray-400">{{ $employee->employee_middlename}}</td>
+                            <td class="text-black border border-gray-400">{{ $employee->employee_rfid}}</td>
+                            <td class="text-black border border-gray-400">{{ $employee->department->department_abbreviation}}</td>
+                            <td class="text-black border border-gray-400">{{ $employee->school->abbreviation}}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <div class="flex justify-between">
+                <div class="uppercase text-black mt-2 text-sm mb-4">
+                    @if($search)
+                        {{ $employees->total() }} Search results
+                    @endif
+                </div>
+            </div>
+            <text class="font-bold uppercase">{{ $employees->links() }}</text>
+        </div>
+    @endif
     <hr class="border-gray-200 my-4">
         @if(!$schoolToShow)
             @if ($errors->any())

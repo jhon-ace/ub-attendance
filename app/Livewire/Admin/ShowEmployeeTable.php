@@ -66,7 +66,11 @@ class ShowEmployeeTable extends Component
         $query = Employee::with('department')->with('school');
 
         // Apply search filters
-        $query = $this->applySearchFilters($query);
+        // Apply search filters
+        if ($this->search) {
+            $query = $this->applySearchFilters($query);
+        }
+
 
         // Apply selected school filter
         if ($this->selectedSchool) {
