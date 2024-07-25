@@ -537,7 +537,7 @@
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     <!-- {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min. -->
-                                                      @php
+                                                    @php
                                                     // Total hours worked in AM PM shift
                                                     $totalHoursPM = floor($attendance->hours_workedPM);
                                                     $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
@@ -631,60 +631,67 @@
 
                                                 </td>
                                                 <td class="text-black border uppercase border-gray-400 text-xs">
-                                                    @php
-                                                        $lateDurationAM = $attendance->late_duration;
-                                                        $lateDurationPM = $attendance->late_durationPM;
-                                                        $am = $attendance->undertimeAM ?? 0;
-                                                        $pm = $attendance->undertimePM ?? 0;
+                                                @php
+                                                    $lateDurationAM = $attendance->late_duration;
+                                                    $lateDurationPM = $attendance->late_durationPM;
+                                                    $am = $attendance->undertimeAM ?? 0;
+                                                    $pm = $attendance->undertimePM ?? 0;
 
-                                                        $totalHoursAM = floor($attendance->hours_workedAM);
-                                                        $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
-                                                        $totalHoursPM = floor($attendance->hours_workedPM);
-                                                        $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
-                                                        $totalHours = $totalHoursAM + $totalHoursPM;
-                                                        $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+                                                    $totalHoursAM = floor($attendance->hours_workedAM);
+                                                    $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                    $totalHoursPM = floor($attendance->hours_workedPM);
+                                                    $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                                                    $totalHours = $totalHoursAM + $totalHoursPM;
+                                                    $totalMinutes = $totalMinutesAM + $totalMinutesPM;
 
-                                                        $remarkss = '';
+                                                    $remarkss = '';
 
-                                                        if (
-                                                            $lateDurationAM == 0 &&
-                                                            $lateDurationPM == 0 &&
-                                                            $am == 0 &&
-                                                            $pm == 0 &&
-                                                            $totalHoursAM == 0 &&
-                                                            $totalMinutesAM == 0 &&
-                                                            $totalHoursPM == 0 &&
-                                                            $totalMinutesPM == 0
-                                                        ) {
-                                                            $remarkss = 'Absent';
-                                                        }else {
+                                                    if (
+                                                        $lateDurationAM == 0 &&
+                                                        $lateDurationPM == 0 &&
+                                                        $am == 0 &&
+                                                        $pm == 0 &&
+                                                        $totalHoursAM == 0 &&
+                                                        $totalMinutesAM == 0 &&
+                                                        $totalHoursPM == 0 &&
+                                                        $totalMinutesPM == 0
+                                                    ) {
+                                                        $remarkss = 'Absent';
+                                                    } else {
+                                                        if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
+                                                            $remarkss = "Present but Absent Morning";
+                                                        }
+                                                        else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
+                                                            $remarkss = "Present but Absent Afternoon";
+                                                        } else {
                                                             if ($lateDurationAM > 0 && $lateDurationPM > 0) {
                                                                 $remarkss = 'Present - Late AM & PM';
                                                             } elseif ($lateDurationAM > 0) {
                                                                 $remarkss = 'Present - Late AM';
                                                             } elseif ($lateDurationPM > 0) {
                                                                 $remarkss = 'Present - Late PM';
-                                                            }
-                                                            else{
+                                                            } else {
                                                                 $remarkss = "Present";
                                                             }
+                                                        }
 
-                                                            $undertimeRemark = '';
-                                                            if ($am > 0) {
-                                                                $undertimeRemark .= 'Undertime AM';
-                                                            }
-                                                            if ($pm > 0) {
-                                                                if (!empty($undertimeRemark)) {
-                                                                    $undertimeRemark .= ' & PM';
-                                                                } else {
-                                                                    $undertimeRemark .= 'Undertime PM';
-                                                                }
-                                                            }
+                                                        $undertimeRemark = '';
+                                                        if ($am > 0) {
+                                                            $undertimeRemark .= 'Undertime AM';
+                                                        }
+                                                        if ($pm > 0) {
                                                             if (!empty($undertimeRemark)) {
-                                                                $remarkss .= ' - ' . $undertimeRemark;
+                                                                $undertimeRemark .= ' & PM';
+                                                            } else {
+                                                                $undertimeRemark .= 'Undertime PM';
                                                             }
                                                         }
-                                                    @endphp
+                                                        if (!empty($undertimeRemark)) {
+                                                            $remarkss .= ' - ' . $undertimeRemark;
+                                                        }
+                                                    }
+                                                @endphp
+
                                                     {{ $remarkss }}
                                                 </td>
                                             </tr>
