@@ -41,7 +41,7 @@
             border-radius: 8px;
             width: 100%;
             max-width: 400px; /* Adjust width as needed */
-            margin: 2rem auto; /* Center the form horizontally and add top and bottom margin */
+            margin-top:50px;/* Center the form horizontally and add top and bottom margin */
         }
 
         .text-section {
@@ -69,7 +69,7 @@
     <div class="logo-background"></div> <!-- Add this div for the logo background -->
     <div class="container">
         <!-- Form Section -->
-        <div class="form-section">
+        <div class="form-section mx-auto">
             <!-- Session Status -->
             <x-auth-session-status class="mb-4" :status="session('status')" />
 
