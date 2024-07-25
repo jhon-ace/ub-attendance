@@ -62,6 +62,7 @@
             text-align: center;
             width: 100%;
             max-width: 1000px; /* Adjust width as needed */
+             margin-top: auto; 
         }
 
         /* Enlarged text */
