@@ -95,7 +95,7 @@
                 </div>
                 <div class="p-2 mb-2 font-bold uppercase">
                     <span class="text-sm tracking-wider" style="color:#FBBF24;">Employee Name</span><br>
-                    <span style="font-size: 40px;" class="text-white shadow-sm tracking-wide">{{ $employee->employee_lastname }}, {{ $employee->employee_firstname }}</span>
+                    <span style="font-size: 40px;" class="text-white shadow-sm tracking-wide">{{ $employee->employee_lastname }}, {{ $employee->employee_firstname }}, {{ ucfirst($employee->employee_middlename[0]) }}</span>
                 </div>
                 <div class="p-2 font-bold uppercase">
                      <span class="text-sm tracking-wider" style="color:#FBBF24;">Department/Office</span><br>
