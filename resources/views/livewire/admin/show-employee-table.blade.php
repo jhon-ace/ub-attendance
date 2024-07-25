@@ -72,7 +72,7 @@
 
     @if($search && $employees->isEmpty())
         @if ($search)
-            
+            <!-- <p class="text-black mt-8 text-center">No employee/s found for matching "{{ $search }}"</p> -->
         @else
             <p class="text-black mt-8 text-center">No employee/s found for matching "{{ $search }}"</p>
         @endif
@@ -84,6 +84,9 @@
         @endif
     @elseif($search && $employees->isNotEmpty())
         <div class="overflow-x-auto mt-10">
+            <div class="flex justify-center mb-2">
+                <p>Search Result</p>
+            </div>
             <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                 <thead class="bg-gray-200 text-black">
                     <tr>
