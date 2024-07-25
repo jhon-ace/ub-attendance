@@ -13,8 +13,8 @@
     <style>
         /* Your existing styles here */
         .logo-background {
-            background-image: url('{{ asset('assets/img/logo.png') }}');
-            background-size: contain;
+            background-image: url('{{ asset('assets/img/bg.jpg') }}');
+            background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
             position: absolute;
@@ -23,76 +23,123 @@
             width: 100%;
             height: 100%;
             z-index: -1; /* Ensure it's behind other content */
-            opacity: 0.2; /* Adjust opacity as needed */
+            opacity: .9; /* Adjust opacity as needed */
         }
 
-        /* Center the form */
-        .form-container {
+        /* Container for layout with margins */
+        .container {
+            max-width: 1200px; /* Adjust as needed */
+            margin: 0 auto; /* Center the container */
+            padding: 0 1rem; /* Add padding to the left and right */
+        }
+
+        /* Flex container to center content */
+        .layout-container {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh; /* Ensure full viewport height */
+            gap: 2rem; /* Space between form and text */
+        }
+
+        /* Style for the form section */
+        .form-section {
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px; /* Adjust width as needed */
+        }
+
+        /* Style for the text section */
+        .text-section {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            font-size: 1.5rem;
+            text-align: center;
+            width: 100%;
+            max-width: 1000px; /* Adjust width as needed */
+        }
+
+        /* Enlarged text */
+        .motto {
+            font-size: 1.5rem;
+            font-weight: bold;
         }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gradient-to-r from-yellow-400 to-red-500">
-<div class="relative min-h-screen flex flex-col items-center justify-center selection:bg-[#FF2D20] selection:text-white">
+<body class="font-sans antialiased ">
+<div class="relative min-h-screen">
     <div class="logo-background"></div> <!-- Add this div for the logo background -->
-    <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl">
-        <div class="form-container"> <!-- Container for centering -->
-            <!-- Session Status -->
-            <x-auth-session-status class="mb-4" :status="session('status')" />
-            <form method="POST" action="{{ route('login') }}" class="bg-white opacity-85 w-[340px] p-6 -mt-3 max-w-sm rounded-lg shadow-md">
-                @csrf
-    
-                <!-- Email Address -->
-                             <h4 class="text-center mb-10 text-lg uppercase tracking-widest">University of Bohol Attendance System</h4>
-                <div class="mb-4">
-                    <x-input-label for="email" :value="__('Enter your work email')" />
-                    <x-text-input id="email" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                                  type="email"
-                                  name="email"
-                                  :value="old('email')"
-                                  required
-                                  autofocus
-                                  autocomplete="username" />
-                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                </div>
-    
-                <!-- Password -->
-                <div class="mb-4">
-                    <x-input-label for="password" :value="__('Password')" />
-                    <x-text-input id="password" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                                  type="password"
-                                  name="password"
-                                  required
-                                  autocomplete="current-password" />
-                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                </div>
-    
-                <!-- Remember Me -->
-                <div class="mb-4">
-                    <label for="remember_me" class="inline-flex items-center">
-                        <input id="remember_me" type="checkbox" class="rounded dark:bg-white border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-                    </label>
-                </div>
-    
-                <div class="flex justify-center">
-                    <x-primary-button class="">
-                        {{ __('Log in') }}
-                    </x-primary-button>
-                </div>
-                <div class="flex items-center justify-end">
-                    @if (Route::has('password.request'))
-                        <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                            {{ __('Forgot your password?') }}
-                        </a>
-                    @endif
-                </div>
-            </form>
-        </div> <!-- End .form-container -->
+    <div class="container">
+        <div class="layout-container">
+            <!-- Form Section -->
+            <div class="form-section">
+                <!-- Session Status -->
+                <x-auth-session-status class="mb-4" :status="session('status')" />
+
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+
+                    <!-- Email Address -->
+                    <img src="{{ asset('assets/img/logo.png')}}" alt="" class="w-24 mx-auto mb-4">
+                    <h4 class="text-center mb-10 text-lg uppercase tracking-widest">University of Bohol Attendance System</h4>
+
+                    <div class="mb-4">
+                        <x-input-label for="email" :value="__('Enter your work email')" />
+                        <x-text-input id="email" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+                                      type="email"
+                                      name="email"
+                                      :value="old('email')"
+                                      required
+                                      autofocus
+                                      autocomplete="username" />
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    </div>
+        
+                    <!-- Password -->
+                    <div class="mb-4">
+                        <x-input-label for="password" :value="__('Password')" />
+                        <x-text-input id="password" class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+                                      type="password"
+                                      name="password"
+                                      required
+                                      autocomplete="current-password" />
+                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                    </div>
+        
+                    <!-- Remember Me -->
+                    <div class="mb-4">
+                        <label for="remember_me" class="inline-flex items-center">
+                            <input id="remember_me" type="checkbox" class="rounded dark:bg-white border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
+                            <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
+                        </label>
+                    </div>
+        
+                    <div class="flex justify-center">
+                        <x-primary-button class="">
+                            {{ __('Log in') }}
+                        </x-primary-button>
+                    </div>
+                    <div class="flex items-center justify-end">
+                        @if (Route::has('password.request'))
+                            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
+                                {{ __('Forgot your password?') }}
+                            </a>
+                        @endif
+                    </div>
+                </form>
+            </div>
+
+            <!-- Text Section -->
+            <div class="text-section">
+                <p class="motto">A premier university transforming lives for a great future.</p>
+            </div>
+        </div>
     </div>
 </div>
 </body>
