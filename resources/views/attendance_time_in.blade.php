@@ -210,8 +210,8 @@
                     <!-- Repeat the above <tr> structure for each row as needed    date('g:i:s A', strtotime($attendanceIn->check_in_time)) -->
                 </tbody>
             </table>
-        </div>
-
+        </div> 
+<!--  -->
         <div class="table-container shadow-xl">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - OUT List</h2>
             <table>
