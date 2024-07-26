@@ -95,7 +95,7 @@
         background-color: rgba(255, 255, 255, 1);
         overflow: hidden; /* Prevents container scroll */
         /* margin-bottom: 2rem; Adds space between tables */
-        height:60vh;
+        height:58vh;
         margin-left:-30px; 
         /*  */
         z-index: 10;
@@ -189,7 +189,7 @@
 <div class="container ">
 <div class="logo-background"></div> 
     <div class="flex-container">
-        <div class="table-container shadow-xl mr-5">
+        <div class="table-container shadow-xl mr-10">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - In List</h2>
             <table>
                 <thead>
