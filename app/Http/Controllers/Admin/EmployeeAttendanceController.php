@@ -189,7 +189,7 @@ public function submitPortalTimeIn(Request $request)
                     // return response()->json([
                     //     'message' => 'Already Time In Morning.',
                     // ], 403);
-                    return redirect()->route('admin.attendance.time-in.portal')->with('success', 'Already Time In!');
+                    return redirect()->route('admin.attendance.time-in.portal')->with('success', 'Already Timed In!');
                 }
         } elseif ($timeInCount == 2 && $timeOutCount == 1) {
             // Check interval for second check-out
@@ -221,7 +221,7 @@ public function submitPortalTimeIn(Request $request)
                 // return response()->json([
                 //     'message' => 'Already Time-in Afternoon.',
                 // ], 403);
-                return redirect()->route('admin.attendance.time-in.portal')->with('success', 'Already Time In!');
+                return redirect()->route('admin.attendance.time-in.portal')->with('success', 'Already Timed In!');
             }
 
         } else {
