@@ -71,7 +71,7 @@
         align-items: center;
         justify-content: center;
         padding: 2rem;
-        margin-left:50px;
+        margin-left:80px;
         text-align: center;
         flex: 1;
         overflow: hidden; /* Prevents container scroll */
@@ -104,7 +104,7 @@
 
     table {
         border-collapse: collapse;
-        width: 460px; /* Adjust width as needed */
+        width: 400px; /* Adjust width as needed */
         background-color: rgba(255, 255, 255, 0.8); 
         padding: 1rem;
         margin: 0.5rem; /* Adjusted margin */
@@ -194,7 +194,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="tracking-wider uppercase" style="max-width:272px;">Employee Name</th>
+                        <th class="tracking-wider uppercase" >Employee Name</th>
                         <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
                     </tr>
                 </thead>
@@ -204,7 +204,7 @@
                             <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
                                 <text>{{ $data->employee->employee_lastname}}, {{ $data->employee->employee_firstname}} {{ $data->employee->employee_middlename}}</text>
                             </td>
-                            <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($data->check_in_time)) }}</td>
+                            <td class="font-bold text-md uppercase text-center tracking-wider" >{{ date('m-d :: g:i:s A', strtotime($data->check_in_time)) }}</td>
                         </tr>
                     @endforeach
                     <!-- Repeat the above <tr> structure for each row as needed    date('g:i:s A', strtotime($attendanceIn->check_in_time)) -->
@@ -217,7 +217,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="tracking-wider uppercase" style="max-width:272px;">Employee Name</th>
+                        <th class="tracking-wider uppercase">Employee Name</th>
                         <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
                     </tr>
                 </thead>
