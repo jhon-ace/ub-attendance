@@ -174,6 +174,11 @@
         z-index: 10;
     }
 
+    #timeInTable tr:last-child,
+    #timeOutTable tr:last-child {
+        background-color: #FFFFCC; /* Adjust color as needed */
+    }
+
     </style>
 </head>
 <body>
