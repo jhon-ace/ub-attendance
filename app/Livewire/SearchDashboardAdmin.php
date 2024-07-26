@@ -99,7 +99,7 @@ class SearchDashboardAdmin extends Component
 
     protected function applySearchFiltersTimeIn($queryTimeIn)
     {
-        $currentDate = Carbon::today()->toDateString();
+        $currentDate = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
         
         return $queryTimeIn->whereHas('employee', function (Builder $query) {
             $query->where('employee_id', 'like', '%' . $this->search . '%')
@@ -116,7 +116,7 @@ class SearchDashboardAdmin extends Component
 
     protected function applySearchFiltersTimeOut($queryTimeOut)
     {
-        $currentDate = Carbon::today()->toDateString();
+         $currentDate = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
         
         return $queryTimeOut->whereHas('employee', function (Builder $query) { 
             $query->where('employee_id', 'like', '%' . $this->search . '%')

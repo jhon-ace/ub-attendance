@@ -61,6 +61,7 @@
         /* background: linear-gradient(to right, #1e3a8a, #1e3a8a); */
 
         overflow:hidden;
+
     }
 
     /* Container styles */
@@ -74,6 +75,7 @@
         text-align: center;
         flex: 1;
         overflow: hidden; /* Prevents container scroll */
+        
     }
 
     /* Table and content styles */
@@ -85,6 +87,7 @@
         overflow: hidden; /* Prevents container scroll */
         margin-top:-100px;
         /* background-color:red; */
+        
     }
 
     .table-container {
@@ -96,6 +99,7 @@
         margin-left:-30px; 
         /*  */
         z-index: 10;
+
     }
 
     table {
@@ -168,7 +172,7 @@
         padding: 20px; /* Padding to make time more visible */
         z-index: 1000;
         -webkit-text-stroke: 2px white; /* Text stroke for WebKit browsers (Safari, Chrome, etc.) */
-        
+        box-shadow:none;
     }
     .s{
         z-index: 10;
