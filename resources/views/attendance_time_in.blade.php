@@ -71,7 +71,7 @@
         align-items: center;
         justify-content: center;
         padding: 2rem;
-        margin-left:80px;
+        margin-left:60px;
         text-align: center;
         flex: 1;
         overflow: hidden; /* Prevents container scroll */
@@ -95,7 +95,7 @@
         background-color: rgba(255, 255, 255, 1);
         overflow: hidden; /* Prevents container scroll */
         /* margin-bottom: 2rem; Adds space between tables */
-        height:56vh;
+        height:58vh;
         margin-left:-30px; 
         /*  */
         z-index: 10;
@@ -104,7 +104,7 @@
 
     table {
         border-collapse: collapse;
-        width: 400px; /* Adjust width as needed */
+        width: 450px; /* Adjust width as needed */
         background-color: rgba(255, 255, 255, 0.8); 
         padding: 1rem;
         margin: 0.5rem; /* Adjusted margin */
@@ -194,7 +194,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="tracking-wider uppercase" >Employee Name</th>
+                        <th class="tracking-wider uppercase" style="max-width:281px;">Employee Name</th>
                         <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
                     </tr>
                 </thead>
@@ -217,7 +217,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="tracking-wider uppercase">Employee Name</th>
+                        <th class="tracking-wider uppercase"  style="max-width:281px;">Employee Name</th>
                         <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
                     </tr>
                 </thead>
