@@ -90,3 +90,8 @@ input[type="file"] {
     font-size: 24px;
     font-weight: bold;
 }
+
+
+[x-cloak] {
+    display: none;
+}

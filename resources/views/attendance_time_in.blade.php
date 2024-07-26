@@ -59,7 +59,7 @@
         /* background: linear-gradient(to right, #FBBF24, #EF4444); */
         /* background: linear-gradient(to right, #1e3a8a, #2563eb); */
         /* background: linear-gradient(to right, #1e3a8a, #1e3a8a); */
-        color: #000;
+
         overflow:hidden;
     }
 
