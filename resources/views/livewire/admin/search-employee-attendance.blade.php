@@ -706,6 +706,9 @@
             <div class="flex justify-items-end justify-end">
                 <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p>
             </div>
+            <div class="flex justify-center">
+                <button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', 'a')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
+            </div>
         @endif
     @else
         @if($attendanceTimeIn->isEmpty())
