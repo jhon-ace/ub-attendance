@@ -118,7 +118,7 @@ class SearchDashboardAdmin extends Component
     {
         $currentDate = Carbon::today()->toDateString();
         
-        return $queryTimeOut->whereHas('employee', function (Builder $query) {
+        return $queryTimeOut->whereHas('employee', function (Builder $query) { //
             $query->where('employee_id', 'like', '%' . $this->search . '%')
                 ->orWhere('employee_lastname', 'like', '%' . $this->search . '%')
                 ->orWhere('employee_firstname', 'like', '%' . $this->search . '%')
