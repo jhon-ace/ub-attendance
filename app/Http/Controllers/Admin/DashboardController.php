@@ -29,17 +29,17 @@ class DashboardController extends Controller
         // // Check if there is an admin user
         // if ($adminUser) {
 
-            $current_date = now()->setTimezone('Asia/Kuala_Lumpur')->format('Y-m-d');
+            // $current_date = now()->setTimezone('Asia/Kuala_Lumpur')->format('Y-m-d');
 
-            // Retrieve attendance data for the current date
-            $curdateDataIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)->get();
-            $curdateDataOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)->get();
+            // // Retrieve attendance data for the current date
+            // $curdateDataIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)->get();
+            // $curdateDataOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)->get();
 
             // Return view with the attendance data
-            return view('dashboard', compact('curdateDataIn', 'curdateDataOut'));
+            return view('Admin.dashboard.dashboard');
         // }
 
         // Redirect with an error message if no admin user is found
-        return redirect()->back()->with('error', 'No admin user found.');
+        // return redirect()->back()->with('error', 'No admin user found.');
     }
 }

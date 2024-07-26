@@ -87,53 +87,64 @@
                 <div class="container shadow-lg p-5 sm:p-6 md:p-7 lg:p-8 bg-white rounded-md text-black font-medium"
                     :style="{ 'width': isFullScreen ? 'calc(100vw - 16px)' : 'auto', 'margin-left': isFullScreen ? '-192px' : '0' }">
                     <h2 class="uppercase font-bold text-3xl">Current Date</h2>
-                    <div class="flex  justify-around ">
-                        <div class="table-container">
-                            <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - In List</h2>
-                            <table class="mr-10">
-                                <thead>
-                                    <tr>
-                                        <th class="tracking-wider uppercase">Employee Name</th>
-                                        <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
-                                    </tr>
-                                </thead>
-                                <tbody  id="timeInTable" >
-                                    @foreach($curdateDataIn as $data)
-                                        <tr>
-                                            <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
-                                                <text>{{ $data->employee->employee_lastname}}, {{ $data->employee->employee_firstname}} {{ $data->employee->employee_middlename}}</text>
-                                            </td>
-                                            <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($data->check_in_time)) }}</td>
-                                        </tr>
-                                    @endforeach
-                                    <!-- Repeat the above <tr> structure for each row as needed    date('g:i:s A', strtotime($attendanceIn->check_in_time)) -->
-                                </tbody>
-                            </table>
+                    <p>
+                        <div class="mt-4">
+                            <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 ml-2 py-1.5 w-full md:w-64" placeholder="Search Employee ..." autofocus>
                         </div>
-                        <div class=""></div>
-                        <div class="table-container ml-5">
-                            <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - OUT List</h2>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th class="tracking-wider uppercase">Employee Name</th>
-                                        <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
-                                    </tr>
-                                </thead>
-                                <tbody  id="timeOutTable" >
-                                    @foreach($curdateDataOut as $dataOut)
+                    </p>
+                    @if($search && $attendanceTimeIn->isEmpty())
+                     <p class="text-black mt-8 text-center">No employee found
+                    @elseif (!$search && $attendanceTimeIn->isEmpty())
+                        <p>No data avaible</p>
+                    @else
+                        <div class="flex  justify-around ">
+                            <div class="table-container">
+                                <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - In List</h2>
+                                <table class="mr-10">
+                                    <thead>
                                         <tr>
-                                            <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
-                                                <text>{{ $dataOut->employee->employee_lastname}}, {{ $dataOut->employee->employee_firstname}} {{ $dataOut->employee->employee_middlename}}</text>
-                                            </td>
-                                            <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($dataOut->check_out_time)) }}</td>
+                                            <th class="tracking-wider uppercase">Employee Name</th>
+                                            <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
                                         </tr>
-                                    @endforeach
-                                    <!-- Repeat the above <tr> structure for each row as needed -->
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody  id="timeInTable" >
+                                        @foreach($curdateDataIn as $data)
+                                            <tr>
+                                                <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
+                                                    <text>{{ $data->employee->employee_lastname}}, {{ $data->employee->employee_firstname}} {{ $data->employee->employee_middlename}}</text>
+                                                </td>
+                                                <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($data->check_in_time)) }}</td>
+                                            </tr>
+                                        @endforeach
+                                        <!-- Repeat the above <tr> structure for each row as needed    date('g:i:s A', strtotime($attendanceIn->check_in_time)) -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class=""></div>
+                            <div class="table-container ml-5">
+                                <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - OUT List</h2>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="tracking-wider uppercase">Employee Name</th>
+                                            <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody  id="timeOutTable" >
+                                        @foreach($curdateDataOut as $dataOut)
+                                            <tr>
+                                                <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
+                                                    <text>{{ $dataOut->employee->employee_lastname}}, {{ $dataOut->employee->employee_firstname}} {{ $dataOut->employee->employee_middlename}}</text>
+                                                </td>
+                                                <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($dataOut->check_out_time)) }}</td>
+                                            </tr>
+                                        @endforeach
+                                        <!-- Repeat the above <tr> structure for each row as needed -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
