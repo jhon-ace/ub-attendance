@@ -189,7 +189,7 @@
 <div class="container ">
 <div class="logo-background"></div> 
     <div class="flex-container">
-        <div class="table-container shadow-xl">
+        <div class="table-container shadow-xl mr-5">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - In List</h2>
             <table>
                 <thead>
