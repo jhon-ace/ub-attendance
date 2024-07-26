@@ -147,9 +147,9 @@ public function updateEmployeesByDepartment()
                 ->orWhere('employee_middlename', 'like', '%' . $this->search . '%')
                 ->orWhere('employee_lastname', 'like', '%' . $this->search . '%')
                 ->orWhere('employee_rfid', 'like', '%' . $this->search . '%')
-                ->orWhereHas('school', function (Builder $query) {
-                    $query->where('abbreviation', 'like', '%' . $this->search . '%')
-                        ->orWhere('school_name', 'like', '%' . $this->search . '%');
+                ->orWhereHas('department', function (Builder $query) {
+                    $query->where('department_abbreviation', 'like', '%' . $this->search . '%')
+                        ->orWhere('department_name', 'like', '%' . $this->search . '%');
                 });
         });
     }

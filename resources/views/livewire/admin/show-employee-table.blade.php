@@ -60,7 +60,7 @@
         <div class="col-span-1 -ml-2 pt-4 mt-6 "> or </div>
          <div class="col-span-1 p-4 mt-5">
             <div class="justify-end">
-                <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 ml-2 py-1.5 w-full md:w-64" placeholder="Search Employee directly..." autofocus>
+                <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 ml-2 py-1.5 w-full md:w-64" placeholder="Search Employee or by department directly..." autofocus>
             </div>
         </div>
         <div class="justify-end mt-9">
