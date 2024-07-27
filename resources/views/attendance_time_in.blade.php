@@ -195,7 +195,7 @@
                 <thead>
                     <tr>
                         <th class="tracking-wider uppercase" >Employee Name</th>
-                        <th class="tracking-wider uppercase text-center" >MM - DD :: TIME</th>
+                        <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
                     </tr>
                 </thead>
                 <tbody  id="timeInTable" >

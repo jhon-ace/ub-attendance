@@ -115,7 +115,7 @@ class SearchEmployeeAttendance extends Component
     }
 
     public function searchById($employeeId)
-    {
+    {   
         $this->search = $employeeId;
         $this->selectedEmployeeId = $employeeId; // Optional: to highlight selected row or for other purposes
     }
