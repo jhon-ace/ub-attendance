@@ -41,6 +41,8 @@ class SearchEmployeeAttendance extends Component
     public $selectedStartDate = null;
     public $selectedEndDate = null;
     public $selectedAttendanceByDate;
+    public $departmentDisplayWorkingHour = [];
+    public $selectedEmployeeId = '';
 
 
     
@@ -112,8 +114,18 @@ class SearchEmployeeAttendance extends Component
         $this->sortField = $field;
     }
 
+    public function searchById($employeeId)
+    {
+        $this->search = $employeeId;
+        $this->selectedEmployeeId = $employeeId; // Optional: to highlight selected row or for other purposes
+    }
+
     public function render()
     {
+
+
+
+
         // Base query for EmployeeAttendanceTimeIn with left join to EmployeeAttendanceTimeOut
         $queryTimeIn = EmployeeAttendanceTimeIn::query()
             ->with(['employee.school', 'employee.department']);
@@ -131,6 +143,8 @@ class SearchEmployeeAttendance extends Component
 
        // Apply selected employee filter
     if ($this->search) {
+
+
         // Search employees based on search term in multiple fields
         $this->employees = Employee::where(function ($query) {
             $query->where('employee_id', 'like', '%' . $this->search . '%')
@@ -490,7 +504,7 @@ class SearchEmployeeAttendance extends Component
             'selectedEmployeeToShow' => $this->selectedEmployeeToShow,
             // 'employees' => $employees, // Ensure employees variable is defined if needed
             'selectedAttendanceByDate' => $this->selectedAttendanceByDate,
-            'departmentDisplayWorkingHour' => $departmentDisplayWorkingHour,
+            'departmentDisplayWorkingHour' => $this->departmentDisplayWorkingHour,
         ]);
     }
 
