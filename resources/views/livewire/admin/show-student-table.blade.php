@@ -68,12 +68,98 @@
                     <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 ml-2 py-1.5 w-full md:w-64" placeholder="Search student directly..." autofocus>
                 </div>
             </div>
-            <div class="justify-end mt-9">
+            <div class="justify-end mt-9 w-full">
                 @if($search)
-                    <p><button class="ml-2 border rounded-md border-gray-600 px-3 py-1 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
+                    <p><button class=" ml-2 border rounded-md border-gray-600 px-3 py-1 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
                 @endif
             </div>
+            <div class="flex justify-end  mt-8 w-full">
+                <div x-data="{ open: false }">
+                    <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
+                     
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Student
+                    </button>
+                    <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
+                            <div class="flex justify-between items-center pb-3">
+                                <p class="text-xl font-bold">Add Student</p>
+                                <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
+                            </div>
+                            <div class="mb-4">
+                                <form action="{{ route('admin.student.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                    <x-caps-lock-detector />
+                                    @csrf
+<!--  -->
+                                    <div class="mb-2">
+                                        <input type="file" name="student_photo" id="student_photo" class="hidden" accept="image/*" onchange="previewImage(event)">
+                                        <label for="student_photo" class="cursor-pointer flex flex-col items-center">
+                                            <div id="imagePreviewContainer" class="mb-2 text-center">
+                                                <img id="imagePreview" src="{{ asset('assets/img/user.png') }}" class="rounded-lg w-32 h-auto">
+                                            </div>
+                                            <span class="text-sm text-gray-500">Select Photo</span>
+                                        </label>
+                                        <x-input-error :messages="$errors->get('student_photo')" class="mt-2" />
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div class="mb-2">
+                                            <label for="student_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Student ID</label>
+                                            <input type="text" name="student_id" id="student_id" value="{{ old('student_id') }}" class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_id') is-invalid @enderror" required autofocus>
+                                            <x-input-error :messages="$errors->get('student_id')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="student_lastname" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Lastname</label>
+                                            <input type="text" name="student_lastname" id="student_lastname" value="{{ old('student_lastname') }}" class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_lastname') is-invalid @enderror" required autofocus>
+                                            <x-input-error :messages="$errors->get('student_lastname')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="student_firstname" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Firstname</label>
+                                            <input type="text" name="student_firstname" id="student_firstname" value="{{ old('student_firstname') }}" class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_firstname') is-invalid @enderror" required autofocus>
+                                            <x-input-error :messages="$errors->get('student_firstname')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="student_middlename" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Middlename</label>
+                                            <input type="text" name="student_middlename" id="student_middlename" value="{{ old('student_middlename') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_middlename') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('student_middlename')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="student_rfid" class="block text-gray-700 text-md font-bold mb-2 text-left">Student RFID No</label>
+                                            <input type="text" name="student_rfid" id="student_rfid" value="{{ old('student_rfid') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_rfid') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('student_rfid')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="student_year_grade" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Year/Grade</label>
+                                            <input type="text" name="student_year_grade" id="student_year_grade" value="{{ old('student_year_grade') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_year_grade') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('student_year_grade')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="student_status" class="block text-gray-700 text-md font-bold mb-2 text-left">Student Status</label>
+                                            <input type="text" name="student_status" id="student_status" value="{{ old('student_status') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('student_status') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('student_status')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="course_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Course:</label>
+                                            <select id="course_id" name="course_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('course_id') is-invalid @enderror" required>
+                                                @foreach($courses as $course)
+                                                    <option value="">{{ $course->course_abbreviation }} - {{ $course->course_name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('course_id')" class="mt-2" />
+                                        </div>
+                                    </div>
+
+                                    <div class="flex mb-4 mt-10 justify-center">
+                                        <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                            Save
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        <!-- s -->
         @if($search && $students->isEmpty())
             @if ($search)
                 <p class="text-black mt-8 text-center">No student/s found for matching "{{ $search }}"</p>
