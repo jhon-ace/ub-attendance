@@ -160,7 +160,7 @@
 
     #my-time {
         font-family:"Let's go Digital";
-        font-size: 140px;
+        font-size: 110px;
         font-weight: bold;
         text-align: center;
         margin-top: 20px; /* Adjust margin to fit design */
