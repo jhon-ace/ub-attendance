@@ -96,7 +96,7 @@
         overflow: hidden; /* Prevents container scroll */
         /* margin-bottom: 2rem; Adds space between tables */
         height:60vh;
- 
+        margin-left:-20px;
         /*  */
         z-index: 10;
 
@@ -123,7 +123,7 @@
     }
 
     td, th {
-        padding: 5px;
+        padding: 2px;
         width: 350px; /* Adjust width as needed */
         border-right: 1px solid #ccc;
         border: 1px solid;
@@ -194,7 +194,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="tracking-wider uppercase" style="max-width:282px;">Employee Name</th>
+                        <th class="tracking-wider uppercase" style="max-width:283px;">Employee Name</th>
                         <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
                     </tr>
                 </thead>
@@ -212,7 +212,7 @@
             </table>
         </div> 
 
-        <div class="table-container shadow-xl">
+        <div class="table-container shadow-xl mr-10">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - OUT List</h2>
             <table>
                 <thead>
@@ -239,7 +239,7 @@
         </div>
     </div>
     
-    @if (session('error'))
+    @if (session('error')) 
         <div id="session-error" class="alert alert-danger mt-[30px] bg-white rounded-md shadow-xl s">
             <ul>
                 <li class="text-yellow-800  p-2 font-bold text-[20px] shadow-md tracking-widest">&nbsp;{{ session('error') }}&nbsp;</li>
