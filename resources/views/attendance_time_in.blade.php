@@ -255,6 +255,7 @@
             </div>
         </div>
     @endif
+    <!--  -->
 
     @if (session('success'))
         <!-- Modal Background -->
