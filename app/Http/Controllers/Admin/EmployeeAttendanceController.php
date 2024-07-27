@@ -29,6 +29,11 @@ class EmployeeAttendanceController extends Controller
         return view('Admin.attendance.employee_attendance');
     }
 
+    public function employeeSearch()
+    {
+         return view('Admin.attendance.employeeSearch');
+    }
+
     public function student()
     {
         return view('Admin.attendance.student_attendance');

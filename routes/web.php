@@ -88,6 +88,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Employee Attendance routes
         Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'employee'])->name('attendance.employee_attendance');
+        Route::get('/employees/attendance/search', [EmployeeAttendanceController::class, 'employeeSearch'])->name('attendance.employee_attendance.search');
         Route::get('/generate-pdf', [EmployeeAttendanceController::class, 'generatePDF'])->name('generate.pdf');
 
         Route::get('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'portalTimeIn'])->name('attendance.time-in.portal');

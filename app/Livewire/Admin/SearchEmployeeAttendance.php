@@ -18,15 +18,14 @@ use Carbon\Carbon;
 use DateTime;
 use DateInterval;
 use DateTimeZone;
+use Illuminate\Support\Facades\DB;
 
-
-
-class ShowEmployeeAttendance extends Component
+class SearchEmployeeAttendance extends Component
 {
     use WithPagination;
 
     public $search = '';
-        public $searchh = '';
+    public $searchh = '';
     public $sortField = 'employee_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
@@ -44,7 +43,7 @@ class ShowEmployeeAttendance extends Component
     public $selectedAttendanceByDate;
 
 
-    protected $listeners = ['updateEmployees', 'updateEmployeesByDepartment', 'updateAttendanceByEmployee', 'updateAttendanceByDateRange'];
+    
 
     public function updatingSearch()
     {
@@ -127,43 +126,37 @@ class ShowEmployeeAttendance extends Component
         $queryTimeIn = $this->applySearchFiltersIn($queryTimeIn);
         $queryTimeOut = $this->applySearchFiltersOut($queryTimeOut);
 
-        // Apply selected school filter
-        if ($this->selectedSchool) {
-            $queryTimeIn->whereHas('employee', function (Builder $query) {
-                $query->where('school_id', $this->selectedSchool);
-            });
-            $queryTimeOut->whereHas('employee', function (Builder $query) {
-                $query->where('school_id', $this->selectedSchool);
-            });
-            $this->schoolToShow = School::find($this->selectedSchool);
-        } else {
-            $this->schoolToShow = null;
-        }
 
-        // Apply selected department filter
-        if ($this->selectedDepartment4) {
-            $queryTimeIn->whereHas('employee', function (Builder $query) {
-                $query->where('department_id', $this->selectedDepartment4);
-            });
-            $queryTimeOut->whereHas('employee', function (Builder $query) {
-                $query->where('department_id', $this->selectedDepartment4);
-            });
-            $this->departmentToShow = Department::find($this->selectedDepartment4);
-            $employees = Employee::where('department_id', $this->selectedDepartment4)->get();
-        } else {
-            $this->departmentToShow = null;
-            $employees = Employee::all();
-        }
+        
 
-        // Apply selected employee filter
-        if ($this->selectedEmployee) {
-            $queryTimeIn->where('employee_id', $this->selectedEmployee);
-            $this->selectedEmployeeToShow = Employee::find($this->selectedEmployee);
-            $queryTimeOut->where('employee_id', $this->selectedEmployee);
-            $this->selectedEmployeeToShow = Employee::find($this->selectedEmployee);
+       // Apply selected employee filter
+    if ($this->search) {
+        // Search employees based on search term in multiple fields
+        $this->employees = Employee::where(function ($query) {
+            $query->where('employee_id', 'like', '%' . $this->search . '%')
+                ->orWhere(DB::raw('CONCAT(employee_lastname, ", ", employee_firstname, " ", employee_middlename)'), 'like', '%' . $this->search . '%');
+        })->get();
+        
+        if ($this->employees->isNotEmpty()) {
+            // Assuming $queryTimeIn and $queryTimeOut are previously defined queries
+            $queryTimeIn->whereIn('employee_id', $this->employees->pluck('id'));
+            $queryTimeOut->whereIn('employee_id', $this->employees->pluck('id'));
+
+            // Optionally, select the first employee to show details
+            $this->selectedEmployeeToShow = $this->employees->first();
+            
+            // Fetch and display the department hours for the selected employee's department
+            $departmentId = $this->selectedEmployeeToShow->department_id;
+            $departmentDisplayWorkingHour = DepartmentWorkingHour::where('department_id', $departmentId)->get();
         } else {
             $this->selectedEmployeeToShow = null;
+            $this->departmentDisplayWorkingHour = [];
         }
+    } else {
+        $this->employees = [];
+        $this->selectedEmployeeToShow = null;
+        $departmentDisplayWorkingHour = [];
+    }
 
 
         // Apply date range filter if both dates are set
@@ -178,6 +171,8 @@ class ShowEmployeeAttendance extends Component
             
             $this->selectedAttendanceByDate = $selectedAttendanceByDate;   
         }
+
+        
         
 
         $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
@@ -481,10 +476,9 @@ class ShowEmployeeAttendance extends Component
             ->get();
 
 
-        $departmentDisplayWorkingHour = DepartmentWorkingHour::where('department_id', $this->selectedDepartment4)
-                                                           ->get();
 
-        return view('livewire.admin.show-employee-attendance', [
+
+        return view('livewire.admin.search-employee-attendance', [
             'overallTotalHours' => $overallTotalHours,
             'attendanceData' =>$attendanceData,
             'attendanceTimeIn' => $attendanceTimeIn,
@@ -494,7 +488,7 @@ class ShowEmployeeAttendance extends Component
             'schoolToShow' => $this->schoolToShow,
             'departmentToShow' => $this->departmentToShow,
             'selectedEmployeeToShow' => $this->selectedEmployeeToShow,
-            'employees' => $employees, // Ensure employees variable is defined if needed
+            // 'employees' => $employees, // Ensure employees variable is defined if needed
             'selectedAttendanceByDate' => $this->selectedAttendanceByDate,
             'departmentDisplayWorkingHour' => $departmentDisplayWorkingHour,
         ]);

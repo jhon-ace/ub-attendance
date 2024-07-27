@@ -1,7 +1,5 @@
 <div class="mb-4">
         @php
-            session(['selectedSchool' => $selectedSchool]);
-            session(['selectedDepartment4' => $selectedDepartment4]);
             session(['selectedEmployee' => $selectedEmployee])
         @endphp
     @if (session('success'))
@@ -16,79 +14,29 @@
         <x-sweetalert type="error" :message="session('error')" />
     @endif
     <div class="flex justify-between mb-4 sm:-mt-4">
-        <div class="font-bold text-md tracking-tight text-md text-black mt-2 uppercase">Admin / Employee Attendance</div>
+        <div class="font-bold text-md tracking-tight text-md text-black mt-2 uppercase">Admin / Employee Attendance Search</div>
     </div>
-    
-        <div class="flex flex-column overflow-x-auto -mb-5">
-            <div class="col-span-3 mb-2">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Year:</label>
-                <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
-                        class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
-                        required>
-                    <option value="">Select School Year</option>
-                    @foreach($schools as $school)
-                        <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
-                    @endforeach
-                </select>
-                @if($schoolToShow)
-                    <p class="text-black mt-2 text-sm mb-1 ">Selected School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
-                    <!-- <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p> -->
-                @endif
-            </div>
 
-        <div class="col-span-1 ml-5">
-            @if(!empty($selectedSchool))
-                <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Department:</label>
-                <select wire:model="selectedDepartment4" id="department_id" name="department_id"
-                        wire:change="updateEmployeesByDepartment"
-                        class="mr-5 cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
-                        required>
-                    @if($departments->isEmpty())
-                        <option value="0">No Departments</option>
-                    @else
-                        <option value="">Select Department</option>
-                        @foreach($departments as $department)
-                            <option value="{{ $department->id }}">{{ $department->department_abbreviation }}</option>
-                        @endforeach
-                    @endif
-                </select>
-                @if($departmentToShow)
-                    <!-- <p class="text-black mt-2 text-sm mb-1">Selected Department ID: <span class="text-red-500 ml-2">{{ $departmentToShow->department_id }}</span></p> -->
-                    <p class="text-black text-sm mt-2">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_abbreviation }}</span></p>
-                    
-                @endif
-            @endif
-        </div>
-
-    </div>
     <hr class="border-gray-200 my-4">
-        @if(!$schoolToShow)
-            <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected school</p>
-        @endif
-        @if(!empty($selectedSchool))
-            @if(!$departmentToShow)
-                <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected department</p>
-            @endif
-        @endif
+
         
-        @if($departmentToShow)
+
             <div class="flex justify-start">
                 <div>
-                    <label for="department_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Display attendance:</label>
-                    <select wire:model="selectedEmployee" id="department_id" name="department_id"
-                            wire:change="updateAttendanceByEmployee"
-                            class="cursor-pointer text-sm shadow appearance-none border  rounded text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror md:w-auto"
-                            required>
-                        @if($departments->isEmpty())
-                            <option value="0">No Employees</option>
-                        @else
-                            <option value="" selected>Select Employees</option>
-                            @foreach($employees as $employee)
-                                <option value="{{ $employee->id }}">{{ $employee->employee_id }} - {{ $employee->employee_lastname }}, {{ $employee->employee_firstname }} {{ ucfirst($employee->employee_middlename) }}</option>
-                            @endforeach
-                        @endif
-                    </select>
+                    <label for="search" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Search Employees:</label>
+                    <input 
+                        type="text" 
+                        id="search" 
+                        name="search" 
+                        wire:model.live="search" 
+                        class="text-sm shadow appearance-none border rounded text-black leading-tight focus:outline-none focus:shadow-outline md:w-auto"
+                        placeholder="Enter Employee ID or name..."
+                    />
+
                 </div>
+
+                
+
                             <!-- Modal -->
                 <div x-data="{ open: false }" @keydown.window.escape="open = false" x-cloak>
                     <!-- Modal Trigger Button -->
@@ -116,6 +64,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="bg-white divide-y divide-gray-200">
+                                            
                                             @foreach($departmentDisplayWorkingHour as $working_hour)
                                                 <tr>
                                                     @php
@@ -750,13 +699,9 @@
                     </div>
                 @endif
             @else
-                @if($employees->isEmpty())
-                    <p class="text-black text-sm mt-11 mb-4 uppercase text-center">Add Employee first in the department</p>
-                @else
-                    <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected Employee</p>
-                @endif
+               
             @endif
-        @endif
+
             
         
     
