@@ -24,7 +24,7 @@ class SearchEmployeeAttendance extends Component
 {
     use WithPagination;
 
-    public $search = 'a';
+    public $search = '';
     public $searchh = '';
     public $sortField = 'employee_id';
     public $sortDirection = 'asc';
