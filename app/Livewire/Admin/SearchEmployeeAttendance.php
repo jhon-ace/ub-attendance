@@ -24,7 +24,7 @@ class SearchEmployeeAttendance extends Component
 {
     use WithPagination;
 
-    public $search = '';
+    public $search = 'a';
     public $searchh = '';
     public $sortField = 'employee_id';
     public $sortDirection = 'asc';
@@ -190,11 +190,11 @@ class SearchEmployeeAttendance extends Component
         
 
         $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(500);
+            ->paginate(5000);
 
 
         $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(500);
+            ->paginate(5000);
 
 
 
