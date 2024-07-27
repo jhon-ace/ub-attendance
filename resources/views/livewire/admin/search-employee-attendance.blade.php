@@ -308,7 +308,7 @@
                                                 $currentDate = $date;
                                             @endphp
                                         @endif
-                                        <tr wire:click="searchById('{{ $attendanceOut->employee->employee_id }}')" class="hover:bg-gray-100">
+                                        <tr wire:click="searchById('{{ $attendanceOut->employee->employee_id }}')" class="hover:bg-gray-100 cursor-pointer">
                                             <td class="text-black border border-gray-400">{{ $attendanceOut->employee->employee_id }}</td>
                                             <td class="text-black border border-gray-400">
                                                 {{ $attendanceOut->employee->employee_lastname }}, {{ $attendanceOut->employee->employee_firstname }}, {{ substr($attendanceOut->employee->employee_middlename,  0,3) }}.
