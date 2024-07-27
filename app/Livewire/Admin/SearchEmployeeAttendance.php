@@ -142,15 +142,13 @@ class SearchEmployeeAttendance extends Component
         
 
        // Apply selected employee filter
-    if ($this->search) {
-
-
+       if ($this->search) {
         // Search employees based on search term in multiple fields
         $this->employees = Employee::where(function ($query) {
             $query->where('employee_id', 'like', '%' . $this->search . '%')
                 ->orWhere(DB::raw('CONCAT(employee_lastname, ", ", employee_firstname, " ", employee_middlename)'), 'like', '%' . $this->search . '%');
         })->get();
-        // 
+
         if ($this->employees->isNotEmpty()) {
             // Assuming $queryTimeIn and $queryTimeOut are previously defined queries
             $queryTimeIn->whereIn('employee_id', $this->employees->pluck('id'));
@@ -159,9 +157,13 @@ class SearchEmployeeAttendance extends Component
             // Optionally, select the first employee to show details
             $this->selectedEmployeeToShow = $this->employees->first();
             
-            // Fetch and display the department hours for the selected employee's department
-            $departmentId = $this->selectedEmployeeToShow->department_id;
-            $departmentDisplayWorkingHour = DepartmentWorkingHour::where('department_id', $departmentId)->get();
+            if ($this->selectedEmployeeToShow) {
+                // Fetch and display the department hours for the selected employee's department
+                $departmentId = $this->selectedEmployeeToShow->department->id;
+                $this->departmentDisplayWorkingHour = DepartmentWorkingHour::where('department_id', $departmentId)->get();
+            } else {
+                $this->departmentDisplayWorkingHour = [];
+            }
         } else {
             $this->selectedEmployeeToShow = null;
             $this->departmentDisplayWorkingHour = [];
@@ -169,8 +171,23 @@ class SearchEmployeeAttendance extends Component
     } else {
         $this->employees = [];
         $this->selectedEmployeeToShow = null;
-        $departmentDisplayWorkingHour = [];
+        $this->departmentDisplayWorkingHour = [];
     }
+
+
+    // Apply date range filter if both dates are set
+    if ($this->startDate && $this->endDate) {
+        $queryTimeIn->whereDate('check_in_time', '>=', $this->startDate)
+                    ->whereDate('check_in_time', '<=', $this->endDate);
+
+        $queryTimeOut->whereDate('check_out_time', '>=', $this->startDate)
+                    ->whereDate('check_out_time', '<=', $this->endDate);
+                    
+        $selectedAttendanceByDate = $queryTimeIn->get();// Fetch data and assign to selectedAttendanceByDate
+        
+        $this->selectedAttendanceByDate = $selectedAttendanceByDate;   
+    }
+
 
 
         // Apply date range filter if both dates are set
