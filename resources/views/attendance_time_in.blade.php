@@ -95,8 +95,8 @@
         background-color: rgba(255, 255, 255, 1);
         overflow: hidden; /* Prevents container scroll */
         /* margin-bottom: 2rem; Adds space between tables */
-        height:58vh;
-        margin-left:-30px; 
+        height:60vh;
+ 
         /*  */
         z-index: 10;
 
