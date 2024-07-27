@@ -350,7 +350,7 @@
                                 <div class="text-center font-bold uppercase">{{ $attendanceTimeOut->links() }}</div>
                             </div>                
                         </div>
-                         <p><text class="text-red-500">Note:</text> Click the row to select specific employee</p>     
+                         <!-- <p><text class="text-red-500">Note:</text> Click the row to select specific employee</p>      -->
                     </div>
 
                     <div x-show="tab === 'computed-hours'" class="w-full">
