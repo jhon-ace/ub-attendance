@@ -134,7 +134,7 @@ public function submitPortalTimeIn(Request $request)
 
         // Check if the employee has already checked out in the afternoon
         if ($timeInCount == 2 && $timeOutCount == 2) {
-            return redirect()->route('admin.attendance.time-in.portal')->with('success', 'Attendance complete. Safe travels home!');
+            return redirect()->route('admin.attendance.time-in.portal')->with('success', 'Attendance completed. Safe travels home!');
             // return response()->json([
             //     'message' => 'Already checked out in the afternoon. Go home safely!',
             // ], 403);
@@ -247,7 +247,7 @@ public function submitPortalTimeIn(Request $request)
     } else {
         // Handle case where employee with given RFID is not found
         // return response()->json(['error' => 'Employee not found.'], 404);
-        return redirect()->route('admin.attendance.time-in.portal')->with('error', 'RFID not Recognized!');
+        return redirect()->route('admin.attendance.time-in.portal')->with('error', 'RFID not recognized!');
     }
 }
 

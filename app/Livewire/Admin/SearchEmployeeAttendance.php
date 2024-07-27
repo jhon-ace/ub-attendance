@@ -25,7 +25,7 @@ class SearchEmployeeAttendance extends Component
     use WithPagination;
 
     public $search = '';
-    public $searchh = '';
+ 
     public $sortField = 'employee_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
@@ -45,7 +45,7 @@ class SearchEmployeeAttendance extends Component
     public $selectedEmployeeId = '';
 
 
-    
+    protected $listeners = ['searchById'];
 
     public function updatingSearch()
     {
@@ -58,12 +58,11 @@ class SearchEmployeeAttendance extends Component
     }
     public function clearSearch()
     {
-        $this->searchh = '';
+        $this->search = '';
     }
 
     public function mount()
     {
-
         $this->selectedSchool = session('selectedSchool', null);
         $this->selectedDepartment4 = session('selectedDepartment4', null);
         $this->selectedEmployee = session('selectedEmployee', null);
@@ -116,6 +115,7 @@ class SearchEmployeeAttendance extends Component
 
     public function searchById($employeeId)
     {   
+    
         $this->search = $employeeId;
         $this->selectedEmployeeId = $employeeId; // Optional: to highlight selected row or for other purposes
     }
