@@ -237,13 +237,30 @@
         </div>
     </div>
     
-    @if (session('error')) 
+    <!-- @if (session('error')) 
         <div id="session-error" class="alert alert-danger mt-[30px] bg-white rounded-md shadow-xl s">
             <ul>
                 <li class="text-yellow-800  p-2 font-bold text-[20px] shadow-md tracking-widest">&nbsp;{{ session('error') }}&nbsp;</li>
             </ul>
         </div>
-    @endif
+    @endif -->
+    @if (session('error'))
+    <!-- Modal Background -->
+    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-11/12 md:w-1/3 relative">
+            <!-- Modal Header -->
+            <div class="flex justify-start mb-4">
+                <h2 class="text-xl font-bold text-red-600">Error</h2>
+            </div>
+            <!-- Modal Body -->
+            <div>
+                <p class="text-yellow-800 p-2 font-bold text-[20px] tracking-widest">
+                    {{ session('error') }}
+                </p>
+            </div>
+        </div>
+    </div>
+@endif
     
     @if (session('success'))
         <div id="session-success" class="alert alert-success mt-[30px] -ml-90px bg-white rounded-md shadow-xl s">
@@ -285,7 +302,37 @@
         });
     </script>
     @endpush
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('error-modal');
+            const closeModalButton = document.getElementById('close-modal');
 
+            // Show the modal
+            if (modal) {
+                modal.classList.remove('hidden');
+
+                setTimeout(function() {
+                modal.classList.add('hidden');
+            }, 2000); // 120000 milliseconds = 2 minutes
+
+
+            }
+
+            // Close the modal when the close button is clicked
+            if (closeModalButton) {
+                closeModalButton.addEventListener('click', function() {
+                    modal.classList.add('hidden');
+                });
+            }
+
+            // Optionally, close the modal when clicking outside of it
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
+    </script>
     <script>
     //    document.addEventListener('DOMContentLoaded', function () {
             var timeDisplayElement = document.querySelector('#my-time');
