@@ -160,7 +160,7 @@
 
     #my-time {
         font-family:"Let's go Digital";
-        font-size: 160px;
+        font-size: 140px;
         font-weight: bold;
         text-align: center;
         margin-top: 20px; /* Adjust margin to fit design */
@@ -256,7 +256,7 @@
     @endif
 
 
-    <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl"></div> <!-- Date and Time Display -->
+    <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8"></div> <!-- Date and Time Display -->
 </div>
 
     <div class="w-full z-10">
