@@ -194,8 +194,8 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="tracking-wider uppercase">Employee Name</th>
-                        <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
+                        <th class="tracking-wider uppercase" >Employee Name</th>
+                        <th class="tracking-wider uppercase text-center" >MM - DD :: TIME</th>
                     </tr>
                 </thead>
                 <tbody  id="timeInTable" >
@@ -204,7 +204,7 @@
                             <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
                                 <text>{{ $data->employee->employee_lastname}}, {{ $data->employee->employee_firstname}} {{ $data->employee->employee_middlename}}</text>
                             </td>
-                            <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($data->check_in_time)) }}</td>
+                            <td class="font-bold text-md uppercase text-center tracking-wider" >{{ date('m-d :: g:i:s A', strtotime($data->check_in_time)) }}</td>
                         </tr>
                     @endforeach
                     <!-- Repeat the above <tr> structure for each row as needed    date('g:i:s A', strtotime($attendanceIn->check_in_time)) -->
