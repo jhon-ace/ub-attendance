@@ -150,7 +150,7 @@ class SearchEmployeeAttendance extends Component
             $query->where('employee_id', 'like', '%' . $this->search . '%')
                 ->orWhere(DB::raw('CONCAT(employee_lastname, ", ", employee_firstname, " ", employee_middlename)'), 'like', '%' . $this->search . '%');
         })->get();
-        
+        // 
         if ($this->employees->isNotEmpty()) {
             // Assuming $queryTimeIn and $queryTimeOut are previously defined queries
             $queryTimeIn->whereIn('employee_id', $this->employees->pluck('id'));
