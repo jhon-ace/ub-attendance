@@ -194,7 +194,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="tracking-wider uppercase" style="max-width:281px;">Employee Name</th>
+                        <th class="tracking-wider uppercase" style="max-width:282px;">Employee Name</th>
                         <th class="tracking-wider uppercase text-center">MM - DD :: TIME</th>
                     </tr>
                 </thead>
