@@ -568,30 +568,26 @@
 
                                         </td>
                                         <td class="text-black border border-gray-400 px-2 py-1">
-                                            @php
-                                                // Calculate hours and minutes for AM
-                                                $totalHoursAM = floor($attendance->hours_workedAM);
-                                                $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
-                                                
-                                                // Calculate hours and minutes for PM
-                                                $totalHoursPM = floor($attendance->hours_workedPM);
-                                                $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
-                                                
-                                                // Sum total hours and minutes
-                                                $totalHours = $totalHoursAM + $totalHoursPM;
-                                                $totalMinutes = $totalMinutesAM + $totalMinutesPM;
-                                                
-                                                // Convert total minutes to total seconds
-                                                $totalSeconds = $totalMinutes * 60;
-                                                
-                                                // Calculate final hours, minutes, and seconds
-                                                $finalHours = $totalHours + floor($totalSeconds / 3600);
-                                                $remainingSeconds = $totalSeconds % 3600;
-                                                $finalMinutes = floor($remainingSeconds / 60);
-                                                $finalSeconds = $remainingSeconds % 60;
-                                            @endphp
+                                        @php
+                                            // Total hours worked in decimal format
+                                            $totalHoursWorked = $attendance->total_hours_worked;
+                                            
+                                            // Calculate hours and minutes
+                                            $totalHours = floor($totalHoursWorked);
+                                            $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
+                                            
+                                            // Convert total minutes to total seconds
+                                            $totalSeconds = $totalMinutes * 60;
+                                            
+                                            // Calculate final hours, minutes, and seconds
+                                            $finalHours = $totalHours + floor($totalSeconds / 3600);
+                                            $remainingSeconds = $totalSeconds % 3600;
+                                            $finalMinutes = floor($remainingSeconds / 60);
+                                            $finalSeconds = $remainingSeconds % 60;
+                                        @endphp
 
-                                            {{ $finalHours }} hrs. {{ $finalMinutes }} min. {{ $finalSeconds }} sec.
+                                        {{ $finalHours }} hrs. {{ $finalMinutes }} min. {{ $finalSeconds }} sec.
+
 
                                         </td>
                                         <td class="text-black border uppercase border-gray-400 text-xs">
@@ -704,7 +700,17 @@
                 </div>
             </div>
             <div class="flex justify-items-end justify-end">
-                <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p>
+                <!-- <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p> -->
+                @php
+                    $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
+                    $hours = floor($totalSeconds / 3600);
+                    $minutes = floor(($totalSeconds % 3600) / 60);
+                    $seconds = $totalSeconds % 60;
+                @endphp
+
+                <p>Overall Total Time: {{ $hours }} hours, {{ $minutes }} minutes, {{ $seconds }} seconds</p>
+
+
             </div>
             <div class="flex justify-center">
                 <button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', 'a')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
