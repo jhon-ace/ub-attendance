@@ -708,7 +708,7 @@
                     $seconds = $totalSeconds % 60;
                 @endphp
 
-                <p>Overall Total Time: {{ $hours }} hours, {{ $minutes }} minutes, {{ $seconds }} seconds</p>
+                <p>Overall Total Time: {{ $hours }} hrs, {{ $minutes }} mins, {{ $seconds }} sec</p>
 
 
             </div>
