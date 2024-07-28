@@ -706,10 +706,17 @@
                     $hours = floor($totalSeconds / 3600);
                     $minutes = floor(($totalSeconds % 3600) / 60);
                     $seconds = $totalSeconds % 60;
+
+                    $totalSecondsM = $overallTotalHoursLateandUndertime * 3600; // Convert total hours to seconds
+                    $hoursM = floor($totalSecondsM / 3600);
+                    $minutesM = floor(($totalSecondsM % 3600) / 60);
+                    $secondsM = $totalSecondsM % 60;
+
+
                 @endphp
 
                 <p>Overall Total Time: {{ $hours }} hrs, {{ $minutes }} mins, {{ $seconds }} sec</p>
-
+                <p>Overall Minus Time: {{ $hoursM }} hrs, {{ $minutesM }} mins, {{ $secondsM }} sec</p>
 
             </div>
             <div class="flex justify-center">

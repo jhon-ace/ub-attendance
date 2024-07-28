@@ -217,6 +217,7 @@ class SearchEmployeeAttendance extends Component
 
         $attendanceData = [];
         $overallTotalHours = 0;
+        $overallTotalHoursLateandUndertime = 0;
 
         foreach ($attendanceTimeIn as $attendance) {
             // Initialize variables for each record
@@ -228,6 +229,7 @@ class SearchEmployeeAttendance extends Component
             $undertimePM = 0;
             $totalHoursLate = 0;
             $totalUndertimeHours = 0;
+            $totalLateandUndertime = 0;
 
 
             $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
@@ -444,7 +446,7 @@ class SearchEmployeeAttendance extends Component
                     
                     $totalHoursLate = $lateDurationAM + $lateDurationPM;
                     $totalUndertimeHours = $undertimeAM + $undertimePM;
-
+                    $totalLateandUndertime = $totalHoursLate + $totalUndertimeHours;
                     // Determine remark based on lateness
                     $remark = ($lateDurationAM > 0 || $lateDurationPM > 0) ? 'Late' : 'Present';
 
@@ -488,6 +490,7 @@ class SearchEmployeeAttendance extends Component
 
                     // Add total hours worked to overall total
                     $overallTotalHours += $totalHoursWorked;
+                    $overallTotalHoursLateandUndertime += $totalLateandUndertime;
                 }
             }
         }
@@ -496,6 +499,7 @@ class SearchEmployeeAttendance extends Component
         session()->put('attendance_data', $attendanceData);
 
         session()->put('overall_total_hours', $overallTotalHours);
+        session()->put('overall_total_hours_late_and_undertime', $overallTotalHoursLateandUndertime);
 
         // dd($attendanceData);
 
@@ -511,6 +515,7 @@ class SearchEmployeeAttendance extends Component
 
         return view('livewire.admin.search-employee-attendance', [
             'overallTotalHours' => $overallTotalHours,
+            'overallTotalHoursLateandUndertime' => $overallTotalHoursLateandUndertime,
             'attendanceData' =>$attendanceData,
             'attendanceTimeIn' => $attendanceTimeIn,
             'attendanceTimeOut' => $attendanceTimeOut,
