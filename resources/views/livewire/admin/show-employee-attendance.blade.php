@@ -283,7 +283,7 @@
                                                     <td class="text-black border border-gray-400 uppercase">
                                                         @php
 
-                                                            //$checkInTime = ($attendanceIn->check_in_time) * 60;
+                                                            //$checkInTime = $attendanceIn->check_in_time;
                                                             $status = $attendanceIn->status;
                                                             
                                                             $display = "";
@@ -291,12 +291,15 @@
                                                                 $display = "On Leave";
                                                             } elseif($status === "Absent"){
                                                                 $display = "Absent";
+                                                            } 
+                                                            elseif($status === "Weekend"){
+                                                                $display = "Weekend";
                                                             }
                                                             elseif($status === "awol"){
                                                                 $display = "Absent without leave";
                                                             }
                                                             else{
-                                                              $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
+                                                             // $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
                                                             }
                                                         @endphp
                                                         {{  $display }}
@@ -370,6 +373,9 @@
                                                                 $display = "On Leave";
                                                             } elseif($status === "Absent"){
                                                                 $display = "Absent";
+                                                            }
+                                                            elseif($status === "Weekend"){
+                                                                $display = "Weekend";
                                                             }
                                                             elseif($status === "awol"){
                                                                 $display = "Absent without leave";
