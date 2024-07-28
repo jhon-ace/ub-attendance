@@ -299,7 +299,7 @@
                                                                 $display = "Absent without leave";
                                                             }
                                                             else{
-                                                             // $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
+                                                              $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
                                                             }
                                                         @endphp
                                                         {{  $display }}
