@@ -392,9 +392,9 @@
                                                 $lateSeconds = round($lateSeconds);
 
                                                 // Format the late duration string
-                                                $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') 
-                                                                        . ($lateMinutes > 0 ? "{$lateMinutes} min " : '')
-                                                                        . ($lateSeconds > 0 ? "{$lateSeconds} sec" : '');
+                                                $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '0 hrs, ') 
+                                                                        . ($lateMinutes > 0 ? "{$lateMinutes} min " : '0 mins, ')
+                                                                        . ($lateSeconds > 0 ? "{$lateSeconds} sec" : '0 sec');
 
                                                 // If the formatted string is empty, ensure we show "0"
                                                 $lateDurationFormatted = $lateDurationFormatted ?: '0 sec';
@@ -417,9 +417,9 @@
                                                 $lateSeconds = round($lateSeconds);
 
                                                 // Format the late duration string
-                                                $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') 
-                                                                        . ($lateMinutes > 0 ? "{$lateMinutes} min " : '')
-                                                                        . ($lateSeconds > 0 ? "{$lateSeconds} sec" : '');
+                                                $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '0 hrs, ') 
+                                                                        . ($lateMinutes > 0 ? "{$lateMinutes} min " : '0 mins,')
+                                                                        . ($lateSeconds > 0 ? "{$lateSeconds} sec" : '0 sec');
 
                                                 // If the formatted string is empty, ensure we show "0"
                                                 $lateDurationFormatted = $lateDurationFormatted ?: '0 sec';
@@ -443,8 +443,8 @@
 
                                                 // Format the duration string
                                                 $undertimeFormatted = 
-                                                    ($undertimeHours > 0 ? "{$undertimeHours} hr " : '') .
-                                                    ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min ') .
+                                                    ($undertimeHours > 0 ? "{$undertimeHours} hr " : '0 hrs, ') .
+                                                    ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min, ') .
                                                     ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
                                             @endphp
 
@@ -467,8 +467,8 @@
 
                                                 // Format the duration string
                                                 $undertimeFormatted = 
-                                                    ($undertimeHours > 0 ? "{$undertimeHours} hr " : '') .
-                                                    ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min ') .
+                                                    ($undertimeHours > 0 ? "{$undertimeHours} hr " : '0 hrs, ') .
+                                                    ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min, ') .
                                                     ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
                                             @endphp
 
@@ -535,8 +535,8 @@
 
                                                 // Format the duration string
                                                 $totalLateDurationFormatted = 
-                                                    ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') .
-                                                    ($remainingMinutes > 0 ? "{$remainingMinutes} mins " : '0 mins ') .
+                                                    ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '0 hrs, ') .
+                                                    ($remainingMinutes > 0 ? "{$remainingMinutes} mins " : '0 mins, ') .
                                                     ($totalLateSeconds > 0 ? "{$totalLateSeconds} secs" : '0 secs');
                                             @endphp
 
@@ -559,8 +559,8 @@
 
                                                 // Format the duration string
                                                 $totalLateDurationFormatted = 
-                                                    ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') .
-                                                    ($totalLateMinutes > 0 ? "{$totalLateMinutes} mins " : '0 mins ') .
+                                                    ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '0 hrs, ') .
+                                                    ($totalLateMinutes > 0 ? "{$totalLateMinutes} mins " : '0 mins, ') .
                                                     ($totalLateSeconds > 0 ? "{$totalLateSeconds} secs" : '0 secs');
                                             @endphp
 
@@ -699,25 +699,61 @@
                     </div>
                 </div>
             </div>
-            <div class="flex justify-items-end justify-end">
-                <!-- <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p> -->
-                @php
-                    $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
-                    $hours = floor($totalSeconds / 3600);
-                    $minutes = floor(($totalSeconds % 3600) / 60);
-                    $seconds = $totalSeconds % 60;
+            <div class="flex   justify-end">
+                <div class="flex flex-col mr-10">
+                    <!-- <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p> -->
+                    @php
+                        $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
+                        $hours = floor($totalSeconds / 3600);
+                        $minutes = floor(($totalSeconds % 3600) / 60);
+                        $seconds = $totalSeconds % 60;
 
-                    $totalSecondsM = $overallTotalHoursLateandUndertime * 3600; // Convert total hours to seconds
-                    $hoursM = floor($totalSecondsM / 3600);
-                    $minutesM = floor(($totalSecondsM % 3600) / 60);
-                    $secondsM = $totalSecondsM % 60;
+                        //total late
+                        $totalSecondsM = $overallTotalLateHours * 3600; // Convert total hours to seconds
+                        $hoursM = floor($totalSecondsM / 3600);
+                        $minutesM = floor(($totalSecondsM % 3600) / 60);
+                        $secondsM = $totalSecondsM % 60;
 
+                        $undertimeInSeconds = $overallTotalUndertime * 60;
 
-                @endphp
+                        // Convert total seconds to hours, minutes, and seconds
+                        $undertimeHours = intdiv($undertimeInSeconds, 3600); // Total hours
+                        $remainingSeconds = $undertimeInSeconds % 3600; // Remaining seconds after hours
+                        $undertimeMinutes = intdiv($remainingSeconds, 60); // Total minutes
+                        $undertimeSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
 
-                <p>Overall Total Time: {{ $hours }} hrs, {{ $minutes }} mins, {{ $seconds }} sec</p>
-                <p>Overall Minus Time: {{ $hoursM }} hrs, {{ $minutesM }} mins, {{ $secondsM }} sec</p>
+                        // Format the duration string
+                        $undertimeFormatted = 
+                            ($undertimeHours > 0 ? "{$undertimeHours} hr, " : '0 hr, ') .
+                            ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min, ') .
+                            ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
 
+                    @endphp
+                    <!-- <p>Total Hours to be rendered: <text class="text-red-500">{{ $totalHoursTobeRendered }}</text></p>
+                    <p>Total Late:  <text class="text-red-500">{{ $hoursM }} hr, {{ $minutesM }} min, {{ $secondsM }} sec</text></p><br><br>
+                    <p>Total Undertime:  <text class="text-red-500">{{ $undertimeFormatted }}</text></p><br><br>
+                    <p>Overall Total Time: <text class="text-red-500">{{ $hours }} hr, {{ $minutes }} min, {{ $seconds }} sec</text></p> -->
+                    
+                    <table class="border border-black" cellpadding="10">
+                        <tr class="border border-black">
+                            <th class="border border-black text-right">Total Hours to be Rendered</th>
+                            <td class="text-red-500">{{ $totalHoursTobeRendered }}</td>
+                        </tr>
+                        <tr class="border border-black">
+                            <th class="border border-black text-right">Total Late</th>
+                            <td class="text-red-500">{{ $hoursM }} hr, {{ $minutesM }} min, {{ $secondsM }} sec</td>
+                        </tr>
+                        <tr class="border border-black">
+                            <th class="border border-black text-right">Total Undertime</th>
+                            <td class="text-red-500">{{ $undertimeFormatted }}</td>
+                        </tr>
+                        <tr class="border border-black">
+                            <th class="border border-black text-right">Overall Total Time</th>
+                            <td class="text-red-500">{{ $hours }} hr, {{ $minutes }} min, {{ $seconds }} sec</td>
+                        </tr>
+                    </table>
+                
+                </div>                        
             </div>
             <div class="flex justify-center">
                 <button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', 'a')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>

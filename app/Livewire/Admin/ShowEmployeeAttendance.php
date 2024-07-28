@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use DateTime;
 use DateInterval;
 use DateTimeZone;
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -191,6 +192,9 @@ class ShowEmployeeAttendance extends Component
 
         $attendanceData = [];
         $overallTotalHours = 0;
+        $overallTotalLateHours = 0;
+        $overallTotalUndertime = 0;
+        $totalHoursTobeRendered = 0;
 
         foreach ($attendanceTimeIn as $attendance) {
             // Initialize variables for each record
@@ -202,7 +206,15 @@ class ShowEmployeeAttendance extends Component
             $undertimePM = 0;
             $totalHoursLate = 0;
             $totalUndertimeHours = 0;
-
+            $totalLateandUndertime = 0;
+            $latePM = 0;
+            $lateAM = 0;
+            $undertimeAMTotal = 0;
+            $undertimePMTotal = 0;
+            $totalundertime = 0;
+            $totalhoursNeed = 0;
+            
+            
 
             $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
             // Extract date and time from check-in
@@ -235,6 +247,7 @@ class ShowEmployeeAttendance extends Component
                                                 ->where('day_of_week', '!=', 0)
                                                 ->first();
 
+              
                 if ($departmentWorkingHour) 
                 {   
 
@@ -242,6 +255,12 @@ class ShowEmployeeAttendance extends Component
                     $mS = $departmentWorkingHour->morning_start_time;
                     $morningStartTime = clone $checkInDateTime;
                     $morningStartTime->setTime(
+                        (int) date('H', strtotime($mS)),
+                        (int) date('i', strtotime($mS)),
+                        (int) date('s', strtotime($mS))
+                    );
+
+                    $morStart = $morningStartTime->setTime(
                         (int) date('H', strtotime($mS)),
                         (int) date('i', strtotime($mS)),
                         (int) date('s', strtotime($mS))
@@ -271,9 +290,66 @@ class ShowEmployeeAttendance extends Component
                             (int) date('i', strtotime($aE)),
                             (int) date('s', strtotime($aE))
                         );
+                    
+                    $morningStartTimew = $departmentWorkingHour->morning_start_time;
+                    $morningEndTimew = $departmentWorkingHour->morning_end_time;
+                    $afternoonStartTimew = $departmentWorkingHour->afternoon_start_time;
+                    $afternoonEndTimew = $departmentWorkingHour->afternoon_end_time;
 
-                
+                        // Convert times to Carbon instances
+                    $morningStartw = new DateTime($morningStartTimew);
+                    $morningEndw = new DateTime($morningEndTimew);
+                    $afternoonStartw = new DateTime($afternoonStartTimew);
+                    $afternoonEndw = new DateTime($afternoonEndTimew);
 
+                    // Calculate the duration in minutes for morning and afternoon
+                    $morningInterval = $morningStartw->diff($morningEndw);
+                    $morningDurationInMinutes = ($morningInterval->h * 60) + $morningInterval->i;
+                    $afternoonInterval = $afternoonStartw->diff($afternoonEndw);
+                    $afternoonDurationInMinutes = ($afternoonInterval->h * 60) + $afternoonInterval->i;
+
+                    // Convert minutes to hours
+                    $morningDuration = $morningDurationInMinutes / 60;
+                    $afternoonDuration = $afternoonDurationInMinutes / 60;
+                    // Calculate total hours needed
+                    $totalHoursNeed = $morningDuration + $afternoonDuration;
+
+                    if ($this->startDate && $this->endDate) {
+                        $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
+
+                        // Determine if the start date and end date are the same
+                        $isSameDate = $this->startDate === $this->endDate; // Adjust if necessary for your date format
+                        $startDate = Carbon::parse($this->startDate)->startOfDay(); // Start of the selected start date
+                        $endDate = Carbon::parse($this->endDate)->endOfDay(); // End of the selected end date
+
+                        if ($isSameDate) {
+                            // If the start date and end date are the same, only consider that specific day
+                            $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                                ->where('employee_id', $employeeId)
+                                ->whereDate('check_in_time', $this->startDate)
+                                ->first();
+                        } else {
+                            // If the start date and end date are different, consider the range
+                            $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                                ->where('employee_id', $employeeId)
+                                ->whereBetween('check_in_time', [$startDate, $endDate])
+                                ->first();
+                        }
+
+                        // Get the unique check-in days count
+                        $uniqueCheckInDays = (int) $checkInCount->unique_check_in_days;
+                        
+                        // Calculate total hours to be rendered
+                        $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
+                    } else {
+                        $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
+                        $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                            ->where('employee_id', $employeeId)->first();
+
+                            $uniqueCheckInDays = (int) $checkInCount->unique_check_in_days;
+                            $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
+                    }
+                         
                     // AM Shift Calculation  for 15 mins interval of declaring late
                     if ($checkInDateTime < $morningEndTime) {
                         $effectiveCheckInTime = max($checkInDateTime, $morningStartTime);
@@ -291,6 +367,7 @@ class ShowEmployeeAttendance extends Component
                                 $lateIntervalAM = $checkInDateTime->diff($morningStartTime);
                                 $lateDurationAM = ($lateIntervalAM->h * 60) + $lateIntervalAM->i + ($lateIntervalAM->s / 60);
                                 // $lateDurationAM = $lateIntervalAM->h * 60 + $lateIntervalAM->i;
+                                $lateAM = $lateIntervalAM->h + ($lateIntervalAM->i / 60) + ($lateIntervalAM->s / 3600);
 
                                 
                             }
@@ -324,7 +401,7 @@ class ShowEmployeeAttendance extends Component
                                     $actualDiff = $morningEndTime->diff($morningStartTime);
                                 }
                                 $actualMinutesUpToEnd = ($actualDiff->h * 60) + $actualDiff->i + ($actualDiff->s / 60);
-
+                                 $undertimeAMTotal = max(0, $scheduledAMMinutes - $actualMinutesUpToEnd);
                                 // Calculate undertime in minutes
                                 $undertimeAM = max(0, $scheduledAMMinutes - $actualMinutesUpToEnd);
                 
@@ -377,6 +454,7 @@ class ShowEmployeeAttendance extends Component
                             if ($checkInDateTime > $afternoonStartTime) {
                                 $lateIntervalPM = $checkInDateTime->diff($afternoonStartTime);
                                 $lateDurationPM = ($lateIntervalPM->h * 60) + $lateIntervalPM->i + ($lateIntervalPM->s / 60);
+                                $latePM = $lateIntervalPM->h + ($lateIntervalPM->i / 60) + ($lateIntervalPM->s / 3600);
                             }
 
                             // // Calculate undertime for PM
@@ -407,7 +485,7 @@ class ShowEmployeeAttendance extends Component
                             $actualPMDiff = $afternoonEndTime->diff($afternoonStartTime);
                         }
                         $actualMinutesUpToEndPM = ($actualPMDiff->h * 60) + $actualPMDiff->i + ($actualPMDiff->s / 60);
-
+                        $undertimePMTotal = max(0, $scheduledPMMinutes - $actualMinutesUpToEndPM);
                         // Calculate undertime in minutes
                         $undertimePM = max(0, $scheduledPMMinutes - $actualMinutesUpToEndPM);
 
@@ -418,7 +496,11 @@ class ShowEmployeeAttendance extends Component
                     
                     $totalHoursLate = $lateDurationAM + $lateDurationPM;
                     $totalUndertimeHours = $undertimeAM + $undertimePM;
+                    $overallTotalHoursLate = $lateAM + $latePM;
+                    $totalundertime = $undertimeAMTotal + $undertimePMTotal;
 
+                    // $totalhoursNeed = $morningDuration + $afternoonDuration;
+    
                     // Determine remark based on lateness
                     $remark = ($lateDurationAM > 0 || $lateDurationPM > 0) ? 'Late' : 'Present';
 
@@ -433,6 +515,7 @@ class ShowEmployeeAttendance extends Component
                         $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
                         $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
                         $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
+                        $attendanceData[$key]->total_hours_late += $totalHoursLate;
                         $attendanceData[$key]->late_duration += $lateDurationAM;
                         $attendanceData[$key]->late_durationPM += $lateDurationPM;
                         $attendanceData[$key]->undertimeAM += $undertimeAM;
@@ -448,6 +531,7 @@ class ShowEmployeeAttendance extends Component
                             'hours_workedAM' => $hoursWorkedAM,
                             'hours_workedPM' => $hoursWorkedPM,
                             'total_hours_worked' => $totalHoursWorked,
+                            'total_hours_late' => $totalHoursLate,
                             'late_duration' => $lateDurationAM,
                             'late_durationPM' => $lateDurationPM,
                             'undertimeAM' => $undertimeAM,
@@ -462,6 +546,8 @@ class ShowEmployeeAttendance extends Component
 
                     // Add total hours worked to overall total
                     $overallTotalHours += $totalHoursWorked;
+                    $overallTotalLateHours += $overallTotalHoursLate;
+                    $overallTotalUndertime += $totalundertime;
                 }
             }
         }
@@ -486,6 +572,9 @@ class ShowEmployeeAttendance extends Component
 
         return view('livewire.admin.show-employee-attendance', [
             'overallTotalHours' => $overallTotalHours,
+            'overallTotalLateHours' => $overallTotalLateHours,
+            'overallTotalUndertime' => $overallTotalUndertime,
+            'totalHoursTobeRendered' => $totalHoursTobeRendered,
             'attendanceData' =>$attendanceData,
             'attendanceTimeIn' => $attendanceTimeIn,
             'attendanceTimeOut' => $attendanceTimeOut,

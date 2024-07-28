@@ -741,14 +741,62 @@
                         </div>
                     </div>
                     <div class="flex justify-items-end justify-end">
-                        @php
-                            $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
-                            $hours = floor($totalSeconds / 3600);
-                            $minutes = floor(($totalSeconds % 3600) / 60);
-                            $seconds = $totalSeconds % 60;
-                        @endphp
+                        <div class="flex   justify-end">
+                            <div class="flex flex-col mr-10">
+                                <!-- <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p> -->
+                                @php
+                                    $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
+                                    $hours = floor($totalSeconds / 3600);
+                                    $minutes = floor(($totalSeconds % 3600) / 60);
+                                    $seconds = $totalSeconds % 60;
 
-                        <p>Overall Total Time: {{ $hours }} hrs, {{ $minutes }} mins, {{ $seconds }} sec</p>
+                                    //total late
+                                    $totalSecondsM = $overallTotalLateHours * 3600; // Convert total hours to seconds
+                                    $hoursM = floor($totalSecondsM / 3600);
+                                    $minutesM = floor(($totalSecondsM % 3600) / 60);
+                                    $secondsM = $totalSecondsM % 60;
+
+                                    $undertimeInSeconds = $overallTotalUndertime * 60;
+
+                                    // Convert total seconds to hours, minutes, and seconds
+                                    $undertimeHours = intdiv($undertimeInSeconds, 3600); // Total hours
+                                    $remainingSeconds = $undertimeInSeconds % 3600; // Remaining seconds after hours
+                                    $undertimeMinutes = intdiv($remainingSeconds, 60); // Total minutes
+                                    $undertimeSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
+
+                                    // Format the duration string
+                                    $undertimeFormatted = 
+                                        ($undertimeHours > 0 ? "{$undertimeHours} hr, " : '0 hr, ') .
+                                        ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min, ') .
+                                        ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
+
+                                @endphp
+                                <!-- <p>Total Hours to be rendered: <text class="text-red-500">{{ $totalHoursTobeRendered }}</text></p>
+                                <p>Total Late:  <text class="text-red-500">{{ $hoursM }} hr, {{ $minutesM }} min, {{ $secondsM }} sec</text></p><br><br>
+                                <p>Total Undertime:  <text class="text-red-500">{{ $undertimeFormatted }}</text></p><br><br>
+                                <p>Overall Total Time: <text class="text-red-500">{{ $hours }} hr, {{ $minutes }} min, {{ $seconds }} sec</text></p> -->
+                                
+                                <table class="border border-black" cellpadding="10">
+                                    <tr class="border border-black">
+                                        <th class="border border-black text-right">Total Hours to be Rendered</th>
+                                        <td class="text-red-500">{{ $totalHoursTobeRendered }}</td>
+                                    </tr>
+                                    <tr class="border border-black">
+                                        <th class="border border-black text-right">Total Late</th>
+                                        <td class="text-red-500">{{ $hoursM }} hr, {{ $minutesM }} min, {{ $secondsM }} sec</td>
+                                    </tr>
+                                    <tr class="border border-black">
+                                        <th class="border border-black text-right">Total Undertime</th>
+                                        <td class="text-red-500">{{ $undertimeFormatted }}</td>
+                                    </tr>
+                                    <tr class="border border-black">
+                                        <th class="border border-black text-right">Overall Total Time</th>
+                                        <td class="text-red-500">{{ $hours }} hr, {{ $minutes }} min, {{ $seconds }} sec</td>
+                                    </tr>
+                                </table>
+                            
+                            </div>                        
+                        </div>
                     </div>
                 @endif
             @else

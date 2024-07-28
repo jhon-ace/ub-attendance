@@ -192,8 +192,8 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="tracking-wider uppercase text-center tracking-widest" style="max-width:283px;">Employee Name</th>
-                        <th class="tracking-wider uppercase text-center tracking-widest">MM - DD :: TIME</th>
+                        <th class="uppercase text-center tracking-widest" style="max-width:283px;">Employee Name</th>
+                        <th class="uppercase text-center tracking-widest">MM - DD :: TIME</th>
                     </tr>
                 </thead>
                 <tbody  id="timeInTable" >
@@ -215,8 +215,8 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="tracking-wider uppercase text-center tracking-widest"  style="max-width:281px;">Employee Name</th>
-                        <th class="tracking-wider uppercase text-center tracking-widest">MM - DD :: TIME</th>
+                        <th class="uppercase text-center tracking-widest"  style="max-width:281px;">Employee Name</th>
+                        <th class="uppercase text-center tracking-widest">MM - DD :: TIME</th>
                     </tr>
                 </thead>
                 <tbody  id="timeOutTable" >
