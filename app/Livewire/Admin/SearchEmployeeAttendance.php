@@ -316,10 +316,10 @@ class SearchEmployeeAttendance extends Component
                             (int) date('s', strtotime($aE))
                         );
                     
-                    $morningStartTimew = $departmentWorkingHour->morning_start_time;
-                    $morningEndTimew = $departmentWorkingHour->morning_end_time;
-                    $afternoonStartTimew = $departmentWorkingHour->afternoon_start_time;
-                    $afternoonEndTimew = $departmentWorkingHour->afternoon_end_time;
+                        $morningStartTimew = $departmentWorkingHour->morning_start_time;
+                        $morningEndTimew = $departmentWorkingHour->morning_end_time;
+                        $afternoonStartTimew = $departmentWorkingHour->afternoon_start_time;
+                        $afternoonEndTimew = $departmentWorkingHour->afternoon_end_time;
 
                         // Convert times to Carbon instances
                     $morningStartw = new DateTime($morningStartTimew);
@@ -355,10 +355,28 @@ class SearchEmployeeAttendance extends Component
                                 ->first();
                         } else {
                             // If the start date and end date are different, consider the range
-                            $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
-                                ->where('employee_id', $employeeId)
-                                ->whereBetween('check_in_time', [$startDate, $endDate])
-                                ->first();
+                            // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                            //     ->where('employee_id', $employeeId)
+                            //     ->whereBetween('check_in_time', [$startDate, $endDate])
+                            //     ->first();
+                            // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                            //                 ->where('employee_id', $employeeId)
+                            //                 ->whereBetween('check_in_time', [$startDate, $endDate])
+                            //                 ->whereNotIn('status', ['Absent', 'AWOL', 'On Leave'])
+                            //                 ->first();
+
+                            $checkInCount = DB::table('employees_time_in_attendance')
+                                                ->select(DB::raw('COUNT(DISTINCT DATE(employees_time_in_attendance.check_in_time)) as unique_check_in_days'))
+                                                ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
+                                                ->join('working_hour', function($join) {
+                                                    $join->on('employees.department_id', '=', 'working_hour.department_id')
+                                                        ->where('working_hour.day_of_week', '!=', 0); // Exclude Sundays
+                                                })
+                                                ->where('employees_time_in_attendance.employee_id', $employeeId)
+                                                ->whereBetween('employees_time_in_attendance.check_in_time', [$startDate, $endDate])
+                                                ->whereNotIn('employees_time_in_attendance.status', ['Absent', 'AWOL', 'On Leave'])
+                                                ->first();
+
                         }
 //
                         // Get the unique check-in days count
