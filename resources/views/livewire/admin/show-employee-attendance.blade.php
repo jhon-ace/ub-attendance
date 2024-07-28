@@ -611,17 +611,12 @@
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
-                                                        // Calculate hours and minutes for AM
-                                                        $totalHoursAM = floor($attendance->hours_workedAM);
-                                                        $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                        // Total hours worked in decimal format
+                                                        $totalHoursWorked = $attendance->total_hours_worked;
                                                         
-                                                        // Calculate hours and minutes for PM
-                                                        $totalHoursPM = floor($attendance->hours_workedPM);
-                                                        $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
-                                                        
-                                                        // Sum total hours and minutes
-                                                        $totalHours = $totalHoursAM + $totalHoursPM;
-                                                        $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+                                                        // Calculate hours and minutes
+                                                        $totalHours = floor($totalHoursWorked);
+                                                        $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
                                                         
                                                         // Convert total minutes to total seconds
                                                         $totalSeconds = $totalMinutes * 60;
@@ -746,7 +741,14 @@
                         </div>
                     </div>
                     <div class="flex justify-items-end justify-end">
-                        <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p>
+                        @php
+                            $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
+                            $hours = floor($totalSeconds / 3600);
+                            $minutes = floor(($totalSeconds % 3600) / 60);
+                            $seconds = $totalSeconds % 60;
+                        @endphp
+
+                        <p>Overall Total Time: {{ $hours }} hrs, {{ $minutes }} mins, {{ $seconds }} sec</p>
                     </div>
                 @endif
             @else
