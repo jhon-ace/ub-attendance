@@ -316,10 +316,10 @@ class SearchEmployeeAttendance extends Component
                             (int) date('s', strtotime($aE))
                         );
                     
-                        $morningStartTimew = $departmentWorkingHour->morning_start_time;
-                        $morningEndTimew = $departmentWorkingHour->morning_end_time;
-                        $afternoonStartTimew = $departmentWorkingHour->afternoon_start_time;
-                        $afternoonEndTimew = $departmentWorkingHour->afternoon_end_time;
+                    $morningStartTimew = $departmentWorkingHour->morning_start_time;
+                    $morningEndTimew = $departmentWorkingHour->morning_end_time;
+                    $afternoonStartTimew = $departmentWorkingHour->afternoon_start_time;
+                    $afternoonEndTimew = $departmentWorkingHour->afternoon_end_time;
 
                         // Convert times to Carbon instances
                     $morningStartw = new DateTime($morningStartTimew);
