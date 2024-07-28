@@ -360,7 +360,7 @@ class SearchEmployeeAttendance extends Component
                                 ->whereBetween('check_in_time', [$startDate, $endDate])
                                 ->first();
                         }
-
+//
                         // Get the unique check-in days count
                         $uniqueCheckInDays = (int) $checkInCount->unique_check_in_days;
                         
