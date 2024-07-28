@@ -140,7 +140,7 @@
                             </a>
                         </li>
                         <li>
-                            <a  class="flex items-center h-11 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white ">
+                            <a  href="{{ route('admin.dashboard') }}" class="flex items-center h-11 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white ">
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Daily Monitor
                             </a>
                         </li>
