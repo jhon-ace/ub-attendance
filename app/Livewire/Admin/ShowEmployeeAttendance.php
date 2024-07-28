@@ -330,10 +330,22 @@ class ShowEmployeeAttendance extends Component
                                 ->first();
                         } else {
                             // If the start date and end date are different, consider the range
-                            $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
-                                ->where('employee_id', $employeeId)
-                                ->whereBetween('check_in_time', [$startDate, $endDate])
-                                ->first();
+                            // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                            //     ->where('employee_id', $employeeId)
+                            //     ->whereBetween('check_in_time', [$startDate, $endDate])
+                            //     ->first();
+                            $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(employees_time_in_attendance.check_in_time)) as unique_check_in_days'))
+                                        ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
+                                        ->join('working_hour', function($join) {
+                                            $join->on('employees.department_id', '=', 'working_hour.department_id');
+                                        })
+                                        ->where('employees_time_in_attendance.employee_id', $employeeId)
+                                        ->whereNotIn('employees_time_in_attendance.status', ['Absent', 'AWOL', 'On Leave'])
+                                        ->whereNotIn('working_hour.day_of_week', [0, 6])
+                                        ->whereBetween('check_in_time', [$startDate, $endDate]) // Exclude Saturday (6) and Sunday (7)
+                                        ->first();
+                                    
+
                         }
 
                         // Get the unique check-in days count
@@ -343,11 +355,41 @@ class ShowEmployeeAttendance extends Component
                         $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
                     } else {
                         $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
-                        $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
-                            ->where('employee_id', $employeeId)->first();
+                        // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                        //     ->where('employee_id', $employeeId)->first();
+                        // $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
+                        // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                        //     ->where('employee_id', $employeeId)->first();
+                        // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(employees_time_in_attendance.check_in_time)) as unique_check_in_days'))
+                        //             ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
+                        //             ->join('working_hour', function($join) {
+                        //                 $join->on('employees.department_id', '=', 'working_hour.department_id')
+                        //                     ->whereNotIn('working_hour.day_of_week', [0, 6]); // Exclude Sundays and Saturdays
+                        //             })
+                        //             ->where('employees_time_in_attendance.employee_id', $employeeId)
+                        //             ->whereNotIn('employees_time_in_attendance.status', ['Absent', 'AWOL', 'On Leave'])
+                        //             ->first();
+                        //             dd($checkInCount);
 
+                        $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(employees_time_in_attendance.check_in_time)) as unique_check_in_days'))
+                                        ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
+                                        ->join('working_hour', function($join) {
+                                            $join->on('employees.department_id', '=', 'working_hour.department_id');
+                                        })
+                                        ->where('employees_time_in_attendance.employee_id', $employeeId)
+                                        ->whereNotIn('employees_time_in_attendance.status', ['Absent', 'AWOL', 'On Leave'])
+                                        ->whereNotIn('working_hour.day_of_week', [0, 6]) // Exclude Saturday (6) and Sunday (7)
+                                        ->first();
+                              
+                            // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                            //                 ->where('employee_id', $employeeId)
+                            //                 ->whereNotIn('status', ['Absent', 'AWOL', 'On Leave'])
+                            //                 ->first();
+                        
                             $uniqueCheckInDays = (int) $checkInCount->unique_check_in_days;
                             $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
+
+                   
                     }
                          
                     // AM Shift Calculation  for 15 mins interval of declaring late

@@ -30,7 +30,7 @@ export default defineConfig({
 
 //ayaw kalimte ang origin ug hmr host
 //  hmr: {
- //   host: "192.168.33.11", // Adjust HMR host if necessary
+//   host: "192.168.33.11", // Adjust HMR host if necessary
 //},
 
 // origin: "http://192.168.33.11:8000",
