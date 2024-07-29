@@ -371,6 +371,7 @@
                                         <th class="border border-gray-400 px-2 py-1">Total Late</th>
                                         <th class="border border-gray-400 px-2 py-1">Total Undertime</th>
                                         <th class="border border-gray-400 px-2 py-1">Total Hours Rendered</th>
+                                        <th class="border border-gray-400 px-2 py-1">Required Hours</th>
                                         <th class="border border-gray-400 px-2 py-1">Remarks</th>
                                     </tr>
                                 </thead>
@@ -590,6 +591,9 @@
 
 
                                         </td>
+                                        <td class="text-black border border-gray-400 text-xs">
+                                            {{ $attendance->hours_perDay }} hr/s
+                                        </td>
                                         <td class="text-black border uppercase border-gray-400 text-xs">
                                         @php
                                             $lateDurationAM = $attendance->late_duration;
@@ -735,10 +739,10 @@
                     <p>Overall Total Time: <text class="text-red-500">{{ $hours }} hr, {{ $minutes }} min, {{ $seconds }} sec</text></p> -->
                     
                     <table class="border border-black" cellpadding="10">
-                        <tr class="border border-black">
+                        <!-- <tr class="border border-black">
                             <th class="border border-black text-right">Total Hours to be Rendered</th>
                             <td class="text-red-500">{{ $totalHoursTobeRendered }}</td>
-                        </tr>
+                        </tr> -->
                         <tr class="border border-black">
                             <th class="border border-black text-right">Total Late</th>
                             <td class="text-red-500">{{ $hoursM }} hr, {{ $minutesM }} min, {{ $secondsM }} sec</td>

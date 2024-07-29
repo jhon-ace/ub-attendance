@@ -32,7 +32,7 @@ class SubmitMissingAttendance extends Command
     public function handle()
     {
         // Get current time with timezone
-        $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
+        $now = new DateTime('now', new DateTimeZone('Asia/Taipei'));
         $currentDate = $now->format('Y-m-d');
         $dayOfWeek = $now->format('w');
         // Fetch all employees

@@ -213,6 +213,8 @@ class ShowEmployeeAttendance extends Component
             $undertimePMTotal = 0;
             $totalundertime = 0;
             $totalhoursNeed = 0;
+            $totalHoursNeedperDay = 0;
+
             
             
 
@@ -313,7 +315,8 @@ class ShowEmployeeAttendance extends Component
                     $afternoonDuration = $afternoonDurationInMinutes / 60;
                     // Calculate total hours needed
                     $totalHoursNeed = $morningDuration + $afternoonDuration;
-
+                    $totalHoursTobeRendered = $totalHoursNeed;
+                    $totalHoursNeedperDay = $totalHoursNeed;
                     if ($this->startDate && $this->endDate) {
                         $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
 
@@ -380,14 +383,26 @@ class ShowEmployeeAttendance extends Component
                         //                 ->whereNotIn('employees_time_in_attendance.status', ['Absent', 'AWOL', 'On Leave'])
                         //                 ->whereNotIn('working_hour.day_of_week', [0, 6]) // Exclude Saturday (6) and Sunday (7)
                         //                 ->first();
+
+                        $noww = new DateTime('now', new DateTimeZone('Asia/Taipei'));
+                        $currentDatee = $noww->format('Y-m-d') . ' 00:00:00';
+
+                        $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                            ->where('employee_id', $employeeId)
+                            ->where('check_in_time', '<>', $currentDatee)
+                            ->whereNotIn('status', ['Absent', 'AWOL', 'On Leave'])
+                            ->first();
+
+                        $uniqueCheckInDays = (int) $checkInCount->unique_check_in_days;
+                        $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
                               
-                            $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
-                                            ->where('employee_id', $employeeId)
-                                            ->whereNotIn('status', ['Absent', 'AWOL', 'On Leave', '00:00:00'])
-                                            ->first();
+                            // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
+                            //                 ->where('employee_id', $employeeId)
+                            //                 ->whereNotIn('check_in_time', "{$currentDatee} 00:00:00")
+                            //                 ->whereNotIn('status', ['Absent', 'AWOL', 'On Leave'])
+                            //                 ->first();
                         
-                            $uniqueCheckInDays = (int) $checkInCount->unique_check_in_days;
-                            $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
+                            
 
                    
                     }
@@ -554,6 +569,8 @@ class ShowEmployeeAttendance extends Component
                     // Check if this entry already exists in $attendanceData
                     if (isset($attendanceData[$key])) {
                         // Update existing entry
+                        
+                        $attendanceData[$key]->hours_perDay = $totalHoursNeedperDay;
                         $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
                         $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
                         $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
@@ -568,6 +585,7 @@ class ShowEmployeeAttendance extends Component
                     } else {
                         // Create new entry
                         $attendanceData[$key] = (object) [
+                            'hours_perDay' => $totalHoursNeedperDay,
                             'employee_id' => $attendance->employee_id,
                             'worked_date' => $checkInDate,
                             'hours_workedAM' => $hoursWorkedAM,

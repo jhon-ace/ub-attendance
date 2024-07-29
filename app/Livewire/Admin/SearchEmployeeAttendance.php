@@ -238,6 +238,7 @@ class SearchEmployeeAttendance extends Component
             $undertimePMTotal = 0;
             $totalundertime = 0;
             $totalhoursNeed = 0;
+            $totalHoursNeedperDay = 0;
             
             
 
@@ -338,6 +339,8 @@ class SearchEmployeeAttendance extends Component
                     $afternoonDuration = $afternoonDurationInMinutes / 60;
                     // Calculate total hours needed
                     $totalHoursNeed = $morningDuration + $afternoonDuration;
+                    $totalHoursTobeRendered = $totalHoursNeed;
+                    $totalHoursNeedperDay = $totalHoursNeed;
 
                     if ($this->startDate && $this->endDate) {
                         $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
@@ -567,6 +570,7 @@ class SearchEmployeeAttendance extends Component
                     // Check if this entry already exists in $attendanceData
                     if (isset($attendanceData[$key])) {
                         // Update existing entry
+                        $attendanceData[$key]->hours_perDay = $totalHoursNeedperDay;
                         $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
                         $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
                         $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
@@ -581,6 +585,7 @@ class SearchEmployeeAttendance extends Component
                     } else {
                         // Create new entry
                         $attendanceData[$key] = (object) [
+                            'hours_perDay' => $totalHoursNeedperDay,
                             'employee_id' => $attendance->employee_id,
                             'worked_date' => $checkInDate,
                             'hours_workedAM' => $hoursWorkedAM,
