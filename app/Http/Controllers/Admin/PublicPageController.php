@@ -119,7 +119,7 @@ class PublicPageController extends Controller
                     // Check if the employee has already checked out in the afternoon
                     if ($timeInCount == 2 && $timeOutCount == 2) {
 
-                        return redirect()->route('attendance.portal')->with('success', 'Attendance complete. Safe travels home!');
+                        return redirect()->route('attendance.portal')->with('success', 'Attendance completed. Safe travels home!');
                         // return response()->json([
                         //     'message' => 'Already checked out in the afternoon. Go home safely!',
                         // ], 403);
@@ -181,7 +181,7 @@ class PublicPageController extends Controller
                             // return response()->json([
                             //     'message' => 'Already Time In Morning.',
                             // ], 403);
-                            return redirect()->route('attendance.portal')->with('success', 'Already Time In!');
+                            return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
                         }
 
                     } elseif ($timeInCount == 2 && $timeOutCount == 1) {
@@ -214,7 +214,7 @@ class PublicPageController extends Controller
                             // return response()->json([
                             //     'message' => 'Already Time-in Afternoon.',
                             // ], 403);
-                            return redirect()->route('attendance.portal')->with('success', 'Already Time In!');
+                            return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
                         }
 
                     } else {
