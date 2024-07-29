@@ -704,7 +704,7 @@
                 </div>
             </div>
             <div class="flex   justify-end">
-                <div class="flex flex-col mr-10">
+                <div class="flex flex-col mr-4">
                     <!-- <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p> -->
                     @php
                         $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
