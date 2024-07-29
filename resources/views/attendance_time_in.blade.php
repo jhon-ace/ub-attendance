@@ -370,7 +370,7 @@
             });
         });
     </script>
-    <script>
+    <!-- <script>
     //    document.addEventListener('DOMContentLoaded', function () {
             var timeDisplayElement = document.querySelector('#my-time');
             
@@ -396,6 +396,31 @@
             setInterval(printTime, 1000);
         // });
 
+    </script> -->
+
+    <script>
+        var serverTime = new Date("<?php echo date('Y-m-d H:i:s'); ?>");
+        
+        function printTime() {
+            var now = new Date(serverTime.getTime() + (new Date().getTime() - serverTime.getTime()));
+            var options = { 
+                year: '2-digit', 
+                month: '2-digit', 
+                day: '2-digit'
+            };
+            var date = now.toLocaleDateString(undefined, options);
+
+            // Manually format the date to match the desired format "Fri, 2024-06-14"
+            var dateParts = date.split('/');
+            var formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
+            
+            var time = now.toLocaleTimeString();
+            time = time.replace('AM', 'A.M.').replace('PM', 'P.M.');
+            
+            document.querySelector('#my-time').innerHTML = `${now.toLocaleDateString(undefined, { weekday: 'short' })}, ${time}`;
+        }
+        
+        setInterval(printTime, 1000);
     </script>
 
     <script>
