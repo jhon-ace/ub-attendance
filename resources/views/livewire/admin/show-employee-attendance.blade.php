@@ -638,7 +638,6 @@
                                                     {{ $finalHours }} hrs. {{ $finalMinutes }} min. {{ $finalSeconds }} sec.
 
                                                 </td>
-                                                hours_perDay
                                                 <td class="text-black border border-gray-400 text-xs">
                                                     {{ $attendance->hours_perDay }} hr/s
                                                 </td>
