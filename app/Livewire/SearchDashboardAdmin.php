@@ -24,8 +24,8 @@ class SearchDashboardAdmin extends Component
      use WithPagination;
 
     public $search = '';
-    public $sortField = 'employee_id';
-    public $sortDirection = 'desc';
+    public $sortField = 'id';
+    public $sortDirection = 'asc';
     public $selectedSchool = null;
     public $selectedDepartment4 = null;
     public $selectedEmployee = null;
