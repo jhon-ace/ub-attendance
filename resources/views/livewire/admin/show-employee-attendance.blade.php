@@ -752,7 +752,7 @@
                     </div>
                     <div class="flex justify-items-end justify-end">
                         <div class="flex   justify-end">
-                            <div class="flex flex-col mr-10">
+                            <div class="flex flex-col mr-4">
                                 <!-- <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p> -->
                                 @php
                                     $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
@@ -776,8 +776,8 @@
 
                                     // Format the duration string
                                     $undertimeFormatted = 
-                                        ($undertimeHours > 0 ? "{$undertimeHours} hr, " : '0 hr, ') .
-                                        ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min, ') .
+                                        ($undertimeHours > 0 ? "{$undertimeHours} hr/s, " : '0 hr/s, ') .
+                                        ($undertimeMinutes > 0 ? "{$undertimeMinutes} min/s " : '0 min/s, ') .
                                         ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
 
                                 @endphp
@@ -793,7 +793,7 @@
                                     </tr> -->
                                     <tr class="border border-black">
                                         <th class="border border-black text-right">Total Late</th>
-                                        <td class="text-red-500">{{ $hoursM }} hr, {{ $minutesM }} min, {{ $secondsM }} sec</td>
+                                        <td class="text-red-500">{{ $hoursM }} hr/s, {{ $minutesM }} min/s, {{ $secondsM }} sec</td>
                                     </tr>
                                     <tr class="border border-black">
                                         <th class="border border-black text-right">Total Undertime</th>
@@ -801,7 +801,7 @@
                                     </tr>
                                     <tr class="border border-black">
                                         <th class="border border-black text-right">Overall Total Time</th>
-                                        <td class="text-red-500">{{ $hours }} hr, {{ $minutes }} min, {{ $seconds }} sec</td>
+                                        <td class="text-red-500">{{ $hours }} hr/s, {{ $minutes }} min/s, {{ $seconds }} sec</td>
                                     </tr>
                                 </table>
                             
