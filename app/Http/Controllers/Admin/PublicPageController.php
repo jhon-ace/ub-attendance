@@ -108,7 +108,7 @@ class PublicPageController extends Controller
                     $intervalAllowed = false;
                     // Check interval for first check-out
                     if ($firstTimeIn) {
-                        $checkInTime = new DateTime($firstTimeIn->check_in_time, new DateTimeZone('Asia/Kuala_Lumpur'));
+                        $checkInTime = new DateTime($firstTimeIn->check_in_time, new DateTimeZone('Asia/Taipei'));
                         $interval = $now->diff($checkInTime);
                         $minutes = $interval->i + ($interval->h * 60);
                         if ($minutes >= 45) {
@@ -129,7 +129,7 @@ class PublicPageController extends Controller
                         $intervalAllowed = false;
 
                         if ($firstTimeOut) {
-                            $checkOutTime = new DateTime($firstTimeOut->check_out_time, new DateTimeZone('Asia/Kuala_Lumpur'));
+                            $checkOutTime = new DateTime($firstTimeOut->check_out_time, new DateTimeZone('Asia/Taipei'));
                             $interval = $now->diff($checkOutTime);
                             $minutes = $interval->i + ($interval->h * 60);
                             if ($minutes >= 45) {
@@ -188,7 +188,7 @@ class PublicPageController extends Controller
                             // Check interval for second check-out
                         $intervalAllowed = false;
                         if ($lastTimeIn) {
-                            $checkInTime = new DateTime($lastTimeIn->check_in_time, new DateTimeZone('Asia/Kuala_Lumpur'));
+                            $checkInTime = new DateTime($lastTimeIn->check_in_time, new DateTimeZone('Asia/Taipei'));
                             $interval = $now->diff($checkInTime);
                             $minutes = $interval->i + ($interval->h * 60);
                             if ($minutes >= 45) {
