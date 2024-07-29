@@ -280,8 +280,9 @@
 
     <!-- <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8"> </div> Date and Time Display -->
     <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8">
-        <span id="current-date">{{ $current_date1 }}</span>, <span id="current-time">{{ $current_time1 }}</span>
-    </div> <!-- Date and Time Display -->
+        <!-- <span id="current-date">{{ $current_date1 }}</span>, <span id="current-time">{{ $current_time1 }}</span> -->
+         <span id="current-date-time"></span>
+    </div> <!-- Date and Time Display --> 
 </div>
 
     <div class="w-full z-10">
@@ -402,7 +403,57 @@
 
     </script> -->
 
-<script>
+          <script>
+        // Function to update the time display
+        function updateTime(serverTime) {
+            const timezone = 'Asia/Taipei';
+
+            // Define options for formatting the date
+            const dateOptions = {
+                weekday: 'short',
+                // day: '2-digit',
+                timeZone: timezone
+            };
+
+            // Define options for formatting the time
+            const timeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: timezone,
+                hour12: true
+            };
+
+            // Format the server date and time in Taipei timezone
+            const dateFormatter = new Intl.DateTimeFormat('en-US', dateOptions);
+            const timeFormatter = new Intl.DateTimeFormat('en-US', timeOptions);
+
+            // Calculate the difference between server time and local time
+            const localNow = new Date();
+            const timeDiff = localNow - new Date(serverTime);
+
+            // Update the date and time every second
+            setInterval(() => {
+                const now = new Date(new Date().getTime() - timeDiff);
+                const formattedDate = dateFormatter.format(now);
+                const formattedTime = timeFormatter.format(now);
+
+                // Combine date and time in the desired format
+                const formattedDateTime = `${formattedDate}, ${formattedTime}`;
+
+                document.getElementById('current-date-time').textContent = formattedDateTime;
+            }, 1000);
+        }
+
+        // Initialize the date and time display
+        document.addEventListener('DOMContentLoaded', () => {
+            const serverTime = "{{ \Carbon\Carbon::now('Asia/Taipei')->toIso8601String() }}";
+            updateTime(serverTime);
+        });
+    </script>
+
+
+    <!-- <script>
         // Set the timezone to Taipei
         const timezone = 'Asia/Taipei';
 
@@ -445,7 +496,7 @@
 
         // Initialize the date and time display immediately
         updateTime();
-    </script>
+    </script> -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
