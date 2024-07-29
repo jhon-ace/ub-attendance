@@ -31,14 +31,21 @@ class PublicPageController extends Controller
 
         // Check if there is an admin user
         if ($adminUser) {
-            $current_date = now()->setTimezone('Asia/Kuala_Lumpur')->format('Y-m-d');
+            // $current_date = now()->setTimezone('Asia/Kuala_Lumpur')->format('Y-m-d');
+            $current_date = now()->setTimezone('Asia/Taipei')->format('Y-m-d');
+            $current_time = now()->setTimezone('Asia/Taipei')->format('H:i:s');
+
+               $timezone = 'Asia/Taipei';
+
+            $current_date1 = Carbon::now($timezone)->format('D, M d, Y'); // E.g., "Mon, Jul 30, 2024"
+            $current_time1 = Carbon::now($timezone)->format('h:i:s A'); 
 
             // Retrieve attendance data for the current date
             $curdateDataIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)->get();
             $curdateDataOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)->get();
 
             // Return view with the attendance data
-            return view('attendance_time_in', compact('curdateDataIn', 'curdateDataOut'));
+            return view('attendance_time_in', compact('curdateDataIn', 'curdateDataOut','current_time1', 'current_date1'));
         }
 
         // Redirect with an error message if no admin user is found
@@ -64,8 +71,9 @@ class PublicPageController extends Controller
                     
                 if ($employee) {
                     // Get the current datetime in Kuala Lumpur timezone
-                    $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
-
+                    // $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
+                    // $now = new DateTime('now', new DateTimeZone('Asia/Taipei'));
+                    $now = Carbon::now('Asia/Taipei');
                     // Format datetime for database insertion
                     $formattedDateTime = $now->format('Y-m-d H:i:s');
 

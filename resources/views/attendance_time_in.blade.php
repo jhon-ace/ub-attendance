@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -277,7 +278,10 @@
 
 
 
-    <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8"></div> <!-- Date and Time Display -->
+    <!-- <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8"> </div> Date and Time Display -->
+    <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8">
+        <span id="current-date">{{ $current_date1 }}</span>, <span id="current-time">{{ $current_time1 }}</span>
+    </div> <!-- Date and Time Display -->
 </div>
 
     <div class="w-full z-10">
@@ -398,29 +402,49 @@
 
     </script> -->
 
-    <script>
-        var serverTime = new Date("<?php echo date('Y-m-d H:i:s'); ?>");
-        
-        function printTime() {
-            var now = new Date(serverTime.getTime() + (new Date().getTime() - serverTime.getTime()));
-            var options = { 
-                year: '2-digit', 
-                month: '2-digit', 
-                day: '2-digit'
-            };
-            var date = now.toLocaleDateString(undefined, options);
+<script>
+        // Set the timezone to Taipei
+        const timezone = 'Asia/Taipei';
 
-            // Manually format the date to match the desired format "Fri, 2024-06-14"
-            var dateParts = date.split('/');
-            var formattedDate = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}`;
+        function updateTime() {
+            // Get the current date and time in Taipei timezone
+            const now = new Date();
             
-            var time = now.toLocaleTimeString();
-            time = time.replace('AM', 'A.M.').replace('PM', 'P.M.');
+            // Define options for formatting the date
+            const dateOptions = {
+                weekday: 'short', // Short weekday name (e.g., Mon for Monday)
+                // year: '2-digit',
+                // month: 'short', // Short month name (e.g., Jul for July)
+                // day: 'numeric',
+                timeZone: timezone
+            };
+
+            // Define options for formatting the time
+            const timeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: timezone,
+                hour12: true // Use 12-hour format with AM/PM
+            };
             
-            document.querySelector('#my-time').innerHTML = `${now.toLocaleDateString(undefined, { weekday: 'short' })}, ${time}`;
+            // Format the current date and time in Taipei timezone
+            const dateFormatter = new Intl.DateTimeFormat('en-US', dateOptions);
+            const timeFormatter = new Intl.DateTimeFormat('en-US', timeOptions);
+
+            const formattedDate = dateFormatter.format(now);
+            const formattedTime = timeFormatter.format(now);
+
+            // Update the date and time on the page
+            document.getElementById('current-date').textContent = formattedDate;
+            document.getElementById('current-time').textContent = formattedTime;
         }
-        
-        setInterval(printTime, 1000);
+
+        // Update the date and time every second
+        setInterval(updateTime, 1000);
+
+        // Initialize the date and time display immediately
+        updateTime();
     </script>
 
     <script>
