@@ -25,7 +25,7 @@ class SearchDashboardAdmin extends Component
 
     public $search = '';
     public $sortField = 'employee_id';
-    public $sortDirection = 'asc';
+    public $sortDirection = 'desc';
     public $selectedSchool = null;
     public $selectedDepartment4 = null;
     public $selectedEmployee = null;
