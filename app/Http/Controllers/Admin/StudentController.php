@@ -10,6 +10,7 @@ use \App\Models\Admin\Student;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
@@ -79,8 +80,15 @@ class StudentController extends Controller
                 $student->student_photo = $fileNameToStore;
                 $student->save();
 
-                return redirect()->route('admin.student.index')
+
+                if (Auth::user()->hasRole('admin')) {
+                    return redirect()->route('admin.student.index')
                     ->with('success', 'Student created successfully.');
+                } else {
+                    return redirect()->route('staff.student.index')
+                    ->with('success', 'Student created successfully.');
+                }
+                
             } else {
                 $errorMessage = '';
                 if ($existingStudentById) {
@@ -94,8 +102,14 @@ class StudentController extends Controller
                 }
 
 
-                return redirect()->route('admin.student.index')
+                
+                if (Auth::user()->hasRole('admin')) {
+                    return redirect()->route('admin.student.index')
                     ->with('error', $errorMessage . 'Try again.');
+                } else {
+                    return redirect()->route('staff.student.index')
+                    ->with('error', $errorMessage . 'Try again.');
+                }
             }
     }
 
@@ -174,8 +188,15 @@ class StudentController extends Controller
             $student->student_photo = $fileNameToStore;
             $student->save();
 
-            return redirect()->route('admin.student.index')
-                ->with('success', 'Student updated successfully.');
+            
+                if (Auth::user()->hasRole('admin')) {
+                    return redirect()->route('admin.student.index')
+                    ->with('success', 'Student updated successfully.');
+                } else {
+                    return redirect()->route('staff.student.index')
+                    ->with('success', 'Student updated successfully.');
+                }
+
         } else {
             $errorMessage = '';
             if ($existingStudentById) {
@@ -189,8 +210,13 @@ class StudentController extends Controller
             }
 
 
-            return redirect()->route('admin.student.index')
-                ->with('error', $errorMessage . 'Try again.');
+            if (Auth::user()->hasRole('admin')) {
+                    return redirect()->route('admin.student.index')
+                    ->with('error', $errorMessage . 'Try again.');
+                } else {
+                    return redirect()->route('staff.student.index')
+                    ->with('error', $errorMessage . 'Try again.');
+                }
         }
     }
 
@@ -202,8 +228,12 @@ class StudentController extends Controller
           $student = Student::findOrFail($id);
 
         $student->delete();
+        if (Auth::user()->hasRole('admin')) {
 
-        return redirect()->route('admin.student.index')->with('success', 'Student deleted successfully.');
+            return redirect()->route('admin.student.index')->with('success', 'Student deleted successfully.');
+        } else {
+            return redirect()->route('staff.student.index')->with('success', 'Student deleted successfully.');
+        }
     }
 
     public function deleteAll(Request $request)

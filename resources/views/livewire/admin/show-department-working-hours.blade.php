@@ -17,7 +17,11 @@
     @endif
 
     <div class="flex justify-between mb-4 sm:-mt-4">
-        <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Admin / Manage Department Work Schedule</div>
+        @if (Auth::user()->hasRole('admin'))
+            <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Admin / Manage Work Schedule</div>
+        @else
+            <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Staff / Manage Work Schedule</div>
+        @endif
     </div>
     <div class="flex flex-col md:flex-row items-start md:items-center md:justify-start">
         <!-- Dropdown and Delete Button -->
@@ -95,7 +99,11 @@
                                     <button @click="open = false" class=" text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                                 </div>
                                 <div class="mb-4">
-                                    <form action="{{ route('admin.workinghour.store') }}" method="POST" class="">
+                                    @if (Auth::user()->hasRole('admin')) 
+                                        <form action="{{ route('admin.workinghour.store') }}" method="POST" class="">
+                                    @else
+                                        <form action="{{ route('staff.workinghour.store') }}" method="POST" class="">
+                                    @endif
                                     <x-caps-lock-detector />
                                         @csrf
 
@@ -180,7 +188,7 @@
                                 @foreach ($workingHour as $schedule)
                                     <tr class="hover:bg-gray-100">
                                         <td class="text-black border border-gray-400 text-left">&nbsp;&nbsp;{{ $daysOfWeek[$schedule->day_of_week] ?? 'Unknown' }} - {{ date('h:i A', strtotime($schedule->morning_start_time)) }} - {{ date('h:i A', strtotime($schedule->morning_end_time)) }} / {{ date('h:i A', strtotime($schedule->afternoon_start_time)) }} - {{ date('h:i A', strtotime($schedule->afternoon_end_time)) }}</td>                                 
-                                        <td class="text-black border border-gray-400 px-1 py-1">
+                                        <td class="text-black border border-gray-400 px-1 py-3">
                                             <div class="flex justify-center items-center space-x-2">
                                                 <div x-data="{ open: false, 
                                                     id: {{ json_encode($department->id) }},
@@ -269,13 +277,19 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <form id="deleteSelected" action="{{ route('admin.workinghour.delete', [':id', ':department_id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $schedule->id }}');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="bg-red-500 text-white text-sm px-3 py-2 rounded hover:bg-red-700">
-                                                        <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i>
-                                                    </button>
-                                                </form>
+                                                @if (Auth::user()->hasRole('admin'))
+                                                    @if (Auth::user()->hasRole('admin')) 
+                                                        <form id="deleteSelected" action="{{ route('admin.workinghour.delete', [':id', ':department_id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $schedule->id }}');">
+                                                    @else
+                                                        <form id="deleteSelected" action="{{ route('staff.workinghour.delete', [':id', ':department_id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $schedule->id }}');">
+                                                    @endif
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="bg-red-500 text-white text-sm px-3 py-2 rounded hover:bg-red-700">
+                                                            <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

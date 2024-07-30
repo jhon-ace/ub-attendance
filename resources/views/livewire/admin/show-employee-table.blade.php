@@ -16,7 +16,11 @@
     @endif
 
     <div class="flex justify-between mb-4 sm:-mt-4">
+    @if (Auth::user()->hasRole('admin'))
         <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Admin / Manage Employee</div>
+    @else
+        <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Staff / Manage Employee</div>
+    @endif
     </div>
     <div class="flex flex-column overflow-x-auto -mb-5">
         <div class="col-span-3 pt-4">
@@ -249,7 +253,11 @@
                                 <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                             </div>
                             <div class="mb-4">
+                            @if (Auth::user()->hasRole('admin'))
                                 <form action="{{ route('admin.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
+                            @else
+                                <form action="{{ route('staff.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
+                            @endif
                                     <x-caps-lock-detector />
                                     @csrf
 
@@ -350,7 +358,11 @@
                                     <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                                 </div>
                                 <div class="mb-4">
+                                @if (Auth::user()->hasRole('admin'))
                                     <form action="{{ route('admin.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                @else
+                                    <form action="{{ route('staff.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                @endif
                                         <x-caps-lock-detector />
                                         @csrf
 
@@ -561,7 +573,11 @@
                                                         <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                     </div>
                                                     <div class="mb-4">
+                                                    @if (Auth::user()->hasRole('admin'))
                                                         <form action="{{ route('admin.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
+                                                    @else
+                                                        <form action="{{ route('staff.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
+                                                    @endif
                                                             <x-caps-lock-detector />
                                                             @csrf
                                                             @method('PUT')
@@ -622,13 +638,20 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <form id="deleteSelected" action="{{ route('admin.employee.destroy', [':id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $employee->id }}', '{{ $employee->employee_lastname }}', '{{ $employee->employee_firstname }}', '{{ $employee->employee_middlename }}');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700" id="hehe">
-                                                <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i>
-                                            </button>
-                                        </form>
+                                        @if (Auth::user()->hasRole('admin'))
+                                            @if (Auth::user()->hasRole('admin'))
+                                                <form id="deleteSelected" action="{{ route('admin.employee.destroy', [':id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $employee->id }}', '{{ $employee->employee_lastname }}', '{{ $employee->employee_firstname }}', '{{ $employee->employee_middlename }}');">
+                                            @else
+                                                <form id="deleteSelected" action="{{ route('staff.employee.destroy', [':id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $employee->id }}', '{{ $employee->employee_lastname }}', '{{ $employee->employee_firstname }}', '{{ $employee->employee_middlename }}');">
+                                            @endif
+                                                
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700" id="hehe">
+                                                        <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i>
+                                                    </button>
+                                                </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

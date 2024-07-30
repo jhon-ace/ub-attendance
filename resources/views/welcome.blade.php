@@ -44,7 +44,7 @@
             <!-- Session Status -->
             <x-auth-session-status class="mb-4" :status="session('status')" />
             
-            <form method="POST" action="{{ route('login') }}" class="bg-white p-6 max-w-sm rounded-lg shadow-md">
+            <form method="POST" action="{{ route('loginStaff') }}" class="bg-white p-6 max-w-sm rounded-lg shadow-md">
                 @csrf
     
                 <!-- Email Address -->

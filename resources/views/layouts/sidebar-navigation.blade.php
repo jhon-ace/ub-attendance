@@ -197,39 +197,138 @@
 
 
 
-@elseif (Auth::user()->hasRole('employee'))
 
-    <div id="sidebarContainer" class="fixed flex flex-col left-0 w-14 hover:w-48 md:w-48 bg-gray-900 h-full text-black transition-all duration-300 border-r-2 border-gray-300 dark:border-gray-600 z-10 sidebar">
+
+
+
+
+
+
+@elseif (Auth::user()->hasRole('admin_staff'))
+
+    <div x-cloak x-data="{ isFullScreen: (window.innerHeight === screen.height) }" x-init="
+                        window.addEventListener('resize', () => {
+                            isFullScreen = (window.innerHeight === screen.height);
+                        });
+                    " x-show="!isFullScreen" id="sidebarContainer"  class="fixed flex flex-col left-0 w-14 hover:w-48 md:w-48 bg-gradient-to-r from-red-500 to-orange-500 h-full text-black transition-all duration-300 border-r-2 border-gray-300 dark:border-gray-600 z-10 sidebar">
         <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-0.5">
             <ul class="flex flex-col py-2 space-y-1 text-gray-800" >
-                <a href="#">
-                    <img class="w-auto h-auto object-contain" src="{{ asset('assets/img/user.png') }}" alt="SCMS Logo">
+                <a href="#" class="flex justify-center items-center">
+                    <img class="w-32 h-auto object-contain" src="{{ asset('assets/img/logo.png') }}" alt="SCMS Logo">
                 </a>
+
                 <label class="relative flex flex-row justify-center items-center h-2 focus:outline-none   text-white-600 hover:text-white-800 border-l-4 border-transparent  pr-3 ">
-                    <span class=" text-sm tracking-wide truncate text-white">{{ Auth::user()->name }}</span>
+                    <span class=" text-sm tracking-wide truncate text-gray-200">{{ Auth::user()->name }}</span>
                 </label>
                 <label class="relative flex flex-row justify-center h-5 focus:outline-none   text-white-600 hover:text-white-800 border-l-4 border-transparent   ">
-                    <span class=" text-xs tracking-wide truncate text-white">{{ Auth::user()->email }}</span>
+                    <span class=" text-xs tracking-wide truncate text-gray-200">{{ Auth::user()->email }}</span>
                 </label>
                 <div class="border-t"></div>
                 <li>
-                    <a href="{{ route('employee.dashboard') }}" class="relative flex flex-row items-center h-11 focus:outline-none hover:rounded-e-3xl hover:bg-blue-800 dark:hover:bg-slate-700 text-slate-700 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
-                    {{ request()->routeIs('employee.dashboard') ? ' rounded-e-3xl border-l-green-500 bg-slate-700 text-gray-700 dark:text-gray-200' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                    <a href="{{ route('staff.dashboard') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                    {{ request()->routeIs('staff.dashboard') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                         <span class="inline-flex justify-center items-center ml-4">
-                            <i class="fa-solid fa-gauge-high fa-lg text-white" style="color: #fffff;"></i>
+                            <i class="fa-solid fa-gauge-high fa-sm text-gray-200 "></i>
                         </span>
-                        <span class="ml-2 text-sm tracking-wide truncate text-white">Dashboard</span>
+                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Dashboard</span>
                     </a>
                 </li>
+                <!-- <li >
+                    <a href="{{ route('staff.school.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                    {{ request()->routeIs('staff.school.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                        <span class="inline-flex justify-center items-center ml-4">
+                            <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                        </span>
+                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">School Year</span>
+                    </a>
+                </li> -->
+                <li x-data="{ open: {{ request()->routeIs('staff.department.index')  || request()->routeIs('staff.workinghour.index') ? 'true'  : 'false' }} }">
+                    <a @click="open = !open" class="cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
+                        <span class="inline-flex justify-center items-center ml-3">
+                            <i class="fa-solid fa-users fa-sm text-gray-200"></i>
+                        </span>
+                        <span class="text-sm tracking-wide truncate text-gray-200 ml-2">Department</span>
+                        <span class="ml-auto">
+                            <svg fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
+                                <path x-show="!open" fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                <path x-show="open" fill-rule="evenodd" d="M14.707 10.707a1 1 0 01-1.414 0L10 7.414 6.707 10.707a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
+                    </a>
+                    <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1">
+                        <li>
+                            <a href="{{ route('staff.department.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                            {{ request()->routeIs('staff.department.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <span class="inline-flex justify-center items-center ml-4">
+                                    <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                                </span>
+                                <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Department</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('staff.workinghour.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                            {{ request()->routeIs('staff.workinghour.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <span class="inline-flex justify-center items-center ml-4">
+                                    <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                                </span>
+                                <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Working Hour</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="{{ route('staff.course.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                    {{ request()->routeIs('staff.course.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                        <span class="inline-flex justify-center items-center ml-4">
+                            <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                        </span>
+                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Courses</span>
+                    </a>
+                </li>
+                <li x-data="{ open: {{ request()->routeIs('admin.staff.index')  || request()->routeIs('staff.employee.index') || request()->routeIs('staff.student.index') ? 'true'  : 'false' }} }">
+                    <a @click="open = !open" class="cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
+                        <span class="inline-flex justify-center items-center ml-3">
+                            <i class="fa-solid fa-users fa-sm text-gray-200"></i>
+                        </span>
+                        <span class="text-sm tracking-wide truncate text-gray-200 ml-2">Users</span>
+                        <span class="ml-auto">
+                            <svg fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
+                                <path x-show="!open" fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                <path x-show="open" fill-rule="evenodd" d="M14.707 10.707a1 1 0 01-1.414 0L10 7.414 6.707 10.707a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
+                    </a>
+                    <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1">
+                        <!-- <li>
+                            <a href="{{ route('admin.staff.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.staff.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                            <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Admin Staff
+                            </a>
+                        </li> -->
+                        <li>
+                            <a href="{{ route('staff.employee.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                                {{ request()->routeIs('staff.employee.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Employee
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('staff.student.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                                {{ request()->routeIs('staff.student.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Student
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+
                 <li>
                     <form id="logout" method="POST" action="{{ route('logout') }}" onsubmit="return confirmLogout(event)">
                         @csrf
 
-                        <button type="submit" class="relative flex flex-row items-center w-full h-11 focus:outline-none hover:rounded-e-3xl hover:bg-blue-800 dark:hover:bg-slate-700 text-slate-700 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
-                            <span class="inline-flex justify-center items-center ml-4">
-                            <i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i>
-                        </span>
-                        <span class="ml-2 text-sm tracking-wide truncate text-white">{{ __('Log Out') }}</span>
+                        <button type="submit" class="relative flex flex-row items-center w-full h-11 focus:outline-none  hover:bg-[#172029] text-white] dark:hover:bg-slate-700 text-gray-200 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
+                            <span class="inline-flex justify-center items-center ml-5">
+                                <i class="fa-solid fa-right-from-bracket fa-sm text-gray-200"></i>
+                            </span>
+                            <span class="ml-2 text-sm tracking-wide truncate text-gray-200">{{ __('Sign Out') }}</span>
                         </button>
                     </form>
                 </li>
@@ -239,8 +338,139 @@
     </div>
 
 
+    <!-- this is HRD -->
+@elseif (Auth::user()->hasRole('employee'))
 
-@else
+    <div x-cloak x-data="{ isFullScreen: (window.innerHeight === screen.height) }" x-init="
+                        window.addEventListener('resize', () => {
+                            isFullScreen = (window.innerHeight === screen.height);
+                        });
+                    " x-show="!isFullScreen" id="sidebarContainer"  class="fixed flex flex-col left-0 w-14 hover:w-48 md:w-48 bg-gradient-to-r from-red-500 to-orange-500 h-full text-black transition-all duration-300 border-r-2 border-gray-300 dark:border-gray-600 z-10 sidebar">
+        <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-0.5">
+            <ul class="flex flex-col py-2 space-y-1 text-gray-800" >
+                <a href="#" class="flex justify-center items-center">
+                    <img class="w-32 h-auto object-contain" src="{{ asset('assets/img/logo.png') }}" alt="SCMS Logo">
+                </a>
+
+                <label class="relative flex flex-row justify-center items-center h-2 focus:outline-none   text-white-600 hover:text-white-800 border-l-4 border-transparent  pr-3 ">
+                    <span class=" text-sm tracking-wide truncate text-gray-200">{{ Auth::user()->name }}</span>
+                </label>
+                <label class="relative flex flex-row justify-center h-5 focus:outline-none   text-white-600 hover:text-white-800 border-l-4 border-transparent   ">
+                    <span class=" text-xs tracking-wide truncate text-gray-200">{{ Auth::user()->email }}</span>
+                </label>
+                <div class="border-t"></div>
+                <li>
+                    <a href="{{ route('hr.dashboard') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                    {{ request()->routeIs('hr.dashboard') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                        <span class="inline-flex justify-center items-center ml-4">
+                            <i class="fa-solid fa-gauge-high fa-sm text-gray-200 "></i>
+                        </span>
+                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Dashboard</span>
+                    </a>
+                </li>
+                <!-- <li >
+                    <a href="{{ route('staff.school.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                    {{ request()->routeIs('staff.school.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                        <span class="inline-flex justify-center items-center ml-4">
+                            <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                        </span>
+                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">School Year</span>
+                    </a>
+                </li> -->
+                <li x-data="{ open: {{ request()->routeIs('hr.department.index')  || request()->routeIs('hr.workinghour.index') ? 'true'  : 'false' }} }">
+                    <a @click="open = !open" class="cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
+                        <span class="inline-flex justify-center items-center ml-3">
+                            <i class="fa-solid fa-users fa-sm text-gray-200"></i>
+                        </span>
+                        <span class="text-sm tracking-wide truncate text-gray-200 ml-2">Department</span>
+                        <span class="ml-auto">
+                            <svg fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
+                                <path x-show="!open" fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                <path x-show="open" fill-rule="evenodd" d="M14.707 10.707a1 1 0 01-1.414 0L10 7.414 6.707 10.707a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
+                    </a>
+                    <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1">
+                        <li>
+                            <a href="{{ route('hr.department.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                            {{ request()->routeIs('hr.department.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <span class="inline-flex justify-center items-center ml-4">
+                                    <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                                </span>
+                                <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Department</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('hr.workinghour.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                            {{ request()->routeIs('hr.workinghour.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <span class="inline-flex justify-center items-center ml-4">
+                                    <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                                </span>
+                                <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Working Hour</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="{{ route('staff.course.index') }}" class="relative flex flex-row items-center h-11 focus:outline-none  hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6 
+                    {{ request()->routeIs('staff.course.index') ? ' border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                        <span class="inline-flex justify-center items-center ml-4">
+                            <i class="fa-solid fa-school fa-sm text-gray-200 "></i>
+                        </span>
+                        <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Courses</span>
+                    </a>
+                </li>
+                <li x-data="{ open: {{ request()->routeIs('admin.staff.index')  || request()->routeIs('staff.employee.index') || request()->routeIs('staff.student.index') ? 'true'  : 'false' }} }">
+                    <a @click="open = !open" class="cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
+                        <span class="inline-flex justify-center items-center ml-3">
+                            <i class="fa-solid fa-users fa-sm text-gray-200"></i>
+                        </span>
+                        <span class="text-sm tracking-wide truncate text-gray-200 ml-2">Users</span>
+                        <span class="ml-auto">
+                            <svg fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
+                                <path x-show="!open" fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                <path x-show="open" fill-rule="evenodd" d="M14.707 10.707a1 1 0 01-1.414 0L10 7.414 6.707 10.707a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
+                    </a>
+                    <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1">
+                        <!-- <li>
+                            <a href="{{ route('admin.staff.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.staff.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                            <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Admin Staff
+                            </a>
+                        </li> -->
+                        <li>
+                            <a href="{{ route('staff.employee.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                                {{ request()->routeIs('staff.employee.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Employee
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('staff.student.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                                {{ request()->routeIs('staff.student.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Student
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+
+                <li>
+                    <form id="logout" method="POST" action="{{ route('logout') }}" onsubmit="return confirmLogout(event)">
+                        @csrf
+
+                        <button type="submit" class="relative flex flex-row items-center w-full h-11 focus:outline-none  hover:bg-[#172029] text-white] dark:hover:bg-slate-700 text-gray-200 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
+                            <span class="inline-flex justify-center items-center ml-5">
+                                <i class="fa-solid fa-right-from-bracket fa-sm text-gray-200"></i>
+                            </span>
+                            <span class="ml-2 text-sm tracking-wide truncate text-gray-200">{{ __('Sign Out') }}</span>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+                <p class="mb-14 px-5 py-3 hidden md:block text-center text-xs text-white">Copyright @2024</p>
+        </div>
+    </div>
 
 @endif
 

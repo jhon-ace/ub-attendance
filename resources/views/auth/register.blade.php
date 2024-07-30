@@ -27,6 +27,7 @@
                     <option value="employee">Employee</option>
                     <option value="student">Student</option>
                     <option value="admin_staff">Admin Staff</option>
+                    <option value="hr">HR</option>
                 </select>
 
                 @error('role')

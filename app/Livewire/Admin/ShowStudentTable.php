@@ -102,6 +102,7 @@ class ShowStudentTable extends Component
 
             // Fetch courses for the selected department
             $courses = Course::where('department_id', $this->selectedDepartment3)->get();
+  
         } else {
             $this->departmentToShow = null;
             $courses = Course::all(); // Fetch all courses if no department selected
@@ -127,6 +128,8 @@ class ShowStudentTable extends Component
             ->groupBy('course_id')
             ->get()
             ->keyBy('course_id');
+
+        //  $courses = Course::all();
 
         return view('livewire.admin.show-student-table', [
             'students' => $students,

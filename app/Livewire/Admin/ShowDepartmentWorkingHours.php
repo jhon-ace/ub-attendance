@@ -45,7 +45,7 @@ class ShowDepartmentWorkingHours extends Component
         $this->schoolToShow = collect([]);
         $this->scheduleToShow = collect([]); // Initialize as an empty collection
 
-        $this->selectedSchool = $this->selectedSchool ?? json_decode(request()->cookie('selectedSchool'), true);
+        //$this->selectedSchool = $this->selectedSchool ?? json_decode(request()->cookie('selectedSchool'), true);
     }
 
     public function updatingSelectedSchool()

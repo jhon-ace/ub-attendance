@@ -1,5 +1,9 @@
 <x-app-layout>
-    <x-user-route-page-name :routeName="'admin.employee.index'" />
+    @if (Auth::user()->hasRole('admin'))
+        <x-user-route-page-name :routeName="'admin.employee.index'" />
+    @else
+        <x-user-route-page-name :routeName="'staff.employee.index'" />
+    @endif
     <x-content-design>
         <!-- Content Area -->
         <div x-data="{ isFullScreen: (window.innerHeight === screen.height) }" x-init="

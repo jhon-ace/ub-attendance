@@ -34,10 +34,14 @@ class AuthenticatedSessionController extends Controller
             if (Auth::user()->hasRole('admin')) 
             {
                 return redirect()->intended(route('admin.dashboard'))->with('success', 'Successful Login');
+            }
+            else if (Auth::user()->hasRole('admin_staff')) 
+            {
+                return redirect()->intended(route('staff.dashboard'))->with('success', 'Successful Login');
             } 
             else if (Auth::user()->hasRole('employee')) 
             {
-                return redirect()->intended(route('employee.dashboard'))->with('success', 'Successful Login');
+                return redirect()->intended(route('hr.dashboard'))->with('success', 'Successful Login');
             } 
             else if (Auth::user()->hasRole('student')) 
             {
@@ -56,12 +60,37 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+         if (Auth::user()->hasRole('admin')) 
+            {
+                // return redirect()->intended(route('admin.dashboard'))->with('success', 'Successful Login');
+                Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
+                $request->session()->invalidate();
 
-        $request->session()->regenerateToken();
+                $request->session()->regenerateToken();
 
-        return redirect('/');
+                return redirect()->route('login')->with('success', 'Attendance completed. Safe travels home!');
+            }
+            else if (Auth::user()->hasRole('admin_staff')) 
+            {
+                Auth::guard('web')->logout();
+
+                $request->session()->invalidate();
+
+                $request->session()->regenerateToken();
+
+                return redirect()->route('loginStaff')->with('success', 'Attendance completed. Safe travels home!');
+            } 
+
+            else  // This is HR Account
+            {
+                Auth::guard('web')->logout();
+
+                $request->session()->invalidate();
+
+                $request->session()->regenerateToken();
+
+                return redirect()->route('loginHR')->with('success', 'Attendance completed. Safe travels home!');
+            } 
     }
 }

@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use \App\Models\Admin\School;
 use \App\Models\Admin\Employee;
-use \App\Models\Admin\Department;  
+use \App\Models\Admin\Department;
+use Illuminate\Support\Facades\Auth;
 
 class SchoolController extends Controller
 {
@@ -31,16 +32,32 @@ class SchoolController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'abbreviation' => 'required|string|max:255',
-            'school_name' => 'required|string|max:255',
-        ]);
+        if (Auth::user()->hasRole('admin')) {
+            
+            $validatedData = $request->validate([
+                'abbreviation' => 'required|string|max:255',
+                'school_name' => 'required|string|max:255',
+            ]);
 
-        $school = School::create($validatedData);
+            $school = School::create($validatedData);
 
-    
-        return redirect()->route('admin.school.index')
-                        ->with('success', 'School created successfully.');
+        
+            return redirect()->route('admin.school.index')
+                            ->with('success', 'School created successfully.');
+
+        }else if (Auth::user()->hasRole('admin_staff')) {
+
+            $validatedData = $request->validate([
+                'abbreviation' => 'required|string|max:255',
+                'school_name' => 'required|string|max:255',
+            ]);
+
+            $school = School::create($validatedData);
+
+        
+            return redirect()->route('staff.school.index')
+                            ->with('success', 'School created successfully.');
+        }
     }
 
     /**
@@ -65,28 +82,54 @@ class SchoolController extends Controller
     
     public function update(Request $request, School $school)
     {
-        
-        $validatedData = $request->validate([
-            'school_name' => 'required|string|max:255',
-            'abbreviation' => 'required|string|max:255|unique:schools,abbreviation,' . $school->id,
-        ]);
+        if (Auth::user()->hasRole('admin')) {
 
-        // Check for changes
-        $changes = false;
-        foreach ($validatedData as $key => $value) {
-            if ($school->$key !== $value) {
-                $changes = true;
-                break;
+            $validatedData = $request->validate([
+                'school_name' => 'required|string|max:255',
+                'abbreviation' => 'required|string|max:255|unique:schools,abbreviation,' . $school->id,
+            ]);
+
+            // Check for changes
+            $changes = false;
+            foreach ($validatedData as $key => $value) {
+                if ($school->$key !== $value) {
+                    $changes = true;
+                    break;
+                }
             }
+
+            if (!$changes) {
+                return redirect()->route('admin.school.index')->with('info', 'No changes were made.');
+            }
+
+            $school->update($validatedData);
+
+            return redirect()->route('admin.school.index')->with('success', 'School updated successfully.');
+
+        } else if (Auth::user()->hasRole('admin_staff')) {
+            
+            $validatedData = $request->validate([
+                'school_name' => 'required|string|max:255',
+                'abbreviation' => 'required|string|max:255|unique:schools,abbreviation,' . $school->id,
+            ]);
+
+            // Check for changes
+            $changes = false;
+            foreach ($validatedData as $key => $value) {
+                if ($school->$key !== $value) {
+                    $changes = true;
+                    break;
+                }
+            }
+
+            if (!$changes) {
+                return redirect()->route('staff.school.index')->with('info', 'No changes were made.');
+            }
+
+            $school->update($validatedData);
+
+            return redirect()->route('staff.school.index')->with('success', 'School updated successfully.');
         }
-
-        if (!$changes) {
-            return redirect()->route('admin.school.index')->with('info', 'No changes were made.');
-        }
-
-        $school->update($validatedData);
-
-        return redirect()->route('admin.school.index')->with('success', 'School updated successfully.');
     }
 
     /**
@@ -94,16 +137,31 @@ class SchoolController extends Controller
      */
     public function destroy(School $school)
     {
+        if (Auth::user()->hasRole('admin')) {
 
-        // Check if there are any associated records
-        if ($school->employee()->exists() || $school->department()->exists()) {
-            return redirect()->route('admin.school.index')->with('error', 'Cannot delete school because it has associated data.');
+            // Check if there are any associated records
+            if ($school->employee()->exists() || $school->department()->exists()) {
+                return redirect()->route('admin.school.index')->with('error', 'Cannot delete school because it has associated data.');
+            }
+
+            // If no associated records, proceed with deletion
+            $school->delete();
+
+            return redirect()->route('admin.school.index')->with('success', 'School deleted successfully.');
+
+        } else if (Auth::user()->hasRole('admin_staff')) {
+            
+            // Check if there are any associated records
+            if ($school->employee()->exists() || $school->department()->exists()) {
+                return redirect()->route('staff.school.index')->with('error', 'Cannot delete school because it has associated data.');
+            }
+
+            // If no associated records, proceed with deletion
+            $school->delete();
+
+            return redirect()->route('staff.school.index')->with('success', 'School deleted successfully.');
+
         }
-
-        // If no associated records, proceed with deletion
-        $school->delete();
-
-        return redirect()->route('admin.school.index')->with('success', 'School deleted successfully.');
     }
 
     public function deleteAll(Request $request)

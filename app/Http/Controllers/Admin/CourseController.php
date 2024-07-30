@@ -10,6 +10,7 @@ use \App\Models\Admin\Course;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
@@ -76,8 +77,16 @@ class CourseController extends Controller
                 $course->course_logo = $fileNameToStore;
                 $course->save();
 
-                return redirect()->route('admin.course.index')
-                    ->with('success', 'Course created successfully.');
+                if (Auth::user()->hasRole('admin')) {
+                    return redirect()->route('admin.course.index')
+                        ->with('success', 'Course created successfully.');
+                }
+                else{
+                    return redirect()->route('staff.course.index')
+                        ->with('success', 'Course created successfully.');
+                }
+                    
+
             } else {
                 $errorMessage = '';
                 if ($existingCourseById) {
@@ -85,8 +94,15 @@ class CourseController extends Controller
                     $errorMessage .= 'Course ID ' . $request->input('course_id') . ' is already taken by ' . $courseName . '. ';
                 }
 
-                return redirect()->route('admin.course.index')
+                
+                if (Auth::user()->hasRole('admin')) {
+                    return redirect()->route('admin.course.index')
                     ->with('error', $errorMessage . 'Try again.');
+                }
+                else{
+                    return redirect()->route('staff.course.index')
+                    ->with('error', $errorMessage . 'Try again.');
+                }
             }
     }
 
@@ -163,8 +179,15 @@ class CourseController extends Controller
             $course->course_logo = $fileNameToStore;
             $course->save();
 
-            return redirect()->route('admin.course.index')
+
+            if (Auth::user()->hasRole('admin')){
+                return redirect()->route('admin.course.index')
                 ->with('success', 'Course updated successfully.');
+            } else {
+                return redirect()->route('staff.course.index')
+                ->with('success', 'Course updated successfully.');
+            }
+            
         } else {
             $errorMessage = '';
             if ($existingCourseById) {
@@ -172,8 +195,14 @@ class CourseController extends Controller
                 $errorMessage .= 'Course ID ' . $request->input('course_id') . ' is already taken by ' . $courseName . '. ';
             }
 
-            return redirect()->route('admin.course.index')
+            if (Auth::user()->hasRole('admin'))
+            {
+                return redirect()->route('admin.course.index')
                 ->with('error', $errorMessage . 'Try again.');
+            } else {
+                return redirect()->route('staff.course.index')
+                ->with('error', $errorMessage . 'Try again.');
+            }
         }
     }
     /**
@@ -181,10 +210,16 @@ class CourseController extends Controller
      */
     public function destroy(string $id)
     {
-          $course = Course::findOrFail($id);
-
+        
+        $course = Course::findOrFail($id);
         $course->delete();
 
-        return redirect()->route('admin.course.index')->with('success', 'Course deleted successfully.');
+        if (Auth::user()->hasRole('admin'))
+        {
+            return redirect()->route('admin.course.index')->with('success', 'Course deleted successfully.');
+        }
+        else {
+            return redirect()->route('staff.course.index')->with('success', 'Course deleted successfully.');
+        }
     }
 }

@@ -23,23 +23,21 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Retrieve any user with the role 'admin'
-        // $adminUser = User::where('role', 'admin')->first();
 
-        // // Check if there is an admin user
-        // if ($adminUser) {
-
-            // $current_date = now()->setTimezone('Asia/Kuala_Lumpur')->format('Y-m-d');
-
-            // // Retrieve attendance data for the current date
-            // $curdateDataIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)->get();
-            // $curdateDataOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)->get();
-
-            // Return view with the attendance data
             return view('Admin.dashboard.dashboard');
-        // }
 
-        // Redirect with an error message if no admin user is found
-        // return redirect()->back()->with('error', 'No admin user found.');
+    }
+    public function indexStaff()
+    {
+        
+            return view('Admin.dashboard.dashboard');
+
+    }
+
+    public function indexHRD()
+    {
+        
+            return view('Admin.dashboard.dashboard');
+
     }
 }

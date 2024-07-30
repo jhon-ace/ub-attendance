@@ -16,10 +16,10 @@ export default defineConfig({
         host: "0.0.0.0", // Allow Vite to be accessed from any IP
         port: 5173, // Ensure the port matches your Vite server configuration
         hmr: {
-            host: "192.168.33.11", // Adjust HMR host if necessary
+            host: "localhost", // Adjust HMR host if necessary
         },
         cors: {
-            origin: "http://192.168.33.11:8000", //add always huhu
+            origin: "*", //add always huhu
             methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             allowedHeaders: ["Content-Type", "Authorization"],
         },

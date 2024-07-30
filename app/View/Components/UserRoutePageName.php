@@ -44,6 +44,25 @@ class UserRoutePageName extends Component
                 'admin.attendance.employeeSearch' => __('Admin - Employee Attendance Search'),
                 'admin.attendance.student_attendance' => __('Admin - Student Attendance'),
                 'admin.attendance.employee_attendance.portal' => __('Employee Attendance Portal'),
+
+                
+            ];
+
+            $this->title = $titles[$routeName] ?? __('University of Bohol Attendance System');
+
+        }
+        else if (Auth::user()->hasRole('admin_staff')) {
+
+            $titles = [
+
+                'staff.dashboard' => __('Staff | Dashboard'),
+                'staff.school.index' => __('Staff | Manage School Year'),
+                'staff.department.index' => __('Staff | Manage Department'),
+                'staff.workinghour.index' => __('Staff | Manage Dept Working Hour'),
+                'staff.course.index' => __('Staff | Manage Courses'),
+                'staff.employee.index' => __('Staff | Manage Employee'),
+                'staff.student.index' => __('Staff | Manage Student'),
+
             ];
 
             $this->title = $titles[$routeName] ?? __('University of Bohol Attendance System');
@@ -54,7 +73,7 @@ class UserRoutePageName extends Component
             $titles = [
 
                 //employee route pages name
-                'employee.dashboard' => __('Employee Dashboard'),
+                'hr.dashboard' => __('Human Resource | Dashboard'),
             ];
 
             $this->title = $titles[$routeName] ?? __('University of Bohol Attendance System');
@@ -63,6 +82,7 @@ class UserRoutePageName extends Component
          else {
             $this->title = __('University of Bohol Attendance System');
         }
+
     }
 
     /**

@@ -11,6 +11,7 @@ use \App\Models\Admin\Employee;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -83,8 +84,18 @@ class EmployeeController extends Controller
                 $employee->employee_photo = $fileNameToStore;
                 $employee->save();
 
-                return redirect()->route('admin.employee.index')
+                // return redirect()->route('admin.employee.index')
+                //     ->with('success', 'Employee created successfully.');
+
+                if (Auth::user()->hasRole('admin')) {
+                    return redirect()->route('admin.employee.index')
                     ->with('success', 'Employee created successfully.');
+
+                } else {
+                    return redirect()->route('staff.employee.index')
+                    ->with('success', 'Employee created successfully.');
+                }
+
             } else {
                 $errorMessage = '';
                 if ($existingEmployeeById) {
@@ -96,8 +107,18 @@ class EmployeeController extends Controller
                     $errorMessage .= 'Employee RFID No. ' . $request->input('employee_rfid') . ' is already taken by ' . $employeeName . '. ';
                 }
 
-                return redirect()->route('admin.employee.index')
+
+                if (Auth::user()->hasRole('admin')) {
+
+                    return redirect()->route('admin.employee.index')
                     ->with('error', $errorMessage . 'Try again.');
+
+                } else {
+
+                    return redirect()->route('staff.employee.index')
+                    ->with('error', $errorMessage . 'Try again.');
+                }
+                
             }
         }
 
@@ -183,8 +204,19 @@ class EmployeeController extends Controller
             $employee->employee_photo = $fileNameToStore;
             $employee->save();
 
-            return redirect()->route('admin.employee.index')
+
+            if (Auth::user()->hasRole('admin')) {
+                
+                return redirect()->route('admin.employee.index')
                 ->with('success', 'Employee updated successfully.');
+
+            } else {
+
+                return redirect()->route('staff.employee.index')
+                ->with('success', 'Employee updated successfully.');
+
+            }
+
         } else {
             $errorMessage = '';
             if ($existingEmployeeById) {
@@ -196,8 +228,18 @@ class EmployeeController extends Controller
                 $errorMessage .= 'RFID ' . $request->input('employee_rfid') . ' is already taken by ' . $employeeName . '. ';
             }
 
-            return redirect()->route('admin.employee.index')
+            if (Auth::user()->hasRole('admin')) {
+
+                return redirect()->route('admin.employee.index')
                 ->with('error', $errorMessage . 'Try again.');
+
+            } else {
+
+                return redirect()->route('staff.employee.index')
+                ->with('error', $errorMessage . 'Try again.');
+
+            }
+            
         }
     }
 
@@ -209,12 +251,38 @@ class EmployeeController extends Controller
      */
     public function destroy(string $id)
     {
+        
+        // Determine the route and role-based message
+        $route = Auth::user()->hasRole('admin') ? 'admin.employee.index' : 'staff.employee.index';
 
-         $employee = Employee::findOrFail($id);
+        try {
+            // Find the employee or throw a 404 exception
+            $employee = Employee::findOrFail($id);
 
-        $employee->delete();
+            // Attempt to delete the employee
+            $employee->delete();
 
-        return redirect()->route('admin.employee.index')->with('success', 'Employee deleted successfully.');
+            // Return success message based on user role
+            return redirect()->route($route)->with('success', 'Employee deleted successfully.');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Handle case where the employee is not found
+            return redirect()->route($route)->with('error', 'Employee not found.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Handle SQL exceptions
+            if ($e->getCode() == '23000') {
+                return redirect()->route($route)->with('error', 'Cannot delete employee due to a foreign key constraint violation.');
+            }
+
+            // Handle other types of SQL exceptions
+            return redirect()->route($route)->with('error', 'An unexpected error occurred while trying to delete the employee.');
+
+        } catch (\Exception $e) {
+            // Handle any other exceptions
+            return redirect()->route($route)->with('error', 'An unexpected error occurred.');
+        }       
+         
     }
 
     public function deleteAll(Request $request)

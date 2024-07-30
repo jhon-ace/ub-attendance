@@ -16,7 +16,11 @@
         <x-sweetalert type="error" :message="session('error')" />
     @endif
     <div class="flex justify-between mb-4 sm:-mt-4">
-        <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Admin / Manage Courses</div>
+    @if (Auth::user()->hasRole('admin'))
+        <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Admin / Manage Student</div>
+    @else
+        <div class="font-bold text-md tracking-tight text-md text-black  mt-2 uppercase">Staff / Manage Student</div>
+    @endif
     </div>
 
         <div class="flex flex-column overflow-x-auto -mb-5">
@@ -31,7 +35,7 @@
                     @endforeach
                 </select>
                 @if($schoolToShow)
-                    <p class="text-black mt-2 text-sm mb-1 ">Selected School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
+                    <p class="text-black mt-2 text-sm mb-1 ">School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
                     <!-- <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p> -->
                 @endif
             </div>
@@ -57,7 +61,7 @@
                         @endif
                     </select>
                     @if($departmentToShow)
-                        <p class="text-black mt-2 text-sm mb-1">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_abbreviation }}</span></p>
+                        <p class="text-black mt-2 text-sm mb-1">Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_abbreviation }}</span></p>
                         <!-- <p class="text-black text-sm ml-4">Selected Department: <span class="text-red-500 ml-2">{{ $departmentToShow->department_name }}</span></p> -->
                     @endif
                 @endif
@@ -77,17 +81,21 @@
                 <div x-data="{ open: false }">
                     <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                      
-                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Student
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Student in any course
                     </button>
                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
+                        <div  class="w-[50%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
                             <div class="flex justify-between items-center pb-3">
                                 <p class="text-xl font-bold">Add Student</p>
                                 <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                             </div>
                             <div class="mb-4">
+                            @if (Auth::user()->hasRole('admin'))
                                 <form action="{{ route('admin.student.store') }}" method="POST" class="" enctype="multipart/form-data">
-                                    <x-caps-lock-detector />
+                            @else
+                                <form action="{{ route('staff.student.store') }}" method="POST" class="" enctype="multipart/form-data">
+                            @endif
+                                <x-caps-lock-detector />
                                     @csrf
 <!--  -->
                                     <div class="mb-2">
@@ -140,7 +148,7 @@
                                             <label for="course_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Course:</label>
                                             <select id="course_id" name="course_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('course_id') is-invalid @enderror" required>
                                                 @foreach($courses as $course)
-                                                    <option value="">{{ $course->course_abbreviation }} - {{ $course->course_name }}</option>
+                                                    <option value="{{ $course->id }}">{{ $course->course_abbreviation }} - {{ $course->course_name }}</option>
                                                 @endforeach
                                             </select>
                                             <x-input-error :messages="$errors->get('course_id')" class="mt-2" />
@@ -335,7 +343,7 @@
         </select>
 
         @if($selectedCourseToShow)
-            <p>Selected Course: {{ $selectedCourseToShow->course_name }}({{ $selectedCourseToShow->course_abbreviation}})</p>
+            <p>Selected Course: <text class="text-red-500">{{ $selectedCourseToShow->course_name }}({{ $selectedCourseToShow->course_abbreviation}})</text></p>
         @endif
 
         @if($selectedCourseToShow)
@@ -357,7 +365,11 @@
                                     <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                                 </div>
                                 <div class="mb-4">
+                                @if (Auth::user()->hasRole('admin'))
                                     <form action="{{ route('admin.student.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                @else
+                                    <form action="{{ route('staff.student.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                @endif
                                         <x-caps-lock-detector />
                                         @csrf
 
@@ -438,7 +450,7 @@
                             <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                                 <!-- <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> {{$departmentToShow->department_id}} - {{$departmentToShow->department_name}} -->
                                  <!-- {{$selectedCourseToShow->course_id}} {{$selectedCourseToShow->course_name}}  -->
-                                <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Student 
+                                <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Student in {{$selectedCourseToShow->course_name}}
                             </button>
                             <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                 <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
@@ -447,20 +459,25 @@
                                         <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                                     </div>
                                     <div class="mb-4">
+                                    @if (Auth::user()->hasRole('admin'))
                                         <form action="{{ route('admin.student.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                    @else
+                                        <form action="{{ route('staff.student.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                    @endif
                                             <x-caps-lock-detector />
                                             @csrf
 
                                             <div class="mb-2">
                                                 <input type="file" name="student_photo" id="student_photo" class="hidden" accept="image/*" onchange="previewImage(event)">
                                                 <label for="student_photo" class="cursor-pointer flex flex-col items-center">
-                                                    <div id="imagePreviewContainer" class="mb-2 text-center">
+                                                    <div id="bla2" class="mb-2 text-center">
                                                         <img id="imagePreview" src="{{ asset('assets/img/user.png') }}" class="rounded-lg w-32 h-auto">
                                                     </div>
                                                     <span class="text-sm text-gray-500">Select Photo</span>
                                                 </label>
                                                 <x-input-error :messages="$errors->get('student_photo')" class="mt-2" />
                                             </div>
+                                            
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                                 <div class="mb-2">
                                                     <label for="student_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Student ID</label>
@@ -645,7 +662,6 @@
                                     <td class="text-black border border-gray-400">{{ $student->student_rfid}}</td>
                                     <td class="text-black border border-gray-400">{{ $student->student_year_grade }}</td>
                                     <td class="text-black border border-gray-400">{{ $student->student_status }}</td>
-                                    <!-- <td class="text-black border border-gray-400 text-xs">{{ $student->course->course_id}}</td> -->
                                     <td class="text-black border border-gray-400 text-xs">{{ $student->course->course_abbreviation}}</td>
                                     <td class="text-black border border-gray-400">
                                         <div class="flex justify-center items-center space-x-2">
@@ -657,11 +673,16 @@
                                                 <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                                     <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto  mx-auto">
                                                         <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
-                                                            <p class="text-xl font-bold">Edit Course</p>
+                                                            <p class="text-xl font-bold">Edit Student</p>
                                                             <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                         </div>
                                                         <div class="mb-4">
+                                                        @if (Auth::user()->hasRole('admin'))
                                                             <form action="{{ route('admin.student.update', $student->id) }}" method="POST" class="" enctype="multipart/form-data">
+                                                        @else
+                                                            <form action="{{ route('staff.student.update', $student->id) }}" method="POST" class="" enctype="multipart/form-data">
+                                                        @endif  
+                                                            
                                                                 <x-caps-lock-detector />
                                                                 @csrf
                                                                 @method('PUT')
@@ -709,7 +730,7 @@
                                                                     <div class="mb-2">
                                                                         <label for="course_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Course ID</label>
                                                                         <select id="course_id" name="course_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('course_id') is-invalid @enderror" required>
-                                                                            <option value="{{ $selectedCourseToShow->id }}">{{ $selectedCourseToShow->course_id }}</option>
+                                                                            <option value="{{ $selectedCourseToShow->id }}">{{ $selectedCourseToShow->course_abbreviation }}</option>
                                                                         </select>
                                                                         <x-input-error :messages="$errors->get('course_id')" class="mt-2" />
                                                                     </div>
@@ -725,6 +746,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            @if (Auth::user()->hasRole('admin'))
                                             <form id="deleteSelected" action="{{ route('admin.student.destroy', [':id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $student->id }}', '{{ $student->student_lastname }}', '{{ $student->student_firstname }}', '{{ $student->student_middlename }}');">
                                                 @csrf
                                                 @method('DELETE')
@@ -732,6 +754,7 @@
                                                     <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i>
                                                 </button>
                                             </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
