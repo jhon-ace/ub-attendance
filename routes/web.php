@@ -23,6 +23,9 @@ Route::get('/human-resource', function () {
     return view('welcome');
 });
 
+Route::get('/', function () {
+    return view('background');
+});
 
 Route::get('/attendance/portal', [PublicPageController::class, 'portalTimeIn'])->name('attendance.portal');
 Route::post('/attendance/portal', [PublicPageController::class, 'submitAttendance'])->name('admin.attendance.store');
