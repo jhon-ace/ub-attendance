@@ -290,7 +290,7 @@
                         <span class="inline-flex justify-center items-center ml-3">
                             <i class="fa-solid fa-users fa-sm text-gray-200"></i>
                         </span>
-                        <span class="text-sm tracking-wide truncate text-gray-200 ml-2">Users</span>
+                        <span class="text-sm tracking-wide truncate text-gray-200 ml-2"> Manage Users</span>
                         <span class="ml-auto">
                             <svg fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
                                 <path x-show="!open" fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>

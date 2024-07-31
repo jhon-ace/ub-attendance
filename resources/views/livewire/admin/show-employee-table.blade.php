@@ -179,6 +179,18 @@
                                 @endif
                             </button>
                         </th>
+                        <th class="border border-gray-400 px-3 py-2">
+                            <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
+                                Action
+                                @if ($sortField == 'school_id')
+                                    @if ($sortDirection == 'asc')
+                                        &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
+                                    @else
+                                        &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -200,6 +212,102 @@
                             <td class="text-black border border-gray-400">{{ $employee->employee_rfid}}</td>
                             <td class="text-black border border-gray-400">{{ $employee->department->department_abbreviation}}</td>
                             <td class="text-black border border-gray-400">{{ $employee->school->abbreviation}}</td>
+                            <td class="text-black border border-gray-400">
+                                <div class="flex justify-center items-center space-x-2">
+                                        <div x-data="{ open: false
+                                                }">
+                                            <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-[5px] rounded hover:bg-blue-700">
+                                                <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i>
+                                            </a>
+                                            <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                                <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto  mx-auto">
+                                                    <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
+                                                        <p class="text-xl font-bold">Edit employee</p>
+                                                        <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
+                                                    </div>
+                                                    <div class="mb-4">
+                                                    @if (Auth::user()->hasRole('admin'))
+                                                        <form action="{{ route('admin.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
+                                                    @else
+                                                        <form action="{{ route('staff.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
+                                                    @endif
+                                                            <x-caps-lock-detector />
+                                                            @csrf
+                                                            @method('PUT')
+
+                                                                <div class="mb-4 text-center flex flex-col items-center">
+                                                                    <img id="blah" src="{{ $employee->employee_photo ? asset('storage/employee_photo/' . $employee->employee_photo) : asset('assets/img/user.png') }}" alt="Default photo Icon" class="max-w-xs mb-2" />
+                                                                    <input type="file" onchange="readURL(this);" name="employee_photo" id="employee_photo" class="p-2 bg-gray-800 text-white" accept="image/*" />
+                                                                </div>
+
+                                                                <div class="mb-4">
+                                                                    <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee School ID</label>
+                                                                    <input type="text"  name="employee_id" id="employee_id" value="{{ $employee->employee_id }}"  class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required autofocus>
+                                                                    <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="employee_rfid" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee RFID No</label>
+                                                                    <input type="text" name="employee_rfid" id="employee_rfid" value="{{ $employee->employee_rfid }}"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_middlename') is-invalid @enderror" required>
+                                                                    <x-input-error :messages="$errors->get('employee_rfid')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="employee_lastname" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Lastname</label>
+                                                                    <input type="text" name="employee_lastname" id="employee_lastname" value="{{ $employee->employee_lastname }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_lastname') is-invalid @enderror" required>
+                                                                    <x-input-error :messages="$errors->get('employee_lastname')" class="mt-2" />
+                                                                </div>
+
+                                                                <div class="mb-4">
+                                                                    <label for="employee_firstname" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Firstname</label>
+                                                                    <input type="text" name="employee_firstname" id="employee_firstname"  value="{{ $employee->employee_firstname }}"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_firstname') is-invalid @enderror" required>
+                                                                    <x-input-error :messages="$errors->get('employee_firstname')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-4">
+                                                                    <label for="employee_middlename" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Middlename</label>
+                                                                    <input type="text" name="employee_middlename" id="employee_middlename" value="{{ $employee->employee_middlename }}"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_middlename') is-invalid @enderror" required>
+                                                                    <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Year:</label>
+                                                                    <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                                                        
+                                                                        <option value="{{ $employee->school->id }}">{{ $employee->school->abbreviation }}</option>
+                                                                    </select>
+                                                                    <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                                                </div>
+
+                                                                <div class="mb-2">
+                                                                    <label for="department_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department:</label>
+                                                                    <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
+                                                                        <option value="{{ $employee->department->id }}">{{ $employee->department->department_abbreviation }}</option>
+                                                                    </select>
+                                                                    <x-input-error :messages="$errors->get('id')" class="mt-2" />
+                                                                </div>
+                                                            <div class="flex mb-4 mt-10 justify-center">
+                                                                <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                                    Save Changes
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @if (Auth::user()->hasRole('admin'))
+                                            @if (Auth::user()->hasRole('admin'))
+                                                <form id="deleteSelected" action="{{ route('admin.employee.destroy', [':id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $employee->id }}', '{{ $employee->employee_lastname }}', '{{ $employee->employee_firstname }}', '{{ $employee->employee_middlename }}');">
+                                            @else
+                                                <form id="deleteSelected" action="{{ route('staff.employee.destroy', [':id']) }}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $employee->id }}', '{{ $employee->employee_lastname }}', '{{ $employee->employee_firstname }}', '{{ $employee->employee_middlename }}');">
+                                            @endif
+                                                
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700" id="hehe">
+                                                        <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i>
+                                                    </button>
+                                                </form>
+                                        @endif
+                                    </div>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

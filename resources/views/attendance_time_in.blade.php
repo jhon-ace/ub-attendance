@@ -280,7 +280,6 @@
 
     <!-- <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8"> </div> Date and Time Display -->
     <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8">
-        <!-- <span id="current-date">{{ $current_date1 }}</span>, <span id="current-time">{{ $current_time1 }}</span> -->
          <span id="current-date-time"></span>
     </div> <!-- Date and Time Display --> 
 </div>
