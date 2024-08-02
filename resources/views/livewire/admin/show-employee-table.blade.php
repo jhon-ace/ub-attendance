@@ -438,7 +438,7 @@
             </div>
         @else
             <div class="flex justify-between">
-                <form action="{{ route('admin.csv.import') }}" method="post" enctype="multipart/form-data">
+                <!-- <form action="{{ route('admin.csv.import') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="flex items-center space-x-2">
                         <label for="csv_file" class="text-sm font-medium text-gray-700">Choose CSV file:</label>
@@ -451,8 +451,14 @@
                         <button type="submit" class="bg-blue-500 text-white text-sm px-3 py-1 rounded hover:bg-blue-700">
                             Import
                         </button>
+                    </div>-->
+                    <div class="">
+                        <form action="{{ route('admin.insert.photos') }}" method="GET">
+                                  <button type="submit">Insert Photos</button>
+                                  
+                        </form>
                     </div>
-                </form>
+                </form> 
                 <div class="flex justify-center items-center">
                     <div x-data="{ open: false }">
                         <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
@@ -652,7 +658,7 @@
                                 <td class="text-black border border-gray-400">{{ $employee->employee_id}}</td>
                                 <td class="text-black border border-gray-400 border-t-0 border-r-0 border-l-0 px-2 py-1 flex items-center justify-center" >
                                     @if ($employee->employee_photo && Storage::exists('public/employee_photo/' . $employee->employee_photo))
-                                        <a  href="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" 
+                                        <a  href="{{ asset('storage/employee_photo/'. $employee->employee_photo) }}" 
                                             class="hover:border border-red-500 rounded-full" title="Click to view Picture"
                                             data-fancybox data-caption="{{ $employee->employee_lastname}}, {{ $employee->employee_firstname }} {{ ucfirst(substr($employee->employee_middlename, 0, 1)) }}">
                                             <img src="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" class="rounded-full w-9 h-9">

@@ -300,4 +300,69 @@ class EmployeeController extends Controller
 
         
     }
+
+
+        public function employee_insertPhoto()
+    {
+        // Path to your photos directory
+        $photosDirectory = storage_path('app/public/employee_photo/');
+
+        // Directory where photos are currently stored (your desktop)
+        $sourceDirectory = 'C:\Users\Jhon Ace\Desktop\extract\\'; // Ensure trailing backslash
+
+        // Ensure the photos directory exists
+        if (!is_dir($photosDirectory)) {
+            mkdir($photosDirectory, 0755, true);
+        }
+
+        // Get all files from the source directory
+        $files = scandir($sourceDirectory);
+
+        foreach ($files as $file) {
+            // Skip '.' and '..' from the list
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            // Full path to the source file
+            $sourceFilePath = $sourceDirectory . $file;
+
+            // Check if the file exists
+            if (file_exists($sourceFilePath)) {
+                // Extract the employee_id from the filename (assuming format 'employee_id_photo.ext')
+                $employeeId = explode('_', pathinfo($file, PATHINFO_FILENAME))[0];
+
+                // Generate a timestamp
+                $timestamp = now()->format('Ymd_His');
+
+                // Extract the file extension
+                $extension = pathinfo($file, PATHINFO_EXTENSION);
+
+                // Create a new filename with timestamp
+                $newFilename = $timestamp . '_' . pathinfo($file, PATHINFO_FILENAME) . '.' . $extension;
+
+                // Full path to the destination file
+                $destinationFilePath = $photosDirectory . $newFilename;
+
+                // Move and rename the file
+                rename($sourceFilePath, $destinationFilePath);
+
+                // Update the employee record with the new filename
+                $employee = Employee::find($employeeId); // Fetch employee using extracted employeeId
+                if ($employee) {
+                    $employee->employee_photo = $newFilename;
+                    $employee->save();
+                } else {
+                    // Handle the case where the employee does not exist
+                    // You might log an error or handle the missing employee
+                }
+            } else {
+                // Handle the case where the file does not exist
+                // You might log an error or handle the missing file
+            }
+        }
+
+        return redirect()->back()->with('success', 'Photos inserted successfully.');
+    }
+
 }

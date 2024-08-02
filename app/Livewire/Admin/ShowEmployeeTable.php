@@ -89,7 +89,7 @@ class ShowEmployeeTable extends Component
         }
 
         $employees = $query->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(10);
+            ->paginate(50);
 
         $schools = School::all();
         // $departments = Department::where('school_id', $this->selectedSchool)->get();

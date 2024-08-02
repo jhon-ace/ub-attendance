@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Time In Portal | UB</title>
+    <title>Time In Portal | VDT</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .logo-background {
@@ -235,6 +235,7 @@
         </div>
         <div class="flex-col z-50">
             <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[250px]">
+            <img src="{{ asset('assets/img/vdtlogo.png') }}" alt="Logo" class="w-[250px]">
         </div>
     </div>
     
@@ -285,7 +286,7 @@
 </div>
 
     <div class="w-full z-10">
-        <form id="attendanceForm" action="{{ route('admin.attendance.store') }}" method="POST">
+        <form id="attendanceForm" action="{{ route('admin.attendance.store.vdt') }}" method="POST">
             @csrf
             <div class="z-10">
                 <input type="password" id="inputField" name="user_rfid"

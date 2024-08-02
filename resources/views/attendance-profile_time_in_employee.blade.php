@@ -62,11 +62,15 @@
             font-size:70px;
             
         }
+        .ace{
+            width:400px;
+            height:400px;
+        }
     </style>
     <script>
         setTimeout(function() {
             window.location.href = "{{ route('attendance.portal') }}";
-        }, 2000); // 5000 milliseconds = 5 seconds
+        }, 5000); // 5000 milliseconds = 5 seconds
     </script>
 </head>
 <body>
@@ -74,15 +78,27 @@
     <div class="container">
         @forelse ($employees as $employee)
         <div class="flex w-full">
-            <div style="width: 600px;" class="pl-16 ml-5">
+            <div  class="pl-16 ml-5">
                 @if ($employee->employee_photo && Storage::exists('public/employee_photo/' . $employee->employee_photo))
-                <div class="flex justify-center mb-4 mt-5">
-                    <img src="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" class="rounded-lg object-contain" alt="Employee Photo">
-                </div>
+                    <div class="flex flex-col">
+                        <div class="flex justify-center mb-4 mt-5">
+                            <img src="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" class="ace rounded-lg object-contain" alt="Employee Photo">
+                        </div>
+                        <div class="p-2 mb-2 mt-5 font-bold uppercase">       
+                            <span class="text-sm tracking-wider" style="font-size:38px;color:#FBBF24;">Time In</span><br>
+                            <span style="font-size: 50px;" class="text-white shadow-sm tracking-wide">{{ date('m-d :: g:i:s A', strtotime($first_time_in)) }}</span>
+                        </div>
+                    </div> 
                 @else
-                <div class="flex justify-center mb-4">
-                    <img data-fancybox src="{{ asset('assets/img/user.png') }}" style="width: 890px;" class="cursor-pointer  object-contain rounded-sm" title="Click to view Picture" alt="Default User Photo">
-                </div>
+                    <div class="flex flex-col">
+                        <div class="flex justify-center mb-1">
+                            <img data-fancybox src="{{ asset('assets/img/user.png') }}" class="ace cursor-pointer  object-contain rounded-sm" title="Click to view Picture" alt="Default User Photo">
+                        </div>
+                        <div class=" font-bold uppercase">       
+                            <span class="text-sm tracking-wider " style="font-size:38px;color:#FBBF24;">Time In</span><br>
+                            <span style="font-size: 50px;" class="text-white shadow-sm tracking-wide">{{ date('m-d :: g:i:s A', strtotime($first_time_in)) }}</span>
+                        </div>
+                    </div>
                 @endif
             </div>
             <div class="flex flex-1 flex-col w-full -pl-8">

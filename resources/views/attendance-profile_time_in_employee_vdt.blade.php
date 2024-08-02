@@ -1,12 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Employee Profile Out</title>
+    <title>Employee Profile In</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+
         /* Styles for input fields */
         input[type=password] {
             display: block;
@@ -69,38 +71,36 @@
     </style>
     <script>
         setTimeout(function() {
-            window.location.href = "{{ route('attendance.portal') }}";
+            window.location.href = "{{ route('attendance.portal.vdt') }}";
         }, 5000); // 5000 milliseconds = 5 seconds
     </script>
 </head>
 <body>
-    <div class="hehe uppercase font-bold text-3xl text-center mt-11 text-white tracking-widest shadow-lg pb-8">Time - Out</div>
+    <div class="hehe uppercase font-bold text-3xl text-center mt-11 text-white tracking-widest shadow-lg pb-8">Time - In</div>
     <div class="container">
         @forelse ($employees as $employee)
         <div class="flex w-full">
             <div  class="pl-16 ml-5">
                 @if ($employee->employee_photo && Storage::exists('public/employee_photo/' . $employee->employee_photo))
-                <div class="flex flex-col">
-                    <div class="flex justify-center mb-4 mt-5">
-                        <img src="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" class="ace rounded-lg object-contain" alt="Employee Photo">
-                    </div>
-                    <div class="p-2 mb-2 mt-5 font-bold uppercase">       
-                        <span class="text-sm tracking-wider" style="font-size:38px;color:#FBBF24;">Time Out</span><br>
-                        <span style="font-size: 50px;" class="text-white shadow-sm tracking-wide">{{ date('m-d :: g:i:s A', strtotime($first_time_out)) }}</span>
-                    </div>
-                </div>
-                    
-
+                    <div class="flex flex-col">
+                        <div class="flex justify-center mb-4 mt-5">
+                            <img src="{{ asset('storage/employee_photo/' . $employee->employee_photo) }}" class="ace rounded-lg object-contain" alt="Employee Photo">
+                        </div>
+                        <div class="p-2 mb-2 mt-5 font-bold uppercase">       
+                            <span class="text-sm tracking-wider" style="font-size:38px;color:#FBBF24;">Time In</span><br>
+                            <span style="font-size: 50px;" class="text-white shadow-sm tracking-wide">{{ date('m-d :: g:i:s A', strtotime($first_time_in)) }}</span>
+                        </div>
+                    </div> 
                 @else
-                <div class="flex flex-col">
-                    <div class="flex justify-center mb-1">
-                        <img data-fancybox src="{{ asset('assets/img/user.png') }}" class="ace cursor-pointer  object-contain rounded-sm" title="Click to view Picture" alt="Default User Photo">
+                    <div class="flex flex-col">
+                        <div class="flex justify-center mb-1">
+                            <img data-fancybox src="{{ asset('assets/img/user.png') }}" class="ace cursor-pointer  object-contain rounded-sm" title="Click to view Picture" alt="Default User Photo">
+                        </div>
+                        <div class=" font-bold uppercase">       
+                            <span class="text-sm tracking-wider " style="font-size:38px;color:#FBBF24;">Time In</span><br>
+                            <span style="font-size: 50px;" class="text-white shadow-sm tracking-wide">{{ date('m-d :: g:i:s A', strtotime($first_time_in)) }}</span>
+                        </div>
                     </div>
-                    <div class=" font-bold uppercase">       
-                        <span class="text-sm tracking-wider " style="font-size:38px;color:#FBBF24;">Time Out</span><br>
-                        <span style="font-size: 50px;" class="text-white shadow-sm tracking-wide">{{ date('m-d :: g:i:s A', strtotime($first_time_out)) }}</span>
-                    </div>
-                </div>
                 @endif
             </div>
             <div class="flex flex-1 flex-col w-full -pl-8">
@@ -130,7 +130,7 @@
         @endforelse
     </div>
     <div class="w-full z-10">
-            <form id="attendanceForm" action="{{ route('admin.attendance.store') }}" method="POST">
+            <form id="attendanceForm" action="{{ route('admin.attendance.store.vdt') }}" method="POST">
                 @csrf
                 <div class="z-10">
                     <input type="password" id="inputField" name="user_rfid"

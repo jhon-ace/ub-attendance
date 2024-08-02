@@ -69,12 +69,14 @@
         border-right: 2px solid #000; /* Adjust the border style, width, and color as needed */
         margin-right: 10px; /* Optional: Add some margin to separate the content from the border */
     }
+
     </style>
      @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-    <h4>Attendance Report</h4>
-    <span>Employee: {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</span>
+    <h4>ATTENDANCE REPORT</h4>
+    <span>Employee: <text style="color:red">{{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</text></span><br>
+    <span>Employee ID: <text style="color:red">{{ $selectedEmployeeToShow->employee_id }}</text></span>
     @if ($selectedStartDate && $selectedEndDate)
         <div class="date-range">
             <span>Selected Date: {{ date('F d, Y', strtotime($selectedStartDate)) }} to {{ date('F d, Y', strtotime($selectedEndDate)) }}</span>
@@ -85,7 +87,7 @@
         </div>
     @endif
     <div class="table-container">
-        @php
+       @php
             // Group check-ins and check-outs by employee and date
             $groupedAttendance = [];
 
@@ -131,18 +133,29 @@
             <tbody>
                 @foreach($groupedAttendance as $employeeId => $dates)
                     @foreach($dates as $date => $attendance)
+                        @php
+                            $isOnLeave = in_array('12:00:00 AM', $attendance['check_ins']) && in_array('12:00:00 AM', $attendance['check_outs']);
+                        @endphp
                         <tr>
                             <td>{{ $employeeId }}</td>
                             <td>{{ $attendance['date'] }}</td>
                             <td>
-                                @foreach($attendance['check_ins'] as $checkIn)
-                                    {{ $checkIn }}<br>
-                                @endforeach
+                                @if ($isOnLeave)
+                                    On Leave
+                                @else
+                                    @foreach($attendance['check_ins'] as $checkIn)
+                                        {{ $checkIn }}<br>
+                                    @endforeach
+                                @endif
                             </td>
                             <td>
-                                @foreach($attendance['check_outs'] as $checkOut)
-                                    {{ $checkOut }}<br>
-                                @endforeach
+                                @if ($isOnLeave)
+                                    On Leave
+                                @else
+                                    @foreach($attendance['check_outs'] as $checkOut)
+                                        {{ $checkOut }}<br>
+                                    @endforeach
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -384,6 +397,7 @@
                         </td>
                         <td class="text-black border border-gray-400">
                             {{ $attendance->hours_perDay }} hr/s
+                            
                         </td>
                         <td class="text-black border uppercase border-gray-400">
                             @php
@@ -398,6 +412,7 @@
                                 $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
                                 $totalHours = $totalHoursAM + $totalHoursPM;
                                 $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+                                $modify_status = $attendance->modify_status;
 
                                 $remarkss = '';
 
@@ -409,10 +424,38 @@
                                     $totalHoursAM == 0 &&
                                     $totalMinutesAM == 0 &&
                                     $totalHoursPM == 0 &&
-                                    $totalMinutesPM == 0
+                                    $totalMinutesPM == 0 &&
+                                    $modify_status == "Absent"
                                 ) {
                                     $remarkss = 'Absent';
-                                } else {
+                                }
+                                else if (
+                                    $lateDurationAM == 0 &&
+                                    $lateDurationPM == 0 &&
+                                    $am == 0 &&
+                                    $pm == 0 &&
+                                    $totalHoursAM == 0 &&
+                                    $totalMinutesAM == 0 &&
+                                    $totalHoursPM == 0 &&
+                                    $totalMinutesPM == 0 &&
+                                    $modify_status == "On Leave"
+                                ) {
+                                    $remarkss = 'Leave';
+                                }
+                                else if (
+                                    $lateDurationAM == 0 &&
+                                    $lateDurationPM == 0 &&
+                                    $am == 0 &&
+                                    $pm == 0 &&
+                                    $totalHoursAM > 0 &&
+                                    $totalMinutesAM == 0 &&
+                                    $totalHoursPM > 0 &&
+                                    $totalMinutesPM == 0 &&
+                                    $modify_status == "On Leave"
+                                ) {
+                                    $remarkss = 'Leave';
+                                }
+                                    else {
                                     if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
                                         $remarkss = "Present but Absent Morning";
                                     }
@@ -446,7 +489,8 @@
                                     }
                                 }
                             @endphp
-                            {{ $remarkss }}
+
+                                {{ $remarkss }}
                         </td>
                     </tr>
                 @endforeach

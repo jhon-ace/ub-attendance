@@ -30,6 +30,9 @@ Route::get('/', function () {
 Route::get('/attendance/portal', [PublicPageController::class, 'portalTimeIn'])->name('attendance.portal');
 Route::post('/attendance/portal', [PublicPageController::class, 'submitAttendance'])->name('admin.attendance.store');
 
+Route::get('/attendance/portal/vdt', [PublicPageController::class, 'portalTimeInvdt'])->name('attendance.portal.vdt');
+Route::post('/attendance/portal/vdt', [PublicPageController::class, 'submitAttendancevdt'])->name('admin.attendance.store.vdt');
+
 Route::get('/attendance/portal/student', [PublicPageController::class, 'portalTimeInStudent'])->name('attendance.portal.student');
 Route::post('/attendance/portal/student', [PublicPageController::class, 'submitAttendanceStudent'])->name('admin.attendance.store.student');
 
@@ -127,6 +130,13 @@ Route::middleware(['auth'])->group(function () {
             'update' => 'staff.update'
         ]);
         Route::delete('staff', [AdminStaffController::class, 'deleteAll'])->name('staff.deleteAll');
+
+
+        Route::put('/edit-TimeIn/{id}', [EmployeeAttendanceController::class, 'attendanceTimeInUpdate'])->name('attendanceIn.edit');
+        Route::put('/edit-TimeOut/{id}', [EmployeeAttendanceController::class, 'attendanceTimeOutUpdate'])->name('attendanceOut.edit');
+
+        Route::get('/insert-photos', [EmployeeController::class, 'employee_insertPhoto'])->name('insert.photos');
+
 
     });
 

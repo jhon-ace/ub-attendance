@@ -59,6 +59,13 @@
                 @endif
             @endif
         </div>
+        <div class="col-span-1 ml-5 mt-4">
+            @if($departmentToShow)
+                <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
+                    <i class="fa-solid fa-file"></i> Generate Data for Payroll in {{ $departmentToShow->department_abbreviation }} department.
+                </button>
+            @endif
+        </div>
 
     </div>
     <hr class="border-gray-200 my-4">
@@ -195,7 +202,7 @@
                                             </a>
                                         </div>
                                          <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
-                                        <i class="fa-solid fa-file"></i> Print DTR
+                                        <i class="fa-solid fa-file"></i> Generate DTR
                                     </button>
                                     </div>               
                                    
@@ -261,14 +268,20 @@
                                                     <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                                                         <thead class="bg-gray-200 text-black">
                                                             <tr>
-                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                <th class="border border-gray-400 px-3">
                                                                     Emp ID
                                                                 </th>
-                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                <th class="border border-gray-400 px-3">
                                                                     Date
                                                                 </th>
-                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                <th class="border border-gray-400 px-3">
                                                                     Time - In
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3">
+                                                                    Status
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3">
+                                                                    Action
                                                                 </th>
                                                                 <!-- Add other columns as needed -->
                                                             </tr>
@@ -282,27 +295,113 @@
                                                     </td>
                                                     <td class="text-black border border-gray-400 uppercase">
                                                         @php
-
-                                                            //$checkInTime = $attendanceIn->check_in_time;
                                                             $status = $attendanceIn->status;
-                                                            
                                                             $display = "";
+
                                                             if($status === "On Leave"){
                                                                 $display = "On Leave";
                                                             } elseif($status === "Absent"){
                                                                 $display = "Absent";
-                                                            } 
-                                                            elseif($status === "Weekend"){
+                                                            } elseif($status === "Weekend"){
                                                                 $display = "Weekend";
-                                                            }
-                                                            elseif($status === "awol"){
+                                                            } elseif($status === "awol"){
                                                                 $display = "Absent without leave";
-                                                            }
-                                                            else{
-                                                              $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
+                                                            } else {
+                                                                $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
                                                             }
                                                         @endphp
-                                                        {{  $display }}
+
+                                                        @if ($display === "On Leave")
+                                                            <span style="color: red;">{{ $display }}</span>
+                                                        @else
+                                                            {{ $display }}
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-black border border-gray-400 px-1 py-1">
+                                                        {{ ucfirst($attendanceIn->modification_status) }}
+                                                    </td>
+                                                     <!-- id: {{ json_encode($department->id) }},
+                                                                    department_id: {{ json_encode($department->department_id) }},
+                                                                    department_abbreviation: {{ json_encode($department->department_abbreviation) }},
+                                                                    school: {{ json_encode($department->school_id) }},
+                                                                    department_name: {{ json_encode($department->department_name) }},
+                                                                    
+                                                                    } -->
+                                                    <td class="text-black border border-gray-400 px-1 py-1">
+                                                        <div class="flex justify-center items-center space-x-2">
+                                                            <div x-data="{ open: false, 
+                                                        }">
+                                                                <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
+                                                                    <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i>
+                                                                </a>
+                                                                <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                                                    <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
+                                                                        <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
+                                                                            <p class="text-xl font-bold">Edit Time In</p>
+                                                                            <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
+                                                                        </div>
+                                                                        <div class="mb-4">
+                                                                            <form id="updateTimeInForm" action="{{ route('admin.attendanceIn.edit', $attendanceIn->id) }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to update?');">
+                                                                                <x-caps-lock-detector />
+                                                                                @csrf
+                                                                                @method('PUT')
+                                                                                    <div class="mb-2 hidden">
+                                                                                        <label for="attendanceIn_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Attendance ID: </label>
+                                                                                        <select id="attendanceIn_id" name="attendanceIn_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('attendanceIn_id') is-invalid @enderror">
+                                                                                                <option value="{{ $attendanceIn->id }}">{{ $attendanceIn->id }}</option>
+                                                                                        </select>
+                                                                                        <x-input-error :messages="$errors->get('attendanceIn_id')" class="mt-2" />
+                                                                                    </div>
+                                                                                    <div class="mb-4">
+                                                                                        <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee ID</label>
+                                                                                        <input type="text" name="employee_id" id="employee_id" value="{{ $attendanceIn->employee->employee_id }}"  readonly class="cursor-pointer shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_id') is-invalid @enderror" autofocus>
+                                                                                        <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                                                                    </div>
+                                                                                    <div class="mb-4">
+                                                                                        <label for="employee_name" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Name</label>
+                                                                                        <input type="text" name="employee_name" id="employee_name" value="{{ $attendanceIn->employee->employee_lastname }}, {{ $attendanceIn->employee->employee_firstname }}, {{ $attendanceIn->employee->employee_middlename }}" readonly class="cursor-pointer shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_name') is-invalid @enderror" autofocus>
+                                                                                        <x-input-error :messages="$errors->get('employee_name')" class="mt-2" />
+                                                                                    </div>
+                                                                                    <div class="mb-4">
+                                                                                        <label for="check_in_date" class="block text-gray-700 text-md font-bold mb-2 text-left">Date of Attendance</label>
+                                                                                        <input type="text" name="check_in_date" id="check_in_date" value="{{ date('Y-m-d (l)', strtotime($attendanceIn->check_in_time)) }}" readonly class="cursor-pointer shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('check_in_time') is-invalid @enderror" autofocus>
+                                                                                        <x-input-error :messages="$errors->get('check_in_date')" class="mt-2" />
+                                                                                    </div>
+                                                                                    <div class="mb-4">
+                                                                                        <label for="check_in_time" class="block text-gray-700 text-md font-bold mb-2 text-left">Time In</label>
+                                                                                        
+                                                                                        <!-- Hidden input for the date part -->
+                                                                                        <input type="hidden" name="check_in_time_date" id="check_in_time_date"
+                                                                                            value="{{ $attendanceIn->check_in_time ? date('Y-m-d', strtotime($attendanceIn->check_in_time)) : '' }}"
+                                                                                            class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('check_in_time_date') is-invalid @enderror"
+                                                                                            autofocus>
+                                                                                        
+                                                                                        <!-- Visible input for time part with AM/PM formatting -->
+                                                                                        <!-- <input type="time" name="check_in_time_time" id="check_in_time_time"
+                                                                                            value="{{ $attendanceIn->check_in_time ? date('h:i:s A', strtotime($attendanceIn->check_in_time)) : '' }}"
+                                                                                            class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('check_in_time_time') is-invalid @enderror"
+                                                                                            placeholder="hh:mm:ss AM/PM" required autofocus> -->
+                                                                                        <input type="time" name="check_in_time_time" id="check_in_time_time"
+                                                                                            value="{{ $attendanceIn->check_in_time ? date('H:i', strtotime($attendanceIn->check_in_time)) : '' }}"
+                                                                                            class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('check_in_time_time') is-invalid @enderror"
+                                                                                            required autofocus>
+                                                                                        
+                                                                                        <!-- Error message container -->
+                                                                                        <p id="time_error" class="text-red-500 text-sm mt-2 hidden">Invalid time input. Please ensure the hour is between 1-12, and minutes and seconds are between 0-59.</p>
+                                                                                        
+                                                                                        <x-input-error :messages="$errors->get('check_in_time_time')" class="mt-2" />
+                                                                                    </div>
+                                                                                <div class="flex mb-4 mt-10 justify-center">
+                                                                                    <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                                                        Save Changes
+                                                                                    </button>
+                                                                                </div>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                     
                                                     <!-- Add other columns as needed -->
@@ -339,14 +438,20 @@
                                                     <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                                                         <thead class="bg-gray-200 text-black">
                                                             <tr>
-                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                <th class="border border-gray-400 px-3">
                                                                     Emp ID
                                                                 </th>
-                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                <th class="border border-gray-400 px-3">
                                                                     Date
                                                                 </th>
-                                                                <th class="border border-gray-400 px-3 py-2">
+                                                                <th class="border border-gray-400 px-3">
                                                                     Time - Out
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3">
+                                                                    Status
+                                                                </th>
+                                                                <th class="border border-gray-400 px-3">
+                                                                    Action
                                                                 </th>
                                                                 <!-- Add other columns as needed -->
                                                             </tr>
@@ -361,30 +466,105 @@
                                                     <td class="text-black border border-gray-400">
                                                         {{ date('m-d-Y (l)', $checkOutTime) }}
                                                     </td>
+                                                    
                                                     <td class="text-black border border-gray-400 uppercase">
                                                         <!-- {{ date('g:i:s A', $checkOutTime) }} -->
                                                         @php
-
-                                                            //$checkInTime = ($attendanceOut->check_out_time) * 60;
                                                             $status = $attendanceOut->status;
-                                                            
                                                             $display = "";
+
                                                             if($status === "On Leave"){
                                                                 $display = "On Leave";
                                                             } elseif($status === "Absent"){
                                                                 $display = "Absent";
-                                                            }
-                                                            elseif($status === "Weekend"){
+                                                            } elseif($status === "Weekend"){
                                                                 $display = "Weekend";
-                                                            }
-                                                            elseif($status === "awol"){
+                                                            } elseif($status === "awol"){
                                                                 $display = "Absent without leave";
-                                                            }
-                                                            else{
-                                                              $display = date('g:i:s A', strtotime($attendanceOut->check_out_time));
+                                                            } else {
+                                                                $display = date('g:i:s A', strtotime($attendanceOut->check_out_time));
                                                             }
                                                         @endphp
-                                                        {{  $display }}
+
+                                                        @if ($display === "On Leave")
+                                                            <span style="color: red;">{{ $display }}</span>
+                                                        @else
+                                                            {{ $display }}
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-black border border-gray-400">
+                                                        {{ ucfirst($attendanceOut->modification_status) }}
+                                                    </td>
+                                                    <td class="text-black border border-gray-400 px-1 py-1">
+                                                        <div class="flex justify-center items-center space-x-2">
+                                                            <div x-data="{ open: false }">
+                                                                <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
+                                                                    <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i>
+                                                                </a>
+                                                                <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                                                    <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
+                                                                        <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
+                                                                            <p class="text-xl font-bold">Edit Time Out</p>
+                                                                            <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
+                                                                        </div>
+                                                                        <div class="mb-4">
+                                                                            <form id="updateTimeOutForm" action="{{ route('admin.attendanceOut.edit', $attendanceOut->id) }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to update?');">
+                                                                                <x-caps-lock-detector />
+                                                                                @csrf
+                                                                                @method('PUT')
+                                                                                    <div class="mb-2 hidden">
+                                                                                        <label for="attendanceOut_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Attendance ID: </label>
+                                                                                        <select id="attendanceOut_id" name="attendanceOut_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('attendanceIn_id') is-invalid @enderror">
+                                                                                                <option value="{{ $attendanceOut->id }}">{{ $attendanceOut->id }}</option>
+                                                                                        </select>
+                                                                                        <x-input-error :messages="$errors->get('attendanceOut_id')" class="mt-2" />
+                                                                                    </div>
+                                                                                    <div class="mb-4">
+                                                                                        <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee ID</label>
+                                                                                        <input type="text" name="employee_id" id="employee_id" value="{{ $attendanceOut->employee->employee_id }}"  readonly class="cursor-pointer shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_id') is-invalid @enderror" autofocus>
+                                                                                        <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                                                                    </div>
+                                                                                    <div class="mb-4">
+                                                                                        <label for="employee_name" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Name</label>
+                                                                                        <input type="text" name="employee_name" id="employee_name" value="{{ $attendanceOut->employee->employee_lastname }}, {{ $attendanceIn->employee->employee_firstname }}, {{ $attendanceIn->employee->employee_middlename }}" readonly class="cursor-pointer shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_name') is-invalid @enderror" autofocus>
+                                                                                        <x-input-error :messages="$errors->get('employee_name')" class="mt-2" />
+                                                                                    </div>
+                                                                                    <div class="mb-4">
+                                                                                        <label for="check_in_date" class="block text-gray-700 text-md font-bold mb-2 text-left">Date of Attendance</label>
+                                                                                        <input type="text" name="check_in_date" id="check_in_date" value="{{ date('Y-m-d (l)', strtotime($attendanceOut->check_out_time)) }}" readonly class="cursor-pointer shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('check_in_time') is-invalid @enderror" autofocus>
+                                                                                        <x-input-error :messages="$errors->get('check_in_date')" class="mt-2" />
+                                                                                    </div>
+                                                                                    <div class="mb-4">
+                                                                                        <label for="check_in_time" class="block text-gray-700 text-md font-bold mb-2 text-left">Time Out</label>
+                                                                                        
+                                                                                        <!-- Hidden input for the date part -->
+                                                                                        <input type="hidden" name="check_out_time_date" id="check_in_time_date"
+                                                                                            value="{{ $attendanceOut->check_out_time ? date('Y-m-d', strtotime($attendanceOut->check_out_time)) : '' }}"
+                                                                                            class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('check_in_time_date') is-invalid @enderror"
+                                                                                            autofocus>
+                                                                                        <x-input-error :messages="$errors->get('check_out_time_date')" class="mt-2" />
+
+                                                                                        <input type="time" name="check_out_time_time" id="check_in_time_time"
+                                                                                            value="{{ $attendanceOut->check_out_time ? date('H:i', strtotime($attendanceOut->check_out_time)) : '' }}"
+                                                                                            class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('check_in_time_time') is-invalid @enderror"
+                                                                                            required autofocus>
+                                                                                        
+                                                                                        <!-- Error message container -->
+                                                                                        <p id="time_error" class="text-red-500 text-sm mt-2 hidden">Invalid time input. Please ensure the hour is between 1-12, and minutes and seconds are between 0-59.</p>
+                                                                                        
+                                                                                        <x-input-error :messages="$errors->get('check_out_time_time')" class="mt-2" />
+                                                                                    </div>
+                                                                                <div class="flex mb-4 mt-10 justify-center">
+                                                                                    <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                                                        Save Changes
+                                                                                    </button>
+                                                                                </div>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                     <!-- Add other columns as needed -->
                                                 </tr>
@@ -400,7 +580,7 @@
 
                                 </div>
                             </div>
-
+                            
                             <div x-show="tab === 'computed-hours'" class="w-full">
                                 <!-- Table for Computed Working Hours -->
                                 <div class="w-full">
@@ -654,6 +834,7 @@
                                                     $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
                                                     $totalHours = $totalHoursAM + $totalHoursPM;
                                                     $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+                                                    $modify_status = $attendance->modify_status;
 
                                                     $remarkss = '';
 
@@ -665,10 +846,38 @@
                                                         $totalHoursAM == 0 &&
                                                         $totalMinutesAM == 0 &&
                                                         $totalHoursPM == 0 &&
-                                                        $totalMinutesPM == 0
+                                                        $totalMinutesPM == 0 &&
+                                                        $modify_status == "Absent"
                                                     ) {
                                                         $remarkss = 'Absent';
-                                                    } else {
+                                                    }
+                                                    else if (
+                                                        $lateDurationAM == 0 &&
+                                                        $lateDurationPM == 0 &&
+                                                        $am == 0 &&
+                                                        $pm == 0 &&
+                                                        $totalHoursAM == 0 &&
+                                                        $totalMinutesAM == 0 &&
+                                                        $totalHoursPM == 0 &&
+                                                        $totalMinutesPM == 0 &&
+                                                        $modify_status == "On Leave"
+                                                    ) {
+                                                        $remarkss = 'Leave';
+                                                    }
+                                                    else if (
+                                                        $lateDurationAM == 0 &&
+                                                        $lateDurationPM == 0 &&
+                                                        $am == 0 &&
+                                                        $pm == 0 &&
+                                                        $totalHoursAM > 0 &&
+                                                        $totalMinutesAM == 0 &&
+                                                        $totalHoursPM > 0 &&
+                                                        $totalMinutesPM == 0 &&
+                                                        $modify_status == "On Leave"
+                                                    ) {
+                                                        $remarkss = 'Leave';
+                                                    }
+                                                     else {
                                                         if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
                                                             $remarkss = "Present but Absent Morning";
                                                         }
@@ -712,7 +921,7 @@
                                 </div>
                                 <!-- end -->
                             </div>
-                            <div x-show="tab === 'modify_date'" class="w-full">
+                            <div  x-show="tab === 'modify_date'" class="w-full">
                                 <!-- Table for Computed Working Hours -->
                                 <div class="w-full">
                                     <div class="w-[50%] flex justify-center mb-4 mx-auto">
@@ -817,11 +1026,43 @@
                 @endif
             @endif
         @endif
-            
-        
-    
-   
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const timeInput = document.getElementById('check_in_time_time');
+
+    // Function to format and validate time input
+    timeInput.addEventListener('input', function(event) {
+        let value = event.target.value;
+        
+        // Regular expression to match time format with optional AM/PM
+        const amPmPattern = /^([0-1]?[0-9]|1[0-2]):([0-5][0-9]):([0-5][0-9])\s?(AM|PM)?$/i;
+        const match = amPmPattern.exec(value);
+        
+        if (match) {
+            let hours = parseInt(match[1], 10);
+            let minutes = parseInt(match[2], 10);
+            let seconds = parseInt(match[3], 10);
+            let ampm = match[4] ? match[4].toUpperCase() : '';
+
+            // Validate and correct values
+            if (hours < 1) hours = 12;
+            if (hours > 12) hours = 12;
+            if (minutes > 59) minutes = 59;
+            if (seconds > 59) seconds = 59;
+
+            // Update input value
+            event.target.value = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${ampm}`;
+        } else {
+            // Remove invalid characters
+            event.target.value = value.replace(/[^0-9:AMPM\s]/g, '');
+        }
+    });
+});
+</script>
+
+
 @push('scripts')
 <script>
     Livewire.on('livewire:load', () => {
@@ -1051,6 +1292,33 @@
 
         return false; 
     }
+
+
+    function ConfirmUpdateOut(event, attendanceID) {
+        event.preventDefault(); // Prevent form submission initially
+
+        Swal.fire({
+            title: `Are you sure you want to update this attendance time-in?`,
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, Update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.getElementById('updateTimeOutForm');
+                // Replace the placeholder with the actual school ID
+                form.action = `{{ route('admin.attendanceOut.edit', ':attendanceOutId') }}`.replace(':attendanceOutId', attendanceID);
+                form.submit();
+            }
+        });
+
+        return false; 
+    }
+
+
+
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>

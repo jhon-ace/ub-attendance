@@ -561,8 +561,10 @@ class ShowEmployeeAttendance extends Component
                     // Determine remark based on lateness
                     $remark = ($lateDurationAM > 0 || $lateDurationPM > 0) ? 'Late' : 'Present';
 
-                    
-                    
+                    $modifyStatus = $attendance->status;
+
+          
+
                     // Prepare the key for $attendanceData
                     $key = $attendance->employee_id . '-' . $checkInDate;
 
@@ -581,6 +583,8 @@ class ShowEmployeeAttendance extends Component
                         $attendanceData[$key]->undertimePM += $undertimePM;
                         $attendanceData[$key]->total_late += $totalHoursLate;
                         $attendanceData[$key]->remarks = $remark;
+                        $attendanceData[$key]->modify_status = $modifyStatus;
+
                         // dd($attendanceData[$key]->undertimeAM += $undertimeAM);
                     } else {
                         // Create new entry
@@ -598,7 +602,8 @@ class ShowEmployeeAttendance extends Component
                             'undertimePM' => $undertimePM,
                             'total_late' => $totalHoursLate,
                             'remarks' => $remark,
-                            
+                            'modify_status'=> $modifyStatus,
+
                         ];
 
                         //  session()->put('late_duration', $lateDurationAM);
@@ -1107,6 +1112,7 @@ class ShowEmployeeAttendance extends Component
                         // Determine remark based on lateness
                         $remark = ($lateDurationAM > 0 || $lateDurationPM > 0) ? 'Late' : 'Present';
 
+                        $modifyStatus = $attendance->status;
                         
                         
                         // Prepare the key for $attendanceData
@@ -1127,6 +1133,7 @@ class ShowEmployeeAttendance extends Component
                             $attendanceData[$key]->undertimePM += $undertimePM;
                             $attendanceData[$key]->total_late += $totalHoursLate;
                             $attendanceData[$key]->remarks = $remark;
+                            $attendanceData[$key]->modify_status = $modifyStatus;
                             // dd($attendanceData[$key]->undertimeAM += $undertimeAM);
                         } else {
                             // Create new entry
@@ -1144,9 +1151,11 @@ class ShowEmployeeAttendance extends Component
                                 'undertimePM' => $undertimePM,
                                 'total_late' => $totalHoursLate,
                                 'remarks' => $remark,
+                                'modify_status'=> $modifyStatus,
+                                
                                 
                             ];
-
+                            
                             //  session()->put('late_duration', $lateDurationAM);
                         }
 

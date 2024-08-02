@@ -159,6 +159,7 @@ public function submitPortalTimeIn(Request $request)
                 $attendanceIn->employee_id = $employee->id;
                 $attendanceIn->check_in_time = $formattedDateTime; // Store formatted datetime
                 $attendanceIn->status = "On-campus";
+                $attendanceIn->modification_status = "Unmodified";
                 $attendanceIn->save();
 
                 // return response()->json([
@@ -182,6 +183,7 @@ public function submitPortalTimeIn(Request $request)
                     $attendanceOut->employee_id = $employee->id;
                     $attendanceOut->check_out_time = $formattedDateTime; // Store formatted datetime
                     $attendanceOut->status = "Outside Campus";
+                    $attendanceOut->modification_status = "Unmodified";
                     $attendanceOut->save();
 
                     // return response()->json([
@@ -214,6 +216,7 @@ public function submitPortalTimeIn(Request $request)
                 $attendanceOut->employee_id = $employee->id;
                 $attendanceOut->check_out_time = $formattedDateTime; // Store formatted datetime
                 $attendanceOut->status = "Outside Campus";
+                $attendanceOut->modification_status = "Unmodified";
                 $attendanceOut->save();
 
                 // return response()->json([
@@ -235,6 +238,7 @@ public function submitPortalTimeIn(Request $request)
             $attendanceIn->employee_id = $employee->id;
             $attendanceIn->check_in_time = $formattedDateTime; // Store formatted datetime
             $attendanceIn->status = "On-campus";
+            $attendanceIn->modification_status = "Unmodified";
             $attendanceIn->save();
 
             return view('attendance-profile_time_in_employee', compact('employees'));
@@ -511,29 +515,32 @@ public function submitPortalTimeOut(Request $request)
                 $employee_id = $request->input('employee_id');
                 $employees = Employee::where('id', $employee_id)->first();
 
+
                 if ($employees) {
                     
+                    $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $employees->department_id)->first();
+
                     $attendance = new EmployeeAttendanceTimeIn();
                     $attendance->employee_id = $employees->id;
-                    $attendance->check_in_time = $validatedData['selected_date'];
+                    $attendance->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
                     $attendance->status = $validatedData['status'];
                     $attendance->save();
 
                     $attendance = new EmployeeAttendanceTimeIn();
                     $attendance->employee_id = $employees->id;
-                    $attendance->check_in_time = $validatedData['selected_date'];
+                    $attendance->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
                     $attendance->status = $validatedData['status'];
                     $attendance->save();
 
                     $attendance = new EmployeeAttendanceTimeOut();
                     $attendance->employee_id = $employees->id;
-                    $attendance->check_out_time = $validatedData['selected_date'];
+                    $attendance->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_end_time;
                     $attendance->status = $validatedData['status'];
                     $attendance->save();
 
                     $attendance = new EmployeeAttendanceTimeOut();
                     $attendance->employee_id = $employees->id;
-                    $attendance->check_out_time = $validatedData['selected_date'];
+                    $attendance->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_end_time;
                     $attendance->status = $validatedData['status'];
                     $attendance->save();
 
@@ -547,5 +554,105 @@ public function submitPortalTimeOut(Request $request)
         // Optionally, you can redirect back with a success message
         
 
+    }
+
+
+
+    public function attendanceTimeInUpdate(Request $request, string $id){
+            
+        // Validate the request data
+        $validatedData = $request->validate([
+            'attendanceIn_id' => 'required',
+            'check_in_time_date' => 'required|date',
+            'check_in_time_time' => 'required|date_format:H:i',
+        ]);
+
+        $date = $validatedData['check_in_time_date'];
+        $time = $validatedData['check_in_time_time'];
+
+        // Combine date and time into a single string
+        $dateTimeString = "{$date} {$time}";
+
+        // Convert the date and time into a Carbon instance
+        try {
+            $checkInTime = Carbon::createFromFormat('Y-m-d H:i', $dateTimeString);
+            // Debugging output
+
+
+            // Format the time for storage
+            $formattedTime = $checkInTime->format('Y-m-d H:i:s');
+        } catch (\Exception $e) {
+            // Handle invalid time format
+            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Invalid time format.');
+        }
+
+        // Find the record by ID
+        $attendanceIn = EmployeeAttendanceTimeIn::findOrFail($id);
+
+        // Check if the value has changed
+        if ($attendanceIn->check_in_time === $formattedTime) {
+            // No changes made
+            return redirect()->route('admin.attendance.employee_attendance')->with('info', 'No changes made.');
+        }
+
+        // Update the check-in time and modification status
+        $attendanceIn->check_in_time = $formattedTime;
+        $attendanceIn->status = 'On-Campus';
+        $attendanceIn->modification_status = 'modified';
+        $attendanceIn->save();
+
+        // Redirect or return a response
+        return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time In updated successfully!');
+    }
+
+
+
+    public function attendanceTimeOutUpdate(Request $request, string $id){
+            
+        // Validate the request data
+        $validatedData = $request->validate([
+            'attendanceOut_id' => 'required',
+            'check_out_time_date' => 'required|date',
+            'check_out_time_time' => 'required|date_format:H:i',
+        ]);
+
+
+
+        $date = $validatedData['check_out_time_date'];
+        $time = $validatedData['check_out_time_time'];
+
+        // Combine date and time into a single string
+        $dateTimeString = "{$date} {$time}";
+
+        // Convert the date and time into a Carbon instance
+        try {
+            $checkOutTime = Carbon::createFromFormat('Y-m-d H:i', $dateTimeString);
+            // Debugging output
+
+
+            // Format the time for storage
+            $formattedTime = $checkOutTime->format('Y-m-d H:i:s');
+        } catch (\Exception $e) {
+            // Handle invalid time format
+            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Invalid time format.');
+        }
+
+        // Find the record by ID
+        $attendanceOut = EmployeeAttendanceTimeOut::findOrFail($id);
+
+        // Check if the value has changed
+        if ($attendanceOut->check_out_time === $formattedTime) {
+            // No changes made
+            return redirect()->route('admin.attendance.employee_attendance')->with('info', 'No changes made.');
+        }
+
+        // Update the check-in time and modification status
+        $attendanceOut->check_out_time = $formattedTime;
+        $attendanceOut->status = 'Off-Campus';
+        $attendanceOut->modification_status = 'modified';
+        $attendanceOut->save();
+
+        // Redirect or return a response
+        return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time In updated successfully!');
     }
 }
