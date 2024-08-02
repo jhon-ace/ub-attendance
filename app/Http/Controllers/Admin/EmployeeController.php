@@ -308,7 +308,7 @@ class EmployeeController extends Controller
         $photosDirectory = storage_path('app/public/employee_photo/');
 
         // Directory where photos are currently stored (your desktop)
-        $sourceDirectory = 'C:\Users\Jhon Ace\Desktop\extract\\'; // Ensure trailing backslash
+        $sourceDirectory = 'D:\SAP\\'; // Ensure trailing backslash
 
         // Ensure the photos directory exists
         if (!is_dir($photosDirectory)) {
