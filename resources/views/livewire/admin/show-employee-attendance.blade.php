@@ -1294,31 +1294,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    // function ConfirmUpdateOut(event, attendanceID) {
-    //     event.preventDefault(); // Prevent form submission initially
-
-    //     Swal.fire({
-    //         title: `Are you sure you want to update this attendance time-in?`,
-    //         text: "You won't be able to revert this!",
-    //         icon: 'warning',
-    //         showCancelButton: true,
-    //         confirmButtonColor: '#d33',
-    //         cancelButtonColor: '#3085d6',
-    //         confirmButtonText: 'Yes, Update it!'
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             const form = document.getElementById('updateTimeOutForm');
-    //             // Replace the placeholder with the actual school ID
-    //             form.action = `{{ route('admin.attendanceOut.edit', ':attendanceOutId') }}`.replace(':attendanceOutId', attendanceID);
-    //             form.submit();
-    //         }
-    //     });
-
-    //     return false; 
-    // }
-
-
-
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
