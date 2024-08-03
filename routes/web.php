@@ -99,6 +99,10 @@ Route::middleware(['auth'])->group(function () {
 
         // Employee Attendance routes
         Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'employee'])->name('attendance.employee_attendance');
+        Route::post('/employees/attendance/add-time-in', [EmployeeAttendanceController::class, 'employeeAddTimeIn'])->name('attendance.employee_attendance.addIn');
+        Route::post('/employees/attendance/add-time-out', [EmployeeAttendanceController::class, 'employeeAddTimeOut'])->name('attendance.employee_attendance.addOut');
+        Route::delete('employees/attendance/delete-time-in/{id}', [EmployeeAttendanceController::class, 'deleteTimeIn'])->name('attendance.employee_attendance.deleteTimeIn');
+        Route::delete('employees/attendance/delete-time-out/{id}', [EmployeeAttendanceController::class, 'deleteTimeOut'])->name('attendance.employee_attendance.deleteTimeOut');
         Route::get('/employees/attendance/search', [EmployeeAttendanceController::class, 'employeeSearch'])->name('attendance.employee_attendance.search');
         Route::get('/generate-pdf', [EmployeeAttendanceController::class, 'generatePDF'])->name('generate.pdf');
 
@@ -136,6 +140,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/edit-TimeOut/{id}', [EmployeeAttendanceController::class, 'attendanceTimeOutUpdate'])->name('attendanceOut.edit');
 
         Route::get('/insert-photos', [EmployeeController::class, 'employee_insertPhoto'])->name('insert.photos');
+
 
 
     });

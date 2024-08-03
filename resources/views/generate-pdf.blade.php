@@ -396,7 +396,21 @@
 
                         </td>
                         <td class="text-black border border-gray-400">
-                            {{ $attendance->hours_perDay }} hr/s
+                            @php
+                                // Assuming $attendance->hours_perDay is in decimal format
+                                $totalHours = $attendance->hours_perDay;
+                                $hours = floor($totalHours);
+                                $minutes = floor(($totalHours - $hours) * 60);
+                                $seconds = round((((($totalHours - $hours) * 60) - $minutes) * 60));
+
+                                $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
+                                $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
+                                $formattedSeconds = $seconds > 0 ? "{$seconds} sec" : '0 sec';
+
+                                $result = "{$formattedHours}, {$formattedMinutes}";
+                            @endphp
+
+                            {{ $result }}
                             
                         </td>
                         <td class="text-black border uppercase border-gray-400">
@@ -504,6 +518,7 @@
             <div class="flex   justify-end">
                 <div class="flex flex-col mr-4">
                     @php
+                        //total hour
                         $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
                         $hours = floor($totalSeconds / 3600);
                         $minutes = floor(($totalSeconds % 3600) / 60);
@@ -515,9 +530,10 @@
                         $minutesM = floor(($totalSecondsM % 3600) / 60);
                         $secondsM = $totalSecondsM % 60;
 
-                        $undertimeInSeconds = $overallTotalUndertime * 60;
+                        
 
-                        // Convert total seconds to hours, minutes, and seconds
+                        // total undertime
+                        $undertimeInSeconds = $overallTotalUndertime * 60;
                         $undertimeHours = intdiv($undertimeInSeconds, 3600); // Total hours
                         $remainingSeconds = $undertimeInSeconds % 3600; // Remaining seconds after hours
                         $undertimeMinutes = intdiv($remainingSeconds, 60); // Total minutes
@@ -528,10 +544,54 @@
                             ($undertimeHours > 0 ? "{$undertimeHours} hr/s, " : '0 hr/s, ') .
                             ($undertimeMinutes > 0 ? "{$undertimeMinutes} min/s " : '0 min/s, ') .
                             ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
+                        
 
+                        // Combine all into one total in seconds
+                        $combinedTotalSeconds = $totalSeconds + $totalSecondsM + $undertimeInSeconds;
+
+                        // Convert combined total seconds to hours, minutes, and seconds
+                        $combinedHours = floor($combinedTotalSeconds / 3600);
+                        $combinedMinutes = floor(($combinedTotalSeconds % 3600) / 60);
+                        $combinedSeconds = $combinedTotalSeconds % 60;
+
+                        // Format the final total
+                        //$finalTotalFormatted = sprintf('%02d:%02d:%02d', $combinedHours, $combinedMinutes, $combinedSeconds);
+
+                        $finalTotalFormatted = 
+                            ($combinedHours > 0 ? "{$combinedHours} hr/s, " : '0 hr/s, ') .
+                            ($combinedMinutes > 0 ? "{$combinedMinutes} min/s " : '0 min/s, ') .
+                            ($combinedSeconds > 0 ? "{$combinedSeconds} sec" : '0 sec');
+
+                        //$finalTotalFormatted = 
+                        //    ($combinedHours > 0 ? "{$combinedHours} hr/s " : '0 hr/s ');
+
+                    @endphp
+                    
+                    
+
+                    @php
+                        $totalHours = 0;
+                        foreach ($attendanceData as $attendance) {
+                            $totalHours += $attendance->hours_perDay;
+                        }
+
+                        // Convert total hours to hours, minutes, and seconds
+                        $hours = floor($totalHours);
+                        $minutes = floor(($totalHours - $hours) * 60);
+                        $seconds = round((((($totalHours - $hours) * 60) - $minutes) * 60));
+
+                        // Format the output
+                        $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
+                        $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
+
+                        $formattedTotal = "{$formattedHours}, {$formattedMinutes}";
                     @endphp
               
                     <table class="border border-black" cellpadding="10">
+                        <tr class="border border-black">
+                            <th class="border border-black text-right">Duty Hours To Be Rendered</th>
+                            <td class="text-red-500">{{ $formattedTotal }}</td>
+                        </tr>
                         <tr class="border border-black">
                             <th class="border border-black text-right">Total Late</th>
                             <td class="text-red-500">{{ $hoursM }} hr/s, {{ $minutesM }} min/s, {{ $secondsM }} sec</td>

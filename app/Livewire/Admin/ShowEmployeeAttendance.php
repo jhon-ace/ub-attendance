@@ -181,12 +181,12 @@ class ShowEmployeeAttendance extends Component
         }
         
 
-        $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(500);
+        $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
+            ->paginate(31);
 
 
-        $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(500);
+        $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
+            ->paginate(31);
 
 
 
@@ -195,6 +195,7 @@ class ShowEmployeeAttendance extends Component
         $overallTotalLateHours = 0;
         $overallTotalUndertime = 0;
         $totalHoursTobeRendered = 0;
+        $overallTotalHoursSum = 0;
 
         foreach ($attendanceTimeIn as $attendance) {
             // Initialize variables for each record
@@ -215,8 +216,53 @@ class ShowEmployeeAttendance extends Component
             $totalhoursNeed = 0;
             $totalHoursNeedperDay = 0;
 
+            $totalHoursByDay = [];
+            $overallTotalHoursSumm = 0;
             
+            $departmentId = $attendance->employee->department_id;
+
+            $workingHoursByDay = DepartmentWorkingHour::select(
+                    'day_of_week',
+                    'morning_start_time',
+                    'morning_end_time',
+                    'afternoon_start_time',
+                    'afternoon_end_time'
+                )
+                ->where('department_id', $departmentId)
+                ->where('day_of_week', '!=', 0)
+                ->get()
+                ->groupBy('day_of_week');
+
             
+
+            foreach ($workingHoursByDay as $dayOfWeek => $workingHours) {
+                $totalHours = 0;
+
+                foreach ($workingHours as $workingHour) {
+                    if ($workingHour->morning_start_time && $workingHour->morning_end_time) {
+                        $morningStart = Carbon::parse($workingHour->morning_start_time);
+                        $morningEnd = Carbon::parse($workingHour->morning_end_time);
+                        $totalHours += $morningStart->diffInHours($morningEnd);
+                        
+                    }
+
+                    if ($workingHour->afternoon_start_time && $workingHour->afternoon_end_time) {
+                        $afternoonStart = Carbon::parse($workingHour->afternoon_start_time);
+                        $afternoonEnd = Carbon::parse($workingHour->afternoon_end_time);
+                        $totalHours += $afternoonStart->diffInHours($afternoonEnd);
+                    }
+                }
+
+                $totalHoursByDay[$dayOfWeek] = $totalHours;
+                $overallTotalHoursSumm += $totalHours;
+            }
+
+            // foreach ($totalHoursByDay as $dayOfWeek => $totalHours) {
+            //     echo "Day of Week: $dayOfWeek\n";
+            //     echo "Total Working Hours: $totalHours hours\n";
+            //     echo "------------------------\n";
+            // }
+            // echo "Overall Total Working Hours: $overallTotalHours hours\n";
 
             $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
             // Extract date and time from check-in
@@ -249,7 +295,11 @@ class ShowEmployeeAttendance extends Component
                                                 ->where('day_of_week', '!=', 0)
                                                 ->first();
 
-              
+                
+                
+
+
+                
                 if ($departmentWorkingHour) 
                 {   
 
@@ -357,32 +407,9 @@ class ShowEmployeeAttendance extends Component
                         // Calculate total hours to be rendered
                         $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
                     } else {
+                        
                         $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
-                        // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
-                        //     ->where('employee_id', $employeeId)->first();
-                        // $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
-                        // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
-                        //     ->where('employee_id', $employeeId)->first();
-                        // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(employees_time_in_attendance.check_in_time)) as unique_check_in_days'))
-                        //             ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
-                        //             ->join('working_hour', function($join) {
-                        //                 $join->on('employees.department_id', '=', 'working_hour.department_id')
-                        //                     ->whereNotIn('working_hour.day_of_week', [0, 6]); // Exclude Sundays and Saturdays
-                        //             })
-                        //             ->where('employees_time_in_attendance.employee_id', $employeeId)
-                        //             ->whereNotIn('employees_time_in_attendance.status', ['Absent', 'AWOL', 'On Leave'])
-                        //             ->first();
-                        //             dd($checkInCount);
-
-                        // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(employees_time_in_attendance.check_in_time)) as unique_check_in_days'))
-                        //                 ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
-                        //                 ->join('working_hour', function($join) {
-                        //                     $join->on('employees.department_id', '=', 'working_hour.department_id');
-                        //                 })
-                        //                 ->where('employees_time_in_attendance.employee_id', $employeeId)
-                        //                 ->whereNotIn('employees_time_in_attendance.status', ['Absent', 'AWOL', 'On Leave'])
-                        //                 ->whereNotIn('working_hour.day_of_week', [0, 6]) // Exclude Saturday (6) and Sunday (7)
-                        //                 ->first();
+                        
 
                         $noww = new DateTime('now', new DateTimeZone('Asia/Taipei'));
                         $currentDatee = $noww->format('Y-m-d') . ' 00:00:00';
@@ -396,11 +423,7 @@ class ShowEmployeeAttendance extends Component
                         $uniqueCheckInDays = (int) $checkInCount->unique_check_in_days;
                         $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
                               
-                            // $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
-                            //                 ->where('employee_id', $employeeId)
-                            //                 ->whereNotIn('check_in_time', "{$currentDatee} 00:00:00")
-                            //                 ->whereNotIn('status', ['Absent', 'AWOL', 'On Leave'])
-                            //                 ->first();
+   
                         
                             
 
@@ -429,24 +452,10 @@ class ShowEmployeeAttendance extends Component
                                 
                             }
 
-                            // // Calculate undertime for AM
-                            // $scheduledAMMinutes = ($morningStartTime->diff($morningEndTime)->h * 60) + $morningStartTime->diff($morningEndTime)->i;
-                            // $actualMinutesWorkedAM = ($effectiveCheckOutTime->diff($effectiveCheckInTime)->h * 60) + $effectiveCheckOutTime->diff($effectiveCheckInTime)->i;
-                            // $undertimeAM = max(0, $scheduledAMMinutes - $actualMinutesWorkedAM);
+ 
 
                         }
-                        // Calculate scheduled AM minutes
-                            // $scheduledAMMinutes = ($morningStartTime->diff($morningEndTime)->h * 60) + $morningStartTime->diff($morningEndTime)->i;
 
-                            // // Calculate actual minutes worked up to the morning end time
-                            // if ($effectiveCheckOutTime < $morningEndTime) {
-                            //     $actualMinutesUpToEnd = ($effectiveCheckOutTime->diff($morningStartTime)->h * 60) + $effectiveCheckOutTime->diff($morningStartTime)->i;
-                            // } else {
-                            //     $actualMinutesUpToEnd = ($morningEndTime->diff($morningStartTime)->h * 60) + $morningEndTime->diff($morningStartTime)->i;
-                            // }
-
-                            // // Calculate undertime for AM
-                            // $undertimeAM = max(0, $scheduledAMMinutes - $actualMinutesUpToEnd);
 
                             $scheduledDiff = $morningStartTime->diff($morningEndTime);
                             $scheduledAMMinutes = ($scheduledDiff->h * 60) + $scheduledDiff->i + ($scheduledDiff->s / 60);
@@ -465,37 +474,7 @@ class ShowEmployeeAttendance extends Component
                     }  
 
 
-                    //no interval, automatic late after the morning start time
-                    // if ($checkInDateTime < $morningEndTime) {
-                    //     $effectiveCheckInTime = max($checkInDateTime, $morningStartTime);
-                    //     $effectiveCheckOutTime = min($checkOutDateTime, $morningEndTime);
-                        
-                    //     if ($effectiveCheckInTime < $effectiveCheckOutTime) {
-                    //         $intervalAM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
-                    //         $hoursWorkedAM = $intervalAM->h + ($intervalAM->i / 60);
-                            
-                    //         // Calculate late duration for AM
-                    //         if ($checkInDateTime > $morningStartTime) {
-                    //             $lateIntervalAM = $checkInDateTime->diff($morningStartTime);
-                    //             $lateDurationAM = $lateIntervalAM->h * 60 + $lateIntervalAM->i;
-                    //         } else {
-                    //             $lateDurationAM = 0;
-                    //         }
-
-                    //         // Calculate scheduled AM minutes
-                    //         $scheduledAMMinutes = ($morningStartTime->diff($morningEndTime)->h * 60) + $morningStartTime->diff($morningEndTime)->i;
-
-                    //         // Calculate actual minutes worked up to the morning end time
-                    //         if ($effectiveCheckOutTime < $morningEndTime) {
-                    //             $actualMinutesUpToEnd = ($effectiveCheckOutTime->diff($morningStartTime)->h * 60) + $effectiveCheckOutTime->diff($morningStartTime)->i;
-                    //         } else {
-                    //             $actualMinutesUpToEnd = ($morningEndTime->diff($morningStartTime)->h * 60) + $morningEndTime->diff($morningStartTime)->i;
-                    //         }
-
-                    //         // Calculate undertime for AM
-                    //         $undertimeAM = max(0, $scheduledAMMinutes - $actualMinutesUpToEnd);
-                    //     }
-                    // }
+                 
 
                     // PM Shift Calculation
                     if ($checkInDateTime < $afternoonEndTime && $checkOutDateTime > $afternoonStartTime) {
@@ -514,23 +493,10 @@ class ShowEmployeeAttendance extends Component
                                 $latePM = $lateIntervalPM->h + ($lateIntervalPM->i / 60) + ($lateIntervalPM->s / 3600);
                             }
 
-                            // // Calculate undertime for PM
-                            // $scheduledPMMinutes = ($afternoonStartTime->diff($afternoonEndTime)->h * 60) + $afternoonStartTime->diff($afternoonEndTime)->i;
-                            // $actualMinutesWorkedPM = ($effectiveCheckOutTime->diff($effectiveCheckInTime)->h * 60) + $effectiveCheckOutTime->diff($effectiveCheckInTime)->i;
-                            // $undertimePM = max(0, $scheduledPMMinutes - $actualMinutesWorkedPM);
+                            
                         }
 
-                        // $scheduledPMMinutes = ($afternoonStartTime->diff($afternoonEndTime)->h * 60) + $afternoonStartTime->diff($afternoonEndTime)->i;
-
-                        // // Calculate actual minutes worked up to the morning end time
-                        // if ($effectiveCheckOutTime < $afternoonEndTime) {
-                        //     $actualMinutesUpToEnd = ($effectiveCheckOutTime->diff($afternoonStartTime)->h * 60) + $effectiveCheckOutTime->diff($afternoonStartTime)->i;
-                        // } else {
-                        //     $actualMinutesUpToEnd = ($afternoonEndTime->diff($afternoonStartTime)->h * 60) + $afternoonEndTime->diff($afternoonStartTime)->i;
-                        // }
-
-                        // // Calculate undertime for AM
-                        // $undertimePM = max(0, $scheduledPMMinutes - $actualMinutesUpToEnd);
+                        
 
                         $scheduledPMDiff = $afternoonStartTime->diff($afternoonEndTime);
                         $scheduledPMMinutes = ($scheduledPMDiff->h * 60) + $scheduledPMDiff->i + ($scheduledPMDiff->s / 60);
@@ -584,6 +550,8 @@ class ShowEmployeeAttendance extends Component
                         $attendanceData[$key]->total_late += $totalHoursLate;
                         $attendanceData[$key]->remarks = $remark;
                         $attendanceData[$key]->modify_status = $modifyStatus;
+   
+
 
                         // dd($attendanceData[$key]->undertimeAM += $undertimeAM);
                     } else {
@@ -604,6 +572,7 @@ class ShowEmployeeAttendance extends Component
                             'remarks' => $remark,
                             'modify_status'=> $modifyStatus,
 
+
                         ];
 
                         //  session()->put('late_duration', $lateDurationAM);
@@ -613,6 +582,7 @@ class ShowEmployeeAttendance extends Component
                     $overallTotalHours += $totalHoursWorked;
                     $overallTotalLateHours += $overallTotalHoursLate;
                     $overallTotalUndertime += $totalundertime;
+                    $overallTotalHoursSum = $overallTotalHoursSumm;
                 }
             }
         }
@@ -638,6 +608,7 @@ class ShowEmployeeAttendance extends Component
         return view('livewire.admin.show-employee-attendance', [
             'overallTotalHours' => $overallTotalHours,
             'overallTotalLateHours' => $overallTotalLateHours,
+            'overallTotalHoursSum' => $overallTotalHoursSum,
             'overallTotalUndertime' => $overallTotalUndertime,
             'totalHoursTobeRendered' => $totalHoursTobeRendered,
             'attendanceData' =>$attendanceData,
@@ -658,8 +629,8 @@ class ShowEmployeeAttendance extends Component
 
     public function generatePDF()
     {
-        $savePath = storage_path('app/'); // Default save path (storage/app/)
-
+        $savePath = storage_path('/app/generatedPDF'); // Default save path (storage/app/)
+        // $savePath = 'C:/Users/YourUsername/Downloads/'; // Windows example
         try {
 
            // Determine the filename dynamically with date included if both startDate and endDate are selected
@@ -732,12 +703,17 @@ class ShowEmployeeAttendance extends Component
                 $this->selectedAttendanceByDate = $selectedAttendanceByDate;   
             }
             
+            // $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
+            //     ->paginate(50);
+            // $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
+            //     ->paginate(50);
 
 
-            $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
-                ->paginate(50);
-            $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
-                ->paginate(50);
+            $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
+                ->paginate(31);
+
+            $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
+                ->paginate(31);
 
 
 

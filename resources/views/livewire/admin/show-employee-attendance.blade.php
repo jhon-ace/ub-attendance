@@ -99,7 +99,7 @@
                             <!-- Modal -->
                 <div x-data="{ open: false }" @keydown.window.escape="open = false" x-cloak>
                     <!-- Modal Trigger Button -->
-                    <button @click="open = true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-2 mt-5"><i class="fa-solid fa-calendar-days"></i></button>
+                    <button @click="open = true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-2 mt-5"><i class="fa-solid fa-calendar-days"></i> Click to view Working Hour</button>
 
                     <!-- Modal Background -->
                     <div x-show="open" class="fixed inset-0 bg-black bg-opacity-50 z-50" @click="open = false"></div>
@@ -107,9 +107,9 @@
                     <!-- Modal Content -->
                     <div x-show="open" class="fixed inset-0 flex items-center justify-center z-50">
                         <div class="bg-white p-8 rounded-lg shadow-lg max-w-7xl w-full ">
-                            <div class="mt-6 flex justify-between">
-                                <h2 class="text-lg font-semibold mb-4">Work Details</h2>
-                                <button @click="open = false" class="btn btn-secondary hover:text-blue-500">Close</button>
+                            <div class="mt-2 flex justify-between">
+                                <h2 class="text-lg font-semibold mb-4">Work Details</h2> <a href="{{ route('admin.workinghour.index') }}"><button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-2 ">Edit Now</button></a>
+                                <button @click="open = false" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-2 "><i class="fa-solid fa-times fa-xs"></i> Close</button>
                             </div>
                             <!-- Modal Body -->
                             <div class="space-y-4">
@@ -167,7 +167,7 @@
                 @else
                     <div class="flex justify-between mt-1 mb-2">
                         <div class="mt-2 text-sm font-bold ">
-                            <text class="uppercase">Attendance of Employee: <text class="text-red-500">{{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</text>
+                            <text class="uppercase">Selected Employee: <text class="text-red-500">{{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</text>
                         </div>
                         <div class="flex flex-col">
                             <div class="flex justify-between items-center mb-2">
@@ -198,7 +198,7 @@
                                     <div class="flex flex-col -mt-10">
                                         <div class="flex justify-end mb-2 -mt-2">
                                             <a href="">
-                                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"><i class="fa-solid fa-arrows-rotate"></i></button>
+                                                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
                                             </a>
                                         </div>
                                          <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
@@ -239,7 +239,7 @@
                                     :class="{ 'bg-blue-500 text-white': tab === 'modify_date', 'border border-gray-500': tab !== 'modify_date' }"
                                     class="px-4 py-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
                                 >
-                                    Modify Date
+                                    Modify Date for Approved Leave
                                 </button>
                             </div>
 
@@ -248,7 +248,47 @@
                                 <!-- Table for Time In -->
                                 <div class="flex justify-between">
                                     <div class="w-[49%]">
-                                        <h3 class="text-center uppercase font-bold">Time In</h3>
+                                        <div class="flex justify-center mb-2 mt-2">
+                                            <h3 class="text-center uppercase font-bold">Time In &nbsp;</h3> | &nbsp;
+                                            <div class="flex justify-center items-center space-x-2">
+                                                <div x-data="{ open: false }">
+                                                    <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
+                                                        <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> Add Time In
+                                                    </a>
+                                                    <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                                        <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
+                                                            <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
+                                                                <p class="text-xl font-bold">Add Time In</p>
+                                                                <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
+                                                            </div>
+                                                            <div class="mb-4">
+                                                                <form action="{{ route('admin.attendance.employee_attendance.addIn') }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to add time in?');">
+                                                                    <x-caps-lock-detector />
+                                                                    @csrf
+                                                                        <div class="mb-2">
+                                                                            <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Name: </label>
+                                                                            <select id="employee_id" name="employee_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('employee_id') is-invalid @enderror">
+                                                                                    <option selected value="{{ $selectedEmployeeToShow->id }}">{{ $selectedEmployeeToShow->employee_id }} - {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</option>
+                                                                            </select>
+                                                                            <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                                                        </div>
+                                                                        <div class="mb-2">
+                                                                            <label for="selected-date-time" class="block text-gray-700 text-md font-bold mb-2 text-left">Select Date & Time:</label>
+                                                                            <input type="datetime-local" id="selected-date-time"  name="selected-date-time" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('selected-date-time') is-invalid @enderror" required>
+                                                                            <x-input-error :messages="$errors->get('selected-date-time')" class="mt-2" />
+                                                                        </div>
+                                                                    <div class="flex mb-4 mt-10 justify-center">
+                                                                        <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                                            Save
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <!-- Assuming $attendanceTimeIn is sorted by check_in_time descending -->
                                         @if ($attendanceTimeIn->isNotEmpty())
                                             @php
@@ -328,11 +368,10 @@
                                                                     
                                                                     } -->
                                                     <td class="text-black border border-gray-400 px-1 py-1">
-                                                        <div class="flex justify-center items-center space-x-2">
-                                                            <div x-data="{ open: false, 
-                                                        }">
-                                                                <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
-                                                                    <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i>
+                                                        <div class="flex justify-center items-center">
+                                                            <div x-data="{ open: false }" class="mr-2">
+                                                                <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-[5.5px] rounded hover:bg-blue-700">
+                                                                    <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> Edit
                                                                 </a>
                                                                 <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                                                     <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
@@ -401,6 +440,13 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <form action="{{ route('admin.attendance.employee_attendance.deleteTimeIn', $attendanceIn->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this time in?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700">
+                                                                    <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i> Delete
+                                                                </button>
+                                                            </form>
                                                         </div>
                                                     </td>
                                                     
@@ -418,7 +464,47 @@
                                     </div>
                                     
                                     <div class="w-[49%]">
-                                        <h3 class="text-center uppercase font-bold">Time Out</h3>
+                                        <div class="flex justify-center mb-2 mt-2">
+                                            <h3 class="text-center uppercase font-bold">Time Out &nbsp;</h3> | &nbsp;
+                                            <div class="flex justify-center items-center space-x-2">
+                                                <div x-data="{ open: false }">
+                                                    <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
+                                                        <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> Add Time Out
+                                                    </a>
+                                                    <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                                        <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
+                                                            <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
+                                                                <p class="text-xl font-bold">Add Time Out</p>
+                                                                <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
+                                                            </div>
+                                                            <div class="mb-4">
+                                                                <form action="{{ route('admin.attendance.employee_attendance.addOut') }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to add time out?');">
+                                                                    <x-caps-lock-detector />
+                                                                    @csrf
+                                                                        <div class="mb-2">
+                                                                            <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Name: </label>
+                                                                            <select id="employee_id" name="employee_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('employee_id') is-invalid @enderror">
+                                                                                    <option selected value="{{ $selectedEmployeeToShow->id }}">{{ $selectedEmployeeToShow->employee_id }} - {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</option>
+                                                                            </select>
+                                                                            <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                                                        </div>
+                                                                        <div class="mb-2">
+                                                                            <label for="selected-date-time" class="block text-gray-700 text-md font-bold mb-2 text-left">Select Date & Time:</label>
+                                                                            <input type="datetime-local" id="selected-date-time"  name="selected-date-time" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('selected-date-time') is-invalid @enderror" required>
+                                                                            <x-input-error :messages="$errors->get('selected-date-time')" class="mt-2" />
+                                                                        </div>
+                                                                    <div class="flex mb-4 mt-10 justify-center">
+                                                                        <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                                            Save
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         @if ($attendanceTimeOut->isNotEmpty())
                                             @php
                                                 $currentDate = null;
@@ -499,7 +585,7 @@
                                                         <div class="flex justify-center items-center space-x-2">
                                                             <div x-data="{ open: false }">
                                                                 <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
-                                                                    <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i>
+                                                                    <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> Edit
                                                                 </a>
                                                                 <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                                                     <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
@@ -564,6 +650,13 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <form action="{{ route('admin.attendance.employee_attendance.deleteTimeOut', $attendanceOut->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this time out?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700">
+                                                                    <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i> Delete
+                                                                </button>
+                                                            </form>
                                                         </div>
                                                     </td>
                                                     <!-- Add other columns as needed -->
@@ -583,8 +676,11 @@
                             
                             <div x-show="tab === 'computed-hours'" class="w-full">
                                 <!-- Table for Computed Working Hours -->
+
+                                <p>Required Total Hour Per Week based on Working hour: <text class="text-red-500">{{ $overallTotalHoursSum }} hr/s.</text></p>
+
                                 <div class="w-full">
-                                    <h3 class="text-center text-lg font-semibold">Calculation of Work Hours</h3>
+                                    <h3 class="text-center text-lg font-semibold uppercase mb-2 mt-2">Calculation of Work Hours</h3>
                                     
                                     <table class="table-auto min-w-full text-center text-xs mb-4 divide-y divide-gray-200">
                                         <thead class="bg-gray-200 text-black">
@@ -816,12 +912,28 @@
                                                     @endphp
 
                                                     {{ $finalHours }} hrs. {{ $finalMinutes }} min. {{ $finalSeconds }} sec.
-
+                                                            
                                                 </td>
                                                 <td class="text-black border border-gray-400 text-xs">
-                                                    {{ $attendance->hours_perDay }} hr/s
+                                                    <!-- this is total hour required -->
+                                                    <!-- {{ $attendance->hours_perDay }} hr/s -->
+                                                    @php
+                                                        // Assuming $attendance->hours_perDay is in decimal format
+                                                        $totalHours = $attendance->hours_perDay;
+                                                        $hours = floor($totalHours);
+                                                        $minutes = floor(($totalHours - $hours) * 60);
+                                                        $seconds = round((((($totalHours - $hours) * 60) - $minutes) * 60));
+
+                                                        $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
+                                                        $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
+                                                        $formattedSeconds = $seconds > 0 ? "{$seconds} sec" : '0 sec';
+
+                                                        $result = "{$formattedHours}, {$formattedMinutes}";
+                                                    @endphp
+
+                                                    {{ $result }}
                                                 </td>
-                                                <td class="text-black border uppercase border-gray-400 text-xs">
+                                                <td class="text-black border uppercase border-gray-400 text-xs font-semibold">
                                                 @php
                                                     $lateDurationAM = $attendance->late_duration;
                                                     $lateDurationPM = $attendance->late_durationPM;
@@ -964,6 +1076,7 @@
                             <div class="flex flex-col mr-4">
                                 <!-- <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p> -->
                                 @php
+                                    //total hour
                                     $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
                                     $hours = floor($totalSeconds / 3600);
                                     $minutes = floor(($totalSeconds % 3600) / 60);
@@ -975,9 +1088,10 @@
                                     $minutesM = floor(($totalSecondsM % 3600) / 60);
                                     $secondsM = $totalSecondsM % 60;
 
-                                    $undertimeInSeconds = $overallTotalUndertime * 60;
+                                    
 
-                                    // Convert total seconds to hours, minutes, and seconds
+                                    // total undertime
+                                    $undertimeInSeconds = $overallTotalUndertime * 60;
                                     $undertimeHours = intdiv($undertimeInSeconds, 3600); // Total hours
                                     $remainingSeconds = $undertimeInSeconds % 3600; // Remaining seconds after hours
                                     $undertimeMinutes = intdiv($remainingSeconds, 60); // Total minutes
@@ -988,18 +1102,51 @@
                                         ($undertimeHours > 0 ? "{$undertimeHours} hr/s, " : '0 hr/s, ') .
                                         ($undertimeMinutes > 0 ? "{$undertimeMinutes} min/s " : '0 min/s, ') .
                                         ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
+                                    
+
+                                    // Combine all into one total in seconds
+                                    $combinedTotalSeconds = $totalSeconds + $totalSecondsM + $undertimeInSeconds;
+
+                                    // Convert combined total seconds to hours, minutes, and seconds
+                                    $combinedHours = floor($combinedTotalSeconds / 3600);
+                                    $combinedMinutes = floor(($combinedTotalSeconds % 3600) / 60);
+                                    $combinedSeconds = $combinedTotalSeconds % 60;
+
+                                    // Format the final total
+                                    //$finalTotalFormatted = sprintf('%02d:%02d:%02d', $combinedHours, $combinedMinutes, $combinedSeconds);
+
+                                    $finalTotalFormatted = 
+                                        ($combinedHours > 0 ? "{$combinedHours} hr/s, " : '0 hr/s, ') .
+                                        ($combinedMinutes > 0 ? "{$combinedMinutes} min/s " : '0 min/s, ') .
+                                        ($combinedSeconds > 0 ? "{$combinedSeconds} sec" : '0 sec');
+
+                                    //$finalTotalFormatted = 
+                                    //    ($combinedHours > 0 ? "{$combinedHours} hr/s " : '0 hr/s ');
 
                                 @endphp
-                                <!-- <p>Total Hours to be rendered: <text class="text-red-500">{{ $totalHoursTobeRendered }}</text></p>
-                                <p>Total Late:  <text class="text-red-500">{{ $hoursM }} hr, {{ $minutesM }} min, {{ $secondsM }} sec</text></p><br><br>
-                                <p>Total Undertime:  <text class="text-red-500">{{ $undertimeFormatted }}</text></p><br><br>
-                                <p>Overall Total Time: <text class="text-red-500">{{ $hours }} hr, {{ $minutes }} min, {{ $seconds }} sec</text></p> -->
-                                
+
+                               @php
+                                    $totalHours = 0;
+
+                                    // Calculate the total hours
+                                    foreach ($attendanceData as $attendance) {
+                                        $totalHours += $attendance->hours_perDay;
+                                    }
+
+                                    // Convert total hours to seconds
+                                    $totalSecondss = $totalHours * 3600;
+
+                                    // Convert seconds to hours, minutes, and seconds
+                                    $hourss = floor($totalSecondss / 3600);
+                                    $minutess = floor(($totalSecondss % 3600) / 60);
+                                    $secondss = $totalSecondss % 60;
+                                @endphp
+
                                 <table class="border border-black" cellpadding="10">
-                                    <!-- <tr class="border border-black">
-                                        <th class="border border-black text-right">Total Hours to be Rendered</th>
-                                        <td class="text-red-500">{{ $totalHoursTobeRendered }}</td>
-                                    </tr> -->
+                                    <tr class="border border-black">
+                                        <th class="border border-black text-right">Duty Hours To Be Rendered</th>
+                                        <td class="text-red-500">{{ $hourss }} hr/s {{ $minutess }} min/s</td>
+                                    </tr>
                                     <tr class="border border-black">
                                         <th class="border border-black text-right">Total Late</th>
                                         <td class="text-red-500">{{ $hoursM }} hr/s, {{ $minutesM }} min/s, {{ $secondsM }} sec</td>
@@ -1009,7 +1156,7 @@
                                         <td class="text-red-500">{{ $undertimeFormatted }}</td>
                                     </tr>
                                     <tr class="border border-black">
-                                        <th class="border border-black text-right">Overall Total Time</th>
+                                        <th class="border border-black text-right">Total Time Rendered</th>
                                         <td class="text-red-500">{{ $hours }} hr/s, {{ $minutes }} min/s, {{ $seconds }} sec</td>
                                     </tr>
                                 </table>

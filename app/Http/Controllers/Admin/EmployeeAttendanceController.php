@@ -497,64 +497,69 @@ public function submitPortalTimeOut(Request $request)
     }
 
 
-    public function modifyAttendance(Request $request){
-
+    public function modifyAttendance(Request $request)
+    {
         $validatedData = $request->validate([
             'selected_date' => 'required|date',
             'status' => 'required|string',
+            'employee_id' => 'required|integer',
         ]);
 
+        $employee_id = $validatedData['employee_id'];
+        $employees = Employee::where('id', $employee_id)->first();
 
-        // $attendance = new \App\Models\Attendance();
-        // $attendance->selected_date = $validatedData['selected_date'];
-        // $attendance->status = $validatedData['status'];
-        // $attendance->save();
+        if ($employees) {
+            $dateOnly = Carbon::parse($validatedData['selected_date'])->format('Y-m-d');
 
-       // $employees = Employee::where('employee_r', $rfid)->get();
+            // Check if there are already 2 check-in and 2 check-out records for the employee on the selected date
+            $checkInCount = EmployeeAttendanceTimeIn::where('employee_id', $employee_id)
+                ->whereDate('check_in_time', $dateOnly)
+                ->count();
 
-                $employee_id = $request->input('employee_id');
-                $employees = Employee::where('id', $employee_id)->first();
+            $checkOutCount = EmployeeAttendanceTimeOut::where('employee_id', $employee_id)
+                ->whereDate('check_out_time', $dateOnly)
+                ->count();
 
+            if ($checkInCount == 0 && $checkOutCount == 0) {
+                $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $employees->department_id)->first();
 
-                if ($employees) {
-                    
-                    $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $employees->department_id)->first();
+                // Create AM check-in record
+                $attendanceInAm = new EmployeeAttendanceTimeIn();
+                $attendanceInAm->employee_id = $employees->id;
+                $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
+                $attendanceInAm->status = $validatedData['status'];
+                $attendanceInAm->save();
 
-                    $attendance = new EmployeeAttendanceTimeIn();
-                    $attendance->employee_id = $employees->id;
-                    $attendance->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
-                    $attendance->status = $validatedData['status'];
-                    $attendance->save();
+                // Create PM check-in record
+                $attendanceInPm = new EmployeeAttendanceTimeIn();
+                $attendanceInPm->employee_id = $employees->id;
+                $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
+                $attendanceInPm->status = $validatedData['status'];
+                $attendanceInPm->save();
 
-                    $attendance = new EmployeeAttendanceTimeIn();
-                    $attendance->employee_id = $employees->id;
-                    $attendance->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
-                    $attendance->status = $validatedData['status'];
-                    $attendance->save();
+                // Create AM check-out record
+                $attendanceOutAm = new EmployeeAttendanceTimeOut();
+                $attendanceOutAm->employee_id = $employees->id;
+                $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_end_time;
+                $attendanceOutAm->status = $validatedData['status'];
+                $attendanceOutAm->save();
 
-                    $attendance = new EmployeeAttendanceTimeOut();
-                    $attendance->employee_id = $employees->id;
-                    $attendance->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_end_time;
-                    $attendance->status = $validatedData['status'];
-                    $attendance->save();
+                // Create PM check-out record
+                $attendanceOutPm = new EmployeeAttendanceTimeOut();
+                $attendanceOutPm->employee_id = $employees->id;
+                $attendanceOutPm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_end_time;
+                $attendanceOutPm->status = $validatedData['status'];
+                $attendanceOutPm->save();
 
-                    $attendance = new EmployeeAttendanceTimeOut();
-                    $attendance->employee_id = $employees->id;
-                    $attendance->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_end_time;
-                    $attendance->status = $validatedData['status'];
-                    $attendance->save();
+                return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Date Successfully modified!');
+            } else {
+                return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot modify date: check-in or check-out records exist.');
+            }
+        }
 
-                    
-
-                   
-                    
-                    return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Date Successfully modified!');
-                } 
-
-        // Optionally, you can redirect back with a success message
-        
-
+        return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Employee not found.');
     }
+
 
 
 
@@ -597,7 +602,7 @@ public function submitPortalTimeOut(Request $request)
 
         // Update the check-in time and modification status
         $attendanceIn->check_in_time = $formattedTime;
-        $attendanceIn->status = 'On-Campus';
+        $attendanceIn->status = 'On-campus';
         $attendanceIn->modification_status = 'modified';
         $attendanceIn->save();
 
@@ -648,11 +653,130 @@ public function submitPortalTimeOut(Request $request)
 
         // Update the check-in time and modification status
         $attendanceOut->check_out_time = $formattedTime;
-        $attendanceOut->status = 'Off-Campus';
+        $attendanceOut->status = 'Off-campus';
         $attendanceOut->modification_status = 'modified';
         $attendanceOut->save();
 
         // Redirect or return a response
-        return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time In updated successfully!');
+        return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time Out updated successfully!');
     }
+
+
+
+    public function employeeAddTimeIn(Request $request)
+    {
+
+        // Validate the request
+        $validatedData = $request->validate([
+            'employee_id' => 'required|exists:employees,id', // Ensure employee_id exists
+            'selected-date-time' => 'required|date_format:Y-m-d\TH:i',
+        ]);
+
+        // Convert the validated date-time value to a Carbon instance
+        $selectedDateTime = Carbon::parse($validatedData['selected-date-time']) ;
+        $formattedDateTime = $selectedDateTime->format('Y-m-d H:i:s');
+        $dateOnly = $selectedDateTime->toDateString();
+        
+        // Check if there are already 2 check-in records for the employee
+        $checkInCount = EmployeeAttendanceTimeIn::where('employee_id', $validatedData['employee_id'])
+            ->whereDate('check_in_time', $dateOnly) // Optional: Check for today's date
+            ->count();
+
+        // Insert the new record if the count is less than 2
+        if ($checkInCount < 2) {
+            EmployeeAttendanceTimeIn::create([
+                'employee_id' => $validatedData['employee_id'],
+                'check_in_time' => $formattedDateTime,
+                'status' => "On-campus",
+                // Add other required fields here
+            ]);
+            
+            return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time In recorded successfully!');
+            // return response()->json(['message' => 'Check-in time recorded successfully.']);
+        } else {
+            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot record more than 2 check-in times');
+            // return response()->json(['message' => 'Cannot record more than 2 check-in times for today.'], 400);
+        }
+
+
+    }
+
+
+    public function employeeAddTimeOut(Request $request)
+    {
+
+        // Validate the request
+        $validatedData = $request->validate([
+            'employee_id' => 'required|exists:employees,id', // Ensure employee_id exists
+            'selected-date-time' => 'required|date_format:Y-m-d\TH:i',
+        ]);
+
+        // Convert the validated date-time value to a Carbon instance
+        $selectedDateTime = Carbon::parse($validatedData['selected-date-time']) ;
+        $formattedDateTime = $selectedDateTime->format('Y-m-d H:i:s');
+        $dateOnly = $selectedDateTime->toDateString();
+        
+        // Check if there are already 2 check-in records for the employee
+        $checkInCount = EmployeeAttendanceTimeOut::where('employee_id', $validatedData['employee_id'])
+            ->whereDate('check_out_time', $dateOnly) // Optional: Check for today's date
+            ->count();
+
+        // Insert the new record if the count is less than 2
+        if ($checkInCount < 2) {
+            EmployeeAttendanceTimeOut::create([
+                'employee_id' => $validatedData['employee_id'],
+                'check_out_time' => $formattedDateTime,
+                'status' => "On-campus",
+                // Add other required fields here
+            ]);
+            
+            return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time Out recorded successfully!');
+            // return response()->json(['message' => 'Check-in time recorded successfully.']);
+        } else {
+            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot record more than 2 check-out times');
+            // return response()->json(['message' => 'Cannot record more than 2 check-in times for today.'], 400);
+        }
+
+
+    }
+
+
+
+    public function deleteTimeIn($id)
+    {
+
+        $attendanceIn = EmployeeAttendanceTimeIn::find($id);
+
+        if ($attendanceIn) {
+
+            $attendanceIn->delete();
+
+            return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Attendance deleted successfully.');
+        } else {
+            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Attendance record not found.');
+        }
+
+    }
+
+    public function deleteTimeOut($id)
+    {
+
+        $attendanceOut = EmployeeAttendanceTimeOut::find($id);
+
+        if ($attendanceOut) {
+
+            $attendanceOut->delete();
+
+            return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Attendance deleted successfully.');
+        } else {
+            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Attendance record not found.');
+        }
+
+    }
+
+
+
+
+
+
 }
