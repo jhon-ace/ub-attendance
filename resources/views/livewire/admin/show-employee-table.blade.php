@@ -278,7 +278,12 @@
                                                                 <div class="mb-2">
                                                                     <label for="department_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department:</label>
                                                                     <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
-                                                                        <option value="{{ $employee->department->id }}">{{ $employee->department->department_abbreviation }}</option>
+                                                                        <option selected value="{{ $employee->department->id }}">{{ $employee->department->department_abbreviation }}</option>
+                                                                        @foreach($departments as $department)
+                                                                            @if($department->id != $employee->department->id)
+                                                                                <option value="{{ $department->id }}">{{ $department->department_abbreviation }}</option>
+                                                                            @endif
+                                                                        @endforeach
                                                                     </select>
                                                                     <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                                                 </div>
@@ -529,8 +534,12 @@
                                         <div class="mb-2">
                                             <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department:</label>
                                             <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
-                                                <!-- <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_id }} | {{ $departmentToShow->department_name }}</option> -->
-                                                <option value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_abbreviation }}</option>
+                                                <option selected value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_abbreviation }}</option>
+                                                @foreach($departments as $department)
+                                                    @if($department->id != $departmentToShow->id)
+                                                        <option value="{{ $department->id }}">{{ $department->department_abbreviation }}</option>
+                                                    @endif
+                                                @endforeach
                                             </select>
                                             <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                         </div>
@@ -738,7 +747,12 @@
                                                                 <div class="mb-2">
                                                                     <label for="department_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department:</label>
                                                                     <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
-                                                                        <option value="{{ $departmentToShow->id }}">{{ $employee->department->department_abbreviation }}</option>
+                                                                        <option selected value="{{ $departmentToShow->id }}">{{ $employee->department->department_abbreviation }}</option>
+                                                                        @foreach($departments as $department)
+                                                                            @if($department->id != $departmentToShow->id)
+                                                                                <option value="{{ $department->id }}">{{ $department->department_abbreviation }}</option>
+                                                                            @endif
+                                                                        @endforeach
                                                                     </select>
                                                                     <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                                                 </div>
