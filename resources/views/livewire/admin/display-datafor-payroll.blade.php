@@ -1074,16 +1074,18 @@
                                             </button>
                                         </div>
                                     @endif
-                                    <table class="border border-black" cellpadding="2">
+                                    <table class="border border-black " cellpadding="4">
                                         <thead>
-                                            <tr class="border border-black text-sm">
-                                                <th class="border border-black text-center">Employee ID</th>
+                                            <tr class="border border-black text-sm bg-gray-200">
+                                                <!-- <th class="border border-black text-center">Employee ID</th> -->
                                                 <th class="border border-black text-center">Employee Full Name</th>
                                                 <th class="border border-black text-center">Duty Hours To Be Rendered</th>
                                                 <th class="border border-black text-center">Total Time Rendered</th>
+                                                <th class="border border-black text-center">Final Time deduction</th>
                                                 <th class="border border-black text-center">Total Late</th>
                                                 <th class="border border-black text-center">Total Undertime</th>
                                                 <th class="border border-black text-center">Absent</th>
+                                                
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1169,11 +1171,11 @@
                                                      $attendanceDaysCount = count($employeeData['uniqueDays']);
 
                                                      $rtotal = $totalSecondsWorked + $totalSecondsM + $undertimeInSeconds;
-                                                    $absentSeconds = $totalSeconds - $rtotal;
+                                                    $absentSecondss = $totalSeconds - $rtotal;
 
                                                     // Convert absence seconds to hours, minutes, and seconds
-                                                    $absentHours = floor($absentSeconds / 3600);
-                                                    $remainingSeconds = $absentSeconds % 3600;
+                                                    $absentHours = floor($absentSecondss / 3600);
+                                                    $remainingSeconds = $absentSecondss % 3600;
                                                     $absentMinutes = floor($remainingSeconds / 60);
                                                     $absentSeconds = $remainingSeconds % 60;
 
@@ -1188,12 +1190,28 @@
                                                     // Add the comma and space between the valuesdcd
                                                     $absentFormatted = trim($absentFormatted, ', ');
 
+
+                                                    $finalDeduction = $totalSecondsM + $undertimeInSeconds + $absentSecondss;
+
+                                                    // Calculate final hour deduction
+                                                    $finalHourDeductionHours = floor($finalDeduction / 3600);
+                                                    $finalDeductionRemainingSeconds = $finalDeduction % 3600;
+                                                    $finalHourDeductionMinutes = floor($finalDeductionRemainingSeconds / 60);
+                                                    $finalHourDeductionSeconds = $finalDeductionRemainingSeconds % 60;
+
+                                                    // Format final hour deduction
+                                                    $finalHourDeductionFormatted = 
+                                                        ($finalHourDeductionHours > 0 ? "{$finalHourDeductionHours} hr/s, " : '0 hr/s, ') .
+                                                        ($finalHourDeductionMinutes > 0 ? "{$finalHourDeductionMinutes} min/s " : '0 min/s, ') .
+                                                        ($finalHourDeductionSeconds > 0 ? "{$finalHourDeductionSeconds} sec" : '0 sec');
+                                                    
+
                                                 @endphp
 
                                                 <tr class="border border-black text-sm">
-                                                    <td class="text-black border border-black">
+                                                    <!-- <td class="text-black border border-black text-center">
                                                         {{ $employeeData['employee_idd'] }}
-                                                    </td>
+                                                    </td> -->
                                                     <td class="text-black border border-black">
                                                         {{ $employeeData['employee_lastname'] }},
                                                         {{ $employeeData['employee_firstname'] }},
@@ -1201,6 +1219,7 @@
                                                     </td>
                                                     <td class="text-black border border-black">{{ $totalFormatted }}  from ({{ $attendanceDaysCount }} days worked)</td>
                                                     <td class="text-black border border-black">{{$formattedTimeWorked}}</td>
+                                                    <td class="text-black border border-black">{{ $finalHourDeductionFormatted }}</td>
                                                     <td class="text-black border border-black">{{ $lateFormatted }}</td>
                                                     <td class="text-black border border-black">{{ $undertimeFormatted }}</td>
                                                     <td class="text-black border border-black">{{ $absentFormatted }}</td>
