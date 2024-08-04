@@ -25,7 +25,7 @@
                 id="search" 
                 name="search" 
                 wire:model.live="search" 
-                class="text-sm shadow appearance-none border rounded text-black leading-tight focus:outline-none focus:shadow-outline md:w-auto"
+                class="text-sm shadow appearance-none border rounded text-black leading-tight focus:outline-none focus:shadow-outline md:w-72"
                 placeholder="Enter Employee ID or name..."
                 autofocus
             />
@@ -35,8 +35,94 @@
                     <!-- Modal -->
         <div x-data="{ open: false }" @keydown.window.escape="open = false" x-cloak>
             <!-- Modal Trigger Button -->
-            <button @click="open = true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-2 mt-5"><i class="fa-solid fa-calendar-days"></i></button>
-
+             <div class="flex justify-start">
+                <button @click="open = true" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-2 mt-5"><i class="fa-solid fa-calendar-days"></i> View Work Details</button>
+                <div class="flex justify-center mb-2 mt-6 ml-4">
+                    <div class="flex justify-center items-center space-x-2">
+                        <div x-data="{ open: false }">
+                            <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-md px-2 py-2.5 font-bold rounded hover:bg-blue-700">
+                                <i class="fa-solid fa-pen fa-md" style="color: #ffffff;"></i> Add Time In
+                            </a>
+                            <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
+                                    <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
+                                        <p class="text-xl font-bold">Add Time In</p>
+                                        <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
+                                    </div>
+                                    <div class="mb-4">
+                                        <form action="{{ route('admin.attendance.employee_attendance.addIn') }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to add time in?');">
+                                            <x-caps-lock-detector />
+                                            @csrf
+                                                <div class="mb-2">
+                                                    <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Select Employee Name: </label>
+                                                    <select id="employee_id" name="employee_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('employee_id') is-invalid @enderror">
+                                                        @foreach($employees as $employee)
+                                                            <option selected value="{{ $employee->id }}">{{ $employee->employee_id }} - {{ $employee->employee_lastname }}, {{ $employee->employee_firstname }} {{ $employee->employee_middlename }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label for="selected-date-time" class="block text-gray-700 text-md font-bold mb-2 text-left">Select Date & Time:</label>
+                                                    <input type="datetime-local" id="selected-date-time"  name="selected-date-time" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('selected-date-time') is-invalid @enderror" required>
+                                                    <x-input-error :messages="$errors->get('selected-date-time')" class="mt-2" />
+                                                </div>
+                                            <div class="flex mb-4 mt-10 justify-center">
+                                                <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mb-2 mt-6 ml-4">
+                    <div class="flex justify-center items-center space-x-2">
+                        <div x-data="{ open: false }">
+                            <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-md px-2 py-2.5 font-bold rounded hover:bg-blue-700">
+                                <i class="fa-solid fa-pen fa-sm" style="color: #ffffff;"></i> Add Time Out
+                            </a>
+                            <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
+                                    <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
+                                        <p class="text-xl font-bold">Add Time Out</p>
+                                        <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2.5 rounded hover:text-red-500">X</a>
+                                    </div>
+                                    <div class="mb-4">
+                                        <form action="{{ route('admin.attendance.employee_attendance.addOut') }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to add time out?');">
+                                            <x-caps-lock-detector />
+                                            @csrf
+                                                <div class="mb-2">
+                                                    <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Select Employee Name: </label>
+                                                    <select id="employee_id" name="employee_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('employee_id') is-invalid @enderror">
+                                                        @foreach($employees as $employee)
+                                                            <option selected value="{{ $employee->id }}">{{ $employee->employee_id }} - {{ $employee->employee_lastname }}, {{ $employee->employee_firstname }} {{ $employee->employee_middlename }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label for="selected-date-time" class="block text-gray-700 text-md font-bold mb-2 text-left">Select Date & Time:</label>
+                                                    <input type="datetime-local" id="selected-date-time"  name="selected-date-time" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('selected-date-time') is-invalid @enderror" required>
+                                                    <x-input-error :messages="$errors->get('selected-date-time')" class="mt-2" />
+                                                </div>
+                                            <div class="flex mb-4 mt-10 justify-center">
+                                                <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+            
             <!-- Modal Background -->
             <div x-show="open" class="fixed inset-0 bg-black bg-opacity-50 z-50" @click="open = false"></div>
 
@@ -187,7 +273,7 @@
                         <!-- Table for Time In -->
                         <div class="flex justify-between">
                             <div class="w-[49%]">
-                                <h3 class="text-center uppercase font-bold">Time In</h3>
+                                
                                 <!-- Assuming $attendanceTimeIn is sorted by check_in_time descending -->
                                 @if ($attendanceTimeIn->isNotEmpty())
                                     @php

@@ -1098,9 +1098,6 @@
                                                             'hours_late_overall' => 0,
                                                             'hours_undertime_overall' => 0,
                                                             'employee_idd' => $attendance->employee_idd,
-                                                            'employee_lastname' => $attendance->employee_lastname,
-                                                            'employee_firstname' => $attendance->employee_firstname,
-                                                            'employee_middlename' => $attendance->employee_middlename,
                                                             'uniqueDays' => []
                                                         ];
                                                     }
@@ -1236,7 +1233,6 @@
 
                                                 <table class="border border-black" cellpadding="2">
                                                     <tr class="text-sm">
-                                                        <th class="border border-black text-center">Employee Name</th>
                                                         <th class="border border-black text-center">Duty Hours To Be Rendered</th>
                                                         <th class="border border-black text-center">Total Time Rendered</th>
                                                         <th class="border border-black text-center">Total Time Deduction</th>
@@ -1248,11 +1244,6 @@
                                                         <!-- <td class="text-black border border-black text-center">
                                                             {{ $employeeData['employee_idd'] }}
                                                         </td> -->
-                                                        <td class="text-black border border-black">
-                                                            {{ $employeeData['employee_lastname'] }},
-                                                            {{ $employeeData['employee_firstname'] }},
-                                                            {{ $employeeData['employee_middlename'] }}
-                                                        </td>
                                                         <td class="text-black border border-black">{{ $totalFormatted }}  from ({{ $attendanceDaysCount }} days worked)</td>
                                                         <td class="text-black border border-black">{{$formattedTimeWorked}}</td>
                                                         <td class="text-black border border-black">{{ $finalHourDeductionFormatted }}</td>

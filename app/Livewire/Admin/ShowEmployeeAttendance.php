@@ -181,12 +181,19 @@ class ShowEmployeeAttendance extends Component
         }
         
 
-        $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
-            ->paginate(31);
+        // $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
+        //     ->paginate(100);
+
+
+        // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
+        //     ->paginate(100);
+
+             $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
+            ->paginate(100);
 
 
         $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
-            ->paginate(31);
+            ->paginate(100);
 
 
 
@@ -422,10 +429,6 @@ class ShowEmployeeAttendance extends Component
 
                         $uniqueCheckInDays = (int) $checkInCount->unique_check_in_days;
                         $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
-                              
-   
-                        
-                            
 
                    
                     }
@@ -541,6 +544,7 @@ class ShowEmployeeAttendance extends Component
                     $employeeMiddlename = $attendance->employee->employee_middlename;
                     $checkInTimer = $attendance->check_in_time;
 
+                    
                     // Check if this entry already exists in $attendanceData
                     if (isset($attendanceData[$key])) {
                         // Update existing entry
@@ -1080,6 +1084,13 @@ class ShowEmployeeAttendance extends Component
                     // Prepare the key for $attendanceData
                     $key = $attendance->employee_id . '-' . $checkInDate;
 
+                    $employee_idd = $attendance->employee->employee_id;
+                    $employee_id = $attendance->employee_id;
+                    $employeeLastname = $attendance->employee->employee_lastname;
+                    $employeeFirstname = $attendance->employee->employee_firstname;
+                    $employeeMiddlename = $attendance->employee->employee_middlename;
+                    $checkInTimer = $attendance->check_in_time;
+                    
                     // Check if this entry already exists in $attendanceData
                     if (isset($attendanceData[$key])) {
                         // Update existing entry
@@ -1096,6 +1107,14 @@ class ShowEmployeeAttendance extends Component
                         $attendanceData[$key]->total_late += $totalHoursLate;
                         $attendanceData[$key]->remarks = $remark;
                         $attendanceData[$key]->modify_status = $modifyStatus;
+                        $attendanceData[$key]->employee_idd = $employee_idd;
+                        $attendanceData[$key]->employee_id = $employee_id;
+                        $attendanceData[$key]->employee_lastname = $employeeLastname;
+                        $attendanceData[$key]->employee_firstname = $employeeFirstname;
+                        $attendanceData[$key]->employee_middlename = $employeeMiddlename;
+                        $attendanceData[$key]->hours_late_overall += $overallTotalHoursLate;
+                        $attendanceData[$key]->hours_undertime_overall += $totalundertime;
+                        $attendanceData[$key]->check_in_time = $checkInTimer;
    
 
 
@@ -1117,6 +1136,14 @@ class ShowEmployeeAttendance extends Component
                             'total_late' => $totalHoursLate,
                             'remarks' => $remark,
                             'modify_status'=> $modifyStatus,
+                            'hours_late_overall' => $overallTotalHoursLate,
+                            'hours_undertime_overall' => $totalundertime,
+                            'check_in_time' => $checkInTimer,
+                            'employee_idd' => $employee_idd,
+                            'employee_lastname' => $employeeLastname,
+                            'employee_firstname' => $employeeFirstname,
+                            'employee_middlename' => $employeeMiddlename,
+                            
 
 
                         ];

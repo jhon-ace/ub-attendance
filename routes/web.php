@@ -15,16 +15,16 @@ use App\Http\Controllers\Admin\EmployeeAttendanceController;
 use App\Http\Controllers\Admin\CSVImportController;
 use App\Http\Controllers\Admin\PublicPageController;
 
-Route::get('/staff', function () {
-    return view('welcome');
-});
+// Route::get('/staff', function () {
+//     return view('welcome');
+// });
 
-Route::get('/human-resource', function () {
-    return view('welcome');
-});
+// Route::get('/human-resource', function () {
+//     return view('welcome');
+// });
 
 Route::get('/', function () {
-    return view('background');
+    return view('auth.login');
 });
 
 Route::get('/attendance/portal', [PublicPageController::class, 'portalTimeIn'])->name('attendance.portal');

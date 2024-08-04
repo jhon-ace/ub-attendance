@@ -29,6 +29,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        session()->forget('url.intended');
+
         if (Auth::check()) 
         {
             if (Auth::user()->hasRole('admin')) 
@@ -50,7 +52,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Default redirect if no specific role matches
-        return redirect()->intended(route('/'));
+        return view('auth.login');
         
 
     }
@@ -59,7 +61,9 @@ class AuthenticatedSessionController extends Controller
      * Destroy an authenticated session.
      */
     public function destroy(Request $request): RedirectResponse
-    {
+    {   
+        session()->flush(); 
+        
          if (Auth::user()->hasRole('admin')) 
             {
                 // return redirect()->intended(route('admin.dashboard'))->with('success', 'Successful Login');
@@ -69,7 +73,7 @@ class AuthenticatedSessionController extends Controller
 
                 $request->session()->regenerateToken();
 
-                return redirect()->route('login')->with('success', 'Attendance completed. Safe travels home!');
+                return redirect()->route('login')->with('success', 'Successfully logged out');
             }
             else if (Auth::user()->hasRole('admin_staff')) 
             {
@@ -79,7 +83,7 @@ class AuthenticatedSessionController extends Controller
 
                 $request->session()->regenerateToken();
 
-                return redirect()->route('loginStaff')->with('success', 'Attendance completed. Safe travels home!');
+                return redirect()->route('login')->with('success', 'Successfully logged out');
             } 
 
             else  // This is HR Account
@@ -90,7 +94,7 @@ class AuthenticatedSessionController extends Controller
 
                 $request->session()->regenerateToken();
 
-                return redirect()->route('loginHR')->with('success', 'Attendance completed. Safe travels home!');
+                return redirect()->route('login')->with('success', 'Successfully logged out');
             } 
     }
 }
