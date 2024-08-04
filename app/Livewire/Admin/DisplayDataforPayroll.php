@@ -585,6 +585,8 @@ class DisplayDataforPayroll extends Component
                     // Prepare the key for $attendanceData
                     $key = $attendance->employee_id . '-' . $checkInDate;
 
+                    $employee_idd = $attendance->employee->employee_id;
+                    $employee_id = $attendance->employee_id;
                     $employeeLastname = $attendance->employee->employee_lastname;
                     $employeeFirstname = $attendance->employee->employee_firstname;
                     $employeeMiddlename = $attendance->employee->employee_middlename;
@@ -605,6 +607,8 @@ class DisplayDataforPayroll extends Component
                         $attendanceData[$key]->total_late += $totalHoursLate;
                         $attendanceData[$key]->remarks = $remark;
                         $attendanceData[$key]->modify_status = $modifyStatus;
+                        $attendanceData[$key]->employee_idd = $employee_idd;
+                        $attendanceData[$key]->employee_id = $employee_id;
                         $attendanceData[$key]->employee_lastname = $employeeLastname;
                         $attendanceData[$key]->employee_firstname = $employeeFirstname;
                         $attendanceData[$key]->employee_middlename = $employeeMiddlename;
@@ -618,7 +622,7 @@ class DisplayDataforPayroll extends Component
                         // Create new entry
                         $attendanceData[$key] = (object) [
                             'hours_perDay' => $totalHoursNeedperDay,
-                            'employee_id' => $attendance->employee_id,
+                            'employee_id' => $employee_id,
                             'employee_lastname' => $employeeLastname,
                             'employee_firstname' => $employeeFirstname, // Add employee_lastname
                             'employee_middlename' => $employeeMiddlename,
@@ -637,6 +641,7 @@ class DisplayDataforPayroll extends Component
                             'hours_late_overall' => $overallTotalHoursLate,
                             'hours_undertime_overall' => $totalundertime,
                             'check_in_time' => $checkInTimer,
+                            'employee_idd' => $employee_idd,
 
                         ];
 

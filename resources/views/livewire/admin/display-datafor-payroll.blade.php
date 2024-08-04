@@ -159,18 +159,11 @@
                                     wire:model="endDate"
                                     wire:change="updateAttendanceByDateRange"
                                 >
-                            </div>
-                        </div>
-                        <div class="flex flex-col -mt-10">
-                            <div class="flex justify-end mb-2 -mt-2">
                                 <a href="">
                                     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
                                 </a>
                             </div>
-                            <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
-                                <i class="fa-solid fa-file"></i> Generate DTR
-                            </button>
-                        </div>              
+                        </div>        
                     </div>
                 </div>
             </div>                                       
@@ -1017,9 +1010,9 @@
                         <!-- end -->
                     </div>
                     <div x-show="tab === 'modify_date'" class="w-full">
-                        <div class="flex justify-center">
-                            <div class="flex justify-end">
-                                <div class="flex flex-col mr-4">
+                        <div class="flex justify-center ">
+                            <div class="flex justify-end w-full">
+                                <div class="flex flex-col w-full">
 
                                     @php
                                         // Group data by employee_id
@@ -1036,10 +1029,11 @@
                                                     'total_hours_worked' => 0,
                                                     'hours_late_overall' => 0,
                                                     'hours_undertime_overall' => 0,
+                                                    'employee_idd' => $attendance->employee_idd,
                                                     'employee_lastname' => $attendance->employee_lastname,
                                                     'employee_firstname' => $attendance->employee_firstname,
                                                     'employee_middlename' => $attendance->employee_middlename,
-                                                    'uniqueDays' => [],
+                                                    'uniqueDays' => []
                                                 ];
                                             }
 
@@ -1054,15 +1048,37 @@
                                         }
                                     @endphp
                                     
-                                    <h1 class="uppercase text-[30px]">Department: {{ $departmentToShow->department_abbreviation }}</h1>
-                                    <table class="border border-black" cellpadding="10">
+                                    <div class="flex justify-center mt-8">
+                                        <h1 class="uppercase text-[30px]">Department: {{ $departmentToShow->department_abbreviation }}</h1>
+                                    </div>
+                                    @if ($startDate && $endDate)
+                                        <p>Selected Date Range:</p>
+                                        <div class="flex justify-between -mt-4">
+                                            
+                                            <p class="py-4">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
+                                            <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                <i class="fa-solid fa-file"></i> Generate DTR
+                                            </button>
+                                        </div>
+                                    @else
+                                        <p>Selected Date Range:</p>
+                                        <div class="flex justify-between -mt-4">
+                                            
+                                            <p class="py-4">Start Date: No selected &nbsp;&nbsp;End Date: No selected</p>
+                                            <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                <i class="fa-solid fa-file"></i> Generate DTR
+                                            </button>
+                                        </div>
+                                    @endif
+                                    <table class="border border-black" cellpadding="5">
                                         <thead>
-                                            <tr class="border border-black">
-                                                <th class="border border-black text-left">Employee</th>
-                                                <th class="border border-black text-left">Duty Hours To Be Rendered</th>
-                                                <th class="border border-black text-left">Total Time Rendered</th>
-                                                <th class="border border-black text-left">Total Late</th>
-                                                <th class="border border-black text-left">Total Undertime</th>
+                                            <tr class="border border-black text-sm">
+                                                <th class="border border-black text-center">Employee ID</th>
+                                                <th class="border border-black text-center">Employee Full Name</th>
+                                                <th class="border border-black text-center">Duty Hours To Be Rendered</th>
+                                                <th class="border border-black text-center">Total Time Rendered</th>
+                                                <th class="border border-black text-center">Total Late</th>
+                                                <th class="border border-black text-center">Total Undertime</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1116,10 +1132,28 @@
                                                         ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
 
                                                     // Format total hours
-                                                    $totalFormatted = 
-                                                        ($hours > 0 ? "{$hours} hr/s, " : '0 hr/s, ') .
-                                                        ($minutes > 0 ? "{$minutes} min/s " : '0 min/s, ') .
-                                                        ($seconds > 0 ? "{$seconds} sec" : '0 sec');
+                                                    //$totalFormatted = 
+                                                       // ($hours > 0 ? "{$hours} hr/s, " : '0 hr/s, ') .
+                                                       // ($minutes > 0 ? "{$minutes} min/s " : '0 min/s, ');
+
+                                                    $totalFormatted = '';
+
+                                                    if ($hours > 0) {
+                                                        $totalFormatted .= "{$hours} hr/s";
+                                                    }
+
+                                                    if ($minutes > 0) {
+                                                        $totalFormatted .= ($hours > 0 ? ', ' : '') . "{$minutes} min/s";
+                                                    } elseif ($hours > 0) {
+                                                        // Include a comma if hours are present but no minutes
+                                                        $totalFormatted .= '';
+                                                    } else {
+                                                        // If there are no hours and no minutes, ensure the format is '0 hr/s, 0 min/s'
+                                                        $totalFormatted = '0 hr/s, 0 min/s';
+                                                    }
+
+                                                    // Add seconds if needed
+                                                    $totalFormatted .= $seconds > 0 ? " {$seconds} sec" : '';
 
                                                     // Format total late
                                                     $lateFormatted = 
@@ -1132,11 +1166,14 @@
 
                                                 <tr class="border border-black">
                                                     <td class="text-black border border-black">
+                                                        {{ $employeeData['employee_idd'] }}
+                                                    </td>
+                                                    <td class="text-black border border-black">
                                                         {{ $employeeData['employee_lastname'] }},
                                                         {{ $employeeData['employee_firstname'] }},
                                                         {{ $employeeData['employee_middlename'] }}
                                                     </td>
-                                                    <td class="text-black border border-black">{{ $employeeData['totalHours'] }} hr/s ({{ $attendanceDaysCount }} days)</td>
+                                                    <td class="text-black border border-black">{{ $totalFormatted }}  from ({{ $attendanceDaysCount }} days worked)</td>
                                                     <td class="text-black border border-black">{{$formattedTimeWorked}}</td>
                                                     <td class="text-black border border-black">{{ $lateFormatted }}</td>
                                                     <td class="text-black border border-black">{{ $undertimeFormatted }}</td>
