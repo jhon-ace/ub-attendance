@@ -99,6 +99,7 @@ Route::middleware(['auth'])->group(function () {
 
         // Employee Attendance routes
         Route::get('/employees/attendance', [EmployeeAttendanceController::class, 'employee'])->name('attendance.employee_attendance');
+        Route::get('/employees/attendance/payroll', [EmployeeAttendanceController::class, 'employeelist'])->name('attendance.employee_attendance.payroll');
         Route::post('/employees/attendance/add-time-in', [EmployeeAttendanceController::class, 'employeeAddTimeIn'])->name('attendance.employee_attendance.addIn');
         Route::post('/employees/attendance/add-time-out', [EmployeeAttendanceController::class, 'employeeAddTimeOut'])->name('attendance.employee_attendance.addOut');
         Route::delete('employees/attendance/delete-time-in/{id}', [EmployeeAttendanceController::class, 'deleteTimeIn'])->name('attendance.employee_attendance.deleteTimeIn');

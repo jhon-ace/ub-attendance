@@ -29,6 +29,11 @@ class EmployeeAttendanceController extends Controller
         return view('Admin.attendance.employee_attendance');
     }
 
+    public function employeelist()
+    {
+        return view('Admin.attendance.employee_attendance_for_payroll');
+    }
+
     public function employeeSearch()
     {
          return view('Admin.attendance.employeeSearch');
