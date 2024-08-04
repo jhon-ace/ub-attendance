@@ -87,19 +87,24 @@
         </div>
     @endif
     <div class="table-container">
-       @php
+        @php
+            // Define weekend days
+            $weekendDays = ['Saturday', 'Sunday'];
+
             // Group check-ins and check-outs by employee and date
             $groupedAttendance = [];
 
             foreach ($attendanceTimeIn as $attendanceIn) {
                 $date = date('Y-m-d', strtotime($attendanceIn->check_in_time));
                 $employeeId = $attendanceIn->employee->employee_id;
-
+                $status = $attendanceIn->status; // Get status from check-in
+                
                 if (!isset($groupedAttendance[$employeeId][$date])) {
                     $groupedAttendance[$employeeId][$date] = [
                         'date' => date('m-d-Y, (l)', strtotime($attendanceIn->check_in_time)),
                         'check_ins' => [],
-                        'check_outs' => []
+                        'check_outs' => [],
+                        'status' => $status
                     ];
                 }
 
@@ -109,17 +114,46 @@
             foreach ($attendanceTimeOut as $attendanceOut) {
                 $date = date('Y-m-d', strtotime($attendanceOut->check_out_time));
                 $employeeId = $attendanceOut->employee->employee_id;
-
+                $status = $attendanceOut->status; // Get status from check-out
+                
                 if (!isset($groupedAttendance[$employeeId][$date])) {
                     $groupedAttendance[$employeeId][$date] = [
                         'date' => date('m-d-Y, (l)', strtotime($attendanceOut->check_out_time)),
                         'check_ins' => [],
-                        'check_outs' => []
+                        'check_outs' => [],
+                        'status' => $status
                     ];
                 }
 
                 $groupedAttendance[$employeeId][$date]['check_outs'][] = date('g:i:s A', strtotime($attendanceOut->check_out_time));
+                
+                // Update status with the check-out status, appending if it already exists
+                if ($groupedAttendance[$employeeId][$date]['status'] !== $status) {
+                    $groupedAttendance[$employeeId][$date]['status'] = ' Present';
+                }
             }
+
+            // Modify check-ins and check-outs based on status
+            foreach ($groupedAttendance as $employeeId => $dates) {
+                foreach ($dates as $date => &$attendance) {
+                    $status = $attendance['status'];
+                    $dayOfWeek = date('l', strtotime($attendance['date']));
+                    
+                    // Check if status is absent, weekend, or on leave
+                    if ($status === 'Absent' || $status === 'On Leave' || $status === 'Weekend') {
+                        $attendance['check_ins'] = [$status];
+                        $attendance['check_outs'] = [$status];
+                    } else {
+                        // If status is none of the declared statuses, make it "Present"
+
+                        $attendance['check_ins'] = ['Present'];
+                        $attendance['check_outs'] = ['Present'];
+                    }
+
+                }
+            }
+
+            
         @endphp
         <table>
             <thead>
@@ -128,41 +162,53 @@
                     <th>Date</th>
                     <th>Time - In</th>
                     <th>Time - Out</th>
+                    <th>Status</th> <!-- Status column header -->
                 </tr>
             </thead>
             <tbody>
                 @foreach($groupedAttendance as $employeeId => $dates)
                     @foreach($dates as $date => $attendance)
                         @php
-                            $isOnLeave = in_array('12:00:00 AM', $attendance['check_ins']) && in_array('12:00:00 AM', $attendance['check_outs']);
+                            $status = $attendance['status'] ?? 'No Status';
+                            $dayOfWeek = date('l', strtotime($attendance['date']));
+                            $isWeekend = in_array($dayOfWeek, ['Saturday', 'Sunday']);
+                            $isAbsentOrLeave = in_array($status, ['Absent', 'On Leave', 'Weekend']);
                         @endphp
                         <tr>
                             <td>{{ $employeeId }}</td>
                             <td>{{ $attendance['date'] }}</td>
                             <td>
-                                @if ($isOnLeave)
-                                    On Leave
+                                @if ($isAbsentOrLeave)
+                                    {{ $status }} <!-- Show status if absent, on leave, or weekend -->
                                 @else
-                                    @foreach($attendance['check_ins'] as $checkIn)
-                                        {{ $checkIn }}<br>
-                                    @endforeach
+                                    @if (!empty($attendance['check_ins']))
+                                        @foreach($attendance['check_ins'] as $checkIn)
+                                            {{ $checkIn }}<br>
+                                        @endforeach
+                                    @else
+                                        No Check-Ins
+                                    @endif
                                 @endif
                             </td>
                             <td>
-                                @if ($isOnLeave)
-                                    On Leave
+                                @if ($isAbsentOrLeave)
+                                    {{ $status }} <!-- Show status if absent, on leave, or weekend -->
                                 @else
-                                    @foreach($attendance['check_outs'] as $checkOut)
-                                        {{ $checkOut }}<br>
-                                    @endforeach
+                                    @if (!empty($attendance['check_outs']))
+                                        @foreach($attendance['check_outs'] as $checkOut)
+                                            {{ $checkOut }}<br>
+                                        @endforeach
+                                    @else
+                                        No Check-Outs
+                                    @endif
                                 @endif
                             </td>
+                            <td>{{ $status }}</td> <!-- Status column -->
                         </tr>
                     @endforeach
                 @endforeach
             </tbody>
         </table>
-
         <table class="table2">
             <thead>
                 <tr>
@@ -452,7 +498,7 @@
                                     $totalMinutesAM == 0 &&
                                     $totalHoursPM == 0 &&
                                     $totalMinutesPM == 0 &&
-                                    $modify_status == "On Leave"
+                                    $modify_status == "On Leaved"
                                 ) {
                                     $remarkss = 'Leave';
                                 }
@@ -465,9 +511,9 @@
                                     $totalMinutesAM == 0 &&
                                     $totalHoursPM > 0 &&
                                     $totalMinutesPM == 0 &&
-                                    $modify_status == "On Leave"
+                                    $status == "On Leave"
                                 ) {
-                                    $remarkss = 'Leave';
+                                    $remarkss = 'On Leave';
                                 }
                                     else {
                                     if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
@@ -514,9 +560,26 @@
          <br><br><br>
         
     </div>
-    <div style="margin-top:200px; margin-left:82%;display:flex; justify-content:flex-end; align-items:center;">
-            <div class="flex   justify-end">
-                <div class="flex flex-col mr-4">
+    <div style="margin-top:200px; margin-left:20%;display:flex; justify-content:flex-end; align-items:center;">
+            <div class="flex">
+                <div class="flex flex-col">
+                    @php
+                        $totalHours = 0;
+
+                        // Calculate the total hours
+                        foreach ($attendanceData as $attendance) {
+                            $totalHours += $attendance->hours_perDay;
+                        }
+
+                        // Convert total hours to seconds
+                        $totalSecondss = $totalHours * 3600;
+
+                        // Convert seconds to hours, minutes, and seconds
+                        $hourss = floor($totalSecondss / 3600);
+                        $minutess = floor(($totalSecondss % 3600) / 60);
+                        $secondss = $totalSecondss % 60;
+                    @endphp
+
                     @php
                         //total hour
                         $totalSeconds = $overallTotalHours * 3600; // Convert total hours to seconds
@@ -564,45 +627,64 @@
 
                         //$finalTotalFormatted = 
                         //    ($combinedHours > 0 ? "{$combinedHours} hr/s " : '0 hr/s ');
+                        
+                        
 
-                    @endphp
+                        //ABSENT
+                            $rtotal = $totalSeconds + $totalSecondsM + $undertimeInSeconds;
+                        $absentSecondss = $totalSecondss - $rtotal;
+
+                        // Convert absence seconds to hours, minutes, and seconds
+                        $absentHours = floor($absentSecondss / 3600);
+                        $remainingSeconds = $absentSecondss % 3600;
+                        $absentMinutes = floor($remainingSeconds / 60);
+                        $absentSeconds = $remainingSeconds % 60;
+
+                        // Format the absence time
+                        $absentFormatted = 
+                            ($absentHours > 0 ? "{$absentHours} hr/s" : '') .
+                            (($absentHours > 0 && $absentMinutes > 0) ? ", " : '') . 
+                            ($absentMinutes > 0 ? "{$absentMinutes} min/s" : '') .
+                            (($absentMinutes > 0 && $absentSeconds > 0) ? " " : '') . 
+                            ($absentSeconds > 0 ? "{$absentSeconds} sec" : ($absentHours <= 0 && $absentMinutes <= 0 ? ' 0 ' : ''));
+
+                        // Add the comma and space between the valuesdcd
+                        $absentFormatted = trim($absentFormatted, ', ');
+
+
+                        //finalDeduction
+                        $finalDeduction = $totalSecondsM + $undertimeInSeconds + $absentSecondss;
+
+                        // Calculate final hour deduction
+                        $finalHourDeductionHours = floor($finalDeduction / 3600);
+                        $finalDeductionRemainingSeconds = $finalDeduction % 3600;
+                        $finalHourDeductionMinutes = floor($finalDeductionRemainingSeconds / 60);
+                        $finalHourDeductionSeconds = $finalDeductionRemainingSeconds % 60;
+
+                        // Format final hour deduction
+                        $finalHourDeductionFormatted = 
+                            ($finalHourDeductionHours > 0 ? "{$finalHourDeductionHours} hr/s, " : '0 hr/s, ') .
+                            ($finalHourDeductionMinutes > 0 ? "{$finalHourDeductionMinutes} min/s " : '0 min/s, ') .
+                            ($finalHourDeductionSeconds > 0 ? "{$finalHourDeductionSeconds} sec" : '0 sec');
                     
-                    
-
-                    @php
-                        $totalHours = 0;
-                        foreach ($attendanceData as $attendance) {
-                            $totalHours += $attendance->hours_perDay;
-                        }
-
-                        // Convert total hours to hours, minutes, and seconds
-                        $hours = floor($totalHours);
-                        $minutes = floor(($totalHours - $hours) * 60);
-                        $seconds = round((((($totalHours - $hours) * 60) - $minutes) * 60));
-
-                        // Format the output
-                        $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
-                        $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
-
-                        $formattedTotal = "{$formattedHours}, {$formattedMinutes}";
                     @endphp
-              
+
                     <table class="border border-black" cellpadding="10">
-                        <tr class="border border-black">
+                        <tr>
                             <th class="border border-black text-right">Duty Hours To Be Rendered</th>
-                            <td class="text-red-500">{{ $formattedTotal }}</td>
-                        </tr>
-                        <tr class="border border-black">
+                            <th class="border border-black text-right">Total Time Rendered</th>
+                            <th class="border border-black text-right">Total Time Deduction</th>
                             <th class="border border-black text-right">Total Late</th>
-                            <td class="text-red-500">{{ $hoursM }} hr/s, {{ $minutesM }} min/s, {{ $secondsM }} sec</td>
-                        </tr>
-                        <tr class="border border-black">
                             <th class="border border-black text-right">Total Undertime</th>
-                            <td class="text-red-500">{{ $undertimeFormatted }}</td>
+                            <th class="border border-black text-right">Total Absent</th>
                         </tr>
-                        <tr class="border border-black">
-                            <th class="border border-black text-right">Overall Total Time</th>
-                            <td class="text-red-500">{{ $hours }} hr/s, {{ $minutes }} min/s, {{ $seconds }} sec</td>
+                        <tr>
+                            <td class="border border-black text-red-500">{{ $hourss }} hr/s {{ $minutess }} min/s</td>
+                            <td class="border border-black text-red-500">{{ $hours }} hr/s, {{ $minutes }} min/s, {{ $seconds }} sec</td>
+                            <td class="border border-black text-red-500">{{ $finalHourDeductionFormatted }}</td>
+                            <td class="border border-black text-red-500">{{ $hoursM }} hr/s, {{ $minutesM }} min/s, {{ $secondsM }} sec</td>
+                            <td class="border border-black text-red-500">{{ $undertimeFormatted }}</td>
+                            <td class="border border-black text-red-500">{{ $absentFormatted }}</td>
                         </tr>
                     </table>
                 </div>                        

@@ -531,28 +531,47 @@ public function submitPortalTimeOut(Request $request)
                 // Create AM check-in record
                 $attendanceInAm = new EmployeeAttendanceTimeIn();
                 $attendanceInAm->employee_id = $employees->id;
-                $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
+                if($departmentWorkingHour){
+                    $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
+                }else {
+                    $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' 00:00:00';
+                }
                 $attendanceInAm->status = $validatedData['status'];
                 $attendanceInAm->save();
 
                 // Create PM check-in record
                 $attendanceInPm = new EmployeeAttendanceTimeIn();
                 $attendanceInPm->employee_id = $employees->id;
-                $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
+                // $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
+                // Ensure $departmentWorkingHour is not null before accessing its properties
+                if ($departmentWorkingHour) {
+                    $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
+                } else {
+                    // Handle the case where $departmentWorkingHour is null if necessary
+                    $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' 00:00:00';
+                }
                 $attendanceInPm->status = $validatedData['status'];
                 $attendanceInPm->save();
 
                 // Create AM check-out record
                 $attendanceOutAm = new EmployeeAttendanceTimeOut();
                 $attendanceOutAm->employee_id = $employees->id;
-                $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_end_time;
+                if($departmentWorkingHour){
+                    $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_end_time;
+                } else {
+                    $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' 00:00:00';
+                }
                 $attendanceOutAm->status = $validatedData['status'];
                 $attendanceOutAm->save();
 
                 // Create PM check-out record
                 $attendanceOutPm = new EmployeeAttendanceTimeOut();
                 $attendanceOutPm->employee_id = $employees->id;
-                $attendanceOutPm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_end_time;
+                if($departmentWorkingHour){
+                    $attendanceOutPm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_end_time;
+                } else {
+                    $attendanceOutPm->check_out_time = $validatedData['selected_date'] . ' 00:00:00';
+                }
                 $attendanceOutPm->status = $validatedData['status'];
                 $attendanceOutPm->save();
 
