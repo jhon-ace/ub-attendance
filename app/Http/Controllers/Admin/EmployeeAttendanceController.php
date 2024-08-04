@@ -593,7 +593,8 @@ public function submitPortalTimeOut(Request $request)
             $formattedTime = $checkInTime->format('Y-m-d H:i:s');
         } catch (\Exception $e) {
             // Handle invalid time format
-            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Invalid time format.');
+            return back()->with('error', 'Invalid time format.');
+            //return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Invalid time format.');
         }
 
         // Find the record by ID
@@ -602,7 +603,8 @@ public function submitPortalTimeOut(Request $request)
         // Check if the value has changed
         if ($attendanceIn->check_in_time === $formattedTime) {
             // No changes made
-            return redirect()->route('admin.attendance.employee_attendance')->with('info', 'No changes made.');
+            return back()->with('info', 'No changes made.');
+            //return redirect()->route('admin.attendance.employee_attendance')->with('info', 'No changes made.');
         }
 
         // Update the check-in time and modification status
@@ -612,7 +614,8 @@ public function submitPortalTimeOut(Request $request)
         $attendanceIn->save();
 
         // Redirect or return a response
-        return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time In updated successfully!');
+        return back()->with('success', 'Time In updated successfully!');
+        // return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time In updated successfully!');
     }
 
 
@@ -644,7 +647,9 @@ public function submitPortalTimeOut(Request $request)
             $formattedTime = $checkOutTime->format('Y-m-d H:i:s');
         } catch (\Exception $e) {
             // Handle invalid time format
-            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Invalid time format.');
+            return back()->with('error', 'Invalid time format.');
+            //return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Invalid time format.');
+            
         }
 
         // Find the record by ID
@@ -653,7 +658,8 @@ public function submitPortalTimeOut(Request $request)
         // Check if the value has changed
         if ($attendanceOut->check_out_time === $formattedTime) {
             // No changes made
-            return redirect()->route('admin.attendance.employee_attendance')->with('info', 'No changes made.');
+            //return redirect()->route('admin.attendance.employee_attendance')->with('info', 'No changes made.');
+            return back()->with('info', 'No changes made.');
         }
 
         // Update the check-in time and modification status
@@ -663,7 +669,8 @@ public function submitPortalTimeOut(Request $request)
         $attendanceOut->save();
 
         // Redirect or return a response
-        return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time Out updated successfully!');
+        return back()->with('success', 'Time Out updated successfully!');
+        //return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time Out updated successfully!');
     }
 
 
@@ -696,10 +703,12 @@ public function submitPortalTimeOut(Request $request)
                 // Add other required fields here
             ]);
             
-            return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time In recorded successfully!');
+            return back()->with('success', 'Time In recorded successfully!');
+            //return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time In recorded successfully!');
             // return response()->json(['message' => 'Check-in time recorded successfully.']);
         } else {
-            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot record more than 2 check-in times');
+            return back()->with('error', 'Cannot record more than 2 check-in times');
+            //return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot record more than 2 check-in times');
             // return response()->json(['message' => 'Cannot record more than 2 check-in times for today.'], 400);
         }
 
@@ -735,10 +744,12 @@ public function submitPortalTimeOut(Request $request)
                 // Add other required fields here
             ]);
             
-            return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time Out recorded successfully!');
+            // return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Time Out recorded successfully!');
+             return back()->with('success', 'Time Out recorded successfully!');
             // return response()->json(['message' => 'Check-in time recorded successfully.']);
         } else {
-            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot record more than 2 check-out times');
+            // return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot record more than 2 check-out times');
+            return back()->with('error', 'Cannot record more than 2 check-out times');
             // return response()->json(['message' => 'Cannot record more than 2 check-in times for today.'], 400);
         }
 
@@ -756,9 +767,11 @@ public function submitPortalTimeOut(Request $request)
 
             $attendanceIn->delete();
 
-            return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Attendance deleted successfully.');
+            // return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Attendance deleted successfully.');
+             return back()->with('success', 'Attendance deleted successfully.');
         } else {
-            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Attendance record not found.');
+            // return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Attendance record not found.');
+            return back()->with('error', 'Attendance record not found.');
         }
 
     }
@@ -772,9 +785,10 @@ public function submitPortalTimeOut(Request $request)
 
             $attendanceOut->delete();
 
-            return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Attendance deleted successfully.');
+            // return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Attendance deleted successfully.');
+            return back()->with('success', 'Attendance deleted successfully.');
         } else {
-            return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Attendance record not found.');
+             return back()->with('error', 'Attendance record not found.');
         }
 
     }
