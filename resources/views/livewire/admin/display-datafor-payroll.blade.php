@@ -1183,7 +1183,7 @@
                                                         (($absentHours > 0 && $absentMinutes > 0) ? ", " : '') . 
                                                         ($absentMinutes > 0 ? "{$absentMinutes} min/s" : '') .
                                                         (($absentMinutes > 0 && $absentSeconds > 0) ? " " : '') . 
-                                                        ($absentSeconds > 0 ? "{$absentSeconds} sec" : ($absentHours <= 0 && $absentMinutes <= 0 ? '0 sec' : ''));
+                                                        ($absentSeconds > 0 ? "{$absentSeconds} sec" : ($absentHours <= 0 && $absentMinutes <= 0 ? ' 0 ' : ''));
 
                                                     // Add the comma and space between the values
                                                     $absentFormatted = trim($absentFormatted, ', ');
