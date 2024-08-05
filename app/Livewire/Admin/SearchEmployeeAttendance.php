@@ -1209,24 +1209,7 @@ class SearchEmployeeAttendance extends Component
 
         session()->put('overall_total_hours', $overallTotalHours);
 
-            // 'overallTotalHours' => $overallTotalHours,
-            // 'overallTotalLateHours' => $overallTotalLateHours,
-            // 'overallTotalUndertime' => $overallTotalUndertime,
-            // 'totalHoursTobeRendered' => $totalHoursTobeRendered,
-            // 'attendanceData' =>$attendanceData,
-            // 'attendanceTimeIn' => $attendanceTimeIn,
-            // 'attendanceTimeOut' => $attendanceTimeOut,
-            // 'schools' => $schools,
-            // 'departments' => $departments,
-            // 'schoolToShow' => $this->schoolToShow,
-            // 'departmentToShow' => $this->departmentToShow,
-            // 'selectedEmployeeToShow' => $this->selectedEmployeeToShow,
-            // 'employees' => $employees, // Ensure employees variable is defined if needed
-            // 'selectedAttendanceByDate' => $this->selectedAttendanceByDate,
-            // 'departmentDisplayWorkingHour' => $departmentDisplayWorkingHour,
-
-        
-
+       
                 $pdf = \PDF::loadView('generate-pdf-search-employee', [
                 'overallTotalHours' => $overallTotalHours,
                 'overallTotalLateHours' => $overallTotalLateHours,
