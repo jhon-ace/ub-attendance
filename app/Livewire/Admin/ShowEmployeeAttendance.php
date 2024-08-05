@@ -189,11 +189,11 @@ class ShowEmployeeAttendance extends Component
         //     ->paginate(100);
 
              $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
-            ->paginate(100);
+                ->paginate(100);
 
 
-        $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
-            ->paginate(100);
+            $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
+                ->paginate(100);
 
 
 

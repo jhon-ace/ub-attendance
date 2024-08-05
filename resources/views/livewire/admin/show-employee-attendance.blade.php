@@ -59,14 +59,6 @@
                 @endif
             @endif
         </div>
-        <div class="col-span-1 ml-5 mt-4">
-            @if($departmentToShow)
-                <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
-                    <i class="fa-solid fa-file"></i> Generate Data for Payroll in {{ $departmentToShow->department_abbreviation }} department.
-                </button>
-            @endif
-        </div>
-
     </div>
     <hr class="border-gray-200 my-4">
         @if(!$schoolToShow)
@@ -368,13 +360,6 @@
                                                     <td class="text-black border border-gray-400 px-1 py-1">
                                                         {{ ucfirst($attendanceIn->modification_status) }}
                                                     </td>
-                                                     <!-- id: {{ json_encode($department->id) }},
-                                                                    department_id: {{ json_encode($department->department_id) }},
-                                                                    department_abbreviation: {{ json_encode($department->department_abbreviation) }},
-                                                                    school: {{ json_encode($department->school_id) }},
-                                                                    department_name: {{ json_encode($department->department_name) }},
-                                                                    
-                                                                    } -->
                                                     <td class="text-black border border-gray-400 px-1 py-1">
                                                         <div class="flex justify-center items-center">
                                                             <div x-data="{ open: false }" class="mr-2">
@@ -620,7 +605,7 @@
                                                                                     </div>
                                                                                     <div class="mb-4">
                                                                                         <label for="employee_name" class="block text-gray-700 text-md font-bold mb-2 text-left">Employee Name</label>
-                                                                                        <input type="text" name="employee_name" id="employee_name" value="{{ $attendanceOut->employee->employee_lastname }}, {{ $attendanceIn->employee->employee_firstname }}, {{ $attendanceIn->employee->employee_middlename }}" readonly class="cursor-pointer shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_name') is-invalid @enderror" autofocus>
+                                                                                        <input type="text" name="employee_name" id="employee_name" value="{{ $attendanceOut->employee->employee_lastname }}, {{ $attendanceOut->employee->employee_firstname }}, {{ $attendanceOut->employee->employee_middlename }}" readonly class="cursor-pointer shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_name') is-invalid @enderror" autofocus>
                                                                                         <x-input-error :messages="$errors->get('employee_name')" class="mt-2" />
                                                                                     </div>
                                                                                     <div class="mb-4">

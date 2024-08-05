@@ -227,12 +227,16 @@ class DisplayDataforPayroll extends Component
         }
         
 
-        $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
-            ->paginate(500);
+        // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+        //     ->paginate(500);
         
 
-        $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
-            ->paginate(500);
+        // $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+        //     ->paginate(10);
+
+        $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')->get();
+        $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')->get();
+
 
             
 
