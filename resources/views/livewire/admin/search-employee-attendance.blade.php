@@ -268,7 +268,7 @@
                             :class="{ 'bg-blue-500 text-white': tab === 'modify_date', 'border border-gray-500': tab !== 'modify_date' }"
                             class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
                         >
-                            Modify Date
+                            Modify Date for Approved Leave
                         </button>
                         <button 
                             @click="tab = 'reports'"
