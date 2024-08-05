@@ -1031,10 +1031,6 @@ class DisplayDataforPayroll extends Component
 
                         $uniqueCheckInDays = (int) $checkInCount->unique_check_in_days;
                         $totalHoursTobeRendered = $totalHoursNeed * $uniqueCheckInDays;
-                              
-   
-                        
-                            
 
                    
                     }

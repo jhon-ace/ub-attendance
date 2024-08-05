@@ -231,16 +231,23 @@
                     </div>
                 </div>
             </div>
-            <div x-data="{ tab: 'time-in-time-out' }" class="p-4 -mt-[20px]">
+            <div x-data="{ tab: 'time-in' }" class="p-4 -mt-[20px]">
                 <div class="overflow-x-auto">
                     <!-- Tab buttons -->
                     <div class="flex mb-4">
                         <button 
-                            @click="tab = 'time-in-time-out'"
-                            :class="{ 'bg-blue-500 text-white': tab === 'time-in-time-out', 'border border-gray-500': tab !== 'time-in-time-out' }"
+                            @click="tab = 'time-in'"
+                            :class="{ 'bg-blue-500 text-white': tab === 'time-in', 'border border-gray-500': tab !== 'time-in' }"
                             class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
                         >
-                            Time In & Time Out
+                            Time In
+                        </button>
+                        <button 
+                            @click="tab = 'time-out'"
+                            :class="{ 'bg-blue-500 text-white': tab === 'time-out', 'border border-gray-500': tab !== 'time-out' }"
+                            class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                        >
+                            Time Out
                         </button>
                         <!-- <button 
                             @click="tab = 'time-out'"
@@ -273,12 +280,12 @@
                     </div>
 
                     <!-- Tab content -->
-                    <div x-show="tab === 'time-in-time-out'" class="w-full">
+                    <div x-show="tab === 'time-in'" class="w-full">
                         <!-- Table for Time In -->
                         <div class="flex justify-between">
-                            <div class="w-[49%]">
+                            <div class="w-full">
                                 <div class="flex justify-center mb-2 mt-2">
-                                    <h3 class="text-center uppercase font-bold">Time In &nbsp;</h3> | &nbsp;
+                                    <h1 class="text-center uppercase font-bold">Time In &nbsp;</h1> | &nbsp;
                                     <div class="flex justify-center items-center space-x-2">
                                         <div x-data="{ open: false }">
                                             <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
@@ -334,9 +341,9 @@
                                                 $currentDate = $date;
                                                 $firstRow = true;
                                             @endphp
-                                            <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                                            <table class="table-auto min-w-full text-center text-md mb-4 divide-y divide-gray-200">
                                                 <thead class="bg-gray-200 text-black">
-                                                    <tr class="text-xs">
+                                                    <tr class="text-md">
                                                         <th class="border border-gray-400 px-3">
                                                             Emp ID
                                                         </th>
@@ -360,7 +367,7 @@
                                                 </thead>
                                                 <tbody>
                                         @endif
-                                        <tr class="hover:bg-gray-100  text-xs">
+                                        <tr class="hover:bg-gray-100  text-md">
                                             <td class="text-black border border-gray-400">{{ $attendanceIn->employee->employee_id }}</td>
                                             <td class="text-black border border-gray-400">{{ $attendanceIn->employee->employee_lastname }}, {{ $attendanceIn->employee->employee_firstname }}, {{ $attendanceIn->employee->employee_middlename }}</td>
                                             <td class="text-black border border-gray-400">
@@ -487,9 +494,14 @@
                                     <p class="text-center mt-8">No Time In records found.</p>
                                 @endif
                                 <div class="text-center font-bold uppercase">{{ $attendanceTimeIn->links() }}</div>
-                            </div>
-                            
-                            <div class="w-[49%]">
+                            </div>           
+                        </div>
+                         <!-- <p><text class="text-red-500">Note:</text> Click the row to select specific employee</p>      -->
+                    </div>
+                    <div x-show="tab === 'time-out'" class="w-full">
+                        <!-- Table for Time In -->
+                        <div class="flex justify-between">
+                            <div class="w-full">
                                 <div class="flex justify-center mb-2 mt-2">
                                     <h3 class="text-center uppercase font-bold">Time Out &nbsp;</h3> | &nbsp;
                                     <div class="flex justify-center items-center space-x-2">
@@ -547,9 +559,9 @@
                                             @if ($loop->index > 0)
                                                 </tbody></table>
                                             @endif
-                                            <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                                            <table class="table-auto min-w-full text-center text-md mb-4 divide-y divide-gray-200">
                                                 <thead class="bg-gray-200 text-black">
-                                                    <tr class="text-xs">
+                                                    <tr class="text-md">
                                                         <th class="border border-gray-400 px-3">
                                                             Emp ID
                                                         </th>
@@ -576,7 +588,7 @@
                                                 $currentDate = $date;
                                             @endphp
                                         @endif
-                                        <tr class="hover:bg-gray-100 text-xs">
+                                        <tr class="hover:bg-gray-100 text-md">
                                             <td class="text-black border border-gray-400">{{ $attendanceOut->employee->employee_id }}</td>
                                             <td class="text-black border border-gray-400">{{ $attendanceOut->employee->employee_lastname }}, {{ $attendanceOut->employee->employee_firstname }}, {{ $attendanceOut->employee->employee_middlename }}</td>
                                             <td class="text-black border border-gray-400">
