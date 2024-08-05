@@ -90,10 +90,10 @@ class PublicPageController extends Controller
                     // $now = new DateTime('now', new DateTimeZone('Asia/Taipei'));
 
 
-                    if (stripos($employee->department->department_abbreviation, 'VDT') !== false) {
-                        // If the department abbreviation contains 'VDT', deny attendance
-                        return redirect()->route('attendance.portal')->with('error', 'You\'re from VDT. Attendance Invalid.');
-                    }
+                    // if (stripos($employee->department->department_abbreviation, 'VDT') !== false) {
+                    //     // If the department abbreviation contains 'VDT', deny attendance
+                    //     return redirect()->route('attendance.portal')->with('error', 'You\'re from VDT. Attendance Invalid.');
+                    // }
 
 
                     $now = Carbon::now('Asia/Taipei');
@@ -370,9 +370,9 @@ class PublicPageController extends Controller
                     // $now = new DateTime('now', new DateTimeZone('Asia/Kuala_Lumpur'));
                     // $now = new DateTime('now', new DateTimeZone('Asia/Taipei'));
 
-                    if (stripos($employee->department->department_abbreviation, 'VDT') === false) {
-                        return redirect()->route('attendance.portal.vdt')->with('error', 'You\'re not from VDT. Attendance Invalid.');
-                    }
+                    // if (stripos($employee->department->department_abbreviation, 'VDT') === false) {
+                    //     return redirect()->route('attendance.portal.vdt')->with('error', 'You\'re not from VDT. Attendance Invalid.');
+                    // }
 
                     $now = Carbon::now('Asia/Taipei');
                     // Format datetime for database insertion

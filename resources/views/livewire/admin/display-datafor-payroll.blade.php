@@ -603,9 +603,14 @@
                                         <div class="flex justify-between -mt-4">
                                             
                                             <p class="py-4">Start Date: No selected &nbsp;&nbsp;End Date: No selected</p>
-                                            <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                <i class="fa-solid fa-file"></i> Generate DTR | PDF
-                                            </button>
+                                            <div class="">
+                                                <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                    <i class="fa-solid fa-file"></i> Export to Excel
+                                                </button>
+                                                <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                    <i class="fa-solid fa-file"></i> Generate DTR | PDF
+                                                </button>
+                                            </div>
                                         </div>
                                     @endif
                                     <table class="border border-black " cellpadding="4">
