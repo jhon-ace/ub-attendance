@@ -1049,7 +1049,7 @@
                                             <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline " required>
                                                     <option value="">Select Status</option>
                                                     <option value="On Leave">On Leave</option>
-                                                    <option value="awol">Absent w/out leave</option>
+                                                    <!-- <option value="awol">Absent w/out leave</option> -->
                                             </select>
                                             <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                         </div>
