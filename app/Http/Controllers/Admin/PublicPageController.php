@@ -373,6 +373,7 @@ class PublicPageController extends Controller
                     // if (stripos($employee->department->department_abbreviation, 'VDT') === false) {
                     //     return redirect()->route('attendance.portal.vdt')->with('error', 'You\'re not from VDT. Attendance Invalid.');
                     // }
+                    // for restriction
 
                     $now = Carbon::now('Asia/Taipei');
                     // Format datetime for database insertion
