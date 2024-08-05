@@ -52,7 +52,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Default redirect if no specific role matches
-        return view('auth.login');
+        return view('/');
         
 
     }
@@ -63,7 +63,7 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {   
         session()->flush(); 
-        
+
          if (Auth::user()->hasRole('admin')) 
             {
                 // return redirect()->intended(route('admin.dashboard'))->with('success', 'Successful Login');
