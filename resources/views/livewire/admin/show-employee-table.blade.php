@@ -72,8 +72,7 @@
 
     @if($search && $employees->isEmpty())
         @if ($search)
-       
-              <p class="text-black mt-8 text-center">No employee/s found for matching "{{ $search }}"</p>
+            <p class="text-black mt-8 text-center">No employee/s found for matching "{{ $search }}"</p>
         @else
             <p class="text-black mt-8 text-center">No employee/s found for matching "{{ $search }}"</p>
         @endif
