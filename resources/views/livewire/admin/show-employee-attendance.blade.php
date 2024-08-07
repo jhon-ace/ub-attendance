@@ -693,6 +693,7 @@
 
                                 <!-- <p>Required Total Hour Per Week based on Working hour: <text class="text-red-500">{{ $overallTotalHoursSum }} hr/s.</text></p> -->
 
+
                                 <div class="w-full">
                                     <h3 class="text-center text-lg font-semibold uppercase mb-2 mt-2">Calculation of Work Hours</h3>
                                     
@@ -700,6 +701,8 @@
                                         <thead class="bg-gray-200 text-black">
                                             <tr>
                                                 <th class="border border-gray-400 px-2 py-1">Date</th>
+                                                <th class="border border-gray-400 px-2 py-1">Time In</th>
+                                                <th class="border border-gray-400 px-2 py-1">Time Out</th>
                                                 <th class="border border-gray-400 px-2 py-1">AM Late</th>
                                                 <th class="border border-gray-400 px-2 py-1">PM Late</th>
                                                 <th class="border border-gray-400 px-2 py-1">AM UnderTime</th>
@@ -714,9 +717,128 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            @php
+                                                $groupedAttendance = [];
+
+                                                // Group check-in times
+                                                foreach ($attendanceTimeIn as $attendanceIn) {
+                                                    $date = date('Y-m-d', strtotime($attendanceIn->check_in_time));
+                                                    $employeeId = $attendanceIn->employee->employee_id;
+                                                    $status = $attendanceIn->status;
+
+                                                    if (!isset($groupedAttendance[$employeeId])) {
+                                                        $groupedAttendance[$employeeId] = [];
+                                                    }
+
+                                                    if (!isset($groupedAttendance[$employeeId][$date])) {
+                                                        $groupedAttendance[$employeeId][$date] = [
+                                                            'date' => date('m-d-Y, (l)', strtotime($attendanceIn->check_in_time)),
+                                                            'check_ins' => [],
+                                                            'check_outs' => [],
+                                                            'status' => $status,
+                                                        ];
+                                                    }
+
+                                                    $groupedAttendance[$employeeId][$date]['check_ins'][] = date('g:i:s A', strtotime($attendanceIn->check_in_time));
+                                                }
+
+                                                // Group check-out times
+                                                foreach ($attendanceTimeOut as $attendanceOut) {
+                                                    $date = date('Y-m-d', strtotime($attendanceOut->check_out_time));
+                                                    $employeeId = $attendanceOut->employee->employee_id;
+                                                    $status = $attendanceOut->status;
+
+                                                    if (!isset($groupedAttendance[$employeeId])) {
+                                                        $groupedAttendance[$employeeId] = [];
+                                                    }
+
+                                                    if (!isset($groupedAttendance[$employeeId][$date])) {
+                                                        $groupedAttendance[$employeeId][$date] = [
+                                                            'date' => date('m-d-Y, (l)', strtotime($attendanceOut->check_out_time)),
+                                                            'check_ins' => [],
+                                                            'check_outs' => [],
+                                                            'status' => $status,
+                                                        ];
+                                                    }
+
+                                                    $groupedAttendance[$employeeId][$date]['check_outs'][] = date('g:i:s A', strtotime($attendanceOut->check_out_time));
+                                                }
+                                            @endphp
                                             @foreach ($attendanceData as $attendance)
+                                                @php
+                                                    $workedDate = date('Y-m-d', strtotime($attendance->worked_date));
+                                                @endphp
                                             <tr>
                                                 <td class="text-black border border-gray-400 px-2 py-1">{{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}</td>
+                                                <td class="text-black border border-gray-400 px-2 py-1">
+                                                    @foreach ($groupedAttendance as $employeeId => $dates)
+                                                        @foreach ($dates as $date => $attendance1)
+                                                            @if ($date === $workedDate)
+                                                                @if (!empty($attendance1['check_ins']))
+                                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                    <text class="text-red-500"> AM IN  </text>
+                                                                        @php
+                                                                            $isPmDisplayed = false;
+                                                                        @endphp
+
+                                                                        @foreach ($attendance1['check_ins'] as $index => $checkIn)
+                                                                            <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                            {{ $checkIn }}
+
+                                                                            @if (!$isPmDisplayed)
+                                                                                @php
+                                                                                    $isPmDisplayed = true;
+                                                                                @endphp
+                                                                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                                <text class="text-blue-500"> PM IN  </text>
+                                                                            @endif
+                                                                        @endforeach
+
+                                                                        @if (!$isPmDisplayed)
+                                                                            <p>No AM check-in</p>
+                                                                        @endif
+                                                                @else
+                                                                    <p>No Check-Ins</p>
+                                                                @endif
+                                                            @endif
+                                                        @endforeach
+                                                    @endforeach
+                                                </td>
+                                                <td class="text-black border border-gray-400 px-2 py-1">
+                                                    @foreach ($groupedAttendance as $employeeId => $dates)
+                                                        @foreach ($dates as $date => $attendance1)
+                                                            @if ($date === $workedDate)
+                                                                @if (!empty($attendance1['check_outs']))
+                                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                    <text class="text-red-500"> AM OUT  </text>
+                                                                        @php
+                                                                            $isPmDisplayed = false;
+                                                                        @endphp
+
+                                                                        @foreach ($attendance1['check_outs'] as $index => $checkOut)
+                                                                            <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                            {{ $checkOut }}
+
+                                                                            @if (!$isPmDisplayed)
+                                                                                @php
+                                                                                    $isPmDisplayed = true;
+                                                                                @endphp
+                                                                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                                <text class="text-blue-500"> PM OUT  </text>
+                                                                            @endif
+                                                                        @endforeach
+
+                                                                        @if (!$isPmDisplayed)
+                                                                            <p>No PM check-in</p>
+                                                                        @endif
+                                                                @else
+                                                                    <p>No Check-Ins</p>
+                                                                @endif
+                                                            @endif
+                                                        @endforeach
+                                                    @endforeach
+                                                </td>
+                                                </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     @php
                                                         // Calculate late duration in minutes
