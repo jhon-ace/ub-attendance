@@ -142,6 +142,13 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/insert-photos', [EmployeeController::class, 'employee_insertPhoto'])->name('insert.photos');
 
+        //Graceperiod
+        Route::post('/setGracePeriod', [EmployeeAttendanceController::class, 'storePeriod'])->name('attendance.gracePeriod');
+        Route::put('/setGracePeriod/update/{id}', [EmployeeAttendanceController::class, 'updatePeriod'])->name('attendance.gracePeriod.update');
+        Route::delete('/deletePeriod/{id}', [EmployeeAttendanceController::class, 'deletePeriod'])->name('attendance.gracePeriod.delete');
+
+
+
 
 
     });

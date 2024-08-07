@@ -20,6 +20,8 @@ use DateTime;
 use DateInterval;
 use DateTimeZone;
 use Illuminate\Support\Facades\DB;
+use App\Exports\AttendanceExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DisplayDataforPayroll extends Component
 {
@@ -1257,7 +1259,76 @@ class DisplayDataforPayroll extends Component
         }
     }
     
-    
+    public function generateExcel()
+    {
+        $departments = Department::where('id', $this->selectedDepartment4)->get();
+        $department = Department::find($this->selectedDepartment4);
+
+        try {
+            if ($this->startDate && $this->endDate) {
+                $selectedStartDate = date('jS F Y', strtotime($this->startDate));
+                $selectedEndDate = date('jS F Y', strtotime($this->endDate));
+                $dateRange = $selectedStartDate . ' to ' . $selectedEndDate;
+            } else {
+                $dateRange = 'No Date Selected';
+            }
+
+            if ($department) {
+                $departmentName = $department->department_abbreviation;
+                $filename = $departmentName . ' - ' . $dateRange . '.xlsx';
+            } else {
+                $filename = 'Unknown Department - ' . $dateRange . '.xlsx';
+            }
+
+            $queryTimeIn = EmployeeAttendanceTimeIn::query()->with(['employee.school', 'employee.department']);
+            $queryTimeOut = EmployeeAttendanceTimeOut::query()->with(['employee.school', 'employee.department']);
+
+            if ($this->selectedSchool) {
+                $queryTimeIn->whereHas('employee', function (Builder $query) {
+                    $query->where('school_id', $this->selectedSchool);
+                });
+                $queryTimeOut->whereHas('employee', function (Builder $query) {
+                    $query->where('school_id', $this->selectedSchool);
+                });
+                $this->schoolToShow = School::find($this->selectedSchool);
+            } else {
+                $this->schoolToShow = null;
+            }
+
+            if ($this->selectedDepartment4) {
+                $queryTimeIn->whereHas('employee', function (Builder $query) {
+                    $query->where('department_id', $this->selectedDepartment4);
+                });
+                $queryTimeOut->whereHas('employee', function (Builder $query) {
+                    $query->where('department_id', $this->selectedDepartment4);
+                });
+                $this->departmentToShow = Department::find($this->selectedDepartment4);
+                $employees = Employee::where('department_id', $this->selectedDepartment4)->get();
+            } else {
+                $this->departmentToShow = null;
+                $employees = Employee::all();
+            }
+
+            if ($this->startDate && $this->endDate) {
+                $queryTimeIn->whereDate('check_in_time', '>=', $this->startDate)
+                            ->whereDate('check_in_time', '<=', $this->endDate);
+                $queryTimeOut->whereDate('check_out_time', '>=', $this->startDate)
+                            ->whereDate('check_out_time', '<=', $this->endDate);
+            }
+
+            $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')->get();
+            $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')->get();
+
+                
+
+            $export = new AttendanceExport($attendanceTimeIn, $attendanceTimeOut);
+
+            return Excel::download($export, $filename);
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'An error occurred while generating the Excel file: ' . $e->getMessage());
+        }
+    }
 
 
 

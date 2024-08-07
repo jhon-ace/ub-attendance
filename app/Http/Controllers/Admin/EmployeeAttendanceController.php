@@ -13,6 +13,7 @@ use \App\Models\Admin\EmployeeAttendanceTimeOut;
 use \App\Models\Admin\StudentAttendanceTimeIn;
 use \App\Models\Admin\StudentAttendanceTimeOut;
 use \App\Models\Admin\DepartmentWorkingHour;
+use \App\Models\Admin\GracePeriod;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Carbon\Carbon;
@@ -813,6 +814,72 @@ public function submitPortalTimeOut(Request $request)
     }
 
 
+    public function storePeriod(Request $request)
+    {
+        $validatedData = $request->validate([
+            'grace_period' => 'required|integer',
+        ]);
+
+        $gracePeriodInSeconds = ($validatedData['grace_period'] * 60); // Convert minutes to seconds
+
+        // Convert total seconds to fractional hours
+        $totalHours = $gracePeriodInSeconds / 3600;
+
+        // Format the result to two decimal places
+        $formattedHours = number_format($totalHours, 2);
+
+        // Check if there is already a grace period in the database
+        $existingGracePeriodCount = GracePeriod::count();
+
+        if ($existingGracePeriodCount >= 1) {
+            return back()->with('error', 'A grace period has already been added. You cannot add another one.');
+        }
+
+        // If no existing grace period, proceed to add a new one
+        $gracePeriod = new GracePeriod();
+        $gracePeriod->grace_period = $formattedHours;
+        $gracePeriod->save();
+
+        return back()->with('success', 'Grace Period successfully added!');
+
+    }
+
+    public function updatePeriod(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'grace_period' => 'required|integer',
+        ]);
+
+        $gracePeriodInSeconds = ($validatedData['grace_period'] * 60); // Convert minutes to seconds
+
+        // Convert total seconds to fractional hours
+        $totalHours = $gracePeriodInSeconds / 3600;
+
+        // Format the result to two decimal places
+        $formattedHours = number_format($totalHours, 2);
+        $gracePeriod = GracePeriod::find($id);
+        $gracePeriod->grace_period = $formattedHours;
+        $gracePeriod->save();
+
+        return back()->with('success', 'Grace Period successfully updated!');
+
+    }
+    
+
+    public function deletePeriod($id)
+    {
+        $gracePeriod = GracePeriod::find($id);
+
+        if ($gracePeriod) {
+
+            $gracePeriod->delete();
+
+            // return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Attendance deleted successfully.');
+            return back()->with('success', 'Grace Period deleted successfully.');
+        } else {
+             return back()->with('error', 'Grace Period record not found.');
+        }
+    }
 
 
 

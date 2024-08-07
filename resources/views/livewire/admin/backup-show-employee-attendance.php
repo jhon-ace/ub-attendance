@@ -204,54 +204,43 @@
                     <div x-data="{ tab: 'time-in-time-out' }" class="p-4">
                         <div class="overflow-x-auto">
                             <!-- Tab buttons -->
-                            <div class="flex justify-between mb-4">
-                                <div>
-                                    <button 
-                                        @click="tab = 'time-in-time-out'"
-                                        :class="{ 'bg-blue-500 text-white': tab === 'time-in-time-out', 'border border-gray-500': tab !== 'time-in-time-out' }"
-                                        class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
-                                    >
-                                        Time In & Time Out
-                                    </button>
-                                    <!-- <button 
-                                        @click="tab = 'time-out'"
-                                        :class="{ 'bg-blue-500 text-white': tab === 'time-out', 'bg-gray-200': tab !== 'time-out' }"
-                                        class="px-4 py-2 mr-2 rounded hover:bg-blue-600 focus:outline-none"
-                                    >
-                                        Time Out
-                                    </button> -->
-                                    <button 
-                                        @click="tab = 'computed-hours'"
-                                        :class="{ 'bg-blue-500 text-white': tab === 'computed-hours', 'border border-gray-500': tab !== 'computed-hours' }"
-                                        class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
-                                    >
-                                        Calculation of Work Hours
-                                    </button>
-                                    <button 
-                                        @click="tab = 'modify_date'"
-                                        :class="{ 'bg-blue-500 text-white': tab === 'modify_date', 'border border-gray-500': tab !== 'modify_date' }"
-                                        class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
-                                    >
-                                        Modify Date for Approved Leave
-                                    </button>
+                            <div class="flex mb-4">
+                                <button 
+                                    @click="tab = 'time-in-time-out'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'time-in-time-out', 'border border-gray-500': tab !== 'time-in-time-out' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                >
+                                    Time In & Time Out
+                                </button>
+                                <!-- <button 
+                                    @click="tab = 'time-out'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'time-out', 'bg-gray-200': tab !== 'time-out' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 focus:outline-none"
+                                >
+                                    Time Out
+                                </button> -->
+                                <button 
+                                    @click="tab = 'computed-hours'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'computed-hours', 'border border-gray-500': tab !== 'computed-hours' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                >
+                                    Calculation of Work Hours
+                                </button>
+                                <button 
+                                    @click="tab = 'modify_date'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'modify_date', 'border border-gray-500': tab !== 'modify_date' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                >
+                                    Modify Date for Approved Leave
+                                </button>
 
-                                    <button 
-                                        @click="tab = 'reports'"
-                                        :class="{ 'bg-blue-500 text-white': tab === 'reports', 'border border-gray-500': tab !== 'reports' }"
-                                        class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
-                                    >
-                                        Reports
-                                    </button>
-                                </div>
-                                <div class="flex justify-end">
-                                    <button 
-                                        @click="tab = 'period'"
-                                        :class="{ 'bg-blue-500 text-white': tab === 'period', 'border border-gray-500': tab !== 'period' }"
-                                        class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
-                                    >
-                                        Set Grace Period
-                                    </button>
-                                </div>
+                                <button 
+                                    @click="tab = 'reports'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'reports', 'border border-gray-500': tab !== 'reports' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                >
+                                    Reports
+                                </button>
                             </div>
 
                             <!-- Tab content -->
@@ -807,40 +796,31 @@
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     <!-- {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min. -->
                                                    @php
-                                                        // Total hours worked in AM shift
-                                                        $totalHoursAM = floor($attendance->hours_workedAM);
-                                                        $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                    // Total hours worked in AM shift
+                                                    $totalHoursAM = floor($attendance->hours_workedAM);
+                                                    $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
 
-                                                        // Convert minutes to seconds
-                                                        $totalSecondsAM = ($totalMinutesAM - floor($totalMinutesAM)) * 60;
-                                                        $totalMinutesAM = floor($totalMinutesAM);
+                                                    // Convert minutes to seconds
+                                                    $totalSecondsAM = ($totalMinutesAM - floor($totalMinutesAM)) * 60;
+                                                    $totalMinutesAM = floor($totalMinutesAM);
 
-                                                        // Convert total minutes to hours and minutes for AM shift
-                                                        $finalHoursAM = $totalHoursAM + floor($totalMinutesAM / 60);
-                                                        $finalMinutesAM = $totalMinutesAM % 60;
+                                                    // Get late duration in minutes for AM shift
+                                                 
+                                                    // Convert total minutes to hours and minutes for AM shift
+                                                    $finalHoursAM = $totalHoursAM + floor($totalMinutesAM / 60);
+                                                    $finalMinutesAM = $totalMinutesAM % 60;
 
-                                                        // Ensure final seconds is a whole number
-                                                        $finalSecondsAM = round($totalSecondsAM);
+                                                    // Ensure final seconds is a whole number
+                                                    $finalSecondsAM = round($totalSecondsAM);
 
-                                                        // Handle case where seconds is 60
-                                                        if ($finalSecondsAM == 60) {
-                                                            $finalSecondsAM = 0;
-                                                            $finalMinutesAM += 1;
-                                                        }
+                                                @endphp
 
-                                                        // Handle case where minutes exceed 59
-                                                        if ($finalMinutesAM >= 60) {
-                                                            $finalMinutesAM = 0;
-                                                            $finalHoursAM += 1;
-                                                        }
-                                                    @endphp
-
-                                                    {{ $finalHoursAM }} hrs. {{ $finalMinutesAM }} min. {{ $finalSecondsAM }} sec.
+                                                {{ $finalHoursAM }} hrs. {{ $finalMinutesAM }} min. {{ $finalSecondsAM }} sec.
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     <!-- {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min. -->
                                                     @php
-                                                    // Total hours worked in  PM shift
+                                                    // Total hours worked in AM PM shift
                                                     $totalHoursPM = floor($attendance->hours_workedPM);
                                                     $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
 
@@ -855,19 +835,7 @@
                                                     $finalMinutesPM = $totalMinutesPM % 60;
 
                                                     // Ensure final seconds is a whole number
-                                                    $finalSecondsPM = round($totalSecondsPM);   
-
-                                                    // Handle case where seconds is 60
-                                                        if ($finalSecondsPM == 60) {
-                                                            $finalSecondsPM = 0;
-                                                            $finalMinutesPM += 1;
-                                                        }
-
-                                                        // Handle case where minutes exceed 59
-                                                        if ($finalMinutesPM >= 60) {
-                                                            $finalMinutesPM = 0;
-                                                            $finalHoursPM += 1;
-                                                        }
+                                                    $finalSecondsPM = round($totalSecondsPM);
 
                                                 @endphp
 
@@ -926,25 +894,17 @@
                                                         $totalHours = floor($totalHoursWorked);
                                                         $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
                                                         
-                                                        // Calculate the final hours, minutes, and seconds
-                                                        $finalMinutes = floor($totalMinutes);
-                                                        $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
-                                                        $finalSeconds = round($totalSeconds);
+                                                        // Convert total minutes to total seconds
+                                                        $totalSeconds = $totalMinutes * 60;
                                                         
-                                                        // Handle case where seconds is 60
-                                                        if ($finalSeconds == 60) {
-                                                            $finalSeconds = 0;
-                                                            $finalMinutes += 1;
-                                                        }
-                                                        
-                                                        // Handle case where minutes exceed 59
-                                                        if ($finalMinutes >= 60) {
-                                                            $finalMinutes = 0;
-                                                            $totalHours += 1;
-                                                        }
+                                                        // Calculate final hours, minutes, and seconds
+                                                        $finalHours = $totalHours + floor($totalSeconds / 3600);
+                                                        $remainingSeconds = $totalSeconds % 3600;
+                                                        $finalMinutes = floor($remainingSeconds / 60);
+                                                        $finalSeconds = $remainingSeconds % 60;
                                                     @endphp
 
-                                                    {{ $totalHours }} hrs. {{ $finalMinutes }} min. {{ $finalSeconds }} sec.
+                                                    {{ $finalHours }} hrs. {{ $finalMinutes }} min. {{ $finalSeconds }} sec.
                                                             
                                                 </td>
                                                 <td class="text-black border border-gray-400 text-xs">
@@ -1021,19 +981,6 @@
                                                         $modify_status == "On Leave"
                                                     ) {
                                                         $remarkss = 'Leave';
-                                                    }
-                                                    else if (
-                                                        $lateDurationAM == 0 &&
-                                                        $lateDurationPM == 0 &&
-                                                        $am == 0 &&
-                                                        $pm == 0 &&
-                                                        $totalHoursAM == 0 &&
-                                                        $totalMinutesAM == 0 &&
-                                                        $totalHoursPM == 0 &&
-                                                        $totalMinutesPM == 0 &&
-                                                        $modify_status == "On-campus"
-                                                    ) {
-                                                        $remarkss = 'Invalid Attendance';
                                                     }
                                                     
                                                      else {
@@ -1305,97 +1252,7 @@
                                         </div>                        
                                     </div>
                                 </div> 
-                            </div>
-                            <div x-show="tab === 'period'" class="w-full">
-                                <div class="flex justify-center mt-8 w-full">
-                                    <div class="w-[50%] flex justify-center mb-4 mx-auto">
-                                        @if($gracePeriod->isNotEmpty())
-                                            @foreach($gracePeriod as $period)
-                                                <table class="border border-collapse border-1 border-black w-full mb-4">
-                                                    <thead>
-                                                        <tr class="border border-collapse border-1 border-black">
-                                                            <th class="border border-collapse border-1 border-black">Grace Period</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                        
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr class="border border-collapse border-1 border-black text-center p-2">
-                                                            <td class="border border-collapse border-1 border-black p-2">{{ round($period->grace_period * 60) }} minutes</td>
-                                                            <td class="border border-collapse border-1 border-black p-2">
-                                                                <div class="flex justify-center items-center space-x-2">
-                                                                    <div x-data="{ open: false }">
-                                                                        <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
-                                                                            <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> Edit
-                                                                        </a>
-                                                                        <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                                            <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
-                                                                                <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
-                                                                                    <p class="text-xl font-bold">Edit Grace Period</p>
-                                                                                    <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
-                                                                                </div>
-                                                                                <div class="mb-4">
-                                                                                    <form id="" action="{{ route('admin.attendance.gracePeriod.update', $period->id) }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to update?');">
-                                                                                        <x-caps-lock-detector />
-                                                                                        @csrf
-                                                                                        @method('PUT')
-                                                                                            
-                                                                                            <div class="mb-4">
-                                                                                                <label for="grace_period" class="block text-gray-700 text-md font-bold mb-2 text-left">New Grace Period</label>
-                                                                                                <input type="number" name="grace_period" id="grace_period" min="0" max="60" value="{{ floor($period->grace_period * 60) }}" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('grace_period') is-invalid @enderror" autofocus required>
-                                                                                                <x-input-error :messages="$errors->get('grace_period')" class="mt-2" />
-                                                                                            </div>
-                                                                                            
-                                                                                            
-                                                                                        <div class="flex mb-4 mt-10 justify-center">
-                                                                                            <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
-                                                                                                Save Changes
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    </form>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <form action="{{ route('admin.attendance.gracePeriod.delete', $period->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this grace period?');">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button type="submit" class="bg-red-500 text-white text-sm px-2 py-0.5 rounded hover:bg-red-700">
-                                                                            <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i> Delete
-                                                                        </button>
-                                                                    </form>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            @endforeach
-                                        @else
-                                            <p class="font-bold text-red-500 mb-4">No Grace Period registered</p>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="flex justify-center">
-                                    <div>
-                                        <form action="{{ route('admin.attendance.gracePeriod') }}" method="POST" class="">
-                                        <x-caps-lock-detector />
-                                        @csrf
-                                            <div class="mb-2">
-                                                <label for="grace_period" class="block  mb-2 text-left">Enter New grace period:</label>
-                                                <input type="number" id="grace_period" name="grace_period" min="0" max="60" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full max-w-md" required  autofocus >
-                                                <p>Note: This is minutes only.</p>
-                                            </div> 
-
-
-                                            <div class="flex mb-4 mt-10 justify-center">
-                                                <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
-                                                    Save Period
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div> 
-                            </div>                      
+                            </div>                    
                         </div>
                     </div>
                     
