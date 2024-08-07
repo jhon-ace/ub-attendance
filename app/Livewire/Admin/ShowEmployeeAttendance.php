@@ -523,9 +523,11 @@ class ShowEmployeeAttendance extends Component
                                     // Define the latest allowed check-in time with a 15-minute grace period
                                     // $latestAllowedCheckInAM = clone $morningStartTime;
                                     // $latestAllowedCheckInAM->add(new DateInterval('PT15M'));
+                                    // Rounds to nearest integer
 
                                     
                                     $gracePeriodMinutes = $gracePeriodValue * 60;
+                                    $gracePeriodMinutes = round($gracePeriodMinutes);
                                     $intervalSpec = 'PT' . $gracePeriodMinutes . 'M';
                                     
                                     // Clone the original time and add the interval
@@ -669,8 +671,16 @@ class ShowEmployeeAttendance extends Component
                                 $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
 
                                 // Calculate late duration for PM
-                                $latestAllowedCheckInPM = clone $afternoonStartTime;
-                                $latestAllowedCheckInPM->add(new DateInterval('PT15M'));
+                                // $latestAllowedCheckInPM = clone $afternoonStartTime;
+                                // $latestAllowedCheckInPM->add(new DateInterval('PT15M'));
+
+                                    $gracePeriodMinutes = $gracePeriodValue * 60;
+                                    $gracePeriodMinutes = round($gracePeriodMinutes);
+                                    $intervalSpec = 'PT' . $gracePeriodMinutes . 'M';
+                                    
+                                    // Clone the original time and add the interval
+                                    $latestAllowedCheckInPM = clone $afternoonStartTime;
+                                    $latestAllowedCheckInPM->add(new DateInterval($intervalSpec));
 
                                 // Check if there's only one check-in and check-out in the same day
                                 // if ($checkInDateTime->format('Y-m-d') == $checkOutDateTime->format('Y-m-d')) {
@@ -740,6 +750,7 @@ class ShowEmployeeAttendance extends Component
                                     // $latestAllowedCheckInPM->add(new DateInterval('PT15M'));
 
                                     $gracePeriodMinutes = $gracePeriodValue * 60;
+                                    $gracePeriodMinutes = round($gracePeriodMinutes);
                                     $intervalSpec = 'PT' . $gracePeriodMinutes . 'M';
                                     
                                     // Clone the original time and add the interval

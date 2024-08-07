@@ -357,6 +357,9 @@
                                                                 $display = "Weekend";
                                                             } elseif($status === "awol"){
                                                                 $display = "Absent without leave";
+                                                            
+                                                            } elseif($status === "Official Travel"){
+                                                                $display = "Official Travel";
                                                             } else {
                                                                 $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
                                                             }
@@ -364,6 +367,9 @@
 
                                                         @if ($display === "On Leave")
                                                             <span style="color: red;">{{ $display }}</span>
+                                                        @elseif ($display === "Official Travel")
+                                                            <span style="color: red;">{{ $display }}</span>
+                                                        
                                                         @else
                                                             {{ $display }}
                                                         @endif
@@ -571,12 +577,16 @@
                                                                 $display = "Weekend";
                                                             } elseif($status === "awol"){
                                                                 $display = "Absent without leave";
+                                                            } elseif($status === "Official Travel"){
+                                                                $display = "Official Travel";
                                                             } else {
                                                                 $display = date('g:i:s A', strtotime($attendanceOut->check_out_time));
                                                             }
                                                         @endphp
 
                                                         @if ($display === "On Leave")
+                                                            <span style="color: red;">{{ $display }}</span>
+                                                        @elseif ($display === "Official Travel")
                                                             <span style="color: red;">{{ $display }}</span>
                                                         @else
                                                             {{ $display }}
@@ -815,27 +825,34 @@
                                                         $totalSecondsAM = ($totalMinutesAM - floor($totalMinutesAM)) * 60;
                                                         $totalMinutesAM = floor($totalMinutesAM);
 
-                                                        // Convert total minutes to hours and minutes for AM shift
-                                                        $finalHoursAM = $totalHoursAM + floor($totalMinutesAM / 60);
-                                                        $finalMinutesAM = $totalMinutesAM % 60;
+                                                        // Initialize final hours
+                                                        $finalHoursAM = $totalHoursAM;
 
-                                                        // Ensure final seconds is a whole number
-                                                        $finalSecondsAM = round($totalSecondsAM);
+                                                        // Round minutes and adjust seconds
+                                                        $roundedMinutes = round($totalMinutesAM + ($totalSecondsAM / 60));
+                                                        $finalSecondsAM = round($totalSecondsAM % 60);
 
-                                                        // Handle case where seconds is 60
-                                                        if ($finalSecondsAM == 60) {
+                                                        // Adjust minutes if seconds were rounded to 60
+                                                        if ($finalSecondsAM >= 60) {
+                                                            $finalSecondsAM -= 60;
+                                                            $roundedMinutes += 1;
+                                                        }
+                                                        else {
                                                             $finalSecondsAM = 0;
-                                                            $finalMinutesAM += 1;
                                                         }
 
-                                                        // Handle case where minutes exceed 59
-                                                        if ($finalMinutesAM >= 60) {
-                                                            $finalMinutesAM = 0;
+                                                        // Adjust hours if minutes exceed 59
+                                                        if ($roundedMinutes >= 60) {
+                                                            $roundedMinutes -= 60;
                                                             $finalHoursAM += 1;
                                                         }
+
+                                                        // Set final minutes
+                                                        $finalMinutesAM = $roundedMinutes;
                                                     @endphp
 
                                                     {{ $finalHoursAM }} hrs. {{ $finalMinutesAM }} min. {{ $finalSecondsAM }} sec.
+
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-2 py-1">
                                                     <!-- {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min. -->
@@ -1027,6 +1044,19 @@
                                                         $lateDurationPM == 0 &&
                                                         $am == 0 &&
                                                         $pm == 0 &&
+                                                        $totalHoursAM > 0 &&
+                                                        $totalMinutesAM == 0 &&
+                                                        $totalHoursPM > 0 &&
+                                                        $totalMinutesPM == 0 &&
+                                                        $modify_status == "Official Travel"
+                                                    ) {
+                                                        $remarkss = 'Official Travel';
+                                                    }
+                                                    else if (
+                                                        $lateDurationAM == 0 &&
+                                                        $lateDurationPM == 0 &&
+                                                        $am == 0 &&
+                                                        $pm == 0 &&
                                                         $totalHoursAM == 0 &&
                                                         $totalMinutesAM == 0 &&
                                                         $totalHoursPM == 0 &&
@@ -1102,6 +1132,7 @@
                                                     <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline " required>
                                                             <option value="">Select Status</option>
                                                             <option value="On Leave">On Leave</option>
+                                                            <option value="Official Travel">Official Travel</option>
                                                             <!-- <option value="awol">Absent w/out leave</option> -->
                                                     </select>
                                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
@@ -1341,8 +1372,12 @@
                                                                                         @method('PUT')
                                                                                             
                                                                                             <div class="mb-4">
+                                                                                                @php
+                                                                                                    $minutes = $period->grace_period * 60;
+                                                                                                    $roundedMinutes = round($minutes);
+                                                                                                @endphp
                                                                                                 <label for="grace_period" class="block text-gray-700 text-md font-bold mb-2 text-left">New Grace Period</label>
-                                                                                                <input type="number" name="grace_period" id="grace_period" min="0" max="60" value="{{ floor($period->grace_period * 60) }}" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('grace_period') is-invalid @enderror" autofocus required>
+                                                                                                <input type="float" name="grace_period" id="grace_period" min="0" max="60" value="{{ $roundedMinutes }}" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('grace_period') is-invalid @enderror" autofocus required>
                                                                                                 <x-input-error :messages="$errors->get('grace_period')" class="mt-2" />
                                                                                             </div>
                                                                                             
