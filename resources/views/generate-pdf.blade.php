@@ -155,7 +155,7 @@
 
             
         @endphp
-        <table>
+        <table style="float:left">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -209,197 +209,358 @@
                 @endforeach
             </tbody>
         </table>
-        <table class="table2">
+    </div>
+        <table>
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>AM Late</th>  
-                    <th>PM Late</th>
-                    <th>AM Undertime</th>  
-                    <th>PM Undertime</th>
-                    <th>Total AM Hours</th>
-                    <th>Total PM Hours</th>
-                    <th>Total Late</th>
-                    <th>Total Undertime</th>
-                    <th>Total Rendered Hours</th>
-                    <th>Required Hours</th>
-                    <th>Remarks</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Date</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase" >Time In</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Time Out</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Late AM | PM</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Total Late</th>
+                    <!-- <th class="border border-gray-400 px-2 py-1">PM Late</th> -->
+                    <th class="border border-gray-400 px-2 py-1 uppercase">UnderTime AM | PM</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Total Undertime</th>
+                    <!-- <th class="border border-gray-400 px-2 py-1">PM UnderTime</th> -->
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Total Hours AM & PM</th>
+                    <!-- <th class="border border-gray-400 px-2 py-1">Total PM Hours</th> -->
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Total Hours Rendered</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Total Deduction (late + undertime)</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Total Absent</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Required Hours</th>
+                    <th class="border border-gray-400 px-2 py-1 uppercase">Remarks</th>
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $groupedAttendance = [];
+
+                    // Group check-in times
+                    foreach ($attendanceTimeIn as $attendanceIn) {
+                        $date = date('Y-m-d', strtotime($attendanceIn->check_in_time));
+                        $employeeId = $attendanceIn->employee->employee_id;
+                        $status = $attendanceIn->status;
+
+                        if (!isset($groupedAttendance[$employeeId])) {
+                            $groupedAttendance[$employeeId] = [];
+                        }
+
+                        if (!isset($groupedAttendance[$employeeId][$date])) {
+                            $groupedAttendance[$employeeId][$date] = [
+                                'date' => date('m-d-Y, (l)', strtotime($attendanceIn->check_in_time)),
+                                'check_ins' => [],
+                                'check_outs' => [],
+                                'status' => $status,
+                            ];
+                        }
+
+                        $groupedAttendance[$employeeId][$date]['check_ins'][] = date('g:i:s A', strtotime($attendanceIn->check_in_time));
+                    }
+
+                    // Group check-out times
+                    foreach ($attendanceTimeOut as $attendanceOut) {
+                        $date = date('Y-m-d', strtotime($attendanceOut->check_out_time));
+                        $employeeId = $attendanceOut->employee->employee_id;
+                        $status = $attendanceOut->status;
+
+                        if (!isset($groupedAttendance[$employeeId])) {
+                            $groupedAttendance[$employeeId] = [];
+                        }
+
+                        if (!isset($groupedAttendance[$employeeId][$date])) {
+                            $groupedAttendance[$employeeId][$date] = [
+                                'date' => date('m-d-Y, (l)', strtotime($attendanceOut->check_out_time)),
+                                'check_ins' => [],
+                                'check_outs' => [],
+                                'status' => $status,
+                            ];
+                        }
+
+                        $groupedAttendance[$employeeId][$date]['check_outs'][] = date('g:i:s A', strtotime($attendanceOut->check_out_time));
+                    }
+                @endphp
                 @foreach ($attendanceData as $attendance)
-                    <tr>
-                        <td class="text-black border border-gray-400">
-                            {{ date('m-d-Y (l)', strtotime($attendance->worked_date)) }}
-                        </td>
-                        <td class="text-black border border-gray-400">
-                            @php
-                                // Calculate late duration in minutes
-                                $lateDurationInMinutes = $attendance->late_duration;
+                    @php
+                        $workedDate = date('Y-m-d', strtotime($attendance->worked_date));
+                    @endphp
+                <tr>
+                    <td class="text-black border border-gray-400 px-2 py-1 font-bold">{{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}</td>
+                    <td class="text-black border border-gray-400 px-2 py-1 w-28">
+                        @foreach ($groupedAttendance as $employeeId => $dates)
+                            @foreach ($dates as $date => $attendance1)
+                                @if ($date === $workedDate)
+                                    @if (!empty($attendance1['check_ins']))
+                                        <hr class="" style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                        <text class="text-red-500">1ST TIME IN:  </text>
+                                            @php
+                                                $isPmDisplayed = false;
+                                            @endphp
+                                    
+                                            @foreach ($attendance1['check_ins'] as $index => $checkIn)
+                                                
+                                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                
+                                                {{ $checkIn }}
+                                                
+                                                @if (!$isPmDisplayed)
+                                                    @php
+                                                        $isPmDisplayed = true;
+                                                    @endphp
+                                                        
+                                                        <br><br>
+                                                        <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                        <text class="text-blue-500">2ND TIME IN:  </text>
 
-                                // Calculate late hours, minutes, and seconds
-                                $lateHours = intdiv($lateDurationInMinutes, 60);
-                                $lateMinutes = $lateDurationInMinutes % 60;
-                                $lateSeconds = ($lateDurationInMinutes - floor($lateDurationInMinutes)) * 60;
+                                                @endif
+                                                
+                                            @endforeach
 
-                                // Round seconds to avoid precision issues
-                                $lateSeconds = round($lateSeconds);
+                                            @if (!$isPmDisplayed)
+                                                <p>No AM check-in</p>
+                                            @endif
+                                    @else
+                                        <p>No Check-Ins</p>
+                                    @endif
+                                @endif
+                            @endforeach
+                        @endforeach
+                    </td>
+                    <td class="text-black border border-gray-400 px-2 py-1 w-32">
+                        @foreach ($groupedAttendance as $employeeId => $dates)
+                            @foreach ($dates as $date => $attendance1)
+                                @if ($date === $workedDate)
+                                    @if (!empty($attendance1['check_outs']))
+                                        <hr style="border: none; border-top: 1px solid #000;">
+                                        <text class="text-red-500"> 1ST TIME OUT:  </text>
+                                            @php
+                                                $isPmDisplayed = false;
+                                            @endphp
 
-                                // Format the late duration string
-                                $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') 
-                                                        . ($lateMinutes > 0 ? "{$lateMinutes} min " : '')
-                                                        . ($lateSeconds > 0 ? "{$lateSeconds} sec" : '');
+                                            @foreach ($attendance1['check_outs'] as $index => $checkOut)
+                                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                {{ $checkOut }}
 
-                                // If the formatted string is empty, ensure we show "0"
-                                $lateDurationFormatted = $lateDurationFormatted ?: '0 sec';
-                            @endphp
-
-                            {{ $lateDurationFormatted }}
-                        </td>
-                        <td class="text-black border border-gray-400">
-                            @php
-                                // Calculate late duration in minutes
-                                $lateDurationInMinutes = $attendance->late_durationPM;
-
-                                // Calculate late hours, minutes, and seconds
-                                $lateHours = intdiv($lateDurationInMinutes, 60);
-                                $lateMinutes = $lateDurationInMinutes % 60;
-                                $lateSeconds = ($lateDurationInMinutes - floor($lateDurationInMinutes)) * 60;
-
-                                // Round seconds to avoid precision issues
-                                $lateSeconds = round($lateSeconds);
-
-                                // Format the late duration string
-                                $lateDurationFormatted = ($lateHours > 0 ? "{$lateHours} hr " : '') 
-                                                        . ($lateMinutes > 0 ? "{$lateMinutes} min " : '')
-                                                        . ($lateSeconds > 0 ? "{$lateSeconds} sec" : '');
-
-                                // If the formatted string is empty, ensure we show "0"
-                                $lateDurationFormatted = $lateDurationFormatted ?: '0 sec';
-                            @endphp
-
-                            {{ $lateDurationFormatted }}
-                        </td>
-                        <td class="text-black border border-gray-400">
-                            @php
-                                // Assume $attendance->undertimeAM is in minutes
-                                $undertimeInMinutes = $attendance->undertimeAM;
-
-                                // Convert minutes to total seconds
-                                $undertimeInSeconds = $undertimeInMinutes * 60;
-
-                                // Convert total seconds to hours, minutes, and seconds
-                                $undertimeHours = intdiv($undertimeInSeconds, 3600); // Total hours
-                                $remainingSeconds = $undertimeInSeconds % 3600; // Remaining seconds after hours
-                                $undertimeMinutes = intdiv($remainingSeconds, 60); // Total minutes
-                                $undertimeSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
-
-                                // Format the duration string
-                                $undertimeFormatted = 
-                                    ($undertimeHours > 0 ? "{$undertimeHours} hr " : '') .
-                                    ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min ') .
-                                    ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
-                            @endphp
-
-                            {{ $undertimeFormatted }}
-                        </td>
-                        <td class="text-black border border-gray-400">
-                            @php
-                                // Assume $attendance->undertimePM is in minutes
-                                $undertimeInMinutes = $attendance->undertimePM;
-
-                                // Convert minutes to total seconds
-                                $undertimeInSeconds = $undertimeInMinutes * 60;
-
-                                // Convert total seconds to hours, minutes, and seconds
-                                $undertimeHours = intdiv($undertimeInSeconds, 3600); // Total hours
-                                $remainingSeconds = $undertimeInSeconds % 3600; // Remaining seconds after hours
-                                $undertimeMinutes = intdiv($remainingSeconds, 60); // Total minutes
-                                $undertimeSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
-
-                                // Format the duration string
-                                $undertimeFormatted = 
-                                    ($undertimeHours > 0 ? "{$undertimeHours} hr " : '') .
-                                    ($undertimeMinutes > 0 ? "{$undertimeMinutes} min " : '0 min ') .
-                                    ($undertimeSeconds > 0 ? "{$undertimeSeconds} sec" : '0 sec');
-                            @endphp
-
-                            {{ $undertimeFormatted }}
-
-                        </td>
-                        <td class="text-black border border-gray-400 px-2 py-1">
+                                                @if (!$isPmDisplayed)
+                                                    @php
+                                                        $isPmDisplayed = true;
+                                                    @endphp
+                                                    <br><br>
+                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                    <text class="text-blue-500"> 2ND TIME OUT:  </text>
                                                     
-                            @php
-                                // Total hours worked in AM shift
-                                $totalHoursAM = floor($attendance->hours_workedAM);
-                                $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                @endif
+                                            @endforeach
 
-                                // Convert minutes to seconds
-                                $totalSecondsAM = ($totalMinutesAM - floor($totalMinutesAM)) * 60;
-                                $totalMinutesAM = floor($totalMinutesAM);
+                                            @if (!$isPmDisplayed)
+                                                <p>No PM check-in</p>
+                                            @endif
+                                    @else
+                                        <p>No Check-Ins</p>
+                                    @endif
+                                @endif
+                            @endforeach
+                        @endforeach
+                    </td>
+                    </td>
+                    <td class="text-black border border-gray-400 px-2 py-1 w-24">
+                        <!-- THIS IS PM AND AM LATE DURATION -->
+                        @php
+                            // Calculate late duration in minutes for AM
+                            $lateDurationInMinutesAM = $attendance->late_duration;
 
-                                // Get late duration in minutes for AM shift
-                                
-                                // Convert total minutes to hours and minutes for AM shift
-                                $finalHoursAM = $totalHoursAM + floor($totalMinutesAM / 60);
-                                $finalMinutesAM = $totalMinutesAM % 60;
+                            // Calculate late hours, minutes, and seconds for AM
+                            $lateHoursAM = intdiv($lateDurationInMinutesAM, 60);
+                            $lateMinutesAM = $lateDurationInMinutesAM % 60;
+                            $lateSecondsAM = ($lateDurationInMinutesAM - floor($lateDurationInMinutesAM)) * 60;
 
-                                // Ensure final seconds is a whole number
-                                $finalSecondsAM = round($totalSecondsAM);
+                            // Round seconds to avoid precision issues for AM
+                            $lateSecondsAM = round($lateSecondsAM);
 
-                            @endphp
+                            // Format the late duration string for AM
+                            $lateDurationFormattedAM = ($lateHoursAM > 0 ? "{$lateHoursAM} hr " : '') 
+                                                    . ($lateMinutesAM > 0 ? "{$lateMinutesAM} min " : '')
+                                                    . ($lateSecondsAM > 0 ? "{$lateSecondsAM} sec" : '');
 
-                            {{ $finalHoursAM }} hrs. {{ $finalMinutesAM }} min. {{ $finalSecondsAM }} sec.
-                        </td>
+                            // If the formatted string is empty for AM, ensure we show "0"
+                            $lateDurationFormattedAM = $lateDurationFormattedAM ?: '0 sec';
 
-                        <td class="text-black border border-gray-400">                     
-                            @php
-                                // Total hours worked in AM PM shift
-                                $totalHoursPM = floor($attendance->hours_workedPM);
-                                $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                            // Calculate late duration in minutes for PM
+                            $lateDurationInMinutesPM = $attendance->late_durationPM;
 
-                                // Convert minutes to seconds
-                                $totalSecondsPM = ($totalMinutesPM - floor($totalMinutesPM)) * 60;
-                                $totalMinutesPM = floor($totalMinutesPM);
+                            // Calculate late hours, minutes, and seconds for PM
+                            $lateHoursPM = intdiv($lateDurationInMinutesPM, 60);
+                            $lateMinutesPM = $lateDurationInMinutesPM % 60;
+                            $lateSecondsPM = ($lateDurationInMinutesPM - floor($lateDurationInMinutesPM)) * 60;
 
-                                
+                            // Round seconds to avoid precision issues for PM
+                            $lateSecondsPM = round($lateSecondsPM);
 
-                                // Convert total minutes to hours and minutes for AM shift
-                                $finalHoursPM = $totalHoursPM + floor($totalMinutesPM / 60);
-                                $finalMinutesPM = $totalMinutesPM % 60;
+                            // Format the late duration string for PM
+                            $lateDurationFormattedPM = ($lateHoursPM > 0 ? "{$lateHoursPM} hr " : '') 
+                                                    . ($lateMinutesPM > 0 ? "{$lateMinutesPM} min " : '')
+                                                    . ($lateSecondsPM > 0 ? "{$lateSecondsPM} sec" : '');
 
-                                // Ensure final seconds is a whole number
-                                $finalSecondsPM = round($totalSecondsPM);
+                            // If the formatted string is empty for PM, ensure we show "0"
+                            $lateDurationFormattedPM = $lateDurationFormattedPM ?: '0 sec';
+                        @endphp
 
-                            @endphp
+                        @if (!empty($lateDurationInMinutesAM) && !empty($lateDurationInMinutesPM))
+                            <div class="mt-2" >
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <text class="text-red-500">AM LATE:</text>
+                                <hr style="border: none; border-top: 1px solid #000;" class="mb-2">
+                                {{ $lateDurationFormattedAM }}
+                            </div>
 
-                            {{ $finalHoursPM }} hrs. {{ $finalMinutesPM }} min. {{ $finalSecondsPM }} sec.
-                        </td>
-                        <td class="text-black border border-gray-400">
-                            @php
-                                // Total late time in minutes as a decimal
-                                $totalLateMinutesDecimal = $attendance->total_late;
+                            <div class="mt-4">
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <text class="text-blue-500">PM LATE</text>
+                                <hr style="border: none; border-top: 1px solid #000;" class="mb-2">
+                                {{ $lateDurationFormattedPM }}
+                            </div>
+                        @elseif (!empty($lateDurationInMinutesAM))
+                            <div class="-mt-6">
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <text class="text-red-500">AM LATE:</text>
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <br>
+                                {{ $lateDurationFormattedAM }}
+                            </div>
+                        @elseif (!empty($lateDurationInMinutesPM))
+                            <div class="mt-1">
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <text class="text-blue-500">PM LATE:</text>
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <br>
+                                {{ $lateDurationFormattedPM }}
+                            </div>
+                        @else
+                            <p>No Late</p>
+                        @endif
+                    </td>
+                    <td class="text-black border border-gray-400 px-2 py-1 w-24">
+                        @php
+                            // Total late time in minutes as a decimal
+                            $totalLateMinutesDecimal = $attendance->total_late;
 
-                                // Convert decimal minutes to total hours, minutes, and seconds
-                                $totalLateHours = intdiv($totalLateMinutesDecimal, 60); // Total hours
-                                $remainingMinutes = floor($totalLateMinutesDecimal % 60); // Remaining minutes
-                                $totalLateSeconds = round(($totalLateMinutesDecimal - floor($totalLateMinutesDecimal)) * 60); // Total seconds
+                            // Convert decimal minutes to total hours, minutes, and seconds
+                            $totalLateHours = intdiv($totalLateMinutesDecimal, 60); // Total hours
+                            $remainingMinutes = floor($totalLateMinutesDecimal % 60); // Remaining minutes
+                            $totalLateSeconds = round(($totalLateMinutesDecimal - floor($totalLateMinutesDecimal)) * 60); // Total seconds
 
-                                // Format the duration string
+                            // Format the duration string
+                            if ($totalLateMinutesDecimal > 0) {
                                 $totalLateDurationFormatted = 
                                     ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') .
                                     ($remainingMinutes > 0 ? "{$remainingMinutes} mins " : '0 mins ') .
                                     ($totalLateSeconds > 0 ? "{$totalLateSeconds} secs" : '0 secs');
-                            @endphp
+                            } else {
+                                $totalLateDurationFormatted = '0';
+                            }
+                        @endphp
 
-                            {{ $totalLateDurationFormatted }}
-                        </td>
-                        <td class="text-black border border-gray-400">
-                            @php
-                                $am = $attendance->undertimeAM;
-                                $pm = $attendance->undertimePM;
-                                $totalUndertimeInMinutes = $am + $pm;
+                        {{ $totalLateDurationFormatted }}
+                    </td>
+                    <td class="text-black border border-gray-400 p-2 w-[134px]">
+                        @php
+                            // Calculate undertime in minutes for AM
+                            $undertimeInMinutesAM = $attendance->undertimeAM;
 
+                            // Convert minutes to total seconds for AM
+                            $undertimeInSecondsAM = $undertimeInMinutesAM * 60;
+
+                            // Convert total seconds to hours, minutes, and seconds for AM
+                            $undertimeHoursAM = intdiv($undertimeInSecondsAM, 3600); // Total hours
+                            $remainingSecondsAM = $undertimeInSecondsAM % 3600; // Remaining seconds after hours
+                            $undertimeMinutesAM = intdiv($remainingSecondsAM, 60); // Total minutes
+                            $undertimeSecondsAM = $remainingSecondsAM % 60; // Remaining seconds after minutes
+
+                            // Format the undertime string for AM
+                            $undertimeFormattedAM = 
+                                ($undertimeHoursAM > 0 ? "{$undertimeHoursAM} hr " : '') .
+                                ($undertimeMinutesAM > 0 ? "{$undertimeMinutesAM} min " : '0 min ') .
+                                ($undertimeSecondsAM > 0 ? "{$undertimeSecondsAM} sec" : '0 sec');
+
+                            // Calculate undertime in minutes for PM
+                            $undertimeInMinutesPM = $attendance->undertimePM;
+
+                            // Convert minutes to total seconds for PM
+                            $undertimeInSecondsPM = $undertimeInMinutesPM * 60;
+
+                            // Convert total seconds to hours, minutes, and seconds for PM
+                            $undertimeHoursPM = intdiv($undertimeInSecondsPM, 3600); // Total hours
+                            $remainingSecondsPM = $undertimeInSecondsPM % 3600; // Remaining seconds after hours
+                            $undertimeMinutesPM = intdiv($remainingSecondsPM, 60); // Total minutes
+                            $undertimeSecondsPM = $remainingSecondsPM % 60; // Remaining seconds after minutes
+
+                            // Format the undertime string for PM
+                            $undertimeFormattedPM = 
+                                ($undertimeHoursPM > 0 ? "{$undertimeHoursPM} hr " : '') .
+                                ($undertimeMinutesPM > 0 ? "{$undertimeMinutesPM} min " : '0 min ') .
+                                ($undertimeSecondsPM > 0 ? "{$undertimeSecondsPM} sec" : '0 sec');
+                        @endphp
+
+                        @if (!empty($undertimeInMinutesAM) && !empty($undertimeInMinutesPM))
+                            <div class="">
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <text class="text-red-500">AM UNDERTIME:</text>
+                                <hr style="border: none; border-top: 1px solid #000;" class="mb-2">
+                                {{ $undertimeFormattedAM }}
+                            </div>
+
+                            <div class="mt-4">
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <text class="text-blue-500">PM UNDERTIME:</text>
+                                <hr style="border: none; border-top: 1px solid #000;" class="mb-2">
+                                {{ $undertimeFormattedPM }}
+                            </div>
+                            <!-- <table class="p-0 w-full m-0">
+                                <tr class="border border-red-500 h-full">
+                                    <td >
+                                        <div class="mt-3 ">
+                                            <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                            <span class="text-red-500">AM UNDERTIME:</span>
+                                            <hr style="border: none; border-top: 1px solid #000;" class="mb-2">
+                                            {{ $undertimeFormattedAM }}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="border border-red-500">
+                                    <td>
+                                        <div class="mt-4">
+                                            <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                            <span class="text-blue-500">PM UNDERTIME:</span>
+                                            <hr style="border: none; border-top: 1px solid #000;" class="mb-2">
+                                            {{ $undertimeFormattedPM }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table> -->
+
+                        @elseif (!empty($undertimeInMinutesAM))
+                            <div>
+                                <text class="text-red-500">AM UNDERTIME:</text>
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                {{ $undertimeFormattedAM }}
+                            </div>
+                        @elseif (!empty($undertimeInMinutesPM))
+                            <div class="mt-1">
+                                <text class="text-blue-500">PM UNDERTIME:</text>
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                {{ $undertimeFormattedPM }}
+                            </div>
+                        @else
+                            <p>No Undertime</p>
+                        @endif
+                    </td>
+                    <td class="text-black border border-gray-400 px-2 py-1">
+                        <!-- Undertime Area Total -->
+                        @php
+                            $am = $attendance->undertimeAM;
+                            $pm = $attendance->undertimePM;
+                            $totalUndertimeInMinutes = $am + $pm;
+
+                            if ($totalUndertimeInMinutes > 0) {
                                 // Convert total minutes to total seconds
                                 $totalUndertimeInSeconds = $totalUndertimeInMinutes * 60;
 
@@ -414,153 +575,426 @@
                                     ($totalLateHours > 0 ? "{$totalLateHours} hrs " : '') .
                                     ($totalLateMinutes > 0 ? "{$totalLateMinutes} mins " : '0 mins ') .
                                     ($totalLateSeconds > 0 ? "{$totalLateSeconds} secs" : '0 secs');
-                            @endphp
+                            } else {
+                                $totalLateDurationFormatted = '0';
+                            }
+                        @endphp
 
-                            {{ $totalLateDurationFormatted }}
+                        {{ $totalLateDurationFormatted }}
+                    </td>
+                    
+                    <td class="text-black border border-gray-400 px-3 py-2 w-40">
+                        @php
+                            // Total hours worked in AM shift
+                            $totalHoursAM = floor($attendance->hours_workedAM);
+                            $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                            $totalSecondsAM = ($totalMinutesAM - floor($totalMinutesAM)) * 60;
+                            $totalMinutesAM = floor($totalMinutesAM);
 
-                        </td>
-                        <td class="text-black border border-gray-400">
-                            @php
-                                // Total hours worked in decimal format
-                                $totalHoursWorked = $attendance->total_hours_worked;
+                            $finalHoursAM = $totalHoursAM;
+                            $roundedMinutesAM = round($totalMinutesAM + ($totalSecondsAM / 60));
+                            $finalSecondsAM = round($totalSecondsAM % 60);
+
+                            if ($finalSecondsAM >= 59) {
+                                $finalSecondsAM = 0;
+                                $roundedMinutesAM += 1;
+                            } else {
+                                $finalSecondsAM = 0;
+                            }
+
+                            if ($roundedMinutesAM >= 59) {
+                                $roundedMinutesAM = 0;
+                                $finalHoursAM += 1;
+                            }
+
+                            $finalMinutesAM = $roundedMinutesAM;
+
+                            // Total hours worked in PM shift
+                            $totalHoursPM = floor($attendance->hours_workedPM);
+                            $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                            $totalSecondsPM = ($totalMinutesPM - floor($totalMinutesPM)) * 60;
+                            $totalMinutesPM = floor($totalMinutesPM);
+
+                            $finalHoursPM = $totalHoursPM + floor($totalMinutesPM / 60);
+                            $finalMinutesPM = $totalMinutesPM % 60;
+                            $finalSecondsPM = round($totalSecondsPM);
+
+                            if ($finalSecondsPM == 60) {
+                                $finalSecondsPM = 0;
+                                $finalMinutesPM += 1;
+                            }
+
+                            if ($finalMinutesPM >= 60) {
+                                $finalMinutesPM = 0;
+                                $finalHoursPM += 1;
+                            }
+                        @endphp
+
+                        @if ($attendance->hours_workedAM > 0 || $attendance->hours_workedPM > 0)
+                            <div class="mt-2">
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <text class="text-red-500">AM WORKED:</text>
+                                <hr style="border: none; border-top: 1px solid #000;" class="mb-2">
+                                {{ $finalHoursAM }} hr/s. {{ $finalMinutesAM }} min. {{ $finalSecondsAM }} sec.
+                            </div>
+
+                            <div class="mt-4">
+                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                <text class="text-blue-500">PM WORKED:</text>
+                                <hr style="border: none; border-top: 1px solid #000;" class="mb-2">
+                                {{ $finalHoursPM }} hrs. {{ $finalMinutesPM }} min. {{ $finalSecondsPM }} sec.
+                            </div>
+                        @else
+                            <p>0</p>
+                        @endif
+                    </td>
+                    <td class="text-black border border-gray-400 px-2 py-1 font-bold w-32">
+                        @php
+                            // Total hours worked in decimal format
+                            $totalHoursWorked = $attendance->total_hours_worked;
+                            
+                            // Calculate hours and minutes
+                            $totalHours = floor($totalHoursWorked);
+                            $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
+                            
+                            // Calculate the final hours, minutes, and seconds
+                            $finalMinutes = floor($totalMinutes);
+                            $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
+                            $finalSeconds = round($totalSeconds);
+                            
+                            // Handle case where seconds is 60
+                            if ($finalSeconds == 60) {
+                                $finalSeconds = 0;
+                                $finalMinutes += 1;
+                            }
+                            
+                            // Handle case where minutes exceed 59
+                            if ($finalMinutes >= 60) {
+                                $finalMinutes = 0;
+                                $totalHours += 1;
+                            }
+
+                            // Format the duration string
+                            if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
+                                $totalHoursWorkedFormatted = '0';
+                            } else {
+                                $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
+                            }
+                        @endphp
+
+                        {{ $totalHoursWorkedFormatted }}
+
                                 
-                                // Calculate hours and minutes
-                                $totalHours = floor($totalHoursWorked);
-                                $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
+                    </td>
+                    <td class="text-black border border-gray-400 px-3 py-2">
+
+                        @php
+                            // Total late time in minutes as a decimal
+                            $totalLateMinutesDecimal = $attendance->total_late;
+
+                            // Total undertime in minutes
+                            $am = $attendance->undertimeAM;
+                            $pm = $attendance->undertimePM;
+                            $totalUndertimeInMinutes = $am + $pm;
+
+                            // Combine late and undertime in minutes
+                            $totalMinutes = $totalLateMinutesDecimal + $totalUndertimeInMinutes;
+
+                            // Convert total minutes to total seconds
+                            $totalSeconds = $totalMinutes * 60;
+
+                            // Convert total seconds to hours, minutes, and seconds
+                            $totalHours = intdiv($totalSeconds, 3600); // Total hours
+                            $remainingSeconds = $totalSeconds % 3600; // Remaining seconds after hours
+                            $totalMinutes = intdiv($remainingSeconds, 60); // Total minutes
+                            $totalSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
+
+                            // Format the duration string for total deduction
+                            if ($totalMinutes > 0 || $totalLateMinutesDecimal > 0 || $totalUndertimeInMinutes > 0) {
+                                $totalDurationFormatted = 
+                                    ($totalHours > 0 ? "{$totalHours} hr/s, " : '') .
+                                    ($totalMinutes > 0 ? "{$totalMinutes} min/s, " : '0 min/s ') .
+                                    ($totalSeconds > 0 ? "{$totalSeconds} sec" : '0 sec');
+                            } else {
+                                $totalDurationFormatted = '0';
+                            }
+
+                            // Total hours worked in decimal format
+                            $totalHoursWorked = $attendance->total_hours_worked;
+                            
+                            // Calculate hours and minutes
+                            $totalHours = floor($totalHoursWorked);
+                            $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
+                            
+                            // Calculate the final hours, minutes, and seconds
+                            $finalMinutes = floor($totalMinutes);
+                            $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
+                            $finalSeconds = round($totalSeconds);
+                            
+                            // Handle case where seconds is 60
+                            if ($finalSeconds == 60) {
+                                $finalSeconds = 0;
+                                $finalMinutes += 1;
+                            }
+                            
+                            // Handle case where minutes exceed 59
+                            if ($finalMinutes >= 60) {
+                                $finalMinutes = 0;
+                                $totalHours += 1;
+                            }
+
+                            // Format the duration string for total hours worked
+                            if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
+                                $totalHoursWorkedFormatted = 'No total hours';
+                            } else {
+                                $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
+                            }
+
+                            // Use hours_perDay if totalHoursWorkedFormatted is 'No total hours'
+                            if ($totalHoursWorkedFormatted === 'No total hours') {
+                                $hoursPerDay = $attendance->hours_perDay;
+                                $hours = floor($hoursPerDay);
+                                $minutes = floor(($hoursPerDay - $hours) * 60);
+                                $seconds = round((((($hoursPerDay - $hours) * 60) - $minutes) * 60));
                                 
-                                // Convert total minutes to total seconds
-                                $totalSeconds = $totalMinutes * 60;
-                                
-                                // Calculate final hours, minutes, and seconds
-                                $finalHours = $totalHours + floor($totalSeconds / 3600);
-                                $remainingSeconds = $totalSeconds % 3600;
-                                $finalMinutes = floor($remainingSeconds / 60);
-                                $finalSeconds = $remainingSeconds % 60;
-                            @endphp
-
-                            {{ $finalHours }} hrs. {{ $finalMinutes }} min. {{ $finalSeconds }} sec.
-
-                        </td>
-                        <td class="text-black border border-gray-400">
-                            @php
-                                // Assuming $attendance->hours_perDay is in decimal format
-                                $totalHours = $attendance->hours_perDay;
-                                $hours = floor($totalHours);
-                                $minutes = floor(($totalHours - $hours) * 60);
-                                $seconds = round((((($totalHours - $hours) * 60) - $minutes) * 60));
-
                                 $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
                                 $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
                                 $formattedSeconds = $seconds > 0 ? "{$seconds} sec" : '0 sec';
 
-                                $result = "{$formattedHours}, {$formattedMinutes}";
-                            @endphp
+                                $totalDurationFormatted = "{$formattedHours}, {$formattedMinutes}, {$formattedSeconds}";
+                            }
+                        @endphp
+                        {{ $totalDurationFormatted }}
 
-                            {{ $result }}
-                            
-                        </td>
-                        <td class="text-black border uppercase border-gray-400">
-                            @php
-                                $lateDurationAM = $attendance->late_duration;
-                                $lateDurationPM = $attendance->late_durationPM;
-                                $am = $attendance->undertimeAM ?? 0;
-                                $pm = $attendance->undertimePM ?? 0;
+                    </td>
+                    <td class="text-black border border-gray-400 px-3 py-2">
+                        @php
 
-                                $totalHoursAM = floor($attendance->hours_workedAM);
-                                $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
-                                $totalHoursPM = floor($attendance->hours_workedPM);
-                                $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
-                                $totalHours = $totalHoursAM + $totalHoursPM;
-                                $totalMinutes = $totalMinutesAM + $totalMinutesPM;
-                                $modify_status = $attendance->modify_status;
+                        $totalHours = $attendance->hours_perDay;
+                            $hours = floor($totalHours);
+                            $minutes = floor(($totalHours - $hours) * 60);
+                            $seconds = round((((($totalHours - $hours) * 60) - $minutes) * 60));
 
-                                $remarkss = '';
+                            // Round minutes if seconds are 59
+                            if ($seconds >= 59) {
+                                $minutes += 1;
+                                $seconds = 0;
+                            }
 
-                                if (
-                                    $lateDurationAM == 0 &&
-                                    $lateDurationPM == 0 &&
-                                    $am == 0 &&
-                                    $pm == 0 &&
-                                    $totalHoursAM == 0 &&
-                                    $totalMinutesAM == 0 &&
-                                    $totalHoursPM == 0 &&
-                                    $totalMinutesPM == 0 &&
-                                    $modify_status == "Absent"
-                                ) {
-                                    $remarkss = 'Absent';
+                            // Format the result based on hours, minutes, and seconds
+                            if ($hours === 0 && $minutes === 0 && $seconds === 0) {
+                                $formattedTime = '0';
+                            } elseif ($hours === 0 && $minutes === 0) {
+                                $formattedTime = '0 sec';
+                            } elseif ($hours === 0 && $seconds === 0) {
+                                $formattedTime = "{$minutes} min";
+                            } elseif ($hours === 0) {
+                                $formattedTime = "{$minutes} min, {$seconds} sec";
+                            } elseif ($minutes === 0 && $seconds === 0) {
+                                $formattedTime = "{$hours} hr/s";
+                            } elseif ($minutes === 0) {
+                                $formattedTime = "{$hours} hr, {$seconds} sec";
+                            } elseif ($seconds === 0) {
+                                $formattedTime = "{$hours} hr, {$minutes} min";
+                            } else {
+                                $formattedTime = "{$hours} hr, {$minutes} min, {$seconds} sec";
+                            }
+
+                            // Time period 1 (formatted time)
+                            $totalHours1 = $attendance->hours_perDay;
+                            $hours1 = floor($totalHours1);
+                            $minutes1 = floor(($totalHours1 - $hours1) * 60);
+                            $seconds1 = round((((($totalHours1 - $hours1) * 60) - $minutes1) * 60));
+
+                            // Convert time period 1 to total seconds
+                            $timePeriod1Seconds = ($hours1 * 3600) + ($minutes1 * 60) + $seconds1;
+
+                            // Time period 2 (total worked time)
+                            $totalHoursWorked = $attendance->total_hours_worked;
+                            $workedHours = floor($totalHoursWorked);
+                            $totalMinutes = ($totalHoursWorked - $workedHours) * 60;
+                            $workedMinutes = floor($totalMinutes);
+                            $workedSeconds = round(($totalMinutes - $workedMinutes) * 60);
+
+                            // Total late and undertime in minutes
+                            $totalLateMinutesDecimal = $attendance->total_late;
+                            $am = $attendance->undertimeAM;
+                            $pm = $attendance->undertimePM;
+                            $totalUndertimeInMinutes = $am + $pm;
+
+                            // Combine late and undertime in minutes
+                            $totalAdditionalMinutes = $totalLateMinutesDecimal + $totalUndertimeInMinutes;
+
+                            // Convert time period 2 to total seconds
+                            $timePeriod2Seconds = ($workedHours * 3600) + ($workedMinutes * 60) + $workedSeconds + ($totalAdditionalMinutes * 60);
+
+                            // Calculate the difference in seconds
+                            $differenceSeconds = $timePeriod1Seconds - $timePeriod2Seconds;
+
+                            // Convert the difference back to hours, minutes, and seconds
+                            $differenceHours = floor($differenceSeconds / 3600);
+                            $differenceMinutes = floor(($differenceSeconds % 3600) / 60);
+                            $differenceSeconds = $differenceSeconds % 60;
+
+                            $formattedDifferenceHours = $differenceHours > 0 ? "{$differenceHours} hr/s" : '';
+                            $formattedDifferenceMinutes = $differenceMinutes > 0 ? "{$differenceMinutes} min" : '';
+                            $formattedDifferenceSeconds = $differenceSeconds > 0 ? "{$differenceSeconds} sec" : '';
+
+                            // Combine formatted parts for difference
+                            $formattedDifference = trim("{$formattedDifferenceHours} {$formattedDifferenceMinutes} {$formattedDifferenceSeconds}");
+                            $formattedDifference = empty($formattedDifference) ? '0' : $formattedDifference;
+                        @endphp
+
+                        {{ $formattedDifference}}
+                    </td>
+                    <td class="text-black border border-gray-400 text-xs">
+                        <!-- this is total hour required -->
+                        <!-- {{ $attendance->hours_perDay }} hr/s -->
+                        @php
+                            // Assuming $attendance->hours_perDay is in decimal format
+                            $totalHours = $attendance->hours_perDay;
+                            $hours = floor($totalHours);
+                            $minutes = floor(($totalHours - $hours) * 60);
+                            $seconds = round((((($totalHours - $hours) * 60) - $minutes) * 60));
+
+                            $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
+                            $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
+                            $formattedSeconds = $seconds > 0 ? "{$seconds} sec" : '0 sec';
+
+                            $result = "{$formattedHours}, {$formattedMinutes}";
+                        @endphp
+
+                        {{ $result }}
+                    </td>
+                    <td class="text-black border uppercase border-gray-400 text-xs font-semibold w-32">
+                    @php
+                        $lateDurationAM = $attendance->late_duration;
+                        $lateDurationPM = $attendance->late_durationPM;
+                        $am = $attendance->undertimeAM ?? 0;
+                        $pm = $attendance->undertimePM ?? 0;
+
+                        $totalHoursAM = floor($attendance->hours_workedAM);
+                        $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                        $totalHoursPM = floor($attendance->hours_workedPM);
+                        $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                        $totalHours = $totalHoursAM + $totalHoursPM;
+                        $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+                        $modify_status = $attendance->modify_status;
+
+                        $remarkss = '';
+
+                        if (
+                            $lateDurationAM == 0 &&
+                            $lateDurationPM == 0 &&
+                            $am == 0 &&
+                            $pm == 0 &&
+                            $totalHoursAM == 0 &&
+                            $totalMinutesAM == 0 &&
+                            $totalHoursPM == 0 &&
+                            $totalMinutesPM == 0 &&
+                            $modify_status == "Absent"
+                        ) {
+                            $remarkss = 'Absent';
+                        }
+                        else if (
+                            $lateDurationAM == 0 &&
+                            $lateDurationPM == 0 &&
+                            $am == 0 &&
+                            $pm == 0 &&
+                            $totalHoursAM == 0 &&
+                            $totalMinutesAM == 0 &&
+                            $totalHoursPM == 0 &&
+                            $totalMinutesPM == 0 &&
+                            $modify_status == "On Leave"
+                        ) {
+                            $remarkss = 'Leave';
+                        }
+                        else if (
+                            $lateDurationAM == 0 &&
+                            $lateDurationPM == 0 &&
+                            $am == 0 &&
+                            $pm == 0 &&
+                            $totalHoursAM > 0 &&
+                            $totalMinutesAM == 0 &&
+                            $totalHoursPM > 0 &&
+                            $totalMinutesPM == 0 &&
+                            $modify_status == "On Leave"
+                        ) {
+                            $remarkss = 'Leave';
+                        }
+                        else if (
+                            $lateDurationAM == 0 &&
+                            $lateDurationPM == 0 &&
+                            $am == 0 &&
+                            $pm == 0 &&
+                            $totalHoursAM > 0 &&
+                            $totalMinutesAM == 0 &&
+                            $totalHoursPM > 0 &&
+                            $totalMinutesPM == 0 &&
+                            $modify_status == "Official Travel"
+                        ) {
+                            $remarkss = 'Official Travel';
+                        }
+                        else if (
+                            $lateDurationAM == 0 &&
+                            $lateDurationPM == 0 &&
+                            $am == 0 &&
+                            $pm == 0 &&
+                            $totalHoursAM == 0 &&
+                            $totalMinutesAM == 0 &&
+                            $totalHoursPM == 0 &&
+                            $totalMinutesPM == 0 &&
+                            $modify_status == "On-campus"
+                        ) {
+                            $remarkss = 'Invalid Attendance';
+                        }
+                        
+                        else {
+                            if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
+                                $remarkss = "Present but Absent Morning";
+                            }
+                            else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
+                                $remarkss = "Present but Absent Afternoon";
+                            }
+                            else {
+                                if ($lateDurationAM > 0 && $lateDurationPM > 0) {
+                                    $remarkss = 'Present - Late AM & PM';
+                                } elseif ($lateDurationAM > 0) {
+                                    $remarkss = 'Present - Late AM';
+                                } elseif ($lateDurationPM > 0) {
+                                    $remarkss = 'Present - Late PM';
+                                } else {
+                                    $remarkss = "Present";
                                 }
-                                else if (
-                                    $lateDurationAM == 0 &&
-                                    $lateDurationPM == 0 &&
-                                    $am == 0 &&
-                                    $pm == 0 &&
-                                    $totalHoursAM == 0 &&
-                                    $totalMinutesAM == 0 &&
-                                    $totalHoursPM == 0 &&
-                                    $totalMinutesPM == 0 &&
-                                    $modify_status == "On Leaved"
-                                ) {
-                                    $remarkss = 'Leave';
-                                }
-                                else if (
-                                    $lateDurationAM == 0 &&
-                                    $lateDurationPM == 0 &&
-                                    $am == 0 &&
-                                    $pm == 0 &&
-                                    $totalHoursAM > 0 &&
-                                    $totalMinutesAM == 0 &&
-                                    $totalHoursPM > 0 &&
-                                    $totalMinutesPM == 0 &&
-                                    $status == "On Leave"
-                                ) {
-                                    $remarkss = 'On Leave';
-                                }
-                                    else {
-                                    if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
-                                        $remarkss = "Present but Absent Morning";
-                                    }
-                                    else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
-                                        $remarkss = "Present but Absent Afternoon";
-                                    } else {
-                                        if ($lateDurationAM > 0 && $lateDurationPM > 0) {
-                                            $remarkss = 'Present - Late AM & PM';
-                                        } elseif ($lateDurationAM > 0) {
-                                            $remarkss = 'Present - Late AM';
-                                        } elseif ($lateDurationPM > 0) {
-                                            $remarkss = 'Present - Late PM';
-                                        } else {
-                                            $remarkss = "Present";
-                                        }
-                                    }
+                            }
 
-                                    $undertimeRemark = '';
-                                    if ($am > 0) {
-                                        $undertimeRemark .= 'Undertime AM';
-                                    }
-                                    if ($pm > 0) {
-                                        if (!empty($undertimeRemark)) {
-                                            $undertimeRemark .= ' & PM';
-                                        } else {
-                                            $undertimeRemark .= 'Undertime PM';
-                                        }
-                                    }
-                                    if (!empty($undertimeRemark)) {
-                                        $remarkss .= ' - ' . $undertimeRemark;
-                                    }
+                            $undertimeRemark = '';
+                            if ($am > 0) {
+                                $undertimeRemark .= 'Undertime AM';
+                            }
+                            if ($pm > 0) {
+                                if (!empty($undertimeRemark)) {
+                                    $undertimeRemark .= ' & PM';
+                                } else {
+                                    $undertimeRemark .= 'Undertime PM';
                                 }
-                            @endphp
+                            }
+                            if (!empty($undertimeRemark)) {
+                                $remarkss .= ' - ' . $undertimeRemark;
+                            }
+                        }
+                    @endphp
 
-                                {{ $remarkss }}
-                        </td>
-                    </tr>
+                        {{ $remarkss }}
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
         <!-- make  -->
          <br><br><br>
-        
-    </div>
-    <div style="margin-top:200px; margin-left:20%;display:flex; justify-content:flex-end; align-items:center;">
+
+        <div style="margin-top:200px; margin-left:20%;display:flex; justify-content:flex-end; align-items:center;">
             <div class="flex">
                 <div class="flex flex-col">
                     @php
@@ -755,5 +1189,6 @@
                 </div>                        
             </div>
         </div>
+    </div>
 </body>
 </html>

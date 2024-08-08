@@ -3,8 +3,8 @@
                         window.addEventListener('resize', () => {
                             isFullScreen = (window.innerHeight === screen.height);
                         });
-                    " x-show="!isFullScreen" id="sidebarContainer"  class="fixed flex flex-col left-0 w-14 hover:w-48 md:w-48 bg-gradient-to-r from-red-500 to-orange-500 h-full text-black transition-all duration-300 border-r-2 border-gray-300 dark:border-gray-600 z-10 sidebar">
-        <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-0.5">
+                    " x-show="!isFullScreen" id="sidebarContainer"  class="fixed flex flex-col left-0 w-14 hover:w-48 md:w-48 bg-gradient-to-r from-red-500 to-orange-500 h-full text-black transition-all duration-300 border-r-2 border-gray-300 dark:border-gray-600 sidebar">
+        <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-0.5 ">
             <ul class="flex flex-col py-2 space-y-1 text-gray-800" >
                 <a href="#" class="flex justify-center items-center">
                     <img class="w-32 h-auto object-contain" src="{{ asset('assets/img/logo.png') }}" alt="SCMS Logo">

@@ -230,12 +230,12 @@
                                                                             <div class="flex mb-2">
                                                                                 <div class="w-1/2 pr-2">
                                                                                     <label for="morning_start_time" class="block text-gray-700 text-sm font-bold mb-1">Morning Start Time</label>
-                                                                                    <input type="time" name="morning_start_time" id="morning_start_time" value="{{ $schedule->morning_start_time }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_start_time') is-invalid @enderror" required>
+                                                                                    <input type="time" name="morning_start_time" id="morning_start_time" value="{{ $schedule->morning_start_time }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_start_time') is-invalid @enderror">
                                                                                     <x-input-error :messages="$errors->get('morning_start_time')" class="mt-2" />
                                                                                 </div>
                                                                                 <div class="w-1/2 pl-2">
                                                                                     <label for="morning_end_time" class="block text-gray-700 text-sm font-bold mb-1">Morning End Time</label>
-                                                                                    <input type="time" name="morning_end_time" id="morning_end_time" value="{{ $schedule->morning_end_time }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_end_time') is-invalid @enderror" required>
+                                                                                    <input type="time" name="morning_end_time" id="morning_end_time" value="{{ $schedule->morning_end_time }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_end_time') is-invalid @enderror">
                                                                                     <x-input-error :messages="$errors->get('morning_end_time')" class="mt-2" />
                                                                                 </div>
                                                                             </div>
@@ -243,12 +243,12 @@
                                                                             <div class="flex">
                                                                                 <div class="w-1/2 pr-2">
                                                                                     <label for="afternoon_start_time" class="block text-gray-700 text-sm font-bold mb-1">Afternoon Start Time</label>
-                                                                                    <input type="time" name="afternoon_start_time" id="afternoon_start_time" value="{{ $schedule->afternoon_start_time }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_start_time') is-invalid @enderror" required>
+                                                                                    <input type="time" name="afternoon_start_time" id="afternoon_start_time" value="{{ $schedule->afternoon_start_time }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_start_time') is-invalid @enderror">
                                                                                     <x-input-error :messages="$errors->get('afternoon_start_time')" class="mt-2" />
                                                                                 </div>
                                                                                 <div class="w-1/2 pl-2">
                                                                                     <label for="afternoon_end_time" class="block text-gray-700 text-sm font-bold mb-1">Afternoon End Time</label>
-                                                                                    <input type="time" name="afternoon_end_time" id="afternoon_end_time" value="{{ $schedule->afternoon_end_time }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_end_time') is-invalid @enderror" required>
+                                                                                    <input type="time" name="afternoon_end_time" id="afternoon_end_time" value="{{ $schedule->afternoon_end_time }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_end_time') is-invalid @enderror">
                                                                                     <x-input-error :messages="$errors->get('afternoon_end_time')" class="mt-2" />
                                                                                 </div>
                                                                             </div>
