@@ -44,7 +44,8 @@ class ShowEmployeeAttendance extends Component
     public $selectedStartDate = null;
     public $selectedEndDate = null;
     public $selectedAttendanceByDate;
-
+    public $selected_date;
+    
 
     protected $listeners = ['updateEmployees', 'updateEmployeesByDepartment', 'updateAttendanceByEmployee', 'updateAttendanceByDateRange'];
 
@@ -117,6 +118,7 @@ class ShowEmployeeAttendance extends Component
 
     public function render()
     {
+        
         // Base query for EmployeeAttendanceTimeIn with left join to EmployeeAttendanceTimeOut
         $queryTimeIn = EmployeeAttendanceTimeIn::query()
             ->with(['employee.school', 'employee.department']);
@@ -978,6 +980,8 @@ class ShowEmployeeAttendance extends Component
 
         $departmentDisplayWorkingHour = DepartmentWorkingHour::where('department_id', $this->selectedDepartment4)
                                                            ->get();
+                  
+
 
         $gracePeriod = GracePeriod::all();
 

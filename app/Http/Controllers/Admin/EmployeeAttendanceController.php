@@ -516,7 +516,8 @@ public function submitPortalTimeOut(Request $request)
 
         if ($employees) {
             $dateOnly = Carbon::parse($validatedData['selected_date'])->format('Y-m-d');
-
+            $dayOfWeek = Carbon::parse($validatedData['selected_date'])->dayOfWeek;
+            
             // Check if there are already 2 check-in and 2 check-out records for the employee on the selected date
             $checkInCount = EmployeeAttendanceTimeIn::where('employee_id', $employee_id)
                 ->whereDate('check_in_time', $dateOnly)
@@ -526,60 +527,71 @@ public function submitPortalTimeOut(Request $request)
                 ->whereDate('check_out_time', $dateOnly)
                 ->count();
 
-            if ($checkInCount == 0 && $checkOutCount == 0) {
-                $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $employees->department_id)->first();
+            // if ($checkInCount == 0 && $checkOutCount == 0) {
+                $currentDayOfWeek = now()->dayOfWeek;
+
+                // Retrieve the DepartmentWorkingHour record for the current department and day of the week
+                $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $employees->department_id)
+                    ->where('day_of_week', $dayOfWeek)
+                    ->first();
 
                 // Create AM check-in record
-                $attendanceInAm = new EmployeeAttendanceTimeIn();
-                $attendanceInAm->employee_id = $employees->id;
-                if($departmentWorkingHour){
-                    $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
-                }else {
-                    $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' 00:00:00';
-                }
-                $attendanceInAm->status = $validatedData['status'];
-                $attendanceInAm->save();
+                if($checkInCount == 0 && $checkOutCount == 0){
 
-                // Create PM check-in record
-                $attendanceInPm = new EmployeeAttendanceTimeIn();
-                $attendanceInPm->employee_id = $employees->id;
-                // $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
-                // Ensure $departmentWorkingHour is not null before accessing its properties
-                if ($departmentWorkingHour) {
-                    $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
-                } else {
-                    // Handle the case where $departmentWorkingHour is null if necessary
-                    $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' 00:00:00';
-                }
-                $attendanceInPm->status = $validatedData['status'];
-                $attendanceInPm->save();
+                    //morning & afternoon start time/time-in
+                    $attendanceInAm = new EmployeeAttendanceTimeIn();
+                    $attendanceInAm->employee_id = $employees->id;
+                    if($departmentWorkingHour){
+                        $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
+                    }else {
+                        $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' 00:00:00';
+                    }
+                    $attendanceInAm->status = $validatedData['status'];
+                    $attendanceInAm->save();
 
-                // Create AM check-out record
-                $attendanceOutAm = new EmployeeAttendanceTimeOut();
-                $attendanceOutAm->employee_id = $employees->id;
-                if($departmentWorkingHour){
-                    $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_end_time;
-                } else {
-                    $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' 00:00:00';
-                }
-                $attendanceOutAm->status = $validatedData['status'];
-                $attendanceOutAm->save();
+                     $attendanceOutAm = new EmployeeAttendanceTimeOut();
+                    $attendanceOutAm->employee_id = $employees->id;
+                    if($departmentWorkingHour){
+                        $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_end_time;
+                    } else {
+                        $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' 00:00:00';
+                    }
+                    $attendanceOutAm->status = $validatedData['status'];
+                    $attendanceOutAm->save();
 
-                // Create PM check-out record
-                $attendanceOutPm = new EmployeeAttendanceTimeOut();
-                $attendanceOutPm->employee_id = $employees->id;
-                if($departmentWorkingHour){
-                    $attendanceOutPm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_end_time;
-                } else {
-                    $attendanceOutPm->check_out_time = $validatedData['selected_date'] . ' 00:00:00';
+                
+
+                
+                    //morning & afternoon end time/time-out
+                    $attendanceInAm = new EmployeeAttendanceTimeIn();
+                    $attendanceInAm->employee_id = $employees->id;
+                    if($departmentWorkingHour){
+                        $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
+                    }else {
+                        $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' 00:00:00';
+                    }
+                    $attendanceInAm->status = $validatedData['status'];
+                    $attendanceInAm->save();
+
+                    $attendanceOutAm = new EmployeeAttendanceTimeOut();
+                    $attendanceOutAm->employee_id = $employees->id;
+                    if($departmentWorkingHour){
+                        $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_end_time;
+                    } else {
+                        $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' 00:00:00';
+                    }
+                    $attendanceOutAm->status = $validatedData['status'];
+                    $attendanceOutAm->save();
+
+                } 
+
+
+                if($checkInCount == 2 && $checkOutCount == 2){
+                    return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot modify date: check-in and check-out records exist.');
                 }
-                $attendanceOutPm->status = $validatedData['status'];
-                $attendanceOutPm->save();
 
                 return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Date Successfully modified!');
-            } else {
-                return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot modify date: check-in or check-out records exist.');
-            }
+
         }
 
         return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Employee not found.');

@@ -121,29 +121,90 @@
                                                 <x-input-error :messages="$errors->get('day_of_week')" class="mt-2" />
                                             </div>
                                             <div class="mb-2">
-                                                <label class="block text-gray-700 text-md font-bold mb-2 text-center">Set Working Hours</label>
+                                                <label class="block text-gray-700 text-md font-bold mb-2">Set Working Hours</label>
                                                 <div class="flex mb-2">
-                                                    <div class="w-1/2 pr-2">
-                                                        <label for="morning_start_time" class="block text-gray-700 text-sm font-bold mb-1">Morning Start Time</label>
-                                                        <input type="time" name="morning_start_time" id="morning_start_time" value="08:00" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_start_time') is-invalid @enderror" required>
+                                                    <div x-data="{ isDisabled: false }" class="w-1/2 pr-2">
+                                                        <!-- Checkbox to toggle input type -->
+                                                        <input type="checkbox" id="toggleCheckbox" x-model="isDisabled" class="mr-2">
+                                                        <label for="toggleCheckbox" class="text-gray-700 text-sm font-bold">No Time In AM</label>
+
+                                                        <label for="morning_start_time" class="block text-gray-700 text-sm font-bold mb-2">Morning Start Time</label>
+                                                        
+                                                        <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
+                                                        <input 
+                                                            :type="isDisabled ? 'text' : 'time'" 
+                                                            name="morning_start_time" 
+                                                            id="morning_start_time" 
+                                                            :value="isDisabled ? '' : ''" 
+                                                            :disabled="isDisabled" 
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_start_time') is-invalid @enderror"
+                                                        >
+                                                        
                                                         <x-input-error :messages="$errors->get('morning_start_time')" class="mt-2" />
                                                     </div>
-                                                    <div class="w-1/2 pl-2">
+
+                                                      
+                                                    <div x-data="{ isDisabled: false }" class="w-1/2 pl-2">
+                                                        <!-- Checkbox to toggle input type -->
+                                                        <input type="checkbox" id="toggleCheckboxMorningEnd" x-model="isDisabled" class="mr-2 text-left">
+                                                        <label for="toggleCheckboxMorningEnd" class="text-gray-700 text-sm font-bold mb-2">No Time Out AM</label>
+
                                                         <label for="morning_end_time" class="block text-gray-700 text-sm font-bold mb-1">Morning End Time</label>
-                                                        <input type="time" name="morning_end_time" id="morning_end_time" value="12:00" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_end_time') is-invalid @enderror" required>
+                                                        
+                                                        <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
+                                                        <input 
+                                                            :type="isDisabled ? 'text' : 'time'" 
+                                                            name="morning_end_time" 
+                                                            id="morning_end_time" 
+                                                            :value="isDisabled ? '' : ''" 
+                                                            :disabled="isDisabled" 
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_end_time') is-invalid @enderror"
+                                                        >
+                                                        
                                                         <x-input-error :messages="$errors->get('morning_end_time')" class="mt-2" />
                                                     </div>
+
                                                 </div>
                                                 
                                                 <div class="flex">
-                                                    <div class="w-1/2 pr-2">
-                                                        <label for="afternoon_start_time" class="block text-gray-700 text-sm font-bold mb-1">Afternoon Start Time</label>
-                                                        <input type="time" name="afternoon_start_time" id="afternoon_start_time" value="13:30" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_start_time') is-invalid @enderror" required>
+                                                    <div x-data="{ isDisabled: false }" class="w-1/2 pr-2">
+                                                        <!-- Checkbox to toggle input type -->
+                                                        <input type="checkbox" id="toggleCheckboxPMStart" x-model="isDisabled" class="mr-2">
+                                                        <label for="toggleCheckboxPMStart" class="text-gray-700 text-sm font-bold">No Time In PM</label>
+
+                                                        <label for="afternoon_start_time" class="block text-gray-700 text-sm font-bold mb-2">Afternoon Start Time</label>
+                                                        
+                                                        <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
+                                                        <input 
+                                                            :type="isDisabled ? 'text' : 'time'" 
+                                                            name="afternoon_start_time" 
+                                                            id="afternoon_start_time" 
+                                                            :value="isDisabled ? '' : ''" 
+                                                            :disabled="isDisabled" 
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_start_time') is-invalid @enderror"
+                                                        >
+                                                        
                                                         <x-input-error :messages="$errors->get('afternoon_start_time')" class="mt-2" />
                                                     </div>
-                                                    <div class="w-1/2 pl-2">
+
+                                                        
+                                                    <div x-data="{ isDisabled: false }" class="w-1/2 pl-2">
+                                                        <!-- Checkbox to toggle input type -->
+                                                        <input type="checkbox" id="toggleCheckboxPMEnd" x-model="isDisabled" class="mr-2 text-left">
+                                                        <label for="toggleCheckboxPMEnd" class="text-gray-700 text-sm font-bold mb-2">No Time Out PM</label>
+
                                                         <label for="afternoon_end_time" class="block text-gray-700 text-sm font-bold mb-1">Afternoon End Time</label>
-                                                        <input type="time" name="afternoon_end_time" id="afternoon_end_time" value="17:30" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_end_time') is-invalid @enderror" required>
+                                                        
+                                                        <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
+                                                        <input 
+                                                            :type="isDisabled ? 'text' : 'time'" 
+                                                            name="afternoon_end_time" 
+                                                            id="afternoon_end_time" 
+                                                            :value="isDisabled ? '' : ''" 
+                                                            :disabled="isDisabled" 
+                                                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_end_time') is-invalid @enderror"
+                                                        >
+                                                        
                                                         <x-input-error :messages="$errors->get('afternoon_end_time')" class="mt-2" />
                                                     </div>
                                                 </div>

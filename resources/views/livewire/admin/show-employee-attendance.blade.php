@@ -133,11 +133,20 @@
                                                         {{ $daysOfWeek[$working_hour->day_of_week] }}
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                       {{ date('h:i A', strtotime($working_hour->morning_start_time)) }} - {{ date('h:i A', strtotime($working_hour->morning_end_time)) }}
+                                                        @if($working_hour->morning_start_time && $working_hour->morning_end_time)
+                                                            {{ date('h:i A', strtotime($working_hour->morning_start_time)) }} - {{ date('h:i A', strtotime($working_hour->morning_end_time)) }}
+                                                        @else
+                                                            No set time
+                                                        @endif
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                       {{ date('h:i A', strtotime($working_hour->afternoon_start_time)) }} - {{ date('h:i A', strtotime($working_hour->afternoon_end_time)) }}
+                                                        @if($working_hour->afternoon_start_time && $working_hour->afternoon_end_time)
+                                                            {{ date('h:i A', strtotime($working_hour->afternoon_start_time)) }} - {{ date('h:i A', strtotime($working_hour->afternoon_end_time)) }}
+                                                        @else
+                                                            No set time
+                                                        @endif
                                                     </td>
+
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -695,7 +704,7 @@
 
                                 <div class="w-full">
                                     <h3 class="text-center text-lg font-semibold uppercase mb-2 mt-6">Calculation of Work Hours</h3>
-                                    
+                                    <p><text class="text-red-500">Note: </text> To assess time-in and time out duration, click working hour to verify.</p>
                                     <table class="table-auto min-w-full text-center text-xs mb-4 divide-y divide-gray-200">
                                         <thead class="bg-gray-200 text-black">
                                             <tr>
@@ -1483,36 +1492,205 @@
                             <div  x-show="tab === 'modify_date'" class="w-full">
                                 <!-- Table for Computed Working Hours -->
                                 <div class="w-full">
-                                    <div class="w-[50%] flex justify-center mb-4 mx-auto">
-                                        <form action="{{ route('admin.attendance.modify') }}" method="POST" class="">
-                                        <x-caps-lock-detector />
-                                            @csrf
+                                    <div x-data="{ activeTab: 'form2' }" class="w-[50%] mb-4 mx-auto mt-8">
+                                        <!-- Tabs -->
+                                        <div class="flex justify-between mb-4">
+                                            <button @click="activeTab = 'form1'" :class="{'bg-blue-500 text-white': activeTab === 'form1'}" class="w-[48%] py-2 px-4 rounded-md text-center border border-black">
+                                                For Half Day Leave
+                                            </button>
+                                            <button @click="activeTab = 'form2'" :class="{'bg-blue-500 text-white': activeTab === 'form2'}" class="w-[48%] py-2 px-4 rounded-md text-center border border-black">
+                                                For Full Day Leave
+                                            </button>
+                                        </div>
 
+                                        <!-- Form 1 -->
+                                        <div x-show="activeTab === 'form1'" class="w-full">
+                                            <form action="{{ route('admin.attendance.modify') }}" method="POST" class="w-full">
+                                                <x-caps-lock-detector />
+                                                @csrf
+
+                                                <br>
+                                                <p class="text-[14px]">
+                                                    <text class="text-red-500">Note:</text> For half day leave, select the date and time based on its working hour.
+                                                                                              <br><text class="ml-10"></text>Check the box where am or pm duration is not set.
+                                                </p>
+                                                <br>
                                                 <div class="mb-2 hidden">
-                                                    <label for="selected-date" class="block  mb-2 text-left">Employee:</label>
+                                                    <label for="selected-date" class="block mb-2 text-left">Employee:</label>
                                                     <input type="text" name="employee_id" value="{{ $selectedEmployeeToShow->id }}" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full max-w-md">
                                                 </div>
+                                                <!-- <div class="mb-2">
+                                                    <label for="selected-date" class="block mb-2 text-left">Select a Date:</label>
+                                                    <input type="date" id="selected-date" name="selected_date" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full">
+                                                </div> -->
+                                                <div x-data="{ selectedDate: '', dayOfWeekNumber: '' }" class="mb-2">
+                                                    <label for="selected-date" class="block mb-2 text-left">Select a Date:</label>
+                                                    <input 
+                                                        type="date" 
+                                                        id="selected-date" 
+                                                        name="selected_date" 
+                                                        class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full"
+                                                        x-model="selectedDate"
+                                                        @change="dayOfWeekNumber = new Date(selectedDate).getDay()"
+                                                        wire:model = "selected_date"
+                                                    >
+
+                                                    <label for="day-of-week" class="block mb-2 text-left">Day of the Week:</label>
+                                                    <input 
+                                                        type="text" 
+                                                        id="day-of-week" 
+                                                        name="day_of_week" 
+                                                        class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full"
+                                                        x-model="dayOfWeekNumber"
+                                                        readonly
+                                                        wire:model="dayOfTheWeek"
+                                                    >
+
+                                                </div>
+                                                    
                                                 <div class="mb-2">
-                                                    <label for="selected-date" class="block  mb-2 text-left">Select a Date:</label>
-                                                    <input type="date" id="selected-date" name="selected_date" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full max-w-md">
+                                                    <label class="block text-gray-700 text-md font-bold mb-2">Set Working Hours</label>
+                                                    <div class="flex mb-2">
+                                                        <div x-data="{ isDisabled: false }" class="w-1/2 pr-2">
+                                                            <!-- Checkbox to toggle input type -->
+                                                            <input type="checkbox" id="toggleCheckbox" x-model="isDisabled" class="mr-2">
+                                                            <label for="toggleCheckbox" class="text-gray-700 text-sm font-bold">No Time In AM</label>
+
+                                                            <label for="morning_start_time" class="block text-gray-700 text-sm font-bold mb-2">Morning Start Time</label>
+                                                            
+                                                            <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
+                                                        
+                                                            <input 
+                                                                :type="isDisabled ? 'text' : 'time'" 
+                                                                name="morning_start_time" 
+                                                                id="morning_start_time" 
+                                                                :value="isDisabled ? '' : '{{ $departmentWorkingHour->morning_start_time ?? '' }}'"
+                                                                :disabled="isDisabled" 
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_start_time') is-invalid @enderror"
+                                                            >
+                                                            
+                                                            <x-input-error :messages="$errors->get('morning_start_time')" class="mt-2" />
+
+
+                                                        </div>
+
+                                                           
+                                                        <div x-data="{ isDisabled: false }" class="w-1/2 pl-2">
+                                                            <!-- Checkbox to toggle input type -->
+                                                            <input type="checkbox" id="toggleCheckboxMorningEnd" x-model="isDisabled" class="mr-2 text-left">
+                                                            <label for="toggleCheckboxMorningEnd" class="text-gray-700 text-sm font-bold mb-2">No Time Out AM</label>
+
+                                                            <label for="morning_end_time" class="block text-gray-700 text-sm font-bold mb-1">Morning End Time</label>
+                                                            
+                                                            <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
+                                                            <input 
+                                                                :type="isDisabled ? 'text' : 'time'" 
+                                                                name="morning_end_time" 
+                                                                id="morning_end_time" 
+                                                                :value="isDisabled ? '' : ''" 
+                                                                :disabled="isDisabled" 
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_end_time') is-invalid @enderror"
+                                                            >
+                                                            
+                                                            <x-input-error :messages="$errors->get('morning_end_time')" class="mt-2" />
+                                                        </div>
+
+                                                    </div>
+                                                    
+                                                    <div class="flex">
+                                                        <div x-data="{ isDisabled: false }" class="w-1/2 pr-2">
+                                                            <!-- Checkbox to toggle input type -->
+                                                            <input type="checkbox" id="toggleCheckboxPMStart" x-model="isDisabled" class="mr-2">
+                                                            <label for="toggleCheckboxPMStart" class="text-gray-700 text-sm font-bold">No Time In PM</label>
+
+                                                            <label for="afternoon_start_time" class="block text-gray-700 text-sm font-bold mb-2">Afternoon Start Time</label>
+                                                            
+                                                            <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
+                                                            <input 
+                                                                :type="isDisabled ? 'text' : 'time'" 
+                                                                name="afternoon_start_time" 
+                                                                id="afternoon_start_time" 
+                                                                :value="isDisabled ? '' : ''" 
+                                                                :disabled="isDisabled" 
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_start_time') is-invalid @enderror"
+                                                            >
+                                                            
+                                                            <x-input-error :messages="$errors->get('afternoon_start_time')" class="mt-2" />
+                                                        </div>
+
+                                                            
+                                                        <div x-data="{ isDisabled: false }" class="w-1/2 pl-2">
+                                                            <!-- Checkbox to toggle input type -->
+                                                            <input type="checkbox" id="toggleCheckboxPMEnd" x-model="isDisabled" class="mr-2 text-left">
+                                                            <label for="toggleCheckboxPMEnd" class="text-gray-700 text-sm font-bold mb-2">No Time Out PM</label>
+
+                                                            <label for="afternoon_end_time" class="block text-gray-700 text-sm font-bold mb-1">Afternoon End Time</label>
+                                                            
+                                                            <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
+                                                            <input 
+                                                                :type="isDisabled ? 'text' : 'time'" 
+                                                                name="afternoon_end_time" 
+                                                                id="afternoon_end_time" 
+                                                                :value="isDisabled ? '' : ''" 
+                                                                :disabled="isDisabled" 
+                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_end_time') is-invalid @enderror"
+                                                            >
+                                                            
+                                                            <x-input-error :messages="$errors->get('afternoon_end_time')" class="mt-2" />
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="mb-2">
                                                     <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Status: </label>
-                                                    <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline " required>
-                                                            <option value="">Select Status</option>
-                                                            <option value="On Leave">On Leave</option>
-                                                            <option value="Official Travel">Official Travel</option>
-                                                            <!-- <option value="awol">Absent w/out leave</option> -->
+                                                    <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline" required>
+                                                        <option value="">Select Status</option>
+                                                        <option value="On Leave">On Leave</option>
+                                                        <option value="Official Travel">Official Travel</option>
                                                     </select>
                                                     <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                                 </div>
+                                                <div class="flex mb-4 mt-10 justify-center">
+                                                    <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                        Save
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
 
-                                            <div class="flex mb-4 mt-10 justify-center">
-                                                <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
-                                                    Save
-                                                </button>
-                                            </div>
-                                        </form>
+                                        <!-- Form 2 -->
+                                        <div x-show="activeTab === 'form2'" class="w-full">
+                                            <form action="{{ route('admin.attendance.modify') }}" method="POST" class="w-[78%] mx-auto">
+                                                <x-caps-lock-detector />
+                                                @csrf
+                                                <br>
+                                                <p class="text-[14px]">
+                                                    <text class="text-red-500">Note:</text> Full Day leave is based on the set working hour of employee's department.
+                                                </p>
+                                                <br>
+                                                <div class="mb-2 hidden">
+                                                    <label for="selected-date" class="block mb-2 text-left">Employee:</label>
+                                                    <input type="text" name="employee_id" value="{{ $selectedEmployeeToShow->id }}" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full max-w-md">
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label for="selected-date" class="block mb-2 text-left">Select a Date:</label>
+                                                    <input type="date" id="selected-date" name="selected_date" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full">
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Status: </label>
+                                                    <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline" required>
+                                                        <option value="">Select Status</option>
+                                                        <option value="On Leave">On Leave</option>
+                                                        <option value="Official Travel">Official Travel</option>
+                                                    </select>
+                                                    <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                                </div>
+                                                <div class="flex mb-4 mt-10 justify-center">
+                                                    <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                        Save Leave
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- end -->

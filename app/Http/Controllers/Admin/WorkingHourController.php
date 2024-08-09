@@ -24,10 +24,10 @@ class WorkingHourController extends Controller
                 'school_id' => 'required|exists:schools,id',
                 'department_id' => 'required|exists:departments,id',
                 'day_of_week' => 'required|integer|between:0,6', // Assuming 0 to 6 for Sunday to Saturday
-                'morning_start_time' => 'required|date_format:H:i',
-                'morning_end_time' => 'required|date_format:H:i',
-                'afternoon_start_time' => 'required|date_format:H:i',
-                'afternoon_end_time' => 'required|date_format:H:i',
+                'morning_start_time' => 'nullable',
+                'morning_end_time' => 'nullable',
+                'afternoon_start_time' => 'nullable',
+                'afternoon_end_time' => 'nullable',
             ]);
 
             // Check if a schedule already exists for the given department and day of the week
@@ -225,10 +225,10 @@ class WorkingHourController extends Controller
                 'school_id' => 'required|exists:schools,id',
                 'department_id' => 'required|exists:departments,id',
                 'day_of_week' => 'required|integer|between:0,6', // Assuming 0 to 6 for Sunday to Saturday
-                // 'morning_start_time' => 'required|date_format:H:i',
-                // 'morning_end_time' => 'required|date_format:H:i',
-                // 'afternoon_start_time' => 'required|date_format:H:i',
-                // 'afternoon_end_time' => 'required|date_format:H:i',
+                'morning_start_time' => 'nullable',
+                'morning_end_time' => 'nullable',
+                'afternoon_start_time' => 'nullable',
+                'afternoon_end_time' => 'nullable',
             ]);
 
             // Find the existing record by $id
