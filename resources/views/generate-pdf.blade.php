@@ -23,9 +23,9 @@
             text-align: center; /* Center align text within container */
         }
         .table-container table {
-            width: 33%;
+            width: 70%;
             border-collapse: collapse;
-            float: left; /* Float tables to achieve side-by-side display */
+            /* Float tables to achieve side-by-side display */
             margin-right: 5px; /* Add some margin between tables */
         }
         table, th, td {
@@ -86,6 +86,7 @@
             <span>Selected Date: No date range selected</span>
         </div>
     @endif
+    <center>
     <div class="table-container">
         @php
             // Define weekend days
@@ -155,61 +156,6 @@
 
             
         @endphp
-        <table style="float:left">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>Time - In</th>
-                    <th>Time - Out</th>
-                    <th>Status</th> <!-- Status column header -->
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($groupedAttendance as $employeeId => $dates)
-                    @foreach($dates as $date => $attendance)
-                        @php
-                            $status = $attendance['status'] ?? 'No Status';
-                            $dayOfWeek = date('l', strtotime($attendance['date']));
-                            $isWeekend = in_array($dayOfWeek, ['Saturday', 'Sunday']);
-                            $isAbsentOrLeave = in_array($status, ['Absent', 'On Leave', 'Weekend']);
-                        @endphp
-                        <tr>
-                            <td>{{ $employeeId }}</td>
-                            <td>{{ $attendance['date'] }}</td>
-                            <td>
-                                @if ($isAbsentOrLeave)
-                                    {{ $status }} <!-- Show status if absent, on leave, or weekend -->
-                                @else
-                                    @if (!empty($attendance['check_ins']))
-                                        @foreach($attendance['check_ins'] as $checkIn)
-                                            {{ $checkIn }}<br>
-                                        @endforeach
-                                    @else
-                                        No Check-Ins
-                                    @endif
-                                @endif
-                            </td>
-                            <td>
-                                @if ($isAbsentOrLeave)
-                                    {{ $status }} <!-- Show status if absent, on leave, or weekend -->
-                                @else
-                                    @if (!empty($attendance['check_outs']))
-                                        @foreach($attendance['check_outs'] as $checkOut)
-                                            {{ $checkOut }}<br>
-                                        @endforeach
-                                    @else
-                                        No Check-Outs
-                                    @endif
-                                @endif
-                            </td>
-                            <td>{{ $status }}</td> <!-- Status column -->
-                        </tr>
-                    @endforeach
-                @endforeach
-            </tbody>
-        </table>
-    </div>
         <table>
             <thead>
                 <tr>
@@ -991,6 +937,62 @@
                 @endforeach
             </tbody>
         </table>
+        <!-- <table style="float:left;" id="table1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Time - In</th>
+                    <th>Time - Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($groupedAttendance as $employeeId => $dates)
+                    @foreach($dates as $date => $attendance)
+                        @php
+                            $status = $attendance['status'] ?? 'No Status';
+                            $dayOfWeek = date('l', strtotime($attendance['date']));
+                            $isWeekend = in_array($dayOfWeek, ['Saturday', 'Sunday']);
+                            $isAbsentOrLeave = in_array($status, ['Absent', 'On Leave', 'Weekend']);
+                        @endphp
+                        <tr>
+                            <td>{{ $employeeId }}</td>
+                            <td>{{ $attendance['date'] }}</td>
+                            <td>
+                                @if ($isAbsentOrLeave)
+                                    {{ $status }} 
+                                @else
+                                    @if (!empty($attendance['check_ins']))
+                                        @foreach($attendance['check_ins'] as $checkIn)
+                                            {{ $checkIn }}<br>
+                                        @endforeach
+                                    @else
+                                        No Check-Ins
+                                    @endif
+                                @endif
+                            </td>
+                            <td>
+                                @if ($isAbsentOrLeave)
+                                    {{ $status }}
+                                @else
+                                    @if (!empty($attendance['check_outs']))
+                                        @foreach($attendance['check_outs'] as $checkOut)
+                                            {{ $checkOut }}<br>
+                                        @endforeach
+                                    @else
+                                        No Check-Outs
+                                    @endif
+                                @endif
+                            </td>
+                            <td>{{ $status }}</td> 
+                        </tr>
+                    @endforeach
+                @endforeach
+            </tbody>
+        </table> -->
+
+        
         <!-- make  -->
          <br><br><br>
 
@@ -1190,5 +1192,6 @@
             </div>
         </div>
     </div>
+    </center>
 </body>
 </html>

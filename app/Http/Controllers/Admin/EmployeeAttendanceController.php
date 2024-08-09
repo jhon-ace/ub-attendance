@@ -546,7 +546,7 @@ public function submitPortalTimeOut(Request $request)
                 // $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
                 // Ensure $departmentWorkingHour is not null before accessing its properties
                 if ($departmentWorkingHour) {
-                    $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
+                    $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
                 } else {
                     // Handle the case where $departmentWorkingHour is null if necessary
                     $attendanceInPm->check_in_time = $validatedData['selected_date'] . ' 00:00:00';

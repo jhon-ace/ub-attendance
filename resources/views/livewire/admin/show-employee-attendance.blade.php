@@ -1706,9 +1706,9 @@
                                                             <button wire:click="generateExcel" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                 <i class="fa-solid fa-file"></i> Export to Excel
                                                             </button>
-                                                            <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                            <!-- <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                 <i class="fa-solid fa-file"></i> Generate DTR | PDF
-                                                            </button>
+                                                            </button> -->
                                                         </div>
                                                     </div>
                                                 @else
@@ -1720,9 +1720,9 @@
                                                             <button wire:click="generateExcel" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                 <i class="fa-solid fa-file"></i> Export to Excel
                                                             </button>
-                                                            <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                            <!-- <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                 <i class="fa-solid fa-file"></i> Generate DTR | PDF
-                                                            </button>
+                                                            </button> -->
                                                         </div>
                                                     </div>
                                                 @endif
@@ -1753,7 +1753,7 @@
                                                                         <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> View
                                                                     </a>
                                                                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                                        <div @click.away="open = true" class=" w-[80%] max-h-[90vh] bg-white p-6 rounded-lg shadow-lg  mx-auto overflow-y-auto">
+                                                                        <div @click.away="open = false" class=" w-[80%] max-h-[90vh] bg-white p-6 rounded-lg shadow-lg  mx-auto overflow-y-auto">
                                                                             <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
                                                                                 <p class="text-xl font-bold">Detailed Calculation of Work Hours</p>
                                                                                 <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>

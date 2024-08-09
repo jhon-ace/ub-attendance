@@ -159,10 +159,10 @@ class WorkingHourController extends Controller
                 'school_id' => 'required|exists:schools,id',
                 'department_id' => 'required|exists:departments,id',
                 'day_of_week' => 'required|integer|between:0,6', // Assuming 0 to 6 for Sunday to Saturday
-                // 'morning_start_time' => 'required|date_format:H:i',
-                // 'morning_end_time' => 'required|date_format:H:i',
-                // 'afternoon_start_time' => 'required|date_format:H:i',
-                // 'afternoon_end_time' => 'required|date_format:H:i',
+                'morning_start_time' => 'nullable',
+                'morning_end_time' => 'nullable',
+                'afternoon_start_time' => 'nullable',
+                'afternoon_end_time' => 'nullable',
             ]);
 
             // Find the existing record by $id
@@ -206,8 +206,7 @@ class WorkingHourController extends Controller
                 return redirect()->route('admin.workinghour.index')
                     ->with('error', ucfirst($dayName) . ' schedule already exists for this department.');
             }
-
-            // Update the fields
+   
             $working_hour->school_id = $request->input('school_id');
             $working_hour->department_id = $request->input('department_id');
             $working_hour->day_of_week = $request->input('day_of_week');

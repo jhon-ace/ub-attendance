@@ -44,17 +44,26 @@ class PublicPageController extends Controller
             // $curdateDataIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)->get();
             // $curdateDataOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)->get();
 
+            // $curdateDataIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)
+            //     ->whereHas('employee.department', function($query) {
+            //         $query->where('department_abbreviation', 'NOT LIKE', '%VDT%');
+            //     })
+            //     ->orderBy('check_in_time', 'asc') // Order by check_in_time in descending order
+            //     ->get();
+
             $curdateDataIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $current_date)
                 ->whereHas('employee.department', function($query) {
                     $query->where('department_abbreviation', 'NOT LIKE', '%VDT%');
                 })
-                ->orderBy('check_in_time', 'asc') // Order by check_in_time in descending order
+                ->whereNotIn('status', ['On Leave', 'Official Travel']) // Exclude records with status 'On Leave' or 'Official Travel'
+                ->orderBy('check_in_time', 'asc') // Order by check_in_time in ascending order
                 ->get();
 
             $curdateDataOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $current_date)
                 ->whereHas('employee.department', function($query) {
                     $query->where('department_abbreviation', 'NOT LIKE', '%VDT%');
                 })
+                ->whereNotIn('status', ['On Leave', 'Official Travel'])
                 ->orderBy('check_out_time', 'asc') // Order by check_out_time in descending order
                 ->get();
 
@@ -304,6 +313,7 @@ class PublicPageController extends Controller
                     ->whereHas('employee.department', function($query) {
                         $query->where('department_abbreviation', 'LIKE', '%VDT%');
                     })
+                    ->whereNotIn('status', ['On Leave', 'Official Travel'])
                     ->orderBy('check_in_time', 'asc') // Order by check_in_time in descending order
                     ->get();
 
@@ -311,6 +321,7 @@ class PublicPageController extends Controller
                     ->whereHas('employee.department', function($query) {
                         $query->where('department_abbreviation', 'LIKE', '%VDT%');
                     })
+                    ->whereNotIn('status', ['On Leave', 'Official Travel'])
                     ->orderBy('check_out_time', 'asc') // Order by check_out_time in descending order
                     ->get();
 
