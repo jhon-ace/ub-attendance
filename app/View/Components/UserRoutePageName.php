@@ -45,7 +45,8 @@ class UserRoutePageName extends Component
                 'admin.attendance.student_attendance' => __('Admin - Student Attendance'),
                 'admin.attendance.employee_attendance.payroll' =>  __('Admin Manage Attendance for Payroll'),
                 'admin.attendance.employee_attendance.portal' => __('Employee Attendance Portal'),
-                
+                'admin.attendance.gracePeriodSet' => __('Admin - Attendance Grace Period'),
+                'admin.attendance.holiday' => __('Admin - Add Holiday'),
 
                 
             ];

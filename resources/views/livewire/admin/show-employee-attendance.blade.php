@@ -251,7 +251,7 @@
                                         Modify Date for Approved Leave / Official Travel
                                     </button>
                                 </div>
-                                <div class="flex justify-end">
+                                <!-- <div class="flex justify-end">
                                     <button 
                                         @click="tab = 'period'"
                                         :class="{ 'bg-blue-500 text-white': tab === 'period', 'border border-gray-500': tab !== 'period' }"
@@ -259,7 +259,7 @@
                                     >
                                         Set Grace Period
                                     </button>
-                                </div>
+                                </div> -->
                             </div>
 
                             <!-- Tab content -->
@@ -1422,6 +1422,60 @@
                                                         $lateDurationPM == 0 &&
                                                         $am == 0 &&
                                                         $pm == 0 &&
+                                                        ($totalHoursAM > 0 &&
+                                                        $totalMinutesAM > 0 ||
+                                                        $totalHoursPM == 0 &&
+                                                        $totalMinutesPM == 0) &&
+                                                        $modify_status == "Official Travel"
+                                                    ) {
+                                                        $remarkss = 'Official Travel';
+                                                    }
+                                                    
+                                                    
+                                                    else if (
+                                                        $lateDurationAM == 0 &&
+                                                        $lateDurationPM == 0 &&
+                                                        $am == 0 &&
+                                                        $pm == 0 &&
+                                                        ($totalHoursAM > 0 &&
+                                                        $totalMinutesAM > 0 ||
+                                                        $totalHoursPM == 0 &&
+                                                        $totalMinutesPM == 0) &&
+                                                        $modify_status == "On Leave"
+                                                    ) {
+                                                        $remarkss = 'On Leave';
+                                                    }
+                                                     else if (
+                                                        $lateDurationAM == 0 &&
+                                                        $lateDurationPM == 0 &&
+                                                        $am == 0 &&
+                                                        $pm == 0 &&
+                                                        ($totalHoursAM == 0 &&
+                                                        $totalMinutesAM == 0 ||
+                                                        $totalHoursPM > 0 &&
+                                                        $totalMinutesPM > 0) &&
+                                                        $modify_status == "Official Travel"
+                                                    ) {
+                                                        $remarkss = 'Official Travel';
+                                                    }
+                                                    else if (
+                                                        $lateDurationAM == 0 &&
+                                                        $lateDurationPM == 0 &&
+                                                        $am == 0 &&
+                                                        $pm == 0 &&
+                                                        ($totalHoursAM == 0 &&
+                                                        $totalMinutesAM == 0 ||
+                                                        $totalHoursPM > 0 &&
+                                                        $totalMinutesPM > 0) &&
+                                                        $modify_status == "On Leave"
+                                                    ) {
+                                                        $remarkss = 'On Leave';
+                                                    }
+                                                    else if (
+                                                        $lateDurationAM == 0 &&
+                                                        $lateDurationPM == 0 &&
+                                                        $am == 0 &&
+                                                        $pm == 0 &&
                                                         $totalHoursAM > 0 &&
                                                         $totalMinutesAM == 0 &&
                                                         $totalHoursPM > 0 &&
@@ -1505,14 +1559,13 @@
 
                                         <!-- Form 1 -->
                                         <div x-show="activeTab === 'form1'" class="w-full">
-                                            <form action="{{ route('admin.attendance.modify') }}" method="POST" class="w-full">
+                                            <form action="{{ route('admin.attendance.modify.halfDay') }}" method="POST" class="w-full">
                                                 <x-caps-lock-detector />
                                                 @csrf
 
                                                 <br>
                                                 <p class="text-[14px]">
-                                                    <text class="text-red-500">Note:</text> For half day leave, select the date and time based on its working hour.
-                                                                                              <br><text class="ml-10"></text>Check the box where am or pm duration is not set.
+                                                    <text class="text-red-500">Note:</text> The half day leave is same to full day leave if the working hours is not half day.
                                                 </p>
                                                 <br>
                                                 <div class="mb-2 hidden">
@@ -1535,111 +1588,22 @@
                                                         wire:model = "selected_date"
                                                     >
 
-                                                    <label for="day-of-week" class="block mb-2 text-left">Day of the Week:</label>
-                                                    <input 
-                                                        type="text" 
-                                                        id="day-of-week" 
-                                                        name="day_of_week" 
-                                                        class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full"
-                                                        x-model="dayOfWeekNumber"
-                                                        readonly
-                                                        wire:model="dayOfTheWeek"
-                                                    >
+                                                    <div class="">
+                                                        <label for="day-of-week" class="block mb-2 text-left">Day of the Week:</label>
+                                                        <input 
+                                                            type="text" 
+                                                            id="day-of-week" 
+                                                            name="day_of_week" 
+                                                            class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full"
+                                                            x-model="dayOfWeekNumber"
+                                                            readonly
+                                                            wire:model="dayOfTheWeek"
+                                                        >
+                                                    </div>
 
                                                 </div>
                                                     
-                                                <div class="mb-2">
-                                                    <label class="block text-gray-700 text-md font-bold mb-2">Set Working Hours</label>
-                                                    <div class="flex mb-2">
-                                                        <div x-data="{ isDisabled: false }" class="w-1/2 pr-2">
-                                                            <!-- Checkbox to toggle input type -->
-                                                            <input type="checkbox" id="toggleCheckbox" x-model="isDisabled" class="mr-2">
-                                                            <label for="toggleCheckbox" class="text-gray-700 text-sm font-bold">No Time In AM</label>
-
-                                                            <label for="morning_start_time" class="block text-gray-700 text-sm font-bold mb-2">Morning Start Time</label>
-                                                            
-                                                            <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
-                                                        
-                                                            <input 
-                                                                :type="isDisabled ? 'text' : 'time'" 
-                                                                name="morning_start_time" 
-                                                                id="morning_start_time" 
-                                                                :value="isDisabled ? '' : '{{ $departmentWorkingHour->morning_start_time ?? '' }}'"
-                                                                :disabled="isDisabled" 
-                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_start_time') is-invalid @enderror"
-                                                            >
-                                                            
-                                                            <x-input-error :messages="$errors->get('morning_start_time')" class="mt-2" />
-
-
-                                                        </div>
-
-                                                           
-                                                        <div x-data="{ isDisabled: false }" class="w-1/2 pl-2">
-                                                            <!-- Checkbox to toggle input type -->
-                                                            <input type="checkbox" id="toggleCheckboxMorningEnd" x-model="isDisabled" class="mr-2 text-left">
-                                                            <label for="toggleCheckboxMorningEnd" class="text-gray-700 text-sm font-bold mb-2">No Time Out AM</label>
-
-                                                            <label for="morning_end_time" class="block text-gray-700 text-sm font-bold mb-1">Morning End Time</label>
-                                                            
-                                                            <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
-                                                            <input 
-                                                                :type="isDisabled ? 'text' : 'time'" 
-                                                                name="morning_end_time" 
-                                                                id="morning_end_time" 
-                                                                :value="isDisabled ? '' : ''" 
-                                                                :disabled="isDisabled" 
-                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('morning_end_time') is-invalid @enderror"
-                                                            >
-                                                            
-                                                            <x-input-error :messages="$errors->get('morning_end_time')" class="mt-2" />
-                                                        </div>
-
-                                                    </div>
-                                                    
-                                                    <div class="flex">
-                                                        <div x-data="{ isDisabled: false }" class="w-1/2 pr-2">
-                                                            <!-- Checkbox to toggle input type -->
-                                                            <input type="checkbox" id="toggleCheckboxPMStart" x-model="isDisabled" class="mr-2">
-                                                            <label for="toggleCheckboxPMStart" class="text-gray-700 text-sm font-bold">No Time In PM</label>
-
-                                                            <label for="afternoon_start_time" class="block text-gray-700 text-sm font-bold mb-2">Afternoon Start Time</label>
-                                                            
-                                                            <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
-                                                            <input 
-                                                                :type="isDisabled ? 'text' : 'time'" 
-                                                                name="afternoon_start_time" 
-                                                                id="afternoon_start_time" 
-                                                                :value="isDisabled ? '' : ''" 
-                                                                :disabled="isDisabled" 
-                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_start_time') is-invalid @enderror"
-                                                            >
-                                                            
-                                                            <x-input-error :messages="$errors->get('afternoon_start_time')" class="mt-2" />
-                                                        </div>
-
-                                                            
-                                                        <div x-data="{ isDisabled: false }" class="w-1/2 pl-2">
-                                                            <!-- Checkbox to toggle input type -->
-                                                            <input type="checkbox" id="toggleCheckboxPMEnd" x-model="isDisabled" class="mr-2 text-left">
-                                                            <label for="toggleCheckboxPMEnd" class="text-gray-700 text-sm font-bold mb-2">No Time Out PM</label>
-
-                                                            <label for="afternoon_end_time" class="block text-gray-700 text-sm font-bold mb-1">Afternoon End Time</label>
-                                                            
-                                                            <!-- Input field with dynamic type, disabled state, and value based on checkbox state -->
-                                                            <input 
-                                                                :type="isDisabled ? 'text' : 'time'" 
-                                                                name="afternoon_end_time" 
-                                                                id="afternoon_end_time" 
-                                                                :value="isDisabled ? '' : ''" 
-                                                                :disabled="isDisabled" 
-                                                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('afternoon_end_time') is-invalid @enderror"
-                                                            >
-                                                            
-                                                            <x-input-error :messages="$errors->get('afternoon_end_time')" class="mt-2" />
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                
                                                 <div class="mb-2">
                                                     <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Status: </label>
                                                     <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline" required>
@@ -1928,7 +1892,7 @@
                                                             <div class="flex justify-center items-center space-x-2 p-2 z-50">
                                                                 <div x-data="{ open: false }">
                                                                     <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
-                                                                        <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> View
+                                                                        <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> View Calculation
                                                                     </a>
                                                                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                                                         <div @click.away="open = false" class=" w-[80%] max-h-[90vh] bg-white p-6 rounded-lg shadow-lg  mx-auto overflow-y-auto">
@@ -2771,7 +2735,7 @@
                                     </div>
                                 </div> 
                             </div>
-                            <div x-show="tab === 'period'" class="w-full">
+                            <div x-show="tab === 'peridod'" class="w-full">
                                 <div class="flex justify-center mt-8 w-full">
                                     <div class="w-[50%] flex justify-center mb-4 mx-auto">
                                         @if($gracePeriod->isNotEmpty())
@@ -2796,7 +2760,7 @@
                                                                         </a>
                                                                         <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                                                             <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
-                                                                                <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
+                                                                                <div class="flex justify-between items-start pb-3"> 
                                                                                     <p class="text-xl font-bold">Edit Grace Period</p>
                                                                                     <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                                                 </div>

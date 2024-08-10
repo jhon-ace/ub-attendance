@@ -599,6 +599,119 @@ public function submitPortalTimeOut(Request $request)
 
 
 
+    public function modifyAttendanceHalfDay(Request $request)
+    {
+        $validatedData = $request->validate([
+            'selected_date' => 'required|date',
+            'status' => 'required|string',
+            'employee_id' => 'required|integer',
+            'day_of_week' => 'required|integer',
+        ]);
+
+      
+        $employee_id = $validatedData['employee_id'];
+        $employees = Employee::where('id', $employee_id)->first();
+
+        if ($employees) {
+            $dateOnly = Carbon::parse($validatedData['selected_date'])->format('Y-m-d');
+            $dayOfWeek = Carbon::parse($validatedData['selected_date'])->dayOfWeek;
+    
+            // Check if there are already 2 check-in and 2 check-out records for the employee on the selected date
+            $checkInCount = EmployeeAttendanceTimeIn::where('employee_id', $employee_id)
+                ->whereDate('check_in_time', $dateOnly)
+                ->count();
+
+            $checkOutCount = EmployeeAttendanceTimeOut::where('employee_id', $employee_id)
+                ->whereDate('check_out_time', $dateOnly)
+                ->count();
+
+            // if ($checkInCount == 0 && $checkOutCount == 0) {
+                $currentDayOfWeek = now()->dayOfWeek;
+
+                // Retrieve the DepartmentWorkingHour record for the current department and day of the week
+                $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $employees->department_id)
+                    ->where('day_of_week', $dayOfWeek)
+                    ->first();
+
+
+                if($checkInCount == 0 && $checkOutCount == 0){
+
+                    //morning & afternoon start time/time-in
+                    $attendanceInAm = new EmployeeAttendanceTimeIn();
+                    $attendanceInAm->employee_id = $employees->id;
+                    if($departmentWorkingHour){
+                        if($departmentWorkingHour->morning_start_time) {
+                            $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_start_time;
+                        } else {
+                            $attendanceInAm->check_in_time = $validatedData['selected_date'];
+                        } 
+                    }else {
+                        $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' 00:00:00';
+                    }
+                    $attendanceInAm->status = $validatedData['status'];
+                    $attendanceInAm->save();
+
+                     $attendanceOutAm = new EmployeeAttendanceTimeOut();
+                    $attendanceOutAm->employee_id = $employees->id;
+                    if($departmentWorkingHour){
+                        if($departmentWorkingHour->morning_end_time){
+                            $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->morning_end_time;
+                        } else {
+                            $attendanceOutAm->check_out_time = $validatedData['selected_date'];
+                        }
+                    } else {
+                        $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' 00:00:00';
+                    }
+                    $attendanceOutAm->status = $validatedData['status'];
+                    $attendanceOutAm->save();
+
+                
+
+                
+                    //morning & afternoon end time/time-out
+                    $attendanceInAm = new EmployeeAttendanceTimeIn();
+                    $attendanceInAm->employee_id = $employees->id;
+                    if($departmentWorkingHour){
+                        if($departmentWorkingHour->afternoon_start_time){
+                            $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_start_time;
+                        } else {
+                            $attendanceInAm->check_in_time = $validatedData['selected_date'];
+                        }
+                    }else {
+                        $attendanceInAm->check_in_time = $validatedData['selected_date'] . ' 00:00:00';
+                    }
+                    $attendanceInAm->status = $validatedData['status'];
+                    $attendanceInAm->save();
+
+                    $attendanceOutAm = new EmployeeAttendanceTimeOut();
+                    $attendanceOutAm->employee_id = $employees->id;
+                    if($departmentWorkingHour){
+                        if($departmentWorkingHour->afternoon_end_time){
+                            $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' ' . $departmentWorkingHour->afternoon_end_time;
+                        } else {
+                            $attendanceOutAm->check_out_time = $validatedData['selected_date'];
+                        }
+                        
+                    } else {
+                        $attendanceOutAm->check_out_time = $validatedData['selected_date'] . ' 00:00:00';
+                    }
+                    $attendanceOutAm->status = $validatedData['status'];
+                    $attendanceOutAm->save();
+
+                } 
+
+
+                if($checkInCount == 2 && $checkOutCount == 2){
+                    return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Cannot modify date: check-in and check-out records exist.');
+                }
+
+                return redirect()->route('admin.attendance.employee_attendance')->with('success', 'Date Successfully modified!');
+
+        }
+
+        return redirect()->route('admin.attendance.employee_attendance')->with('error', 'Employee not found.');
+    }
+
 
     public function attendanceTimeInUpdate(Request $request, string $id){
             
@@ -894,6 +1007,97 @@ public function submitPortalTimeOut(Request $request)
     }
 
 
+    public function storePeriodView()
+    {
+        $gracePeriod = GracePeriod::all();
+        return view('Admin.graceperiod.index', compact('gracePeriod'));
+    }
+
+    public function holiday()
+    {
+        return view('Admin.holiday.index');
+    }
+
+    public function setHoliday(Request $request)
+    {
+        // Validate the selected date
+        $validatedData = $request->validate([
+            'selected_date' => 'required|date',
+        ]);
+
+        // Set the current date from the validated data
+        $currentDate = $validatedData['selected_date'];
+        $dayOfWeek = \Carbon\Carbon::parse($currentDate)->dayOfWeek;
+        
+        // Retrieve all employees
+        $employees = Employee::all();
+       
+        foreach ($employees as $employee) {
+            $employeeId = $employee->id;
+            $departmentId = $employee->department_id;
+
+            // Fetch the working hour for the department on the selected day
+            $departmentWorkingHour = DepartmentWorkingHour::where('day_of_week', $dayOfWeek)  
+                ->first();
+
+
+
+            // Check if there are check-in or check-out records for the current date
+            $hasCheckIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $currentDate)
+                ->where('employee_id', $employeeId)
+                ->exists();
+
+            $hasCheckOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $currentDate)
+                ->where('employee_id', $employeeId)
+                ->exists();
+
+            // Determine the status based on the day of the week
+            $status = "Holiday";
+
+            // Create missing check-in record if none exists
+            if (!$hasCheckIn) {
+                $attendance = new EmployeeAttendanceTimeIn();
+                $attendance->employee_id = $employeeId;
+                $attendance->check_in_time = "{$currentDate} {$departmentWorkingHour->morning_start_time}";
+                $attendance->status = $status;
+                $attendance->save();
+
+                // Duplicate record creation as per your request
+                $attendance = new EmployeeAttendanceTimeIn();
+                $attendance->employee_id = $employeeId;
+                $attendance->check_in_time = "{$currentDate} {$departmentWorkingHour->afternoon_start_time}";
+                $attendance->status = $status;
+                $attendance->save();
+
+                // $this->info("Created missing check-in record for employee ID {$employeeId}.");
+            } 
+            // else {
+            //     $this->info("Check-in record already exists for employee ID {$employeeId}.");
+            // }
+
+            // Create missing check-out record if none exists
+            if (!$hasCheckOut) {
+                $attendance = new EmployeeAttendanceTimeOut();
+                $attendance->employee_id = $employeeId;
+                $attendance->check_out_time = "{$currentDate} {$departmentWorkingHour->morning_end_time}";
+                $attendance->status = $status;
+                $attendance->save();
+
+                // Duplicate record creation as per your request
+                $attendance = new EmployeeAttendanceTimeOut();
+                $attendance->employee_id = $employeeId;
+                $attendance->check_out_time = "{$currentDate} {$departmentWorkingHour->afternoon_end_time}";
+                $attendance->status = $status;
+                $attendance->save();
+            }
+
+            //     $this->info("Created missing check-out record for employee ID {$employeeId}.");
+            // } else {
+            //     $this->info("Check-out record already exists for employee ID {$employeeId}.");
+            // }
+        }
+         return back()->with('success', 'Holiday date implemented to attendances.');
+    }
 
 
 }

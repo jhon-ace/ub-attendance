@@ -152,6 +152,41 @@
                         </li>
                     </ul>
                 </li>
+                <li x-data="{ open: {{ request()->routeIs('admin.attendance.gracePeriodSet') || request()->routeIs('admin.attendance.holiday') ? 'true'  : 'false' }} }">
+                    <a @click="open = !open" class="w-full cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
+                        <span class="inline-flex justify-center items-center ml-3">
+                            <i class="fa-solid fa-cogs text-gray-200"></i>
+                        </span>
+                        <span class="text-sm tracking-wide truncate text-gray-200 ml-2">Settings</span>
+                        <span class="ml-auto">
+                            <svg fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
+                                <path x-show="!open" fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                <path x-show="open" fill-rule="evenodd" d="M14.707 10.707a1 1 0 01-1.414 0L10 7.414 6.707 10.707a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
+                    </a>
+                    <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1 w-full">
+                        <li>
+                            <a href="{{ route('admin.attendance.gracePeriodSet') }}" class="w-[500px] flex items-center h-11 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                            {{ request()->routeIs('admin.attendance.gracePeriodSet') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Set Grace Period
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.attendance.holiday') }}" class=" w-full flex items-center  h-16 pl-4  text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                           {{ request()->routeIs('admin.attendance.holiday') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Set Holiday Date
+                            </a>
+                        </li>
+                        <li>
+                            <a href="" class=" w-full flex items-center  h-16 pl-4  text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                            ">
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Change Password
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </li>
                 <!-- <li x-data="{ open: false }">
                     <a @click="open = !open" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
                         <span class="inline-flex justify-center items-center ml-4">

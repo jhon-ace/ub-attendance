@@ -112,8 +112,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/attendance/time-out/portal', [EmployeeAttendanceController::class, 'portalTimeOut'])->name('attendance.time-out.portal');
 
         Route::post('/attendance/time-in/portal', [EmployeeAttendanceController::class, 'submitPortalTimeIn'])->name('attendance.time-in.store');
-        Route::post('/attendance/time-out/portal', [EmployeeAttendanceController::class, 'submitPortalTimeOut'])->name('attendance.time-out.store');       
-         Route::post('/attendance/modify', [EmployeeAttendanceController::class, 'modifyAttendance'])->name('attendance.modify');       
+        Route::post('/attendance/time-out/portal', [EmployeeAttendanceController::class, 'submitPortalTimeOut'])->name('attendance.time-out.store');   
+
+        Route::post('/attendance/modify', [EmployeeAttendanceController::class, 'modifyAttendance'])->name('attendance.modify');
+        Route::post('/attendance/modify/halfday', [EmployeeAttendanceController::class, 'modifyAttendanceHalfDay'])->name('attendance.modify.halfDay');   
+           
         //Student Attendance routes
         Route::get('/students/attendance', [EmployeeAttendanceController::class, 'student'])->name('attendance.student_attendance');
 
@@ -146,8 +149,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/setGracePeriod', [EmployeeAttendanceController::class, 'storePeriod'])->name('attendance.gracePeriod');
         Route::put('/setGracePeriod/update/{id}', [EmployeeAttendanceController::class, 'updatePeriod'])->name('attendance.gracePeriod.update');
         Route::delete('/deletePeriod/{id}', [EmployeeAttendanceController::class, 'deletePeriod'])->name('attendance.gracePeriod.delete');
-
-
+        //settings nav route
+        Route::get('/setGracePeriodSet', [EmployeeAttendanceController::class, 'storePeriodView'])->name('attendance.gracePeriodSet');
+        Route::get('/setAttendanceHoliday', [EmployeeAttendanceController::class, 'holiday'])->name('attendance.holiday');
+        Route::post('/setHoliday', [EmployeeAttendanceController::class, 'setHoliday'])->name('attendance.setHoliday');
 
 
 
