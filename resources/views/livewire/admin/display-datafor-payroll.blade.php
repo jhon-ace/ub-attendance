@@ -642,6 +642,17 @@
                                                     $overallminutes = floor(($totalSecondsWorked % 3600) / 60);
                                                     $overallseconds = $totalSecondsWorked % 60;
 
+                                                    if ($overallseconds == 59) {
+                                                        $overallminutes += 1;
+                                                        $overallseconds = 0;
+                                                    }
+
+                                                    // If minutes exceed 59, convert to hours
+                                                    if ($overallminutes >= 60) {
+                                                        $overallhours += floor($overallminutes / 60);
+                                                        $overallminutes = $overallminutes % 60;
+                                                    }
+
                                                     $formattedTimeWorked = 
                                                         ($overallhours > 0 ? "{$overallhours} hr/s, " : '0 hr/s, ') .
                                                         ($overallminutes > 0 ? "{$overallminutes} min/s " : '0 min/s, ') .
@@ -718,6 +729,18 @@
                                                     $absentMinutes = floor($remainingSeconds / 60);
                                                     $absentSeconds = $remainingSeconds % 60;
 
+                                                    // If seconds are 59, round up the minutes
+                                                    if ($absentSeconds == 59) {
+                                                        $absentMinutes += 1;
+                                                        $absentSeconds = 0;
+                                                    }
+
+                                                    // If minutes are 60, convert them to an hour
+                                                    if ($absentMinutes == 60) {
+                                                        $absentHours += 1;
+                                                        $absentMinutes = 0;
+                                                    }
+
                                                     // Format the absence time
                                                     $absentFormatted = 
                                                         ($absentHours > 0 ? "{$absentHours} hr/s" : '') .
@@ -726,8 +749,9 @@
                                                         (($absentMinutes > 0 && $absentSeconds > 0) ? " " : '') . 
                                                         ($absentSeconds > 0 ? "{$absentSeconds} sec" : ($absentHours <= 0 && $absentMinutes <= 0 ? ' 0 ' : ''));
 
-                                                    // Add the comma and space between the valuesdcd
+                                                    // Add the comma and space between the values
                                                     $absentFormatted = trim($absentFormatted, ', ');
+
 
 
                                                     $finalDeduction = $totalSecondsM + $undertimeInSeconds + $absentSecondss;
@@ -761,7 +785,7 @@
                                                     <td class="text-black border border-black">{{ $finalHourDeductionFormatted }}</td>
                                                     <td class="text-black border border-black">{{ $lateFormatted }}</td>
                                                     <td class="text-black border border-black">{{ $undertimeFormatted }}</td>
-                                                    <td class="text-black border border-black">{{ $absentFormatted }}</td>
+                                                    <td class="text-black border border-black text-center">{{ $absentFormatted }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
