@@ -1015,9 +1015,6 @@
                                     'hours_late_overall' => 0,
                                     'hours_undertime_overall' => 0,
                                     'employee_idd' => $attendance->employee_idd,
-                                    'employee_lastname' => $attendance->employee_lastname,
-                                    'employee_firstname' => $attendance->employee_firstname,
-                                    'employee_middlename' => $attendance->employee_middlename,
                                     'uniqueDays' => []
                                 ];
                             }
@@ -1045,6 +1042,17 @@
                             $overallhours = floor($totalSecondsWorked / 3600);
                             $overallminutes = floor(($totalSecondsWorked % 3600) / 60);
                             $overallseconds = $totalSecondsWorked % 60;
+
+                            if ($overallseconds == 59) {
+                                $overallminutes += 1;
+                                $overallseconds = 0;
+                            }
+
+                            // If minutes exceed 59, convert to hours
+                            if ($overallminutes >= 60) {
+                                $overallhours += floor($overallminutes / 60);
+                                $overallminutes = $overallminutes % 60;
+                            }
 
                             $formattedTimeWorked = 
                                 ($overallhours > 0 ? "{$overallhours} hr/s, " : '0 hr/s, ') .
@@ -1122,6 +1130,18 @@
                             $absentMinutes = floor($remainingSeconds / 60);
                             $absentSeconds = $remainingSeconds % 60;
 
+                            // If seconds are 59, round up the minutes
+                            if ($absentSeconds == 59) {
+                                $absentMinutes += 1;
+                                $absentSeconds = 0;
+                            }
+
+                            // If minutes are 60, convert them to an hour
+                            if ($absentMinutes == 60) {
+                                $absentHours += 1;
+                                $absentMinutes = 0;
+                            }
+
                             // Format the absence time
                             $absentFormatted = 
                                 ($absentHours > 0 ? "{$absentHours} hr/s" : '') .
@@ -1130,8 +1150,9 @@
                                 (($absentMinutes > 0 && $absentSeconds > 0) ? " " : '') . 
                                 ($absentSeconds > 0 ? "{$absentSeconds} sec" : ($absentHours <= 0 && $absentMinutes <= 0 ? ' 0 ' : ''));
 
-                            // Add the comma and space between the valuesdcd
+                            // Add the comma and space between the values
                             $absentFormatted = trim($absentFormatted, ', ');
+
 
 
                             $finalDeduction = $totalSecondsM + $undertimeInSeconds + $absentSecondss;
@@ -1153,7 +1174,6 @@
 
                         <table class="border border-black" cellpadding="2">
                             <tr class="text-sm">
-                                <th class="border border-black text-center">Employee Name</th>
                                 <th class="border border-black text-center">Duty Hours To Be Rendered</th>
                                 <th class="border border-black text-center">Total Time Rendered</th>
                                 <th class="border border-black text-center">Total Time Deduction</th>
@@ -1162,14 +1182,7 @@
                                 <th class="border border-black text-center">Total Absent</th>
                             </tr>
                                 <tr class="border border-black text-sm">
-                                <!-- <td class="text-black border border-black text-center">
-                                    {{ $employeeData['employee_idd'] }}
-                                </td> -->
-                                <td class="text-black border border-black">
-                                    {{ $employeeData['employee_lastname'] }},
-                                    {{ $employeeData['employee_firstname'] }},
-                                    {{ $employeeData['employee_middlename'] }}
-                                </td>
+
                                 <td class="text-black border border-black">{{ $totalFormatted }}  from ({{ $attendanceDaysCount }} days total hour)</td>
                                 <td class="text-black border border-black">{{$formattedTimeWorked}}</td>
                                 <td class="text-black border border-black">{{ $finalHourDeductionFormatted }}</td>
