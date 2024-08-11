@@ -1422,6 +1422,19 @@
                                                         $lateDurationPM == 0 &&
                                                         $am == 0 &&
                                                         $pm == 0 &&
+                                                        $totalHoursAM > 0 &&
+                                                        $totalMinutesAM == 0 &&
+                                                        $totalHoursPM > 0 &&
+                                                        $totalMinutesPM == 0 &&
+                                                        $modify_status == "Holiday"
+                                                    ) {
+                                                        $remarkss = 'Holiday';
+                                                    }
+                                                    else if (
+                                                        $lateDurationAM == 0 &&
+                                                        $lateDurationPM == 0 &&
+                                                        $am == 0 &&
+                                                        $pm == 0 &&
                                                         ($totalHoursAM > 0 &&
                                                         $totalMinutesAM > 0 ||
                                                         $totalHoursPM == 0 &&
@@ -1512,7 +1525,8 @@
                                                                 $remarkss = 'Present - Late AM';
                                                             } elseif ($lateDurationPM > 0) {
                                                                 $remarkss = 'Present - Late PM';
-                                                            } else {
+                                                            }
+                                                             else {
                                                                 $remarkss = "Present";
                                                             }
                                                         }
