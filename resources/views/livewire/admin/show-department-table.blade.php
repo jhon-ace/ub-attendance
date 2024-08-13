@@ -173,18 +173,7 @@
                                         @endif
                                     </button>
                                 </th>
-                                <th class="border border-gray-400 px-3 py-2">
-                                    <button wire:click="sortBy('department_id')" class="w-full h-full flex items-center justify-center">
-                                        Department ID
-                                        @if ($sortField == 'department_id')
-                                            @if ($sortDirection == 'asc')
-                                                &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                            @else
-                                                &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                            @endif
-                                        @endif
-                                    </button>
-                                </th>
+                                
                                 <th class="border border-gray-400 px-3 py-2">
                                     <button wire:click="sortBy('department_abbreviation')" class="w-full h-full flex items-center justify-center">
                                         Department Abbreviation
@@ -240,7 +229,7 @@
                             @foreach ($departments as $department)
                                 <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
                                     <td class="text-black border border-gray-400  ">{{ $department->id }}</td>
-                                    <td class="text-black border border-gray-400  ">{{ $department->department_id }}</td>
+                                    <!-- <td class="text-black border border-gray-400  ">{{ $department->department_id }}</td> -->
                                     <td class="text-black border border-gray-400">{{ $department->department_abbreviation}}</td>
                                     <td class="text-black border border-gray-400">{{ $department->department_name}}</td>
                                     <td class="text-black border border-gray-400">{{ $department->school->abbreviation}}</td>

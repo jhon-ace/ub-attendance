@@ -103,7 +103,6 @@
         
         <h2 class="uppercase font-bold text-3xl">Current Date Employee Attendance Monitoring
                     @if(Auth::user()->hasRole('employee'))
-            <div class="flex mx-auto bg-black"><h1>hi</h1></div>
 @endif
         </h2>
         <p>
