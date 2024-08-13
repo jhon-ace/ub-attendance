@@ -976,6 +976,9 @@ class DisplayDataforPayroll extends Component
                         $attendanceData[$key] = (object) [
                             'hours_perDay' => $totalHoursNeedperDay,
                             'employee_id' => $attendance->employee_id,
+                            'employee_lastname' => $employeeLastname,
+                            'employee_firstname' => $employeeFirstname,
+                            'employee_middlename' => $employeeMiddlename,
                             'worked_date' => $checkInDate,
                             'hours_workedAM' => $hoursWorkedAM,
                             'hours_workedPM' => $hoursWorkedPM,

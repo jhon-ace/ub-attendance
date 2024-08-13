@@ -778,7 +778,7 @@
                                                     <td class="text-black border border-black">
                                                         {{ $employeeData['employee_lastname'] }},
                                                         {{ $employeeData['employee_firstname'] }},
-                                                        {{ $employeeData['employee_middlename'] }}
+                                                        {{ $employeeData['employee_middlename'][2] }}
                                                     </td>
                                                     <td class="text-black border border-black">{{ $totalFormatted }}  from ({{ $attendanceDaysCount }} days worked)</td>
                                                     <td class="text-black border border-black">{{$formattedTimeWorked}}</td>
