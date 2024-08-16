@@ -606,8 +606,8 @@
                                             
                                             <p class="py-4">Start Date: No selected &nbsp;&nbsp;End Date: No selected</p>
                                             <div class="">
-                                                <button wire:click="generateExcel" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                    <i class="fa-solid fa-file"></i> Export to Excel
+                                                <button wire:click="generateExcelPayroll" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                    <i class="fa-solid fa-file"></i> Export to Excel - Payroll
                                                 </button>
                                                 <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                     <i class="fa-solid fa-file"></i> Generate DTR | PDF
@@ -634,7 +634,6 @@
                                             @foreach($employees as $employeeId => $employeeData)
                                             
                                                 @php
-                                                
                                                     // Total hours
                                                     $totalSeconds = $employeeData['totalHours'] * 3600;
                                                     $hours = floor($totalSeconds / 3600);
@@ -773,7 +772,7 @@
                                                         ($finalHourDeductionMinutes > 0 ? "{$finalHourDeductionMinutes} min/s " : '0 min/s, ') .
                                                         ($finalHourDeductionSeconds > 0 ? "{$finalHourDeductionSeconds} sec" : '0 sec');
                                                     
-                                                   
+
                                                 @endphp
 
                                                 <tr class="border border-black text-xs">
@@ -795,7 +794,7 @@
                                                         <div class="flex justify-center items-center space-x-2 p-2 z-50">
                                                                 <div x-data="{ open: false }">
                                                                     <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
-                                                                        <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> View Calculation {{ $employeeData['employee_id'] }}
+                                                                        <i class="fa-solid fa-eye fa-xs" style="color: #ffffff;"></i> View Records
                                                                     </a>
                                                                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                                                         <div @click.away="open = false" class=" w-[85%] max-h-[90vh] bg-white p-6 rounded-md shadow-lg  mx-auto overflow-y-auto">
