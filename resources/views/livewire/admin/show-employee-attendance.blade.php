@@ -850,7 +850,7 @@
                                                                             <p>No PM check-in</p>
                                                                         @endif
                                                                 @else
-                                                                    <p>No Check-Ins</p>
+                                                                    <p>No Check-Outs</p>
                                                                 @endif
                                                             @endif
                                                         @endforeach
@@ -1182,81 +1182,106 @@
                                                             
                                                 </td>
                                                 <td class="text-black border border-gray-400 px-3 py-2">
-
+                                                        <!-- total deduction -->
                                                     @php
-                                                        // Total late time in minutes as a decimal
-                                                        $totalLateMinutesDecimal = $attendance->total_late;
+                                                        
 
-                                                        // Total undertime in minutes
-                                                        $am = $attendance->undertimeAM;
-                                                        $pm = $attendance->undertimePM;
-                                                        $totalUndertimeInMinutes = $am + $pm;
-
-                                                        // Combine late and undertime in minutes
-                                                        $totalMinutes = $totalLateMinutesDecimal + $totalUndertimeInMinutes;
-
-                                                        // Convert total minutes to total seconds
-                                                        $totalSeconds = $totalMinutes * 60;
-
-                                                        // Convert total seconds to hours, minutes, and seconds
-                                                        $totalHours = intdiv($totalSeconds, 3600); // Total hours
-                                                        $remainingSeconds = $totalSeconds % 3600; // Remaining seconds after hours
-                                                        $totalMinutes = intdiv($remainingSeconds, 60); // Total minutes
-                                                        $totalSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
-
-                                                        // Format the duration string for total deduction
-                                                        if ($totalMinutes > 0 || $totalLateMinutesDecimal > 0 || $totalUndertimeInMinutes > 0) {
-                                                            $totalDurationFormatted = 
-                                                                ($totalHours > 0 ? "{$totalHours} hr/s, " : '') .
-                                                                ($totalMinutes > 0 ? "{$totalMinutes} min/s, " : '0 min/s ') .
-                                                                ($totalSeconds > 0 ? "{$totalSeconds} sec" : '0 sec');
-                                                        } else {
-                                                            $totalDurationFormatted = '0';
-                                                        }
-
-                                                        // Total hours worked in decimal format
                                                         $totalHoursWorked = $attendance->total_hours_worked;
-                                                        
-                                                        // Calculate hours and minutes
-                                                        $totalHours = floor($totalHoursWorked);
-                                                        $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
-                                                        
-                                                        // Calculate the final hours, minutes, and seconds
-                                                        $finalMinutes = floor($totalMinutes);
-                                                        $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
-                                                        $finalSeconds = round($totalSeconds);
-                                                        
-                                                        // Handle case where seconds is 60
-                                                        if ($finalSeconds == 60) {
-                                                            $finalSeconds = 0;
-                                                            $finalMinutes += 1;
-                                                        }
-                                                        
-                                                        // Handle case where minutes exceed 59
-                                                        if ($finalMinutes >= 60) {
-                                                            $finalMinutes = 0;
-                                                            $totalHours += 1;
-                                                        }
 
-                                                        // Format the duration string for total hours worked
-                                                        if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
-                                                            $totalHoursWorkedFormatted = 'No total hours';
-                                                        } else {
-                                                            $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
-                                                        }
-
-                                                        // Use hours_perDay if totalHoursWorkedFormatted is 'No total hours'
-                                                        if ($totalHoursWorkedFormatted === 'No total hours') {
-                                                            $hoursPerDay = $attendance->hours_perDay;
-                                                            $hours = floor($hoursPerDay);
-                                                            $minutes = floor(($hoursPerDay - $hours) * 60);
-                                                            $seconds = round((((($hoursPerDay - $hours) * 60) - $minutes) * 60));
+                                                        if($totalHoursWorked == 0) {
                                                             
-                                                            $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
-                                                            $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
-                                                            $formattedSeconds = $seconds > 0 ? "{$seconds} sec" : '0 sec';
 
-                                                            $totalDurationFormatted = "{$formattedHours}, {$formattedMinutes}, {$formattedSeconds}";
+                                                            $am = $attendance->undertimeAM;
+                                                            $pm = $attendance->undertimePM;
+                                                            $totalUndertimeInMinutes = $am + $pm;
+
+                                                            $undertimeHours = floor($totalUndertimeInMinutes / 60);
+                                                            $undertimeMinutes = $totalUndertimeInMinutes % 60;
+                                                            $undertimeSeconds = round(($totalUndertimeInMinutes * 60) % 60);
+
+                                                            if($totalUndertimeInMinutes > 0){
+                                                                $totalDurationFormatted = "{$undertimeHours} hr/s, {$undertimeMinutes} min/s, {$undertimeSeconds} sec";
+                                                            } else{
+                                                                $totalDurationFormatted = 0;
+                                                            }
+                                                        }
+                                                        else {
+
+                                                            // Total late time in minutes as a decimal
+                                                            $totalLateMinutesDecimal = $attendance->total_late;
+
+                                                            // Total undertime in minutes
+                                                            $am = $attendance->undertimeAM;
+                                                            $pm = $attendance->undertimePM;
+                                                            $totalUndertimeInMinutes = $am + $pm;
+                                                           
+                                                            
+                                                            // Combine late and undertime in minutes
+                                                            $totalMinutes = $totalLateMinutesDecimal + $totalUndertimeInMinutes;
+
+                                                            // Convert total minutes to total seconds
+                                                            $totalSeconds = $totalMinutes * 60;
+
+                                                            // Convert total seconds to hours, minutes, and seconds
+                                                            $totalHours = intdiv($totalSeconds, 3600); // Total hours
+                                                            $remainingSeconds = $totalSeconds % 3600; // Remaining seconds after hours
+                                                            $totalMinutes = intdiv($remainingSeconds, 60); // Total minutes
+                                                            $totalSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
+
+                                                            // Format the duration string for total deduction
+                                                            if ($totalMinutes > 0 || $totalLateMinutesDecimal > 0 || $totalUndertimeInMinutes > 0) {
+                                                                $totalDurationFormatted = 
+                                                                    ($totalHours > 0 ? "{$totalHours} hr/s, " : '') .
+                                                                    ($totalMinutes > 0 ? "{$totalMinutes} min/s, " : '0 min/s ') .
+                                                                    ($totalSeconds > 0 ? "{$totalSeconds} sec" : '0 sec');
+                                                            } else {
+                                                                $totalDurationFormatted = '0';
+                                                            }
+
+                                                            // Total hours worked in decimal format
+                                                            $totalHoursWorked = $attendance->total_hours_worked;
+                                                            
+                                                            // Calculate hours and minutes
+                                                            $totalHours = floor($totalHoursWorked);
+                                                            $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
+                                                            
+                                                            // Calculate the final hours, minutes, and seconds
+                                                            $finalMinutes = floor($totalMinutes);
+                                                            $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
+                                                            $finalSeconds = round($totalSeconds);
+                                                            
+                                                            // Handle case where seconds is 60
+                                                            if ($finalSeconds == 60) {
+                                                                $finalSeconds = 0;
+                                                                $finalMinutes += 1;
+                                                            }
+                                                            
+                                                            // Handle case where minutes exceed 59
+                                                            if ($finalMinutes >= 60) {
+                                                                $finalMinutes = 0;
+                                                                $totalHours += 1;
+                                                            }
+
+                                                            // Format the duration string for total hours worked
+                                                            if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
+                                                                $totalHoursWorkedFormatted = 'No total hours';
+                                                            } else {
+                                                                $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
+                                                            }
+
+                                                            // Use hours_perDay if totalHoursWorkedFormatted is 'No total hours'
+                                                            if ($totalHoursWorkedFormatted === 'No total hours') {
+                                                                $hoursPerDay = $attendance->hours_perDay;
+                                                                $hours = floor($hoursPerDay);
+                                                                $minutes = floor(($hoursPerDay - $hours) * 60);
+                                                                $seconds = round((((($hoursPerDay - $hours) * 60) - $minutes) * 60));
+                                                                
+                                                                $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
+                                                                $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
+                                                                $formattedSeconds = $seconds > 0 ? "{$seconds} sec" : '0 sec';
+
+                                                                $totalDurationFormatted = "{$formattedHours}, {$formattedMinutes}, {$formattedSeconds}";
+                                                            }
                                                         }
                                                     @endphp
                                                     {{ $totalDurationFormatted }}
@@ -1497,11 +1522,12 @@
                                                     ) {
                                                         $remarkss = 'Official Travel';
                                                     }
+                                                    
                                                     else if (
                                                         $lateDurationAM == 0 &&
                                                         $lateDurationPM == 0 &&
-                                                        $am == 0 &&
-                                                        $pm == 0 &&
+                                                        ($am == 0 || $am > 0) &&
+                                                        ($pm == 0 || $pm > 0)  &&
                                                         $totalHoursAM == 0 &&
                                                         $totalMinutesAM == 0 &&
                                                         $totalHoursPM == 0 &&
@@ -2425,79 +2451,104 @@
                                                                                             <td class="text-black border border-gray-400 px-3 py-2">
 
                                                                                                 @php
-                                                                                                    // Total late time in minutes as a decimal
-                                                                                                    $totalLateMinutesDecimal = $attendance->total_late;
+                                                        
 
-                                                                                                    // Total undertime in minutes
-                                                                                                    $am = $attendance->undertimeAM;
-                                                                                                    $pm = $attendance->undertimePM;
-                                                                                                    $totalUndertimeInMinutes = $am + $pm;
-
-                                                                                                    // Combine late and undertime in minutes
-                                                                                                    $totalMinutes = $totalLateMinutesDecimal + $totalUndertimeInMinutes;
-
-                                                                                                    // Convert total minutes to total seconds
-                                                                                                    $totalSeconds = $totalMinutes * 60;
-
-                                                                                                    // Convert total seconds to hours, minutes, and seconds
-                                                                                                    $totalHours = intdiv($totalSeconds, 3600); // Total hours
-                                                                                                    $remainingSeconds = $totalSeconds % 3600; // Remaining seconds after hours
-                                                                                                    $totalMinutes = intdiv($remainingSeconds, 60); // Total minutes
-                                                                                                    $totalSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
-
-                                                                                                    // Format the duration string for total deduction
-                                                                                                    if ($totalMinutes > 0 || $totalLateMinutesDecimal > 0 || $totalUndertimeInMinutes > 0) {
-                                                                                                        $totalDurationFormatted = 
-                                                                                                            ($totalHours > 0 ? "{$totalHours} hr/s, " : '') .
-                                                                                                            ($totalMinutes > 0 ? "{$totalMinutes} min/s, " : '0 min/s ') .
-                                                                                                            ($totalSeconds > 0 ? "{$totalSeconds} sec" : '0 sec');
-                                                                                                    } else {
-                                                                                                        $totalDurationFormatted = '0';
-                                                                                                    }
-
-                                                                                                    // Total hours worked in decimal format
                                                                                                     $totalHoursWorked = $attendance->total_hours_worked;
-                                                                                                    
-                                                                                                    // Calculate hours and minutes
-                                                                                                    $totalHours = floor($totalHoursWorked);
-                                                                                                    $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
-                                                                                                    
-                                                                                                    // Calculate the final hours, minutes, and seconds
-                                                                                                    $finalMinutes = floor($totalMinutes);
-                                                                                                    $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
-                                                                                                    $finalSeconds = round($totalSeconds);
-                                                                                                    
-                                                                                                    // Handle case where seconds is 60
-                                                                                                    if ($finalSeconds == 60) {
-                                                                                                        $finalSeconds = 0;
-                                                                                                        $finalMinutes += 1;
-                                                                                                    }
-                                                                                                    
-                                                                                                    // Handle case where minutes exceed 59
-                                                                                                    if ($finalMinutes >= 60) {
-                                                                                                        $finalMinutes = 0;
-                                                                                                        $totalHours += 1;
-                                                                                                    }
 
-                                                                                                    // Format the duration string for total hours worked
-                                                                                                    if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
-                                                                                                        $totalHoursWorkedFormatted = 'No total hours';
-                                                                                                    } else {
-                                                                                                        $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
-                                                                                                    }
-
-                                                                                                    // Use hours_perDay if totalHoursWorkedFormatted is 'No total hours'
-                                                                                                    if ($totalHoursWorkedFormatted === 'No total hours') {
-                                                                                                        $hoursPerDay = $attendance->hours_perDay;
-                                                                                                        $hours = floor($hoursPerDay);
-                                                                                                        $minutes = floor(($hoursPerDay - $hours) * 60);
-                                                                                                        $seconds = round((((($hoursPerDay - $hours) * 60) - $minutes) * 60));
+                                                                                                    if($totalHoursWorked == 0) {
                                                                                                         
-                                                                                                        $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
-                                                                                                        $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
-                                                                                                        $formattedSeconds = $seconds > 0 ? "{$seconds} sec" : '0 sec';
 
-                                                                                                        $totalDurationFormatted = "{$formattedHours}, {$formattedMinutes}, {$formattedSeconds}";
+                                                                                                        $am = $attendance->undertimeAM;
+                                                                                                        $pm = $attendance->undertimePM;
+                                                                                                        $totalUndertimeInMinutes = $am + $pm;
+
+                                                                                                        $undertimeHours = floor($totalUndertimeInMinutes / 60);
+                                                                                                        $undertimeMinutes = $totalUndertimeInMinutes % 60;
+                                                                                                        $undertimeSeconds = round(($totalUndertimeInMinutes * 60) % 60);
+
+                                                                                                        if($totalUndertimeInMinutes > 0){
+                                                                                                            $totalDurationFormatted = "{$undertimeHours} hr/s, {$undertimeMinutes} min/s, {$undertimeSeconds} sec";
+                                                                                                        } else{
+                                                                                                            $totalDurationFormatted = 0;
+                                                                                                        }
+                                                                                                    }
+                                                                                                    else {
+
+                                                                                                        // Total late time in minutes as a decimal
+                                                                                                        $totalLateMinutesDecimal = $attendance->total_late;
+
+                                                                                                        // Total undertime in minutes
+                                                                                                        $am = $attendance->undertimeAM;
+                                                                                                        $pm = $attendance->undertimePM;
+                                                                                                        $totalUndertimeInMinutes = $am + $pm;
+                                                                                                    
+                                                                                                        
+                                                                                                        // Combine late and undertime in minutes
+                                                                                                        $totalMinutes = $totalLateMinutesDecimal + $totalUndertimeInMinutes;
+
+                                                                                                        // Convert total minutes to total seconds
+                                                                                                        $totalSeconds = $totalMinutes * 60;
+
+                                                                                                        // Convert total seconds to hours, minutes, and seconds
+                                                                                                        $totalHours = intdiv($totalSeconds, 3600); // Total hours
+                                                                                                        $remainingSeconds = $totalSeconds % 3600; // Remaining seconds after hours
+                                                                                                        $totalMinutes = intdiv($remainingSeconds, 60); // Total minutes
+                                                                                                        $totalSeconds = $remainingSeconds % 60; // Remaining seconds after minutes
+
+                                                                                                        // Format the duration string for total deduction
+                                                                                                        if ($totalMinutes > 0 || $totalLateMinutesDecimal > 0 || $totalUndertimeInMinutes > 0) {
+                                                                                                            $totalDurationFormatted = 
+                                                                                                                ($totalHours > 0 ? "{$totalHours} hr/s, " : '') .
+                                                                                                                ($totalMinutes > 0 ? "{$totalMinutes} min/s, " : '0 min/s ') .
+                                                                                                                ($totalSeconds > 0 ? "{$totalSeconds} sec" : '0 sec');
+                                                                                                        } else {
+                                                                                                            $totalDurationFormatted = '0';
+                                                                                                        }
+
+                                                                                                        // Total hours worked in decimal format
+                                                                                                        $totalHoursWorked = $attendance->total_hours_worked;
+                                                                                                        
+                                                                                                        // Calculate hours and minutes
+                                                                                                        $totalHours = floor($totalHoursWorked);
+                                                                                                        $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
+                                                                                                        
+                                                                                                        // Calculate the final hours, minutes, and seconds
+                                                                                                        $finalMinutes = floor($totalMinutes);
+                                                                                                        $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
+                                                                                                        $finalSeconds = round($totalSeconds);
+                                                                                                        
+                                                                                                        // Handle case where seconds is 60
+                                                                                                        if ($finalSeconds == 60) {
+                                                                                                            $finalSeconds = 0;
+                                                                                                            $finalMinutes += 1;
+                                                                                                        }
+                                                                                                        
+                                                                                                        // Handle case where minutes exceed 59
+                                                                                                        if ($finalMinutes >= 60) {
+                                                                                                            $finalMinutes = 0;
+                                                                                                            $totalHours += 1;
+                                                                                                        }
+
+                                                                                                        // Format the duration string for total hours worked
+                                                                                                        if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
+                                                                                                            $totalHoursWorkedFormatted = 'No total hours';
+                                                                                                        } else {
+                                                                                                            $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
+                                                                                                        }
+
+                                                                                                        // Use hours_perDay if totalHoursWorkedFormatted is 'No total hours'
+                                                                                                        if ($totalHoursWorkedFormatted === 'No total hours') {
+                                                                                                            $hoursPerDay = $attendance->hours_perDay;
+                                                                                                            $hours = floor($hoursPerDay);
+                                                                                                            $minutes = floor(($hoursPerDay - $hours) * 60);
+                                                                                                            $seconds = round((((($hoursPerDay - $hours) * 60) - $minutes) * 60));
+                                                                                                            
+                                                                                                            $formattedHours = $hours > 0 ? "{$hours} hr/s" : '0 hr/s';
+                                                                                                            $formattedMinutes = $minutes > 0 ? "{$minutes} min/s" : '0 min/s';
+                                                                                                            $formattedSeconds = $seconds > 0 ? "{$seconds} sec" : '0 sec';
+
+                                                                                                            $totalDurationFormatted = "{$formattedHours}, {$formattedMinutes}, {$formattedSeconds}";
+                                                                                                        }
                                                                                                     }
                                                                                                 @endphp
                                                                                                 {{ $totalDurationFormatted }}
@@ -2674,8 +2725,8 @@
                                                                                                 else if (
                                                                                                     $lateDurationAM == 0 &&
                                                                                                     $lateDurationPM == 0 &&
-                                                                                                    $am == 0 &&
-                                                                                                    $pm == 0 &&
+                                                                                                    ($am == 0 || $am > 0 ) &&
+                                                                                                    ($pm == 0 || $pm > 0 ) &&
                                                                                                     $totalHoursAM == 0 &&
                                                                                                     $totalMinutesAM == 0 &&
                                                                                                     $totalHoursPM == 0 &&
