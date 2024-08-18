@@ -125,166 +125,143 @@
                 </select>
                 @if($selectedStudentToShow)
                     @if($search && $attendanceTimeIn->isEmpty() && $attendanceTimeOut->isEmpty() && !$selectedAttendanceToShow->isEmpty())
-                        <p class="text-black mt-8 text-center">No attendance/s found in <span class="text-red-500">{{ $selectedStudentToShow->student_id }} - {{ $selectedStudentToShow->student_lastname }}, {{ $selectedStudentToShow->student_firstname }} {{ ucfirst($selectedStudentToShow->student_middlename) }} </span> for matching "{{ $search }}"</p>
+                        <p class="text-black mt-8 text-center">No attendance/s found in <span class="text-red-500">{{ $selectedStudentToShow->student_id }} - {{ $selectedStudentToShow->student_lastname }}, {{ $selectedStudentToShow->student_firstname }} {{ ucfirst($selectedStudentToShow->student_middlename) }}</span> for matching "{{ $search }}"</p>
+                        <p class="text-center mt-5">
+                            <button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="clearSearch">
+                                <i class="fa-solid fa-remove"></i> Clear
+                            </button>
+                        </p>
                     @elseif(!$search && $attendanceTimeIn->isEmpty() && $attendanceTimeOut->isEmpty())
-                        <p class="text-black mt-8 text-center uppercase">No data available in student <text class="text-red-500">{{ $selectedStudentToShow->student_id }} - {{ $selectedStudentToShow->student_lastname }}, {{ $selectedStudentToShow->student_firstname }} {{ ucfirst($selectedStudentToShow->student_middlename) }}</text></p>
+                        <p class="text-black mt-11 text-center uppercase">No Time In and Time Out Recorded!
+                            <button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="clearSearch">
+                                <i class="fa-solid fa-remove"></i> Clear
+                            </button>
+                        </p>
                     @else
 
-                    <div class="flex justify-start mt-1 mb-2">
-                        <div class="mt-2 text-sm font-bold ">
-                            <text class="uppercase">Attendance of Employee: {{ $selectedStudentToShow->student_id }} - {{ $selectedStudentToShow->student_lastname }}, {{ $selectedStudentToShow->student_firstname }} {{ ucfirst($selectedStudentToShow->student_middlename) }}
-                        </div>
-                        <!-- <div class="flex flex-col">
-                            <div class="flex justify-between items-center mb-2">
-                                <div class="grid grid-rows-2 grid-flow-col -mt-10">
-                                    <div class="text-center uppercase ml-16">
-                                        Select Specific Date
+                        <div class="flex justify-start mt-1 mb-2 mr-10">
+                            <div class="mt-2 text-sm font-bold ">
+                                <text class="uppercase">Attendance of Employee: {{ $selectedStudentToShow->student_id }} - {{ $selectedStudentToShow->student_lastname }}, {{ $selectedStudentToShow->student_firstname }} {{ ucfirst($selectedStudentToShow->student_middlename) }}
+                            </div>
+                            <div class="flex flex-col -mt-12">
+                                <div class="flex justify-end items-center mb-2">
+                                    <div class="grid grid-rows-2 grid-flow-col ml-10">
+                                  
+                                        <div class="text-center uppercase ml-16">
+                                            Select Specific Date
+                                        </div>
+                                        <div class="flex items-center space-x-4">
+                                            <label for="startDate" class="text-gray-600">Start Date:</label>
+                                            <input 
+                                                id="startDate" 
+                                                type="date" 
+                                                class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                wire:model="startDate"
+                                                wire:change="updateAttendanceByDateRange"
+                                            >
+                                            <label for="endDate" class="text-gray-600">End Date:</label>
+                                            <input 
+                                                id="endDate" 
+                                                type="date" 
+                                                class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                                wire:model="endDate"
+                                                wire:change="updateAttendanceByDateRange"
+                                            >
+                                        </div>
                                     </div>
-                                    <div class="flex items-center space-x-4">
-                                        <label for="startDate" class="text-gray-600">Start Date:</label>
-                                        <input 
-                                            id="startDate" 
-                                            type="date" 
-                                            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                            wire:model="startDate"
-                                           
-                                        >
+                                    <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2 mt-10">
+                                        <i class="fa-solid fa-file"></i> Print DTR
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            @if ($attendanceTimeIn->isNotEmpty())
+                                @php
+                                    $groupedAttendance = [];
 
-                                        <label for="endDate" class="text-gray-600">End Date:</label>
-                                        <input 
-                                            id="endDate" 
-                                            type="date" 
-                                            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                            wire:model="endDate"
-                                           
-                                        >
+                                    foreach ($attendanceTimeIn as $attendanceIn) {
+                                        $date = date('Y-m-d', strtotime($attendanceIn->check_in_time));
+                                        $studentId = $attendanceIn->student_id;
 
+                                        // Initialize the date group if not set
+                                        if (!isset($groupedAttendance[$date])) {
+                                            $groupedAttendance[$date] = [];
+                                        }
+
+                                        $attendanceRecord = [
+                                            'student_id' => $attendanceIn->student->student_id,
+                                            'check_in_time' => $attendanceIn->check_in_time,
+                                            'check_out_time' => null
+                                        ];
+
+                                        // Find the corresponding check-out record
+                                        $attendanceOut = $attendanceTimeOut->firstWhere(function ($attendanceOut) use ($date, $studentId) {
+                                            return date('Y-m-d', strtotime($attendanceOut->check_out_time)) == $date && $attendanceOut->student_id == $studentId;
+                                        });
+
+                                        if ($attendanceOut) {
+                                            $attendanceRecord['check_out_time'] = $attendanceOut->check_out_time;
+                                        }
+
+                                        $groupedAttendance[$date][] = (object) $attendanceRecord;
+                                    }
+                                @endphp
+
+                                <div class="flex">
+                                    <div class="w-[100%]">
+                                        <h1 class="text-center">Attendance Records</h1>
+                                        <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
+                                            <thead class="bg-gray-200 text-black">
+                                                <tr>
+                                                    <th class="border border-gray-400 px-3 py-2 w-60">Date</th>
+                                                    <!-- <th class="border border-gray-400 px-3 py-2">Stud ID</th> -->
+                                                    <th class="border border-gray-400 px-3 py-2">Check-In</th>
+                                                    <th class="border border-gray-400 px-3 py-2">Check-Out</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($groupedAttendance as $date => $records)
+                                                    <tr>
+                                                        <!-- Date displayed only in the first row -->
+                                                        <td class="text-black border border-gray-400" rowspan="{{ count($records) }}">
+                                                            {{ date('m-d-Y (l)', strtotime($date)) }}
+                                                        </td>
+                                                        @foreach ($records as $index => $record)
+                                                            @if ($index > 0)
+                                                                <tr class="hover:bg-gray-100">
+                                                            @endif
+                                                            <!-- <td class="text-black border border-gray-400">{{ $record->student_id }}</td> -->
+                                                            <td class="text-black border border-gray-400">
+                                                                @if ($record->check_in_time)
+                                                                    {{ date('g:i:s A', strtotime($record->check_in_time)) }}
+                                                                @else
+                                                                    No check-in recorded
+                                                                @endif
+                                                            </td>
+                                                            <td class="text-black border border-gray-400">
+                                                                @if ($record->check_out_time)
+                                                                    {{ date('g:i:s A', strtotime($record->check_out_time)) }}
+                                                                @else
+                                                                    No check-out recorded
+                                                                @endif
+                                                            </td>
+                                                            </tr>
+                                                        @endforeach
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        <text class="font-bold uppercase">{{ $attendanceTimeIn->links() }}</text>
                                     </div>
                                 </div>
-                                <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
-                                    <i class="fa-solid fa-file"></i> Print DTR
-                                </button>
-                            </div>
-                        </div> -->
-                    </div>
-                    <div class="overflow-x-auto">
-                        <div class="flex">
-                            <!-- Table for Time In -->
-                            <div class="w-[29%]">
-                                <h3 class="text-center">Time In</h3>
-                                <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
-                                    <thead class="bg-gray-200 text-black">
-                                        <tr>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                Stud ID
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                Date
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                Check-In
-                                            </th>
-                                            <!-- Add other columns as needed -->
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($attendanceTimeIn as $attendanceIn)
-                                            <tr class="hover:bg-gray-100">
-                                                <td class="text-black border border-gray-400">{{ $attendanceIn->student->student_id }}</td>
-                                                <td class="text-black border border-gray-400">
-                                                    {{ date('m-d-Y (l)', strtotime($attendanceIn->check_in_time)) }}
-                                                </td>
-                                                <td class="text-black border border-gray-400">{{ date('g:i:s A', strtotime($attendanceIn->check_in_time)) }}</td>
-                                                <!-- Add other columns as needed -->
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                            <text  class="font-bold uppercase">{{ $attendanceTimeIn->links() }}</text>
-                            <div class="w-[1%]"></div>
-                            <!-- Table for Time Out -->
-                            <div class="w-[24%]">
-                                <h3 class="text-center">Time Out</h3>
-                                    <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
-                                        <thead class="bg-gray-200 text-black">
-                                            <tr>
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    Date
-                                                </th>
-                                                <th class="border border-gray-400 px-3 py-2">
-                                                    Check-Out
-                                                </th>
-                                                <!-- Add other columns as needed -->
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($attendanceTimeOut as $attendanceOut)
-                                                <tr class="hover:bg-gray-100">
-                                                    <td class="text-black border border-gray-400">
-                                                        @if ($attendanceOut->check_out_time)
-                                                            {{ date('m-d-Y, (l)', strtotime($attendanceOut->check_out_time)) }}
-                                                        @else
-                                                            No time out recorded
-                                                        @endif
-                                                    </td>
-                                                    <td class="text-black border border-gray-400">{{ date('g:i:s A', strtotime($attendanceOut->check_out_time)) }}</td>
-                                                    <!-- Add other columns as needed -->
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                    <text  class="font-bold uppercase">{{ $attendanceTimeOut->links() }}</text>
-                            </div>
-                            <div class="w-[1%]"></div>
-                           <div class="w-[47%]">
-                                <h3 class="text-center">Student Time Monitoring</h3>
-                                <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
-                                    <thead class="bg-gray-200 text-black">
-                                        <tr>
-                                            <th class="border border-gray-400 px-3 py-2">
-                                                Date
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2 text-xs">
-                                               AM - hrs. in Campus 
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2 text-xs">
-                                                PM - hrs. in Campus 
-                                            </th>
-                                            <th class="border border-gray-400 px-3 py-2 text-xs">
-                                                Total
-                                            </th>
-                                           <th class="border border-gray-400 px-3 py-2">
-                                                Remarks
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                         @foreach ($attendanceData as $attendance)
-                                            <tr>
-                                                <td class="text-black border border-gray-400">{{ $attendance->worked_date }}</td>
-                                                <td class="text-black border border-gray-400">
-                                                    {{ floor($attendance->hours_workedAM) }} hrs. {{ round($attendance->hours_workedAM - floor($attendance->hours_workedAM), 1) * 60 }} min.
-                                                </td>
-                                                <td class="text-black border border-gray-400">
-                                                    {{ floor($attendance->hours_workedPM) }} hrs. {{ round($attendance->hours_workedPM - floor($attendance->hours_workedPM), 1) * 60 }} min.
-                                                </td>
+                            @else
+                                <p>No Time In & Time Out Records found.</p>
+                            @endif
 
-                                                <td class="text-black border border-gray-400">
-                                                    {{ floor($attendance->total_hours_worked) }} hrs. {{ round($attendance->total_hours_worked - floor($attendance->total_hours_worked), 1) * 60 }} min.
-                                                </td>
-
-                                                <td class="text-black border border-gray-400">{{ $attendance->remarks }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
-                    </div>
-                    <div class="flex justify-items-end justify-end">
-                        <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p>
-                    </div>
+                        <!-- <div class="flex justify-items-end justify-end">
+                            <p>Overall Total Hours: {{ round($overallTotalHours,2) }}</p>
+                        </div> -->
                     @endif
                 @else
                     <p>No selected Student</p>

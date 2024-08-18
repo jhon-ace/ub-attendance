@@ -563,6 +563,8 @@
                                             $check = $attendance->check_in_time;
                                             if (!isset($employees[$employeeId])) {
                                                 $employees[$employeeId] = [
+                                                    'hours_workedAM' => 0,
+                                                    'hours_workedPM' => 0,
                                                     'totalHours' => 0,
                                                     'total_hours_worked' => 0,
                                                     'hours_late_overall' => 0,
@@ -576,10 +578,11 @@
                                                     'uniqueDays' => []
                                                 ];
                                             }
-
+                                            
                                             // Accumulate totals for each employee
                                             $employees[$employeeId]['totalHours'] += $attendance->hours_perDay;
-                                            $employees[$employeeId]['total_hours_worked'] += $attendance->total_hours_worked;
+                                            $total = $attendance->hours_workedAM + $attendance->hours_workedPM;
+                                            $employees[$employeeId]['total_hours_worked'] += $total;
                                             $employees[$employeeId]['hours_late_overall'] += $attendance->hours_late_overall; // Replace with actual late hours field
                                             $employees[$employeeId]['hours_undertime_overall'] += $attendance->hours_undertime_overall; // Replace with actual undertime field
                                         
@@ -653,7 +656,7 @@
 
                                                     // If minutes exceed 59, convert to hours
                                                     if ($overallminutes >= 60) {
-                                                        $overallhours += floor($overallminutes / 60);
+                                                        $overallhours = floor($overallminutes / 60);
                                                         $overallminutes = $overallminutes % 60;
                                                     }
 
@@ -1259,19 +1262,23 @@
                                                                                                         $totalSecondsPM = ($totalMinutesPM - floor($totalMinutesPM)) * 60;
                                                                                                         $totalMinutesPM = floor($totalMinutesPM);
 
-                                                                                                        $finalHoursPM = $totalHoursPM + floor($totalMinutesPM / 60);
-                                                                                                        $finalMinutesPM = $totalMinutesPM % 60;
-                                                                                                        $finalSecondsPM = round($totalSecondsPM);
+                                                                                                        $finalHoursPM = $totalHoursPM;
+                                                                                                        $roundedMinutesPM = round($totalMinutesPM + ($totalSecondsPM / 60));
+                                                                                                        $finalSecondsAM = round($totalSecondsPM % 60);
 
-                                                                                                        if ($finalSecondsPM == 60) {
+                                                                                                        if ($finalSecondsPM >= 59) {
                                                                                                             $finalSecondsPM = 0;
-                                                                                                            $finalMinutesPM += 1;
+                                                                                                            $roundedMinutesPM += 1;
+                                                                                                        } else {
+                                                                                                            $finalSecondsPM = 0;
                                                                                                         }
 
-                                                                                                        if ($finalMinutesPM >= 60) {
-                                                                                                            $finalMinutesPM = 0;
+                                                                                                        if ($roundedMinutesPM >= 59) {
+                                                                                                            $roundedMinutesPM = 0;
                                                                                                             $finalHoursPM += 1;
                                                                                                         }
+
+                                                                                                        $finalMinutesPM = $roundedMinutesPM;
                                                                                                     @endphp
 
                                                                                                     @if ($attendance->hours_workedAM > 0 || $attendance->hours_workedPM > 0)

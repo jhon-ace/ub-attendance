@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Time In Portal | Student</title>
+    <title>Time In-Out Portal | STUDENT</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .logo-background {
@@ -189,11 +189,11 @@
 <div class="logo-background"></div> 
     <div class="flex-container">
         <div class="table-container shadow-xl mr-[50px]">
-            <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - In List</h2>
+            <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Student Time - In List</h2>
             <table>
                 <thead>
                     <tr>
-                        <th class="uppercase text-center tracking-widest" style="max-width:283px;">Employee Name</th>
+                        <th class="uppercase text-center tracking-widest" style="max-width:283px;">Student Name</th>
                         <th class="uppercase text-center tracking-widest">MM - DD :: TIME</th>
                     </tr>
                 </thead>
@@ -201,7 +201,7 @@
                     @foreach($curdateDataIn as $data)
                         <tr>
                             <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
-                                <text>{{ $data->employee->employee_lastname}}, {{ $data->employee->employee_firstname}} {{ $data->employee->employee_middlename}}</text>
+                                <text>{{ $data->student->student_lastname}}, {{ $data->student->student_firstname}} {{ $data->student->student_middlename}}</text>
                             </td>
                             <td class="font-bold text-md uppercase text-center tracking-wider" >{{ date('m-d :: g:i:s A', strtotime($data->check_in_time)) }}</td>
                         </tr>
@@ -212,11 +212,11 @@
         </div> 
 
         <div class="table-container shadow-xl mr-10">
-            <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - OUT List</h2>
+            <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Student Time - OUT List</h2>
             <table>
                 <thead>
                     <tr>
-                        <th class="uppercase text-center tracking-widest"  style="max-width:281px;">Employee Name</th>
+                        <th class="uppercase text-center tracking-widest"  style="max-width:281px;">Student Name</th>
                         <th class="uppercase text-center tracking-widest">MM - DD :: TIME</th>
                     </tr>
                 </thead>
@@ -224,7 +224,7 @@
                     @foreach($curdateDataOut as $dataOut)
                         <tr>
                             <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
-                                <text>{{ $dataOut->employee->employee_lastname}}, {{ $dataOut->employee->employee_firstname}} {{ $dataOut->employee->employee_middlename}}</text>
+                                <text>{{ $dataOut->student->student_lastname}}, {{ $dataOut->student->student_firstname}} {{ $dataOut->student->student_middlename}}</text>
                             </td>
                             <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($dataOut->check_out_time)) }}</td>
                         </tr>
@@ -235,6 +235,7 @@
         </div>
         <div class="flex-col z-50">
             <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[250px]">
+            <!-- <img src="{{ asset('assets/img/vdtlogo.png') }}" alt="Logo" class="w-[250px]"> -->
         </div>
     </div>
     
@@ -280,7 +281,6 @@
 
     <!-- <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8"> </div> Date and Time Display -->
     <div id="my-time" class="text-center tracking-wide w-full flex justify-center shadow-xl p-4 md:p-6 lg:p-8">
-        <!-- <span id="current-date">{{ $current_date1 }}</span>, <span id="current-time">{{ $current_time1 }}</span> -->
          <span id="current-date-time"></span>
     </div> <!-- Date and Time Display --> 
 </div>

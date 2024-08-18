@@ -30,9 +30,12 @@ class ShowStudentAttendance extends Component
     public $selectedStudent5 = null;
     public $selectedAttendanceToShow;
     public $selectedStudentToShow;
+    public $startDate = null;
+    public $endDate = null;
+    
 
 
-    protected $listeners = ['updateEmployees', 'updateEmployeesByDepartment', 'updateStudentsByCourse', 'updateAttendanceByStudent'];
+    protected $listeners = ['updateEmployees', 'updateEmployeesByDepartment', 'updateStudentsByCourse', 'updateAttendanceByStudent', 'updateAttendanceByDateRange'];
 
     public function updatingSearch()
     {
@@ -42,6 +45,9 @@ class ShowStudentAttendance extends Component
     public function clearSearch()
     {
         $this->search = '';
+        $this->updateAttendanceByDateRange();
+        $this->startDate = null;
+        $this->endDate = null;
     }
 
     public function mount()
@@ -117,15 +123,15 @@ class ShowStudentAttendance extends Component
         }
 
         //Apply selected course filter
-        if ($this->selectedCourse5) {
-            $query->where('course_id', $this->selectedCourse5);
-            $this->selectedCourseToShow = Course::find($this->selectedCourse5);
+        // if ($this->selectedCourse5) {
+        //     $query->where('course_id', $this->selectedCourse5);
+        //     $this->selectedCourseToShow = Course::find($this->selectedCourse5);
 
-            $students = Student::where('course_id', $this->selectedCourse5)->get();
-        } else {
-            $this->selectedCourseToShow = null;
-            $students = Student::all();
-        }
+        //     $students = Student::where('course_id', $this->selectedCourse5)->get();
+        // } else {
+        //     $this->selectedCourseToShow = null;
+        //     $students = Student::all();
+        // }
 
         if ($this->selectedCourse5) {
             $query->where('course_id', $this->selectedCourse5);
@@ -160,6 +166,25 @@ class ShowStudentAttendance extends Component
             $this->selectedAttendanceToShow = null;
         }
 
+        if ($this->startDate && $this->endDate) {
+            $queryTimeIn->whereDate('check_in_time', '>=', $this->startDate)
+                        ->whereDate('check_in_time', '<=', $this->endDate);
+
+            $queryTimeOut->whereDate('check_out_time', '>=', $this->startDate)
+                        ->whereDate('check_out_time', '<=', $this->endDate);
+                        
+            $selectedAttendanceByDate = $queryTimeIn->get();// Fetch data and assign to selectedAttendanceByDate
+            
+            $this->selectedAttendanceByDate = $selectedAttendanceByDate;   
+        }
+        else {
+            $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(50);
+
+        $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(50);
+        }
+        
         $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
             ->paginate(50);
 
@@ -332,6 +357,33 @@ class ShowStudentAttendance extends Component
             // $this->endDate = null; // Reset end date
         }
     }
+
+
+    public function updateAttendanceByDateRange()
+    {
+        // Base query for StudentAttendanceTimeIn with related student data
+        $queryTimeIn = StudentAttendanceTimeIn::query()
+            ->with(['student'])
+            ->where('student_id', $this->selectedStudent5);
+
+        // Apply date range filter only if both startDate and endDate are selected
+        if ($this->startDate && $this->endDate) {
+            // Ensure startDate and endDate are valid dates and endDate is not before startDate
+            if ($this->startDate <= $this->endDate) {
+                $queryTimeIn->whereDate('check_in_time', '>=', $this->startDate)
+                            ->whereDate('check_in_time', '<=', $this->endDate);
+            } else {
+                // Handle the case where endDate is before startDate
+                 $this->selectedAttendanceToShow = StudentAttendanceTimeIn::where('student_id', $this->selectedStudent5)->get();
+            $this->selectedAttendanceToShow = StudentAttendanceTimeOut::where('student_id', $this->selectedStudent5)->get();
+            }
+        }
+
+        // Execute the query and get the results
+          $this->selectedAttendanceToShow = StudentAttendanceTimeIn::where('student_id', $this->selectedStudent5)->get();
+            $this->selectedAttendanceToShow = StudentAttendanceTimeOut::where('student_id', $this->selectedStudent5)->get();
+    }
+
 
     // protected function applySearchFilters($query)
     // {

@@ -241,10 +241,6 @@ class DisplayDataforPayroll extends Component
         $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')->get();
 
 
-            
-
-
-
         $attendanceData = [];
         $overallTotalHours = 0;
         $overallTotalLateHours = 0;
@@ -918,11 +914,13 @@ class DisplayDataforPayroll extends Component
                     // Calculate total hours worked
                     $totalHoursWorked = $hoursWorkedAM + $hoursWorkedPM;
                     
+                    
                     $totalHoursLate = $lateDurationAM + $lateDurationPM;
                     $totalUndertimeHours = $undertimeAM + $undertimePM;
                     $overallTotalHoursLate = $lateAM + $latePM;
                     $totalundertime = $undertimeAMTotal + $undertimePMTotal;
 
+                    
                     // $totalhoursNeed = $morningDuration + $afternoonDuration;
     
                     // Determine remark based on lateness
@@ -941,7 +939,7 @@ class DisplayDataforPayroll extends Component
                     $employeeFirstname = $attendance->employee->employee_firstname;
                     $employeeMiddlename = $attendance->employee->employee_middlename;
                     $checkInTimer = $attendance->check_in_time;
-
+                    
                     
                     // Check if this entry already exists in $attendanceData
                     if (isset($attendanceData[$key])) {
@@ -949,7 +947,7 @@ class DisplayDataforPayroll extends Component
                         
                         $attendanceData[$key]->hours_perDay = $totalHoursNeedperDay;
                         $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
-                        $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
+                        $attendanceData[$key]->hours_workedPM = $hoursWorkedPM;
                         $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
                         $attendanceData[$key]->total_hours_late += $totalHoursLate;
                         $attendanceData[$key]->late_duration += $lateDurationAM;
@@ -968,9 +966,9 @@ class DisplayDataforPayroll extends Component
                         $attendanceData[$key]->hours_undertime_overall += $totalundertime;
                         $attendanceData[$key]->check_in_time = $checkInTimer;
    
+               
 
-
-                        // dd($attendanceData[$key]->undertimeAM += $undertimeAM);
+                        // dd($attendanceData[$key]->total_hours_worked += $totalHoursWorked;);
                     } else {
                         // Create new entry
                         $attendanceData[$key] = (object) [

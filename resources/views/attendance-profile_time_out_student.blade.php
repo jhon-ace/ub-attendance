@@ -60,7 +60,7 @@
     </style>
     <script>
         setTimeout(function() {
-            window.location.href = "{{ route('admin.attendance.time-out.portal') }}";
+            window.location.href = "{{ route('attendance.portal.student') }}";
         }, 5000); // 5000 milliseconds = 5 seconds
     </script>
 </head>
@@ -106,7 +106,7 @@
         @endforelse
     </div>
     <div class="w-full z-10">
-            <form id="attendanceForm" action="{{ route('admin.attendance.time-out.store') }}" method="POST">
+            <form id="attendanceForm" action="{{ route('admin.attendance.store.student') }}" method="POST">
                 @csrf
                 <div class="z-10">
                     <input type="password" id="inputField" name="user_rfid"
