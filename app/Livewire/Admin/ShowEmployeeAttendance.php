@@ -745,7 +745,7 @@ class ShowEmployeeAttendance extends Component
                                             // if($afternoonStartTime > $secondTime){
                                             //     $hoursWorkedPM = 0;
                                             // } else {
-                                                $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
+                                               $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
 
                                                 // if($afternoonStartTime > $secondTime){
                                             //     $hoursWorkedPM = 0;
@@ -759,6 +759,7 @@ class ShowEmployeeAttendance extends Component
                                     }
                                 } else {
                                     // Set to 0 if counts are not both 2
+                                    
                                     if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 1) {
                                         $hoursWorkedPM = 0;
                                     }
@@ -811,7 +812,7 @@ class ShowEmployeeAttendance extends Component
                                         
                                         $latePM = $lateIntervalPM->h + ($lateIntervalPM->i / 60) + ($lateIntervalPM->s / 3600);
                                         
-                                        // Calculate hours worked in the AM
+                                        // Calculate hours worked in the PM
                                         $intervalPM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
                                         $hoursWork = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
 
@@ -820,8 +821,45 @@ class ShowEmployeeAttendance extends Component
                                         $dataInMinutes = $intervalToAfternoonStart->h * 60 + $intervalToAfternoonStart->i + ($intervalToAfternoonStart->s / 60);
                                         $dataInHours = $dataInMinutes / 60;
 
-                                        $hoursWorkedPM = $hoursWorkedPM + $dataInHours;
+                                        if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 2) {
+                                            if ($secondCheckIn && $secondCheckOut) {
+                                                // Convert check-in and check-out times to Carbon instances
+                                                $checkInTime = Carbon::parse($secondCheckIn->check_in_time);
+                                                $checkOutTime = Carbon::parse($secondCheckOut->check_out_time);
+
+                                                // Ensure check-in is PM and check-out is also PM
+                                                if ($checkInTime->format('a') === 'pm' && $checkOutTime->format('a') === 'pm') {
+                                                    $timeStartTimeSecond = Carbon::parse($afternoonStartTime)->format('H:i:s');
+                                                    $secondTime = Carbon::parse($secondCheckIn->check_in_time)->format('H:i:s');
+                                                    
+                                                    //dd($afternoonStartTime > $secondTime);
+                                                    // if($afternoonStartTime > $secondTime){
+                                                    //     $hoursWorkedPM = 0;
+                                                    // } else {
+                                                  $hoursWorkedPM = $hoursWorkedPM + $dataInHours;
+
+                                                        // if($afternoonStartTime > $secondTime){
+                                                    //     $hoursWorkedPM = 0;
+                                                    // } else {
+                                                    // }
+                                                } else {
+                                                    $hoursWorkedPM = 0;
+                                                }
+                                            } else {
+                                                $hoursWorkedPM = 0;
+                                            }
+                                        } else {
+                                            // Set to 0 if counts are not both 2
+                                            
+                                            if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 1) {
+                                                $hoursWorkedPM = 0;
+                                            }
+                                        }
+                                                
+
+                                                                              
                                         
+                                         
                                         $lateDurationPM = 0;
                                         $latePM = 0;
                                         
