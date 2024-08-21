@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // session()->forget('url.intended');
+        session()->forget('url.intended');
 
         if (Auth::check()) 
         {
