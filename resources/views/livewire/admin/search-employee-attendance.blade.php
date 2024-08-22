@@ -1965,28 +1965,28 @@
                                                                             <div class="flex justify-between -mt-4">
                                                                                 
                                                                                 <p class="py-4 text-red-500">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
-                                                                                <div class="">
+                                                                                <!-- <div class="">
                                                                                     <button wire:click="generateExcel" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                                                        <i class="fa-solid fa-file"></i> Export Employee Attendance Report for Selected Date to Excel
+                                                                                        <i class="fa-solid fa-file"></i> Export to Excel
                                                                                     </button>
-                                                                                    <!-- <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                                                    <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                                         <i class="fa-solid fa-file"></i> Generate DTR | PDF
-                                                                                    </button> -->
-                                                                                </div>
+                                                                                    </button>
+                                                                                </div> -->
                                                                             </div>
                                                                         @else
                                                                             <p>Selected Date Range:</p>
                                                                             <div class="flex justify-between -mt-4">
                                                                                 
-                                                                                <p class="py-4">No selected Date</p>
-                                                                                <div class="">
+                                                                                <p class="py-4">Start Date: None selected &nbsp;&nbsp;End Date: None selected</p>
+                                                                                <!-- <div class="">
                                                                                     <button wire:click="generateExcel" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                                                        <i class="fa-solid fa-file"></i> Export Dept. Employees Attendance Report to Excel
+                                                                                        <i class="fa-solid fa-file"></i> Export to Excel
                                                                                     </button>
-                                                                                    <!-- <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                                                    <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                                         <i class="fa-solid fa-file"></i> Generate DTR | PDF
-                                                                                    </button> -->
-                                                                                </div>
+                                                                                    </button>
+                                                                                </div> -->
                                                                             </div>
                                                                         @endif
                                                                         <table class="table-auto min-w-full text-center text-xs mb-4 divide-y divide-gray-200">
@@ -2804,7 +2804,6 @@
                                                     <th class="border border-collapse border-1 border-black">Grace Period</th>
                                                     <th>Action</th>
                                                 </tr>
-                                                
                                             </thead>
                                             <tbody>
                                                 <tr class="border border-collapse border-1 border-black text-center p-2">
