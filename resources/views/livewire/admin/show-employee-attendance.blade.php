@@ -170,7 +170,7 @@
                         <div class="mt-2 text-sm font-bold ">
                             <text class="uppercase">Selected Employee: <text class="text-red-500">{{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</text>
                         </div>
-                        <div class="flex flex-col">
+                        <div class="flex flex-col mt-11">
                             <div class="flex justify-between items-center mb-2">
                                 <div class="grid grid-rows-2 grid-flow-col -mt-10">
                                   
