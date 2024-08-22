@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        session()->forget('url.intended');
+        // session()->forget('url.intended');
 
         if (Auth::check()) 
         {
@@ -52,9 +52,9 @@ class AuthenticatedSessionController extends Controller
         }
 
         // Default redirect if no specific role matches
-        //return view('auth.login');
+        return view('auth.login');
         //return redirect()->intended(route('admin.dashboard')); // redirect to a default route
-         return redirect()->intended('/'); // redirect to a default route
+        //  return redirect()->intended('/'); // redirect to a default route
         
 
     }

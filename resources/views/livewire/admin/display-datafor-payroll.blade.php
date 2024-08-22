@@ -788,13 +788,13 @@
                                                         {{ $employeeData['employee_middlename'] }}
                                                     </td>
                                                     <td class="text-black border border-black">{{ $totalFormatted }}  from ({{ $attendanceDaysCount }} days worked)</td>
-                                                    <td class="text-black border border-black">{{$formattedTimeWorked}}</td>
-                                                    <td class="text-black border border-black">{{ $finalHourDeductionFormatted }}</td>
-                                                    <td class="text-black border border-black">{{ $lateFormatted }}</td>
-                                                    <td class="text-black border border-black">{{ $undertimeFormatted }}</td>
-                                                    <td class="text-black border border-black text-center">{{ $absentFormatted }}</td>
-                                                    <td>
-                                                        <div class="flex justify-center items-center space-x-2 p-2 z-50">
+                                                        <td class="text-black border border-black">{{$formattedTimeWorked}}</td>
+                                                        <td class="text-black border border-black">{{ $finalHourDeductionFormatted }}</td>
+                                                        <td class="text-black border border-black">{{ $lateFormatted }}</td>
+                                                        <td class="text-black border border-black">{{ $undertimeFormatted }}</td>
+                                                        <td class="text-black border border-black text-center">{{ $absentFormatted }}</td>
+                                                        <td class="text-black border border-black">
+                                                            <div class="flex justify-center items-center space-x-2 p-2 z-50">
                                                                 <div x-data="{ open: false }">
                                                                     <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
                                                                         <i class="fa-solid fa-eye fa-xs" style="color: #ffffff;"></i> View Records
@@ -1300,40 +1300,44 @@
                                                                                                     @endif
                                                                                                 </td>
                                                                                                 <td class="text-black border border-gray-400 px-2 py-1 font-bold w-32">
-                                                                                                    @php
-                                                                                                        // Total hours worked in decimal format
-                                                                                                        $totalHoursWorked = $attendance->total_hours_worked;
-                                                                                                        
-                                                                                                        // Calculate hours and minutes
-                                                                                                        $totalHours = floor($totalHoursWorked);
-                                                                                                        $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
-                                                                                                        
-                                                                                                        // Calculate the final hours, minutes, and seconds
-                                                                                                        $finalMinutes = floor($totalMinutes);
-                                                                                                        $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
-                                                                                                        $finalSeconds = round($totalSeconds);
-                                                                                                        
-                                                                                                        // Handle case where seconds is 60
-                                                                                                        if ($finalSeconds == 60) {
-                                                                                                            $finalSeconds = 0;
-                                                                                                            $finalMinutes += 1;
-                                                                                                        }
-                                                                                                        
-                                                                                                        // Handle case where minutes exceed 59
-                                                                                                        if ($finalMinutes >= 60) {
-                                                                                                            $finalMinutes = 0;
-                                                                                                            $totalHours += 1;
-                                                                                                        }
+                                                                                                    <td class="text-black border border-gray-400 px-2 py-1 font-bold w-32">
+                                                                                                @php
+                                                                                                    // Total hours worked in decimal format
+                                                                                                    $totalHoursWorked = $attendance->total_hours_worked;
+                                                                                                    
+                                                                                                    // Calculate hours and minutes
+                                                                                                    $totalHours = floor($totalHoursWorked);
+                                                                                                    $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
+                                                                                                    
+                                                                                                    // Calculate the final hours, minutes, and seconds
+                                                                                                    $finalMinutes = floor($totalMinutes);
+                                                                                                    $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
+                                                                                                    $finalSeconds = round($totalSeconds);
+                                                                                                    
+                                                                                                    // Handle case where seconds is 60
+                                                                                                    if ($finalSeconds == 60) {
+                                                                                                        $finalSeconds = 0;
+                                                                                                        $finalMinutes += 1;
+                                                                                                    }
+                                                                                                    
+                                                                                                    // Handle case where minutes exceed 59
+                                                                                                    if ($finalMinutes >= 60) {
+                                                                                                        $finalMinutes = 0;
+                                                                                                        $totalHours += 1;
+                                                                                                    }
 
-                                                                                                        // Format the duration string
-                                                                                                        if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
-                                                                                                            $totalHoursWorkedFormatted = '0';
-                                                                                                        } else {
-                                                                                                            $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
-                                                                                                        }
-                                                                                                    @endphp
+                                                                                                    // Format the duration string
+                                                                                                    if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
+                                                                                                        $totalHoursWorkedFormatted = '0';
+                                                                                                    } else {
+                                                                                                        $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
+                                                                                                    }
+                                                                                                @endphp
 
-                                                                                                    {{ $totalHoursWorkedFormatted }}
+                                                                                                {{ $totalHoursWorkedFormatted }}
+
+                                                                                                        
+                                                                                            </td>
 
                                                                                                             
                                                                                                 </td>

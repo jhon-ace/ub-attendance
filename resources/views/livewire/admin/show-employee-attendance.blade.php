@@ -203,7 +203,7 @@
                                             </a>
                                         </div>
                                          <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
-                                        <i class="fa-solid fa-file"></i> Generate DTR
+                                        <i class="fa-solid fa-file"></i> Generate Selected Employee's DTR
                                     </button>
                                     </div>               
                                    
@@ -1877,7 +1877,7 @@
 
                                                 @endphp
                                                 <div class="flex justify-center mt-2">
-                                                    <h1 class="uppercase text-[16px]">Department: {{ $departmentToShow->department_abbreviation }}</h1>
+                                                    <h1 class="uppercase text-[16px]">Department: <text class="text-red-500">{{ $departmentToShow->department_abbreviation }}</text></h1>
                                                 </div>
                                                 @if ($startDate && $endDate)
                                                     <p>Selected Date Range:</p>
@@ -1886,7 +1886,7 @@
                                                         <p class="py-4 text-red-500">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
                                                         <div class="">
                                                             <button wire:click="generateExcel" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                                <i class="fa-solid fa-file"></i> Export to Excel
+                                                                <i class="fa-solid fa-file"></i> Export Employee Attendance Report for Selected Date to Excel
                                                             </button>
                                                             <!-- <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                 <i class="fa-solid fa-file"></i> Generate DTR | PDF
@@ -1897,10 +1897,10 @@
                                                     <p>Selected Date Range:</p>
                                                     <div class="flex justify-between -mt-4">
                                                         
-                                                        <p class="py-4">Start Date: None selected &nbsp;&nbsp;End Date: None selected</p>
+                                                        <p class="py-4">No selected Date</p>
                                                         <div class="">
                                                             <button wire:click="generateExcel" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                                <i class="fa-solid fa-file"></i> Export to Excel
+                                                                <i class="fa-solid fa-file"></i> Export All Dept. Employees Attendance Report to Excel
                                                             </button>
                                                             <!-- <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                 <i class="fa-solid fa-file"></i> Generate DTR | PDF
@@ -2117,7 +2117,7 @@
                                                                                                                         <p>No PM check-in</p>
                                                                                                                     @endif
                                                                                                             @else
-                                                                                                                <p>No Check-Ins</p>
+                                                                                                                <p>No Check-Outs</p>
                                                                                                             @endif
                                                                                                         @endif
                                                                                                     @endforeach
@@ -2449,9 +2449,9 @@
                                                                                                         
                                                                                             </td>
                                                                                             <td class="text-black border border-gray-400 px-3 py-2">
-
+                                                                                                    <!-- total deduction -->
                                                                                                 @php
-                                                        
+                                                                                                    
 
                                                                                                     $totalHoursWorked = $attendance->total_hours_worked;
 
@@ -2718,6 +2718,47 @@
                                                                                                     $totalMinutesAM == 0 &&
                                                                                                     $totalHoursPM > 0 &&
                                                                                                     $totalMinutesPM == 0 &&
+                                                                                                    $modify_status == "Holiday"
+                                                                                                ) {
+                                                                                                    $remarkss = 'Holiday';
+                                                                                                }
+                                                                                                else if (
+                                                                                                    $lateDurationAM == 0 &&
+                                                                                                    $lateDurationPM == 0 &&
+                                                                                                    $am == 0 &&
+                                                                                                    $pm == 0 &&
+                                                                                                    ($totalHoursAM > 0 &&
+                                                                                                    $totalMinutesAM > 0 ||
+                                                                                                    $totalHoursPM == 0 &&
+                                                                                                    $totalMinutesPM == 0) &&
+                                                                                                    $modify_status == "Official Travel"
+                                                                                                ) {
+                                                                                                    $remarkss = 'Official Travel';
+                                                                                                }
+                                                                                                
+                                                                                                
+                                                                                                else if (
+                                                                                                    $lateDurationAM == 0 &&
+                                                                                                    $lateDurationPM == 0 &&
+                                                                                                    $am == 0 &&
+                                                                                                    $pm == 0 &&
+                                                                                                    ($totalHoursAM > 0 &&
+                                                                                                    $totalMinutesAM > 0 ||
+                                                                                                    $totalHoursPM == 0 &&
+                                                                                                    $totalMinutesPM == 0) &&
+                                                                                                    $modify_status == "On Leave"
+                                                                                                ) {
+                                                                                                    $remarkss = 'On Leave';
+                                                                                                }
+                                                                                                else if (
+                                                                                                    $lateDurationAM == 0 &&
+                                                                                                    $lateDurationPM == 0 &&
+                                                                                                    $am == 0 &&
+                                                                                                    $pm == 0 &&
+                                                                                                    ($totalHoursAM == 0 &&
+                                                                                                    $totalMinutesAM == 0 ||
+                                                                                                    $totalHoursPM > 0 &&
+                                                                                                    $totalMinutesPM > 0) &&
                                                                                                     $modify_status == "Official Travel"
                                                                                                 ) {
                                                                                                     $remarkss = 'Official Travel';
@@ -2725,8 +2766,35 @@
                                                                                                 else if (
                                                                                                     $lateDurationAM == 0 &&
                                                                                                     $lateDurationPM == 0 &&
-                                                                                                    ($am == 0 || $am > 0 ) &&
-                                                                                                    ($pm == 0 || $pm > 0 ) &&
+                                                                                                    $am == 0 &&
+                                                                                                    $pm == 0 &&
+                                                                                                    ($totalHoursAM == 0 &&
+                                                                                                    $totalMinutesAM == 0 ||
+                                                                                                    $totalHoursPM > 0 &&
+                                                                                                    $totalMinutesPM > 0) &&
+                                                                                                    $modify_status == "On Leave"
+                                                                                                ) {
+                                                                                                    $remarkss = 'On Leave';
+                                                                                                }
+                                                                                                else if (
+                                                                                                    $lateDurationAM == 0 &&
+                                                                                                    $lateDurationPM == 0 &&
+                                                                                                    $am == 0 &&
+                                                                                                    $pm == 0 &&
+                                                                                                    $totalHoursAM > 0 &&
+                                                                                                    $totalMinutesAM == 0 &&
+                                                                                                    $totalHoursPM > 0 &&
+                                                                                                    $totalMinutesPM == 0 &&
+                                                                                                    $modify_status == "Official Travel"
+                                                                                                ) {
+                                                                                                    $remarkss = 'Official Travel';
+                                                                                                }
+                                                                                                
+                                                                                                else if (
+                                                                                                    $lateDurationAM == 0 &&
+                                                                                                    $lateDurationPM == 0 &&
+                                                                                                    ($am == 0 || $am > 0) &&
+                                                                                                    ($pm == 0 || $pm > 0)  &&
                                                                                                     $totalHoursAM == 0 &&
                                                                                                     $totalMinutesAM == 0 &&
                                                                                                     $totalHoursPM == 0 &&
@@ -2750,7 +2818,8 @@
                                                                                                             $remarkss = 'Present - Late AM';
                                                                                                         } elseif ($lateDurationPM > 0) {
                                                                                                             $remarkss = 'Present - Late PM';
-                                                                                                        } else {
+                                                                                                        }
+                                                                                                        else {
                                                                                                             $remarkss = "Present";
                                                                                                         }
                                                                                                     }
@@ -2795,6 +2864,7 @@
                                                         <td class="border border-black text-red-500">{{ $absentFormatted }}</td>
                                                     </tr> -->
                                                 </table>
+                                                <p class="text-right">Note: Select Specific Date Range to Export</p>
                                             @endforeach
                                         </div>                        
                                     </div>

@@ -1150,10 +1150,17 @@ class ShowEmployeeAttendance extends Component
 
 
             $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
-                ->paginate(31);
+                ->paginate(100);
 
             $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
-                ->paginate(31);
+                ->paginate(100);
+
+            //     $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
+            //     ->paginate(100);
+
+
+            // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
+            //     ->paginate(100);
 
 
 
@@ -1627,7 +1634,7 @@ class ShowEmployeeAttendance extends Component
                             $effectiveCheckOutTime = min($checkOutDateTime, $afternoonEndTime);
                             if ($effectiveCheckInTime < $effectiveCheckOutTime) {
                                 $intervalPM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
-                                $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
+                                // $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
 
                                 // Calculate late duration for PM
                                 // $latestAllowedCheckInPM = clone $afternoonStartTime;
@@ -1672,22 +1679,40 @@ class ShowEmployeeAttendance extends Component
                                     ->orderBy('check_out_time', 'asc')
                                     ->first();
 
+                                $secondCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
+                                    ->whereDate('check_in_time', $dateKey1)
+                                    ->orderBy('check_in_time', 'asc')
+                                    ->skip(1)
+                                    ->first();
 
-
-
+                                $secondCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                                    ->whereDate('check_out_time', $dateKey2)
+                                    ->orderBy('check_out_time', 'asc')
+                                    ->skip(1)
+                                    ->first();
 
                                 // Calculate PM hours if applicable
-                                if ($checkInnCount->get($dateKey1, 0) == 1 && $checkOuttCount->get($dateKey2, 0) == 1) {
-                                    if ($firstCheckIn && $firstCheckOut) {
-                                        $checkInTime = new DateTime($firstCheckIn->check_in_time);
-                                        $checkOutTime = new DateTime($firstCheckOut->check_out_time);
+                                if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 2) {
+                                    if ($secondCheckIn && $secondCheckOut) {
+                                        // Convert check-in and check-out times to Carbon instances
+                                        $checkInTime = Carbon::parse($secondCheckIn->check_in_time);
+                                        $checkOutTime = Carbon::parse($secondCheckOut->check_out_time);
 
                                         // Ensure check-in is PM and check-out is also PM
                                         if ($checkInTime->format('a') === 'pm' && $checkOutTime->format('a') === 'pm') {
-                                            // $intervalPM = $checkInTime->diff($checkOutTime);
-                                            // $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
-                                            $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
+                                            $timeStartTimeSecond = Carbon::parse($afternoonStartTime)->format('H:i:s');
+                                            $secondTime = Carbon::parse($secondCheckIn->check_in_time)->format('H:i:s');
                                             
+                                            //dd($afternoonStartTime > $secondTime);
+                                            // if($afternoonStartTime > $secondTime){
+                                            //     $hoursWorkedPM = 0;
+                                            // } else {
+                                               $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
+
+                                                // if($afternoonStartTime > $secondTime){
+                                            //     $hoursWorkedPM = 0;
+                                            // } else {
+                                            // }
                                         } else {
                                             $hoursWorkedPM = 0;
                                         }
@@ -1695,11 +1720,13 @@ class ShowEmployeeAttendance extends Component
                                         $hoursWorkedPM = 0;
                                     }
                                 } else {
-                                    // Set to 0 if counts are not both 1
-                                    if ($checkInnCount->get($dateKey1, 0) == 1 && $checkOuttCount->get($dateKey2, 0) == 1) {
+                                    // Set to 0 if counts are not both 2
+                                    
+                                    if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 1) {
                                         $hoursWorkedPM = 0;
                                     }
                                 }
+
 
 
                                 
@@ -1747,7 +1774,7 @@ class ShowEmployeeAttendance extends Component
                                         
                                         $latePM = $lateIntervalPM->h + ($lateIntervalPM->i / 60) + ($lateIntervalPM->s / 3600);
                                         
-                                        // Calculate hours worked in the AM
+                                        // Calculate hours worked in the PM
                                         $intervalPM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
                                         $hoursWork = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
 
@@ -1756,8 +1783,45 @@ class ShowEmployeeAttendance extends Component
                                         $dataInMinutes = $intervalToAfternoonStart->h * 60 + $intervalToAfternoonStart->i + ($intervalToAfternoonStart->s / 60);
                                         $dataInHours = $dataInMinutes / 60;
 
-                                        $hoursWorkedPM = $hoursWorkedPM + $dataInHours;
+                                        if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 2) {
+                                            if ($secondCheckIn && $secondCheckOut) {
+                                                // Convert check-in and check-out times to Carbon instances
+                                                $checkInTime = Carbon::parse($secondCheckIn->check_in_time);
+                                                $checkOutTime = Carbon::parse($secondCheckOut->check_out_time);
+
+                                                // Ensure check-in is PM and check-out is also PM
+                                                if ($checkInTime->format('a') === 'pm' && $checkOutTime->format('a') === 'pm') {
+                                                    $timeStartTimeSecond = Carbon::parse($afternoonStartTime)->format('H:i:s');
+                                                    $secondTime = Carbon::parse($secondCheckIn->check_in_time)->format('H:i:s');
+                                                    
+                                                    //dd($afternoonStartTime > $secondTime);
+                                                    // if($afternoonStartTime > $secondTime){
+                                                    //     $hoursWorkedPM = 0;
+                                                    // } else {
+                                                  $hoursWorkedPM = $hoursWorkedPM + $dataInHours;
+
+                                                        // if($afternoonStartTime > $secondTime){
+                                                    //     $hoursWorkedPM = 0;
+                                                    // } else {
+                                                    // }
+                                                } else {
+                                                    $hoursWorkedPM = 0;
+                                                }
+                                            } else {
+                                                $hoursWorkedPM = 0;
+                                            }
+                                        } else {
+                                            // Set to 0 if counts are not both 2
+                                            
+                                            if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 1) {
+                                                $hoursWorkedPM = 0;
+                                            }
+                                        }
+                                                
+
+                                                                              
                                         
+                                         
                                         $lateDurationPM = 0;
                                         $latePM = 0;
                                         
@@ -2022,8 +2086,22 @@ class ShowEmployeeAttendance extends Component
                             ->whereDate('check_out_time', '<=', $this->endDate);
             }
 
-            $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')->get();
-            $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')->get();
+            // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')->get();
+            // $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')->get();
+            // $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
+            //     ->paginate(1000);
+
+            // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
+            //     ->paginate(1000);
+
+            $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+                ->orderBy('check_in_time', 'asc')
+                ->paginate(1000);
+
+            $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+                ->orderBy('check_out_time', 'asc')
+                ->paginate(1000);
+
 
             // Construct the attendance data array
             $attendanceData = [];
@@ -2496,7 +2574,7 @@ class ShowEmployeeAttendance extends Component
                                 $effectiveCheckOutTime = min($checkOutDateTime, $afternoonEndTime);
                                 if ($effectiveCheckInTime < $effectiveCheckOutTime) {
                                     $intervalPM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
-                                    $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
+                                    // $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
 
                                     // Calculate late duration for PM
                                     // $latestAllowedCheckInPM = clone $afternoonStartTime;
@@ -2541,22 +2619,40 @@ class ShowEmployeeAttendance extends Component
                                         ->orderBy('check_out_time', 'asc')
                                         ->first();
 
+                                    $secondCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
+                                        ->whereDate('check_in_time', $dateKey1)
+                                        ->orderBy('check_in_time', 'asc')
+                                        ->skip(1)
+                                        ->first();
 
-
-
+                                    $secondCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                                        ->whereDate('check_out_time', $dateKey2)
+                                        ->orderBy('check_out_time', 'asc')
+                                        ->skip(1)
+                                        ->first();
 
                                     // Calculate PM hours if applicable
-                                    if ($checkInnCount->get($dateKey1, 0) == 1 && $checkOuttCount->get($dateKey2, 0) == 1) {
-                                        if ($firstCheckIn && $firstCheckOut) {
-                                            $checkInTime = new DateTime($firstCheckIn->check_in_time);
-                                            $checkOutTime = new DateTime($firstCheckOut->check_out_time);
+                                    if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 2) {
+                                        if ($secondCheckIn && $secondCheckOut) {
+                                            // Convert check-in and check-out times to Carbon instances
+                                            $checkInTime = Carbon::parse($secondCheckIn->check_in_time);
+                                            $checkOutTime = Carbon::parse($secondCheckOut->check_out_time);
 
                                             // Ensure check-in is PM and check-out is also PM
                                             if ($checkInTime->format('a') === 'pm' && $checkOutTime->format('a') === 'pm') {
-                                                // $intervalPM = $checkInTime->diff($checkOutTime);
-                                                // $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
-                                                $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
+                                                $timeStartTimeSecond = Carbon::parse($afternoonStartTime)->format('H:i:s');
+                                                $secondTime = Carbon::parse($secondCheckIn->check_in_time)->format('H:i:s');
                                                 
+                                                //dd($afternoonStartTime > $secondTime);
+                                                // if($afternoonStartTime > $secondTime){
+                                                //     $hoursWorkedPM = 0;
+                                                // } else {
+                                                $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
+
+                                                    // if($afternoonStartTime > $secondTime){
+                                                //     $hoursWorkedPM = 0;
+                                                // } else {
+                                                // }
                                             } else {
                                                 $hoursWorkedPM = 0;
                                             }
@@ -2564,11 +2660,13 @@ class ShowEmployeeAttendance extends Component
                                             $hoursWorkedPM = 0;
                                         }
                                     } else {
-                                        // Set to 0 if counts are not both 1
-                                        if ($checkInnCount->get($dateKey1, 0) == 1 && $checkOuttCount->get($dateKey2, 0) == 1) {
+                                        // Set to 0 if counts are not both 2
+                                        
+                                        if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 1) {
                                             $hoursWorkedPM = 0;
                                         }
                                     }
+
 
 
                                     
@@ -2616,7 +2714,7 @@ class ShowEmployeeAttendance extends Component
                                             
                                             $latePM = $lateIntervalPM->h + ($lateIntervalPM->i / 60) + ($lateIntervalPM->s / 3600);
                                             
-                                            // Calculate hours worked in the AM
+                                            // Calculate hours worked in the PM
                                             $intervalPM = $effectiveCheckInTime->diff($effectiveCheckOutTime);
                                             $hoursWork = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
 
@@ -2625,7 +2723,44 @@ class ShowEmployeeAttendance extends Component
                                             $dataInMinutes = $intervalToAfternoonStart->h * 60 + $intervalToAfternoonStart->i + ($intervalToAfternoonStart->s / 60);
                                             $dataInHours = $dataInMinutes / 60;
 
-                                            $hoursWorkedPM = $hoursWorkedPM + $dataInHours;
+                                            if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 2) {
+                                                if ($secondCheckIn && $secondCheckOut) {
+                                                    // Convert check-in and check-out times to Carbon instances
+                                                    $checkInTime = Carbon::parse($secondCheckIn->check_in_time);
+                                                    $checkOutTime = Carbon::parse($secondCheckOut->check_out_time);
+
+                                                    // Ensure check-in is PM and check-out is also PM
+                                                    if ($checkInTime->format('a') === 'pm' && $checkOutTime->format('a') === 'pm') {
+                                                        $timeStartTimeSecond = Carbon::parse($afternoonStartTime)->format('H:i:s');
+                                                        $secondTime = Carbon::parse($secondCheckIn->check_in_time)->format('H:i:s');
+                                                        
+                                                        //dd($afternoonStartTime > $secondTime);
+                                                        // if($afternoonStartTime > $secondTime){
+                                                        //     $hoursWorkedPM = 0;
+                                                        // } else {
+                                                    $hoursWorkedPM = $hoursWorkedPM + $dataInHours;
+
+                                                            // if($afternoonStartTime > $secondTime){
+                                                        //     $hoursWorkedPM = 0;
+                                                        // } else {
+                                                        // }
+                                                    } else {
+                                                        $hoursWorkedPM = 0;
+                                                    }
+                                                } else {
+                                                    $hoursWorkedPM = 0;
+                                                }
+                                            } else {
+                                                // Set to 0 if counts are not both 2
+                                                
+                                                if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 1) {
+                                                    $hoursWorkedPM = 0;
+                                                }
+                                            }
+                                                    
+
+                                                                                
+                                            
                                             
                                             $lateDurationPM = 0;
                                             $latePM = 0;
@@ -2694,7 +2829,7 @@ class ShowEmployeeAttendance extends Component
                             }
                         }
 
-
+                        
 
                         // Calculate total hours worked
                         $totalHoursWorked = $hoursWorkedAM + $hoursWorkedPM;
@@ -2722,7 +2857,8 @@ class ShowEmployeeAttendance extends Component
                         $employeeFirstname = $attendance->employee->employee_firstname;
                         $employeeMiddlename = $attendance->employee->employee_middlename;
                         $checkInTimer = $attendance->check_in_time;
-
+                        $department = $attendance->employee->department->department_abbreviation;
+                        
                         
                         // Check if this entry already exists in $attendanceData
                         if (isset($attendanceData[$key])) {
@@ -2748,6 +2884,10 @@ class ShowEmployeeAttendance extends Component
                             $attendanceData[$key]->hours_late_overall += $overallTotalHoursLate;
                             $attendanceData[$key]->hours_undertime_overall += $totalundertime;
                             $attendanceData[$key]->check_in_time = $checkInTimer;
+                            $attendanceData[$key]->department_abbreviation = $department;
+                            $attendanceData[$key]->startDate = $this->startDate;
+                            $attendanceData[$key]->endDate = $this->endDate;
+                            
     
 
 
@@ -2757,6 +2897,9 @@ class ShowEmployeeAttendance extends Component
                             $attendanceData[$key] = (object) [
                                 'hours_perDay' => $totalHoursNeedperDay,
                                 'employee_id' => $attendance->employee_id,
+                                'employee_lastname' => $employeeLastname,
+                                'employee_firstname' => $employeeFirstname,
+                                'employee_middlename' => $employeeMiddlename,
                                 'worked_date' => $checkInDate,
                                 'hours_workedAM' => $hoursWorkedAM,
                                 'hours_workedPM' => $hoursWorkedPM,
@@ -2773,6 +2916,10 @@ class ShowEmployeeAttendance extends Component
                                 'hours_undertime_overall' => $totalundertime,
                                 'check_in_time' => $checkInTimer,
                                 'employee_idd' => $employee_idd,
+                                'department_abbreviation' => $department,
+                                'startDate' => $this->startDate,
+                                'startDate' => $this->endDate,
+
 
 
                             ];
