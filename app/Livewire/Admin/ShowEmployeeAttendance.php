@@ -730,6 +730,7 @@ class ShowEmployeeAttendance extends Component
                                     ->first();
 
                                 // Calculate PM hours if applicable
+                                
                                 if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 2) {
                                     if ($secondCheckIn && $secondCheckOut) {
                                         // Convert check-in and check-out times to Carbon instances
@@ -762,7 +763,10 @@ class ShowEmployeeAttendance extends Component
                                     
                                     if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 1) {
                                         $hoursWorkedPM = 0;
+                                    } else {
+                                        $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
                                     }
+                                    
                                 }
 
 
@@ -1725,6 +1729,8 @@ class ShowEmployeeAttendance extends Component
                                     
                                     if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 1) {
                                         $hoursWorkedPM = 0;
+                                    } else {
+                                        $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
                                     }
                                 }
 
@@ -2670,6 +2676,8 @@ class ShowEmployeeAttendance extends Component
                                         
                                         if ($checkInnCount->get($dateKey1, 0) == 2 && $checkOuttCount->get($dateKey2, 0) == 1) {
                                             $hoursWorkedPM = 0;
+                                        } else {
+                                            $hoursWorkedPM = $intervalPM->h + ($intervalPM->i / 60) + ($intervalPM->s / 3600);
                                         }
                                     }
 

@@ -1558,10 +1558,10 @@
                                             
                                                 else {
                                                 if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
-                                                    $remarkss = "Present but Absent Morning";
+                                                    $remarkss = "Present Afternoon Absent Morning";
                                                 }
                                                 else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
-                                                    $remarkss = "Present but Absent Afternoon";
+                                                    $remarkss = "Present Morning Absent Afternoon";
                                                 }
                                                 else {
                                                     if ($lateDurationAM > 0 && $lateDurationPM > 0) {
@@ -2776,10 +2776,10 @@
                                                                                         
                                                                                         else {
                                                                                             if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
-                                                                                                $remarkss = "Present but Absent Morning";
+                                                                                                $remarkss = "Present Afternoon Absent Morning";
                                                                                             }
                                                                                             else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
-                                                                                                $remarkss = "Present but Absent Afternoon";
+                                                                                                $remarkss = "Present Morning Absent Afternoon";
                                                                                             }
                                                                                             else {
                                                                                                 if ($lateDurationAM > 0 && $lateDurationPM > 0) {
