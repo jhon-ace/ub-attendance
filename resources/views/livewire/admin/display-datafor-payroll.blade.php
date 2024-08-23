@@ -210,7 +210,7 @@
                                                 @endphp
                                                 
                                                 @foreach ($attendanceData as $attendance)
-                                                <tr>
+                                                <tr class="hover:border hover:bg-gray-200">
                                                     <td class="text-black border border-gray-400 px-2 py-1">{{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}</td>
                                                     <td class="text-black border border-gray-400 px-2 py-1">
                                                         @php
@@ -594,30 +594,99 @@
                                     <div class="flex justify-center mt-8">
                                         <h1 class="uppercase text-[30px]">Department: {{ $departmentToShow->department_abbreviation }}</h1>
                                     </div>
-                                    @if ($startDate && $endDate)
-                                        <p>Selected Date Range:</p>
-                                        <div class="flex justify-between -mt-4">
-                                            
-                                            <p class="py-4">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
-                                            <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                <i class="fa-solid fa-file"></i> Generate DTR | PDF
-                                            </button>
-                                        </div>
-                                    @else
-                                        <p>Selected Date Range:</p>
-                                        <div class="flex justify-between -mt-4">
-                                            
-                                            <p class="py-4">Start Date: No selected &nbsp;&nbsp;End Date: No selected</p>
-                                            <div class="">
-                                                <button wire:click="generateExcelPayroll" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                    <i class="fa-solid fa-file"></i> Export to Excel - Payroll
-                                                </button>
-                                                <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                    <i class="fa-solid fa-file"></i> Generate DTR | PDF
-                                                </button>
+                                    <div x-data="{ loading: false, open: {{ session()->has('success') ? 'true' : 'false' }} }"
+                                        x-init="() => {
+                                            if (open) {
+                                                loading = false;
+                                                setTimeout(() => open = false, 3000); // Automatically close the modal after 3 seconds
+                                            }
+                                        }"
+                                        @export-success.window="loading = false; open = true">
+
+                                        <!-- Modal Background -->
+                                        <div x-cloak x-show="open" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                                            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+                                                <h2 class="text-xl font-semibold mb-4">Download Info</h2>
+                                                <p>{{ session()->get('success') }}</p>
+                                                <div class="flex justify-end mt-4">
+                                                    <button @click="open = false" class="px-4 py-2 bg-blue-500 text-white rounded">
+                                                        Close
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    @endif
+
+
+                                        <!-- Loader -->
+                                        <div x-show="loading && !open" 
+                                            x-transition:enter="transition ease-out duration-300" 
+                                            x-transition:enter-start="opacity-0" 
+                                            x-transition:enter-end="opacity-100" 
+                                            x-transition:leave="transition ease-in duration-200" 
+                                            x-transition:leave-start="opacity-100" 
+                                            x-transition:leave-end="opacity-0"
+                                            class="fixed inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+                                            
+                                            <!-- Container for the loader and text -->
+                                            <div class="flex flex-col items-center">
+                                                <!-- Rotating Spinner Loader -->
+                                                <div class="w-16 h-16 border-4 border-t-4 border-white border-solid rounded-full animate-spin"></div>
+                                                
+                                                <!-- Optional Loading Text -->
+                                                
+                                            </div>
+                                        </div>
+
+                                        @if ($startDate && $endDate)
+                                            <p>Selected Date Range:</p>
+                                            <div class="flex justify-between -mt-4">
+                                                <p class="py-4 text-red-500">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
+                                                <div class="">
+                                                    <div class="">
+                                                        <button 
+                                                            x-on:click="loading = true" 
+                                                            wire:click="generateExcelPayroll" 
+                                                            wire:loading.attr="disabled" 
+                                                            wire:loading.class="cursor-wait"
+                                                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                            <i class="fa-solid fa-file"></i> Export to Excel
+                                                        </button>
+                                                        <button 
+                                                            x-on:click="loading = true" 
+                                                            wire:click="generatePDF" 
+                                                            wire:loading.attr="disabled" 
+                                                            wire:loading.class="cursor-wait"
+                                                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                            <i class="fa-solid fa-file"></i> Generate PDF 
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <p>Selected Date Range:</p>
+                                            <div class="flex justify-between -mt-4">
+                                                <p class="py-4">No selected Date</p>
+                                                <div class="">
+                                                    <button 
+                                                        x-on:click="loading = true" 
+                                                        wire:click="generateExcelPayroll" 
+                                                        wire:loading.attr="disabled" 
+                                                        wire:loading.class="cursor-wait"
+                                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                        <i class="fa-solid fa-file"></i> Export to Excel
+                                                    </button>
+                                                    <button 
+                                                        x-on:click="loading = true" 
+                                                        wire:click="generatePDF" 
+                                                        wire:loading.attr="disabled" 
+                                                        wire:loading.class="cursor-wait"
+                                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                        <i class="fa-solid fa-file"></i> Generate PDF 
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
                                     <table class="border border-black " cellpadding="4">
                                         <thead>
                                             <tr class="border border-black text-xs bg-gray-200">
@@ -778,7 +847,7 @@
 
                                                 @endphp
 
-                                                <tr class="border border-black text-xs">
+                                                <tr class="border border-black text-[11px] hover:bg-gray-200">
                                                     <!-- <td class="text-black border border-black text-center">
                                                       
                                                     </td> -->
@@ -794,9 +863,9 @@
                                                         <td class="text-black border border-black">{{ $undertimeFormatted }}</td>
                                                         <td class="text-black border border-black text-center">{{ $absentFormatted }}</td>
                                                         <td class="text-black border border-black">
-                                                            <div class="flex justify-center items-center space-x-2 p-2 z-50">
+                                                            <div class="flex justify-center items-center space-x-2 p-1 z-50">
                                                                 <div x-data="{ open: false }">
-                                                                    <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
+                                                                    <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">
                                                                         <i class="fa-solid fa-eye fa-xs" style="color: #ffffff;"></i> View Records
                                                                     </a>
                                                                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -929,7 +998,7 @@
                                                                                                 @php
                                                                                                     $workedDate = date('Y-m-d', strtotime($attendance->worked_date));
                                                                                                 @endphp
-                                                                                            <tr>
+                                                                                            <tr class="hover:border hover:bg-gray-200">
                                                                                                 <td class="text-black border border-gray-400 px-2 py-1 font-bold">{{ $id }}</td>
                                                                                                 <td class="text-black border border-gray-400 px-2 py-1 font-bold">{{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}</td>
                                                                                                 <td class="text-black border border-gray-400 px-2 py-1 w-28">
@@ -1300,47 +1369,42 @@
                                                                                                     @endif
                                                                                                 </td>
                                                                                                 <td class="text-black border border-gray-400 px-2 py-1 font-bold w-32">
-                                                                                                    <td class="text-black border border-gray-400 px-2 py-1 font-bold w-32">
-                                                                                                @php
-                                                                                                    // Total hours worked in decimal format
-                                                                                                    $totalHoursWorked = $attendance->total_hours_worked;
-                                                                                                    
-                                                                                                    // Calculate hours and minutes
-                                                                                                    $totalHours = floor($totalHoursWorked);
-                                                                                                    $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
-                                                                                                    
-                                                                                                    // Calculate the final hours, minutes, and seconds
-                                                                                                    $finalMinutes = floor($totalMinutes);
-                                                                                                    $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
-                                                                                                    $finalSeconds = round($totalSeconds);
-                                                                                                    
-                                                                                                    // Handle case where seconds is 60
-                                                                                                    if ($finalSeconds == 60) {
-                                                                                                        $finalSeconds = 0;
-                                                                                                        $finalMinutes += 1;
-                                                                                                    }
-                                                                                                    
-                                                                                                    // Handle case where minutes exceed 59
-                                                                                                    if ($finalMinutes >= 60) {
-                                                                                                        $finalMinutes = 0;
-                                                                                                        $totalHours += 1;
-                                                                                                    }
-
-                                                                                                    // Format the duration string
-                                                                                                    if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
-                                                                                                        $totalHoursWorkedFormatted = '0';
-                                                                                                    } else {
-                                                                                                        $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
-                                                                                                    }
-                                                                                                @endphp
-
-                                                                                                {{ $totalHoursWorkedFormatted }}
-
+                                                                                                    @php
+                                                                                                        // Total hours worked in decimal format
+                                                                                                        $totalHoursWorked = $attendance->total_hours_worked;
                                                                                                         
-                                                                                            </td>
+                                                                                                        // Calculate hours and minutes
+                                                                                                        $totalHours = floor($totalHoursWorked);
+                                                                                                        $totalMinutes = ($totalHoursWorked - $totalHours) * 60;
+                                                                                                        
+                                                                                                        // Calculate the final hours, minutes, and seconds
+                                                                                                        $finalMinutes = floor($totalMinutes);
+                                                                                                        $totalSeconds = ($totalMinutes - $finalMinutes) * 60;
+                                                                                                        $finalSeconds = round($totalSeconds);
+                                                                                                        
+                                                                                                        // Handle case where seconds is 60
+                                                                                                        if ($finalSeconds == 60) {
+                                                                                                            $finalSeconds = 0;
+                                                                                                            $finalMinutes += 1;
+                                                                                                        }
+                                                                                                        
+                                                                                                        // Handle case where minutes exceed 59
+                                                                                                        if ($finalMinutes >= 60) {
+                                                                                                            $finalMinutes = 0;
+                                                                                                            $totalHours += 1;
+                                                                                                        }
 
-                                                                                                            
+                                                                                                        // Format the duration string
+                                                                                                        if ($totalHours == 0 && $finalMinutes == 0 && $finalSeconds == 0) {
+                                                                                                            $totalHoursWorkedFormatted = '0';
+                                                                                                        } else {
+                                                                                                            $totalHoursWorkedFormatted = "{$totalHours} hrs. {$finalMinutes} min. {$finalSeconds} sec.";
+                                                                                                        }
+                                                                                                    @endphp
+
+                                                                                                    {{ $totalHoursWorkedFormatted }}   
                                                                                                 </td>
+
                                                                                                 <td class="text-black border border-gray-400 px-3 py-2">
 
                                                                                                     @php
@@ -1995,5 +2059,11 @@ function handleImageError(image) {
                 reader.readAsDataURL(input.files[0]);
             }
         }
+</script>
+
+<script>
+    document.addEventListener('export-success', () => {
+        Alpine.store('loading', false);
+    });
 </script>
 

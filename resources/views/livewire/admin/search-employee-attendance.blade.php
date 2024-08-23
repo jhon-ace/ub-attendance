@@ -797,7 +797,7 @@
                                         @php
                                             $workedDate = date('Y-m-d', strtotime($attendance->worked_date));
                                         @endphp
-                                    <tr>
+                                    <tr class="hover:border hover:bg-gray-200">
                                         <td class="text-black border border-gray-400 px-2 py-1 font-bold">{{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}</td>
                                         <td class="text-black border border-gray-400 px-2 py-1 w-28">
                                             @foreach ($groupedAttendance as $employeeId => $dates)
@@ -1981,7 +1981,7 @@
                                                 <th class="border border-black text-center">Total Absent</th>
                                                 <th class="border border-black text-center">Action</th>
                                             </tr>
-                                                <tr class="border border-black text-sm">
+                                                <tr class="border border-black text-sm  hover:border hover:bg-gray-200">
                                                 <!-- <td class="text-black border border-black text-center">
                                                     {{ $employeeData['employee_idd'] }}
                                                 </td> -->
@@ -2108,7 +2108,7 @@
                                                                                     @php
                                                                                         $workedDate = date('Y-m-d', strtotime($attendance->worked_date));
                                                                                     @endphp
-                                                                                <tr>
+                                                                                <tr class="hover:border hover:bg-gray-200">
                                                                                     <td class="text-black border border-gray-400 px-2 py-1 font-bold">{{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}</td>
                                                                                     <td class="text-black border border-gray-400 px-2 py-1 w-28">
                                                                                         @foreach ($groupedAttendance as $employeeId => $dates)
