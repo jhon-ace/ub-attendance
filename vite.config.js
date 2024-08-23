@@ -19,7 +19,7 @@ export default defineConfig({
             host: "192.168.33.11", // Adjust HMR host if necessary //
         },
         cors: {
-            // origin: "*",
+            // origin: "*",/
             origin: ["http://192.168.33.11:8000", "http://10.10.5.202:8000"],
             methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             allowedHeaders: ["Content-Type", "Authorization"],
