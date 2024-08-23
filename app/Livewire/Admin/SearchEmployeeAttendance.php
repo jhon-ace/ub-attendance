@@ -2959,6 +2959,8 @@ class SearchEmployeeAttendance extends Component
                 }
             }
 
+             $this->dispatch('export-success');
+            session()->flash('success', 'Attendance Report downloaded successfully!');
             $export = new AttendanceExport($attendanceData);
 
             return Excel::download($export, $filename);

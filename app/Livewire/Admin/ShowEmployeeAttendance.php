@@ -1071,6 +1071,7 @@ class ShowEmployeeAttendance extends Component
     {
         $savePath = storage_path('/app/generatedPDF'); // Default save path (storage/app/)
         // $savePath = 'C:/Users/YourUsername/Downloads/'; // Windows example
+
         try {
 
            // Determine the filename dynamically with date included if both startDate and endDate are selected
@@ -2005,7 +2006,7 @@ class ShowEmployeeAttendance extends Component
             // 'selectedAttendanceByDate' => $this->selectedAttendanceByDate,
             // 'departmentDisplayWorkingHour' => $departmentDisplayWorkingHour,
 
-
+                session()->flash('success', 'Attendance Report downloaded successfully!');
                 $pdf = \PDF::loadView('generate-pdf', [
                 'overallTotalHours' => $overallTotalHours,
                 'overallTotalLateHours' => $overallTotalLateHours,
@@ -2022,6 +2023,8 @@ class ShowEmployeeAttendance extends Component
              $pdf->save($savePath . '/' . $filename);
 
             // Download the PDF file with the given filename
+           
+            
             return response()->download($savePath . '/' . $filename, $filename);
         } catch (\Exception $e) {
             // Log or handle the exception as needed
@@ -2031,6 +2034,9 @@ class ShowEmployeeAttendance extends Component
     
     public function generateExcel()
     {
+
+        $this->dispatch('export-start');
+
         $departments = Department::where('id', $this->selectedDepartment4)->get();
         $department = Department::find($this->selectedDepartment4);
 
@@ -2936,9 +2942,13 @@ class ShowEmployeeAttendance extends Component
                 }
             }
 
+            $this->dispatch('export-success');
+            session()->flash('success', 'Attendance Report downloaded successfully!');
             $export = new AttendanceExport($attendanceData);
 
             return Excel::download($export, $filename);
+
+            
 
     
     }

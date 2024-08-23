@@ -203,8 +203,8 @@
                                             </a>
                                         </div>
                                          <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
-                                        <i class="fa-solid fa-file"></i> Generate Selected Employee's DTR
-                                    </button>
+                                            <i class="fa-solid fa-file"></i> Generate Selected Employee's DTR
+                                        </button>
                                     </div>               
                                    
                             </div>
@@ -1879,35 +1879,82 @@
                                                 <div class="flex justify-center mt-2">
                                                     <h1 class="uppercase text-[16px]">Department: <text class="text-red-500">{{ $departmentToShow->department_abbreviation }}</text></h1>
                                                 </div>
-                                                @if ($startDate && $endDate)
-                                                    <p>Selected Date Range:</p>
-                                                    <div class="flex justify-between -mt-4">
-                                                        
-                                                        <p class="py-4 text-red-500">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
-                                                        <div class="">
-                                                            <button wire:click="generateExcel" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                                <i class="fa-solid fa-file"></i> Export Employee Attendance Report for Selected Date to Excel
-                                                            </button>
-                                                            <!-- <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                                <i class="fa-solid fa-file"></i> Generate DTR | PDF
-                                                            </button> -->
+                                                
+                                                <div x-data="{ loading: false, open: {{ session()->has('success') ? 'true' : 'false' }} }"
+                                                    x-init="() => {
+                                                        if (open) {
+                                                            loading = false;
+                                                            setTimeout(() => open = false, 3000); // Automatically close the modal after 3 seconds
+                                                        }
+                                                    }"
+                                                    @export-success.window="loading = false; open = true">
+
+                                                    <!-- Modal Background -->
+                                                    <div x-cloak x-show="open" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                                                        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
+                                                            <h2 class="text-xl font-semibold mb-4">Download Info</h2>
+                                                            <p>{{ session()->get('success') }}</p>
+                                                            <div class="flex justify-end mt-4">
+                                                                <button @click="open = false" class="px-4 py-2 bg-blue-500 text-white rounded">
+                                                                    Close
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                @else
-                                                    <p>Selected Date Range:</p>
-                                                    <div class="flex justify-between -mt-4">
+
+
+                                                    <!-- Loader -->
+                                                    <div x-show="loading && !open" 
+                                                        x-transition:enter="transition ease-out duration-300" 
+                                                        x-transition:enter-start="opacity-0" 
+                                                        x-transition:enter-end="opacity-100" 
+                                                        x-transition:leave="transition ease-in duration-200" 
+                                                        x-transition:leave-start="opacity-100" 
+                                                        x-transition:leave-end="opacity-0"
+                                                        class="fixed inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-50 z-50">
                                                         
-                                                        <p class="py-4">No selected Date</p>
-                                                        <div class="">
-                                                            <button wire:click="generateExcel" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                                <i class="fa-solid fa-file"></i> Export All Dept. Employees Attendance Report to Excel
-                                                            </button>
-                                                            <!-- <button wire:click="generatePDF" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
-                                                                <i class="fa-solid fa-file"></i> Generate DTR | PDF
-                                                            </button> -->
+                                                        <!-- Container for the loader and text -->
+                                                        <div class="flex flex-col items-center">
+                                                            <!-- Rotating Spinner Loader -->
+                                                            <div class="w-16 h-16 border-4 border-t-4 border-white border-solid rounded-full animate-spin"></div>
+                                                            
+                                                            <!-- Optional Loading Text -->
+                                                            
                                                         </div>
                                                     </div>
-                                                @endif
+
+                                                    @if ($startDate && $endDate)
+                                                        <p>Selected Date Range:</p>
+                                                        <div class="flex justify-between -mt-4">
+                                                            <p class="py-4 text-red-500">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
+                                                            <div class="">
+                                                                <button 
+                                                                    x-on:click="loading = true" 
+                                                                    wire:click="generateExcel" 
+                                                                    wire:loading.attr="disabled" 
+                                                                    wire:loading.class="cursor-wait"
+                                                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                                    <i class="fa-solid fa-file"></i> Export Employee Attendance Report for Selected Date to Excel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        <p>Selected Date Range:</p>
+                                                        <div class="flex justify-between -mt-4">
+                                                            <p class="py-4">No selected Date</p>
+                                                            <div class="">
+                                                                <button 
+                                                                    x-on:click="loading = true" 
+                                                                    wire:click="generateExcel" 
+                                                                    wire:loading.attr="disabled" 
+                                                                    wire:loading.class="cursor-wait"
+                                                                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
+                                                                    <i class="fa-solid fa-file"></i> Export <span class="text-white underline ">{{ $departmentToShow->department_abbreviation }}</span> Dept. Employees Attendance Report to Excel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                </div>
                                                 <table class="border border-black h-full" cellpadding="2">
                                                     <tr class="text-sm">
                                                         <th class="border border-black text-center">Duty Hours To Be Rendered</th>
@@ -3294,3 +3341,8 @@ function handleImageError(image) {
         }
 </script>
 
+<script>
+    document.addEventListener('export-success', () => {
+        Alpine.store('loading', false);
+    });
+</script>
