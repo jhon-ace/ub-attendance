@@ -988,33 +988,36 @@ class ShowEmployeeAttendance extends Component
                     $remark = ($lateDurationAM > 0 || $lateDurationPM > 0) ? 'Late' : 'Present';
 
                     $modifyStatus = $attendance->status;
+
+                    $dateKey1 = $checkInDateTime->format('Y-m-d');
+                    $dateKey2 = $checkOutDateTime->format('Y-m-d');
      
                     $firstCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
-                                    ->whereDate('check_in_time', $dateKey1)
-                                    ->orderBy('check_in_time', 'asc')
-                                    ->first();
+                        ->whereDate('check_in_time', $dateKey1)
+                        ->orderBy('check_in_time', 'asc')
+                        ->first();
 
-                                $firstCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
-                                    ->whereDate('check_out_time', $dateKey2)
-                                    ->orderBy('check_out_time', 'asc')
-                                    ->first();
+                    $firstCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                        ->whereDate('check_out_time', $dateKey2)
+                        ->orderBy('check_out_time', 'asc')
+                        ->first();
 
-                                $secondCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
-                                    ->whereDate('check_in_time', $dateKey1)
-                                    ->orderBy('check_in_time', 'asc')
-                                    ->skip(1)
-                                    ->first();
+                    $secondCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
+                        ->whereDate('check_in_time', $dateKey1)
+                        ->orderBy('check_in_time', 'asc')
+                        ->skip(1)
+                        ->first();
 
-                                $secondCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
-                                    ->whereDate('check_out_time', $dateKey2)
-                                    ->orderBy('check_out_time', 'asc')
-                                    ->skip(1)
-                                    ->first();
+                    $secondCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                        ->whereDate('check_out_time', $dateKey2)
+                        ->orderBy('check_out_time', 'asc')
+                        ->skip(1)
+                        ->first();
 
-                            $modifyStatusFirstAM = $firstCheckIn;
-                            $modifyStatusSecondAM = $firstCheckOut;
-                            $modifyStatusFirstPM = $secondCheckIn;
-                            $modifyStatusSecondPM = $secondCheckOut;
+                        $modifyStatusFirstAM = $firstCheckIn;
+                        $modifyStatusSecondAM = $firstCheckOut;
+                        $modifyStatusFirstPM = $secondCheckIn;
+                        $modifyStatusSecondPM = $secondCheckOut;
 
                                   
           
@@ -1083,10 +1086,14 @@ class ShowEmployeeAttendance extends Component
                             'hours_undertime_overall' => $totalundertime,
                             'check_in_time' => $checkInTimer,
                             'employee_idd' => $employee_idd,
-                            'firstCheckInStatus' => $firstCheckIn->status,
-                            'firstCheckOutStatus' => $firstCheckOut->status,
-                            'secondCheckInStatus' => $secondCheckIn->status,
-                            'secondCheckOutStatus' => $secondCheckOut->status,
+                            'firstCheckInStatus' => $firstCheckIn->status ?? '',
+                            'firstCheckOutStatus' => $firstCheckOut->status ?? '',
+                            'secondCheckInStatus' => $secondCheckIn->status ?? '',
+                            'secondCheckOutStatus' => $secondCheckOut->status ?? '',
+                            // 'firstCheckInStatus' => $firstCheckIn->status,
+                            // 'firstCheckOutStatus' => $firstCheckOut->status,
+                            // 'secondCheckInStatus' => $secondCheckIn->status,
+                            // 'secondCheckOutStatus' => $secondCheckOut->status,
 
 
                         ];
@@ -2034,6 +2041,9 @@ class ShowEmployeeAttendance extends Component
 
                     $modifyStatus = $attendance->status;
 
+                    $dateKey1 = $checkInDateTime->format('Y-m-d');
+                    $dateKey2 = $checkOutDateTime->format('Y-m-d');
+
                     $firstCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
                             ->whereDate('check_in_time', $dateKey1)
                             ->orderBy('check_in_time', 'asc')
@@ -2125,10 +2135,10 @@ class ShowEmployeeAttendance extends Component
                                 'hours_undertime_overall' => $totalundertime,
                                 'check_in_time' => $checkInTimer,
                                 'employee_idd' => $employee_idd,
-                                'firstCheckInStatus' => $firstCheckIn->status,
-                                'firstCheckOutStatus' => $firstCheckOut->status,
-                                'secondCheckInStatus' => $secondCheckIn->status,
-                                'secondCheckOutStatus' => $secondCheckOut->status,
+                                'firstCheckInStatus' => $firstCheckIn->status ?? '',
+                                'firstCheckOutStatus' => $firstCheckOut->status ?? '',
+                                'secondCheckInStatus' => $secondCheckIn->status ?? '',
+                                'secondCheckOutStatus' => $secondCheckOut->status ?? '',
 
 
                             ];

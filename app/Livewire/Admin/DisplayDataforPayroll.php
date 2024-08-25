@@ -1042,6 +1042,9 @@ class DisplayDataforPayroll extends Component
 
                     $modifyStatus = $attendance->status;
 
+                    $dateKey1 = $checkInDateTime->format('Y-m-d');
+                    $dateKey2 = $checkOutDateTime->format('Y-m-d');
+
                     $firstCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
                         ->whereDate('check_in_time', $dateKey1)
                         ->orderBy('check_in_time', 'asc')
@@ -1136,10 +1139,10 @@ class DisplayDataforPayroll extends Component
                             'hours_undertime_overall' => $totalundertime,
                             'check_in_time' => $checkInTimer,
                             'employee_idd' => $employee_idd,
-                            'firstCheckInStatus' => $firstCheckIn->status,
-                            'firstCheckOutStatus' => $firstCheckOut->status,
-                            'secondCheckInStatus' => $secondCheckIn->status,
-                            'secondCheckOutStatus' => $secondCheckOut->status,
+                            'firstCheckInStatus' => $firstCheckIn->status ?? '',
+                            'firstCheckOutStatus' => $firstCheckOut->status ?? '',
+                            'secondCheckInStatus' => $secondCheckIn->status ?? '',
+                            'secondCheckOutStatus' => $secondCheckOut->status ?? '',
 
 
                         ];
