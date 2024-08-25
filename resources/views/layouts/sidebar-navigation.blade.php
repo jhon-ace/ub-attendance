@@ -4,7 +4,7 @@
                             isFullScreen = (window.innerHeight === screen.height);
                         });
                     " x-show="!isFullScreen" id="sidebarContainer"  class="fixed flex flex-col left-0 w-14 hover:w-48 md:w-48 bg-gradient-to-r from-red-500 to-orange-500 h-full text-black transition-all duration-300 border-r-2 border-gray-300 dark:border-gray-600 sidebar">
-        <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-0.5 ">
+        <div class="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow mr-0.5">
             <ul class="flex flex-col py-2 space-y-1 text-gray-800" >
                 <a href="#" class="flex justify-center items-center">
                     <img class="w-32 h-auto object-contain" src="{{ asset('assets/img/logo.png') }}" alt="SCMS Logo">
@@ -134,24 +134,19 @@
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Individual Attendance Report by Department
                             </a>
                         </li> -->
-                        <li>
-                            <a href="{{ route('admin.attendance.employee_attendance') }}" class="flex items-center  h-16 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                        <li class="w-full">
+                            <a href="{{ route('admin.attendance.employee_attendance') }}" class="flex items-center  h-20 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
                             {{ request()->routeIs('admin.attendance.employee_attendance') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Individual Attendance Report by Department
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('admin.attendance.employee_attendance.payroll') }}" class="flex items-center  h-16 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                            <a href="{{ route('admin.attendance.employee_attendance.payroll') }}" class="flex items-center  h-20 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
                             {{ request()->routeIs('admin.attendance.employee_attendance.payroll') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>All Employee's Attendance Report by Department
                             </a>
                         </li>
-                        <!-- <li>
-                            <a href="{{ route('admin.attendance.employee_attendance.payroll.all') }}" class="flex items-center  h-16 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
-                            {{ request()->routeIs('admin.attendance.employee_attendance.payroll.all') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
-                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>All Employee's Attendance Report
-                            </a>
-                        </li> -->
+
                         <li>
                             <a href="{{ route('admin.attendance.student_attendance') }}" class="flex items-center h-11 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.attendance.student_attendance') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Student
