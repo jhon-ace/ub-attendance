@@ -210,6 +210,7 @@ class ShowEmployeeAttendance extends Component
         $overallTotalHoursSum = 0;
 
         foreach ($attendanceTimeIn as $attendance) {
+            
             // Initialize variables for each record
             $hoursWorkedAM = 0;
             $hoursWorkedPM = 0;
@@ -987,7 +988,35 @@ class ShowEmployeeAttendance extends Component
                     $remark = ($lateDurationAM > 0 || $lateDurationPM > 0) ? 'Late' : 'Present';
 
                     $modifyStatus = $attendance->status;
+     
+                    $firstCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
+                                    ->whereDate('check_in_time', $dateKey1)
+                                    ->orderBy('check_in_time', 'asc')
+                                    ->first();
 
+                                $firstCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                                    ->whereDate('check_out_time', $dateKey2)
+                                    ->orderBy('check_out_time', 'asc')
+                                    ->first();
+
+                                $secondCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
+                                    ->whereDate('check_in_time', $dateKey1)
+                                    ->orderBy('check_in_time', 'asc')
+                                    ->skip(1)
+                                    ->first();
+
+                                $secondCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                                    ->whereDate('check_out_time', $dateKey2)
+                                    ->orderBy('check_out_time', 'asc')
+                                    ->skip(1)
+                                    ->first();
+
+                            $modifyStatusFirstAM = $firstCheckIn;
+                            $modifyStatusSecondAM = $firstCheckOut;
+                            $modifyStatusFirstPM = $secondCheckIn;
+                            $modifyStatusSecondPM = $secondCheckOut;
+
+                                  
           
 
                     // Prepare the key for $attendanceData
@@ -1025,6 +1054,10 @@ class ShowEmployeeAttendance extends Component
                         $attendanceData[$key]->hours_late_overall += $overallTotalHoursLate;
                         $attendanceData[$key]->hours_undertime_overall += $totalundertime;
                         $attendanceData[$key]->check_in_time = $checkInTimer;
+                        $attendanceData[$key]->firstCheckInStatus = $firstCheckIn ? $firstCheckIn->status : null;
+                        $attendanceData[$key]->firstCheckOutStatus = $firstCheckOut ? $firstCheckOut->status : null;
+                        $attendanceData[$key]->secondCheckInStatus = $secondCheckIn ? $secondCheckIn->status : null;
+                        $attendanceData[$key]->secondCheckOutStatus = $secondCheckOut ? $secondCheckOut->status : null;
    
 
 
@@ -1050,6 +1083,10 @@ class ShowEmployeeAttendance extends Component
                             'hours_undertime_overall' => $totalundertime,
                             'check_in_time' => $checkInTimer,
                             'employee_idd' => $employee_idd,
+                            'firstCheckInStatus' => $firstCheckIn->status,
+                            'firstCheckOutStatus' => $firstCheckOut->status,
+                            'secondCheckInStatus' => $secondCheckIn->status,
+                            'secondCheckOutStatus' => $secondCheckOut->status,
 
 
                         ];
@@ -1084,7 +1121,8 @@ class ShowEmployeeAttendance extends Component
         $departmentDisplayWorkingHour = DepartmentWorkingHour::where('department_id', $this->selectedDepartment4)
                                                            ->get();
                   
-
+        $departmentDisplayWorkingHourFetched = DepartmentWorkingHour::where('department_id', $this->selectedDepartment4)
+                                                     ->first();
 
         $gracePeriod = GracePeriod::all();
 
@@ -1106,6 +1144,7 @@ class ShowEmployeeAttendance extends Component
             'selectedAttendanceByDate' => $this->selectedAttendanceByDate,
             'departmentDisplayWorkingHour' => $departmentDisplayWorkingHour,
             'gracePeriod' => $gracePeriod,
+            'departmentDisplayWorkingHourFetched' => $departmentDisplayWorkingHourFetched,
         ]);
     }
 
@@ -1995,74 +2034,107 @@ class ShowEmployeeAttendance extends Component
 
                     $modifyStatus = $attendance->status;
 
-          
+                    $firstCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
+                            ->whereDate('check_in_time', $dateKey1)
+                            ->orderBy('check_in_time', 'asc')
+                            ->first();
 
-                    // Prepare the key for $attendanceData
-                    $key = $attendance->employee_id . '-' . $checkInDate;
+                        $firstCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                            ->whereDate('check_out_time', $dateKey2)
+                            ->orderBy('check_out_time', 'asc')
+                            ->first();
 
-                     $employee_idd = $attendance->employee->employee_id;
-                    $employee_id = $attendance->employee_id;
-                    $employeeLastname = $attendance->employee->employee_lastname;
-                    $employeeFirstname = $attendance->employee->employee_firstname;
-                    $employeeMiddlename = $attendance->employee->employee_middlename;
-                    $checkInTimer = $attendance->check_in_time;
+                        $secondCheckIn = EmployeeAttendanceTimeIn::where('employee_id', $employeeId)
+                            ->whereDate('check_in_time', $dateKey1)
+                            ->orderBy('check_in_time', 'asc')
+                            ->skip(1)
+                            ->first();
 
-                    
-                    // Check if this entry already exists in $attendanceData
-                    if (isset($attendanceData[$key])) {
-                        // Update existing entry
+                        $secondCheckOut = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                            ->whereDate('check_out_time', $dateKey2)
+                            ->orderBy('check_out_time', 'asc')
+                            ->skip(1)
+                            ->first();
+
+                        $modifyStatusFirstAM = $firstCheckIn;
+                        $modifyStatusSecondAM = $firstCheckOut;
+                        $modifyStatusFirstPM = $secondCheckIn;
+                        $modifyStatusSecondPM = $secondCheckOut;
+
+                        // Prepare the key for $attendanceData
+                        $key = $attendance->employee_id . '-' . $checkInDate;
+
+                        $employee_idd = $attendance->employee->employee_id;
+                        $employee_id = $attendance->employee_id;
+                        $employeeLastname = $attendance->employee->employee_lastname;
+                        $employeeFirstname = $attendance->employee->employee_firstname;
+                        $employeeMiddlename = $attendance->employee->employee_middlename;
+                        $checkInTimer = $attendance->check_in_time;
+
                         
-                        $attendanceData[$key]->hours_perDay = $totalHoursNeedperDay;
-                        $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
-                        $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
-                        $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
-                        $attendanceData[$key]->total_hours_late += $totalHoursLate;
-                        $attendanceData[$key]->late_duration += $lateDurationAM;
-                        $attendanceData[$key]->late_durationPM += $lateDurationPM;
-                        $attendanceData[$key]->undertimeAM += $undertimeAM;
-                        $attendanceData[$key]->undertimePM += $undertimePM;
-                        $attendanceData[$key]->total_late += $totalHoursLate;
-                        $attendanceData[$key]->remarks = $remark;
-                        $attendanceData[$key]->modify_status = $modifyStatus;
-                        $attendanceData[$key]->employee_idd = $employee_idd;
-                        $attendanceData[$key]->employee_id = $employee_id;
-                        $attendanceData[$key]->employee_lastname = $employeeLastname;
-                        $attendanceData[$key]->employee_firstname = $employeeFirstname;
-                        $attendanceData[$key]->employee_middlename = $employeeMiddlename;
-                        $attendanceData[$key]->hours_late_overall += $overallTotalHoursLate;
-                        $attendanceData[$key]->hours_undertime_overall += $totalundertime;
-                        $attendanceData[$key]->check_in_time = $checkInTimer;
-   
+                        // Check if this entry already exists in $attendanceData
+                        if (isset($attendanceData[$key])) {
+                            // Update existing entry
+                            
+                            $attendanceData[$key]->hours_perDay = $totalHoursNeedperDay;
+                            $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
+                            $attendanceData[$key]->hours_workedPM += $hoursWorkedPM;
+                            $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
+                            $attendanceData[$key]->total_hours_late += $totalHoursLate;
+                            $attendanceData[$key]->late_duration += $lateDurationAM;
+                            $attendanceData[$key]->late_durationPM += $lateDurationPM;
+                            $attendanceData[$key]->undertimeAM += $undertimeAM;
+                            $attendanceData[$key]->undertimePM += $undertimePM;
+                            $attendanceData[$key]->total_late += $totalHoursLate;
+                            $attendanceData[$key]->remarks = $remark;
+                            $attendanceData[$key]->modify_status = $modifyStatus;
+                            $attendanceData[$key]->employee_idd = $employee_idd;
+                            $attendanceData[$key]->employee_id = $employee_id;
+                            $attendanceData[$key]->employee_lastname = $employeeLastname;
+                            $attendanceData[$key]->employee_firstname = $employeeFirstname;
+                            $attendanceData[$key]->employee_middlename = $employeeMiddlename;
+                            $attendanceData[$key]->hours_late_overall += $overallTotalHoursLate;
+                            $attendanceData[$key]->hours_undertime_overall += $totalundertime;
+                            $attendanceData[$key]->check_in_time = $checkInTimer;
+                            $attendanceData[$key]->firstCheckInStatus = $firstCheckIn ? $firstCheckIn->status : null;
+                            $attendanceData[$key]->firstCheckOutStatus = $firstCheckOut ? $firstCheckOut->status : null;
+                            $attendanceData[$key]->secondCheckInStatus = $secondCheckIn ? $secondCheckIn->status : null;
+                            $attendanceData[$key]->secondCheckOutStatus = $secondCheckOut ? $secondCheckOut->status : null;
 
 
-                        // dd($attendanceData[$key]->undertimeAM += $undertimeAM);
-                    } else {
-                        // Create new entry
-                        $attendanceData[$key] = (object) [
-                            'hours_perDay' => $totalHoursNeedperDay,
-                            'employee_id' => $attendance->employee_id,
-                            'worked_date' => $checkInDate,
-                            'hours_workedAM' => $hoursWorkedAM,
-                            'hours_workedPM' => $hoursWorkedPM,
-                            'total_hours_worked' => $totalHoursWorked,
-                            'total_hours_late' => $totalHoursLate,
-                            'late_duration' => $lateDurationAM,
-                            'late_durationPM' => $lateDurationPM,
-                            'undertimeAM' => $undertimeAM,
-                            'undertimePM' => $undertimePM,
-                            'total_late' => $totalHoursLate,
-                            'remarks' => $remark,
-                            'modify_status'=> $modifyStatus,
-                            'hours_late_overall' => $overallTotalHoursLate,
-                            'hours_undertime_overall' => $totalundertime,
-                            'check_in_time' => $checkInTimer,
-                            'employee_idd' => $employee_idd,
+
+                            // dd($attendanceData[$key]->undertimeAM += $undertimeAM);
+                        } else {
+                            // Create new entry
+                            $attendanceData[$key] = (object) [
+                                'hours_perDay' => $totalHoursNeedperDay,
+                                'employee_id' => $attendance->employee_id,
+                                'worked_date' => $checkInDate,
+                                'hours_workedAM' => $hoursWorkedAM,
+                                'hours_workedPM' => $hoursWorkedPM,
+                                'total_hours_worked' => $totalHoursWorked,
+                                'total_hours_late' => $totalHoursLate,
+                                'late_duration' => $lateDurationAM,
+                                'late_durationPM' => $lateDurationPM,
+                                'undertimeAM' => $undertimeAM,
+                                'undertimePM' => $undertimePM,
+                                'total_late' => $totalHoursLate,
+                                'remarks' => $remark,
+                                'modify_status'=> $modifyStatus,
+                                'hours_late_overall' => $overallTotalHoursLate,
+                                'hours_undertime_overall' => $totalundertime,
+                                'check_in_time' => $checkInTimer,
+                                'employee_idd' => $employee_idd,
+                                'firstCheckInStatus' => $firstCheckIn->status,
+                                'firstCheckOutStatus' => $firstCheckOut->status,
+                                'secondCheckInStatus' => $secondCheckIn->status,
+                                'secondCheckOutStatus' => $secondCheckOut->status,
 
 
-                        ];
+                            ];
 
-                        //  session()->put('late_duration', $lateDurationAM);
-                    }
+                            //  session()->put('late_duration', $lateDurationAM);
+                        }
 
                     // Add total hours worked to overall total
                     $overallTotalHours += $totalHoursWorked;

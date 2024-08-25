@@ -1405,196 +1405,231 @@
 
                                             {{ $result }}
                                         </td>
-                                        <td class="text-black border uppercase border-gray-400 text-xs font-semibold w-32">
-                                        @php
-                                            $lateDurationAM = $attendance->late_duration;
-                                            $lateDurationPM = $attendance->late_durationPM;
-                                            $am = $attendance->undertimeAM ?? 0;
-                                            $pm = $attendance->undertimePM ?? 0;
+                                        <td class="text-red-500 border uppercase border-gray-400 text-xs font-bold w-32">
+                                            @php
+                                                $lateDurationAM = $attendance->late_duration;
+                                                $lateDurationPM = $attendance->late_durationPM;
+                                                $am = $attendance->undertimeAM ?? 0;
+                                                $pm = $attendance->undertimePM ?? 0;
 
-                                            $totalHoursAM = floor($attendance->hours_workedAM);
-                                            $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
-                                            $totalHoursPM = floor($attendance->hours_workedPM);
-                                            $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
-                                            $totalHours = $totalHoursAM + $totalHoursPM;
-                                            $totalMinutes = $totalMinutesAM + $totalMinutesPM;
-                                            $modify_status = $attendance->modify_status;
+                                                $totalHoursAM = floor($attendance->hours_workedAM);
+                                                $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                $totalHoursPM = floor($attendance->hours_workedPM);
+                                                $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                                                $totalHours = $totalHoursAM + $totalHoursPM;
+                                                $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+                                                $modify_status = $attendance->modify_status;
+                                                $firstCheckInStatus = $attendance->firstCheckInStatus;
+                                                $firstCheckOutStatus = $attendance->firstCheckOutStatus;
+                                                $secondCheckInStatus = $attendance->secondCheckInStatus;
+                                                $secondCheckOutStatus = $attendance->secondCheckOutStatus;
 
-                                            $remarkss = '';
+                                                $remarkss = '';
 
-                                            if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                $am == 0 &&
-                                                $pm == 0 &&
-                                                $totalHoursAM == 0 &&
-                                                $totalMinutesAM == 0 &&
-                                                $totalHoursPM == 0 &&
-                                                $totalMinutesPM == 0 &&
-                                                $modify_status == "Absent"
-                                            ) {
-                                                $remarkss = 'Absent';
-                                            }
-                                            else if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                $am == 0 &&
-                                                $pm == 0 &&
-                                                $totalHoursAM == 0 &&
-                                                $totalMinutesAM == 0 &&
-                                                $totalHoursPM == 0 &&
-                                                $totalMinutesPM == 0 &&
-                                                $modify_status == "On Leave"
-                                            ) {
-                                                $remarkss = 'Leave';
-                                            }
-                                            else if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                $am == 0 &&
-                                                $pm == 0 &&
-                                                $totalHoursAM > 0 &&
-                                                $totalMinutesAM == 0 &&
-                                                $totalHoursPM > 0 &&
-                                                $totalMinutesPM == 0 &&
-                                                $modify_status == "On Leave"
-                                            ) {
-                                                $remarkss = 'Leave';
-                                            }
-                                            else if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                $am == 0 &&
-                                                $pm == 0 &&
-                                                $totalHoursAM > 0 &&
-                                                $totalMinutesAM == 0 &&
-                                                $totalHoursPM > 0 &&
-                                                $totalMinutesPM == 0 &&
-                                                $modify_status == "Holiday"
-                                            ) {
-                                                $remarkss = 'Holiday';
-                                            }
-                                            else if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                $am == 0 &&
-                                                $pm == 0 &&
-                                                ($totalHoursAM > 0 &&
-                                                $totalMinutesAM > 0 ||
-                                                $totalHoursPM == 0 &&
-                                                $totalMinutesPM == 0) &&
-                                                $modify_status == "Official Travel"
-                                            ) {
-                                                $remarkss = 'Official Travel';
-                                            }
-                                            
-                                            
-                                            else if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                $am == 0 &&
-                                                $pm == 0 &&
-                                                ($totalHoursAM > 0 &&
-                                                $totalMinutesAM > 0 ||
-                                                $totalHoursPM == 0 &&
-                                                $totalMinutesPM == 0) &&
-                                                $modify_status == "On Leave"
-                                            ) {
-                                                $remarkss = 'On Leave';
-                                            }
+                                                if (
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    $am == 0 &&
+                                                    $pm == 0 &&
+                                                    $totalHoursAM == 0 &&
+                                                    $totalMinutesAM == 0 &&
+                                                    $totalHoursPM == 0 &&
+                                                    $totalMinutesPM == 0 &&
+                                                    $modify_status == "Absent"
+                                                ) {
+                                                    $remarkss = 'Absent';
+                                                }
                                                 else if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                $am == 0 &&
-                                                $pm == 0 &&
-                                                ($totalHoursAM == 0 &&
-                                                $totalMinutesAM == 0 ||
-                                                $totalHoursPM > 0 &&
-                                                $totalMinutesPM > 0) &&
-                                                $modify_status == "Official Travel"
-                                            ) {
-                                                $remarkss = 'Official Travel';
-                                            }
-                                            else if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                $am == 0 &&
-                                                $pm == 0 &&
-                                                ($totalHoursAM == 0 &&
-                                                $totalMinutesAM == 0 ||
-                                                $totalHoursPM > 0 &&
-                                                $totalMinutesPM > 0) &&
-                                                $modify_status == "On Leave"
-                                            ) {
-                                                $remarkss = 'On Leave';
-                                            }
-                                            else if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                $am == 0 &&
-                                                $pm == 0 &&
-                                                $totalHoursAM > 0 &&
-                                                $totalMinutesAM == 0 &&
-                                                $totalHoursPM > 0 &&
-                                                $totalMinutesPM == 0 &&
-                                                $modify_status == "Official Travel"
-                                            ) {
-                                                $remarkss = 'Official Travel';
-                                            }
-                                            
-                                            else if (
-                                                $lateDurationAM == 0 &&
-                                                $lateDurationPM == 0 &&
-                                                ($am == 0 || $am > 0) &&
-                                                ($pm == 0 || $pm > 0)  &&
-                                                $totalHoursAM == 0 &&
-                                                $totalMinutesAM == 0 &&
-                                                $totalHoursPM == 0 &&
-                                                $totalMinutesPM == 0 &&
-                                                $modify_status == "On-campus"
-                                            ) {
-                                                $remarkss = 'Invalid Attendance';
-                                            }
-                                            
-                                                else {
-                                                if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
-                                                    $remarkss = "Present Afternoon Absent Morning";
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    $am == 0 &&
+                                                    $pm == 0 &&
+                                                    $totalHoursAM == 0 &&
+                                                    $totalMinutesAM == 0 &&
+                                                    $totalHoursPM == 0 &&
+                                                    $totalMinutesPM == 0 &&
+                                                    $modify_status == "On Leave"
+                                                ) {
+                                                    $remarkss = 'Leave';
                                                 }
-                                                else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
-                                                    $remarkss = "Present Morning Absent Afternoon";
+                                                else if (
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    $am == 0 &&
+                                                    $pm == 0 &&
+                                                    $totalHoursAM > 0 &&
+                                                    $totalMinutesAM == 0 &&
+                                                    $totalHoursPM > 0 &&
+                                                    $totalMinutesPM == 0 &&
+                                                    //$modify_status == "On Leave"
+                                                    $firstCheckInStatus == "On Leave" &&
+                                                    $firstCheckOutStatus == "On Leave" && 
+                                                    $secondCheckInStatus == "On Leave" &&
+                                                    $secondCheckOutStatus == "On Leave"
+                                                ) {
+                                                    $remarkss = 'On Leave Whole Day';
                                                 }
-                                                else {
-                                                    if ($lateDurationAM > 0 && $lateDurationPM > 0) {
-                                                        $remarkss = 'Present - Late AM & PM';
-                                                    } elseif ($lateDurationAM > 0) {
-                                                        $remarkss = 'Present - Late AM';
-                                                    } elseif ($lateDurationPM > 0) {
-                                                        $remarkss = 'Present - Late PM';
+                                                else if (
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    $am == 0 &&
+                                                    $pm == 0 &&
+                                                    $totalHoursAM > 0 &&
+                                                    $totalMinutesAM == 0 &&
+                                                    $totalHoursPM > 0 &&
+                                                    $totalMinutesPM == 0 &&
+                                                    $modify_status == "Holiday"
+                                                ) {
+                                                    $remarkss = 'Holiday';
+                                                }
+                                                else if (
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    $am == 0 &&
+                                                    $pm == 0 &&
+                                                    ($totalHoursAM > 0 &&
+                                                    $totalMinutesAM > 0 ||
+                                                    $totalHoursPM == 0 &&
+                                                    $totalMinutesPM == 0) &&
+                                                    $modify_status == "Official Travel"
+                                                ) {
+                                                    $remarkss = 'Official Travel';
+                                                }
+                                                
+                                                
+                                                else if (
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    $am == 0 &&
+                                                    $pm == 0 &&
+                                                    ($totalHoursAM > 0 &&
+                                                    $totalMinutesAM > 0 ||
+                                                    $totalHoursPM == 0 &&
+                                                    $totalMinutesPM == 0) &&
+                                                    $modify_status == "On Leave"
+                                                ) {
+                                                    $remarkss = 'On Leave';
+                                                }
+                                                    else if (
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    $am == 0 &&
+                                                    $pm == 0 &&
+                                                    ($totalHoursAM == 0 &&
+                                                    $totalMinutesAM == 0 ||
+                                                    $totalHoursPM > 0 &&
+                                                    $totalMinutesPM > 0) &&
+                                                    $modify_status == "Official Travel"
+                                                ) {
+                                                    $remarkss = 'Official Travel';
+                                                }
+                                                else if (
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    $am == 0 &&
+                                                    $pm == 0 &&
+                                                    ($totalHoursAM == 0 &&
+                                                    $totalMinutesAM == 0 ||
+                                                    $totalHoursPM > 0 &&
+                                                    $totalMinutesPM > 0) &&
+                                                    $modify_status == "On Leave"
+                                                ) {
+                                                    $remarkss = 'On Leave';
+                                                }
+                                                else if (
+                                                    $firstCheckInStatus == "On Leave" &&
+                                                    $firstCheckOutStatus == "On Leave"
+                                                ) {
+                                                    $remarkss = 'On Leave AM - Present PM';
+                                                }
+                                                else if (
+                                                    $secondCheckInStatus == "On Leave" &&
+                                                    $secondCheckOutStatus == "On Leave"
+                                                ) {
+                                                    $remarkss = 'On Leave PM - Present AM';
+                                                }
+                                                else if (
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    $am == 0 &&
+                                                    $pm == 0 &&
+                                                    $totalHoursAM > 0 &&
+                                                    $totalMinutesAM == 0 &&
+                                                    $totalHoursPM > 0 &&
+                                                    $totalMinutesPM == 0 &&
+                                                    //$modify_status == "Official Travel"
+                                                    $firstCheckInStatus == "Official Travel" &&
+                                                    $firstCheckOutStatus == "Official Travel" && 
+                                                    $secondCheckInStatus == "Official Travel" &&
+                                                    $secondCheckOutStatus == "Official Travel"
+                                                ) {
+                                                    $remarkss = 'On Official Travel Whole Day';
+                                                }
+                                                else if (
+                                                    $firstCheckInStatus == "Official Travel" &&
+                                                    $firstCheckOutStatus == "Official Travel"
+                                                ) {
+                                                    $remarkss = 'On Official Travel AM - Present PM';
+                                                }
+                                                else if (
+                                                    $secondCheckInStatus == "Official Travel" &&
+                                                    $secondCheckOutStatus == "Official Travel"
+                                                ) {
+                                                    $remarkss = 'On Official Travel PM - Present AM';
+                                                }
+                                                else if (
+                                                    $lateDurationAM == 0 &&
+                                                    $lateDurationPM == 0 &&
+                                                    ($am == 0 || $am > 0) &&
+                                                    ($pm == 0 || $pm > 0)  &&
+                                                    $totalHoursAM == 0 &&
+                                                    $totalMinutesAM == 0 &&
+                                                    $totalHoursPM == 0 &&
+                                                    $totalMinutesPM == 0 &&
+                                                    $modify_status == "On-campus"
+                                                ) {
+                                                    $remarkss = 'Invalid Attendance';
+                                                }
+                                                
+                                                    else {
+                                                    if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
+                                                        $remarkss = "Present Afternoon, Absent Morning";
                                                     }
-                                                        else {
-                                                        $remarkss = "Present";
+                                                    else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
+                                                        $remarkss = "Present Morning, Absent Afternoon";
                                                     }
-                                                }
+                                                    else {
+                                                        if ($lateDurationAM > 0 && $lateDurationPM > 0) {
+                                                            $remarkss = 'Present - Late AM & PM';
+                                                        } elseif ($lateDurationAM > 0) {
+                                                            $remarkss = 'Present - Late AM';
+                                                        } elseif ($lateDurationPM > 0) {
+                                                            $remarkss = 'Present - Late PM';
+                                                        }
+                                                            else {
+                                                            $remarkss = "Present";
+                                                        }
+                                                    }
 
-                                                $undertimeRemark = '';
-                                                if ($am > 0) {
-                                                    $undertimeRemark .= 'Undertime AM';
-                                                }
-                                                if ($pm > 0) {
+                                                    $undertimeRemark = '';
+                                                    if ($am > 0) {
+                                                        $undertimeRemark .= 'Undertime AM';
+                                                    }
+                                                    if ($pm > 0) {
+                                                        if (!empty($undertimeRemark)) {
+                                                            $undertimeRemark .= ' & PM';
+                                                        } else {
+                                                            $undertimeRemark .= 'Undertime PM';
+                                                        }
+                                                    }
                                                     if (!empty($undertimeRemark)) {
-                                                        $undertimeRemark .= ' & PM';
-                                                    } else {
-                                                        $undertimeRemark .= 'Undertime PM';
+                                                        $remarkss .= ' - ' . $undertimeRemark;
                                                     }
                                                 }
-                                                if (!empty($undertimeRemark)) {
-                                                    $remarkss .= ' - ' . $undertimeRemark;
-                                                }
-                                            }
-                                        @endphp
+                                            @endphp
 
-                                            {{ $remarkss }}
-                                        </td>
+                                                {{ $remarkss }}
+                                            </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -1624,17 +1659,14 @@
 
                                         <br>
                                         <p class="text-[14px]">
-                                            <text class="text-red-500">Note:</text> The half day leave is same to full day leave if the working hours is not half day.
+                                            <text class="text-red-500">Note:</text> The half day leave is the same as a full day leave if the working hours are not half day.
                                         </p>
                                         <br>
                                         <div class="mb-2 hidden">
                                             <label for="selected-date" class="block mb-2 text-left">Employee:</label>
                                             <input type="text" name="employee_id" value="{{ $selectedEmployeeToShow->id }}" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full max-w-md">
                                         </div>
-                                        <!-- <div class="mb-2">
-                                            <label for="selected-date" class="block mb-2 text-left">Select a Date:</label>
-                                            <input type="date" id="selected-date" name="selected_date" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full">
-                                        </div> -->
+
                                         <div x-data="{ selectedDate: '', dayOfWeekNumber: '' }" class="mb-2">
                                             <label for="selected-date" class="block mb-2 text-left">Select a Date:</label>
                                             <input 
@@ -1644,7 +1676,7 @@
                                                 class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full"
                                                 x-model="selectedDate"
                                                 @change="dayOfWeekNumber = new Date(selectedDate).getDay()"
-                                                wire:model = "selected_date"
+                                                wire:model="selected_date"
                                             >
 
                                             <div class="">
@@ -1659,19 +1691,36 @@
                                                     wire:model="dayOfTheWeek"
                                                 >
                                             </div>
-
                                         </div>
-                                            
-                                        
-                                        <div class="mb-2">
-                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Status: </label>
-                                            <select id="school_id" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline" required>
-                                                <option value="">Select Status</option>
+
+                                        <div class="mb-4">
+                                            <label class="block text-gray-700 text-md font-bold mb-2 text-left">Select Shift:</label>
+                                            <div class="flex space-x-4">
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" id="am_shift" name="am_shift" class="mr-2" onchange="updateStatus()">
+                                                    <label for="am_shift">AM Shift</label>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" id="pm_shift" name="pm_shift" class="mr-2" onchange="updateStatus()">
+                                                    <label for="pm_shift">PM Shift</label>
+                                                </div>
+                                            </div>
+                                            <!-- Hidden inputs for checkboxes -->
+                                            <input type="hidden" name="am_shift" id="am_shift_hidden" value="0">
+                                            <input type="hidden" name="pm_shift" id="pm_shift_hidden" value="0">
+                                        </div>
+
+                                        <!-- Status Dropdown -->
+                                        <div class="mb-4">
+                                            <label for="status" class="block text-gray-700 text-md font-bold mb-2 text-left">Status:</label>
+                                            <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline" required>
                                                 <option value="On Leave">On Leave</option>
                                                 <option value="Official Travel">Official Travel</option>
+                                                <!-- <option value="Sick Leave">Sick Leave</option> -->
+                                                <!-- Add other options as needed -->
                                             </select>
-                                            <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                                         </div>
+
                                         <div class="flex mb-4 mt-10 justify-center">
                                             <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
                                                 Save
@@ -2691,127 +2740,231 @@
 
                                                                                         {{ $result }}
                                                                                     </td>
-                                                                                    <td class="text-black border uppercase border-gray-400 text-xs font-semibold w-32">
-                                                                                    @php
-                                                                                        $lateDurationAM = $attendance->late_duration;
-                                                                                        $lateDurationPM = $attendance->late_durationPM;
-                                                                                        $am = $attendance->undertimeAM ?? 0;
-                                                                                        $pm = $attendance->undertimePM ?? 0;
+                                                                                    <td class="text-red-500 border uppercase border-gray-400 text-xs font-bold w-32">
+                                                                                        @php
+                                                                                            $lateDurationAM = $attendance->late_duration;
+                                                                                            $lateDurationPM = $attendance->late_durationPM;
+                                                                                            $am = $attendance->undertimeAM ?? 0;
+                                                                                            $pm = $attendance->undertimePM ?? 0;
 
-                                                                                        $totalHoursAM = floor($attendance->hours_workedAM);
-                                                                                        $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
-                                                                                        $totalHoursPM = floor($attendance->hours_workedPM);
-                                                                                        $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
-                                                                                        $totalHours = $totalHoursAM + $totalHoursPM;
-                                                                                        $totalMinutes = $totalMinutesAM + $totalMinutesPM;
-                                                                                        $modify_status = $attendance->modify_status;
+                                                                                            $totalHoursAM = floor($attendance->hours_workedAM);
+                                                                                            $totalMinutesAM = ($attendance->hours_workedAM - $totalHoursAM) * 60;
+                                                                                            $totalHoursPM = floor($attendance->hours_workedPM);
+                                                                                            $totalMinutesPM = ($attendance->hours_workedPM - $totalHoursPM) * 60;
+                                                                                            $totalHours = $totalHoursAM + $totalHoursPM;
+                                                                                            $totalMinutes = $totalMinutesAM + $totalMinutesPM;
+                                                                                            $modify_status = $attendance->modify_status;
+                                                                                            $firstCheckInStatus = $attendance->firstCheckInStatus;
+                                                                                            $firstCheckOutStatus = $attendance->firstCheckOutStatus;
+                                                                                            $secondCheckInStatus = $attendance->secondCheckInStatus;
+                                                                                            $secondCheckOutStatus = $attendance->secondCheckOutStatus;
 
-                                                                                        $remarkss = '';
+                                                                                            $remarkss = '';
 
-                                                                                        if (
-                                                                                            $lateDurationAM == 0 &&
-                                                                                            $lateDurationPM == 0 &&
-                                                                                            $am == 0 &&
-                                                                                            $pm == 0 &&
-                                                                                            $totalHoursAM == 0 &&
-                                                                                            $totalMinutesAM == 0 &&
-                                                                                            $totalHoursPM == 0 &&
-                                                                                            $totalMinutesPM == 0 &&
-                                                                                            $modify_status == "Absent"
-                                                                                        ) {
-                                                                                            $remarkss = 'Absent';
-                                                                                        }
-                                                                                        else if (
-                                                                                            $lateDurationAM == 0 &&
-                                                                                            $lateDurationPM == 0 &&
-                                                                                            $am == 0 &&
-                                                                                            $pm == 0 &&
-                                                                                            $totalHoursAM == 0 &&
-                                                                                            $totalMinutesAM == 0 &&
-                                                                                            $totalHoursPM == 0 &&
-                                                                                            $totalMinutesPM == 0 &&
-                                                                                            $modify_status == "On Leave"
-                                                                                        ) {
-                                                                                            $remarkss = 'Leave';
-                                                                                        }
-                                                                                        else if (
-                                                                                            $lateDurationAM == 0 &&
-                                                                                            $lateDurationPM == 0 &&
-                                                                                            $am == 0 &&
-                                                                                            $pm == 0 &&
-                                                                                            $totalHoursAM > 0 &&
-                                                                                            $totalMinutesAM == 0 &&
-                                                                                            $totalHoursPM > 0 &&
-                                                                                            $totalMinutesPM == 0 &&
-                                                                                            $modify_status == "On Leave"
-                                                                                        ) {
-                                                                                            $remarkss = 'Leave';
-                                                                                        }
-                                                                                        else if (
-                                                                                            $lateDurationAM == 0 &&
-                                                                                            $lateDurationPM == 0 &&
-                                                                                            $am == 0 &&
-                                                                                            $pm == 0 &&
-                                                                                            $totalHoursAM > 0 &&
-                                                                                            $totalMinutesAM == 0 &&
-                                                                                            $totalHoursPM > 0 &&
-                                                                                            $totalMinutesPM == 0 &&
-                                                                                            $modify_status == "Official Travel"
-                                                                                        ) {
-                                                                                            $remarkss = 'Official Travel';
-                                                                                        }
-                                                                                        else if (
-                                                                                            $lateDurationAM == 0 &&
-                                                                                            $lateDurationPM == 0 &&
-                                                                                            $am == 0 &&
-                                                                                            $pm == 0 &&
-                                                                                            $totalHoursAM == 0 &&
-                                                                                            $totalMinutesAM == 0 &&
-                                                                                            $totalHoursPM == 0 &&
-                                                                                            $totalMinutesPM == 0 &&
-                                                                                            $modify_status == "On-campus"
-                                                                                        ) {
-                                                                                            $remarkss = 'Invalid Attendance';
-                                                                                        }
-                                                                                        
-                                                                                        else {
-                                                                                            if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
-                                                                                                $remarkss = "Present Afternoon Absent Morning";
+                                                                                            if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                $am == 0 &&
+                                                                                                $pm == 0 &&
+                                                                                                $totalHoursAM == 0 &&
+                                                                                                $totalMinutesAM == 0 &&
+                                                                                                $totalHoursPM == 0 &&
+                                                                                                $totalMinutesPM == 0 &&
+                                                                                                $modify_status == "Absent"
+                                                                                            ) {
+                                                                                                $remarkss = 'Absent';
                                                                                             }
-                                                                                            else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
-                                                                                                $remarkss = "Present Morning Absent Afternoon";
+                                                                                            else if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                $am == 0 &&
+                                                                                                $pm == 0 &&
+                                                                                                $totalHoursAM == 0 &&
+                                                                                                $totalMinutesAM == 0 &&
+                                                                                                $totalHoursPM == 0 &&
+                                                                                                $totalMinutesPM == 0 &&
+                                                                                                $modify_status == "On Leave"
+                                                                                            ) {
+                                                                                                $remarkss = 'Leave';
                                                                                             }
+                                                                                            else if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                $am == 0 &&
+                                                                                                $pm == 0 &&
+                                                                                                $totalHoursAM > 0 &&
+                                                                                                $totalMinutesAM == 0 &&
+                                                                                                $totalHoursPM > 0 &&
+                                                                                                $totalMinutesPM == 0 &&
+                                                                                                //$modify_status == "On Leave"
+                                                                                                $firstCheckInStatus == "On Leave" &&
+                                                                                                $firstCheckOutStatus == "On Leave" && 
+                                                                                                $secondCheckInStatus == "On Leave" &&
+                                                                                                $secondCheckOutStatus == "On Leave"
+                                                                                            ) {
+                                                                                                $remarkss = 'On Leave Whole Day';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                $am == 0 &&
+                                                                                                $pm == 0 &&
+                                                                                                $totalHoursAM > 0 &&
+                                                                                                $totalMinutesAM == 0 &&
+                                                                                                $totalHoursPM > 0 &&
+                                                                                                $totalMinutesPM == 0 &&
+                                                                                                $modify_status == "Holiday"
+                                                                                            ) {
+                                                                                                $remarkss = 'Holiday';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                $am == 0 &&
+                                                                                                $pm == 0 &&
+                                                                                                ($totalHoursAM > 0 &&
+                                                                                                $totalMinutesAM > 0 ||
+                                                                                                $totalHoursPM == 0 &&
+                                                                                                $totalMinutesPM == 0) &&
+                                                                                                $modify_status == "Official Travel"
+                                                                                            ) {
+                                                                                                $remarkss = 'Official Travel';
+                                                                                            }
+                                                                                            
+                                                                                            
+                                                                                            else if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                $am == 0 &&
+                                                                                                $pm == 0 &&
+                                                                                                ($totalHoursAM > 0 &&
+                                                                                                $totalMinutesAM > 0 ||
+                                                                                                $totalHoursPM == 0 &&
+                                                                                                $totalMinutesPM == 0) &&
+                                                                                                $modify_status == "On Leave"
+                                                                                            ) {
+                                                                                                $remarkss = 'On Leave';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                $am == 0 &&
+                                                                                                $pm == 0 &&
+                                                                                                ($totalHoursAM == 0 &&
+                                                                                                $totalMinutesAM == 0 ||
+                                                                                                $totalHoursPM > 0 &&
+                                                                                                $totalMinutesPM > 0) &&
+                                                                                                $modify_status == "Official Travel"
+                                                                                            ) {
+                                                                                                $remarkss = 'Official Travel';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                $am == 0 &&
+                                                                                                $pm == 0 &&
+                                                                                                ($totalHoursAM == 0 &&
+                                                                                                $totalMinutesAM == 0 ||
+                                                                                                $totalHoursPM > 0 &&
+                                                                                                $totalMinutesPM > 0) &&
+                                                                                                $modify_status == "On Leave"
+                                                                                            ) {
+                                                                                                $remarkss = 'On Leave';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $firstCheckInStatus == "On Leave" &&
+                                                                                                $firstCheckOutStatus == "On Leave"
+                                                                                            ) {
+                                                                                                $remarkss = 'On Leave AM - Present PM';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $secondCheckInStatus == "On Leave" &&
+                                                                                                $secondCheckOutStatus == "On Leave"
+                                                                                            ) {
+                                                                                                $remarkss = 'On Leave PM - Present AM';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                $am == 0 &&
+                                                                                                $pm == 0 &&
+                                                                                                $totalHoursAM > 0 &&
+                                                                                                $totalMinutesAM == 0 &&
+                                                                                                $totalHoursPM > 0 &&
+                                                                                                $totalMinutesPM == 0 &&
+                                                                                                //$modify_status == "Official Travel"
+                                                                                                $firstCheckInStatus == "Official Travel" &&
+                                                                                                $firstCheckOutStatus == "Official Travel" && 
+                                                                                                $secondCheckInStatus == "Official Travel" &&
+                                                                                                $secondCheckOutStatus == "Official Travel"
+                                                                                            ) {
+                                                                                                $remarkss = 'On Official Travel Whole Day';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $firstCheckInStatus == "Official Travel" &&
+                                                                                                $firstCheckOutStatus == "Official Travel"
+                                                                                            ) {
+                                                                                                $remarkss = 'On Official Travel AM - Present PM';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $secondCheckInStatus == "Official Travel" &&
+                                                                                                $secondCheckOutStatus == "Official Travel"
+                                                                                            ) {
+                                                                                                $remarkss = 'On Official Travel PM - Present AM';
+                                                                                            }
+                                                                                            else if (
+                                                                                                $lateDurationAM == 0 &&
+                                                                                                $lateDurationPM == 0 &&
+                                                                                                ($am == 0 || $am > 0) &&
+                                                                                                ($pm == 0 || $pm > 0)  &&
+                                                                                                $totalHoursAM == 0 &&
+                                                                                                $totalMinutesAM == 0 &&
+                                                                                                $totalHoursPM == 0 &&
+                                                                                                $totalMinutesPM == 0 &&
+                                                                                                $modify_status == "On-campus"
+                                                                                            ) {
+                                                                                                $remarkss = 'Invalid Attendance';
+                                                                                            }
+                                                                                            
                                                                                             else {
-                                                                                                if ($lateDurationAM > 0 && $lateDurationPM > 0) {
-                                                                                                    $remarkss = 'Present - Late AM & PM';
-                                                                                                } elseif ($lateDurationAM > 0) {
-                                                                                                    $remarkss = 'Present - Late AM';
-                                                                                                } elseif ($lateDurationPM > 0) {
-                                                                                                    $remarkss = 'Present - Late PM';
-                                                                                                } else {
-                                                                                                    $remarkss = "Present";
+                                                                                                if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
+                                                                                                    $remarkss = "Present Afternoon, Absent Morning";
                                                                                                 }
-                                                                                            }
+                                                                                                else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
+                                                                                                    $remarkss = "Present Morning, Absent Afternoon";
+                                                                                                }
+                                                                                                else {
+                                                                                                    if ($lateDurationAM > 0 && $lateDurationPM > 0) {
+                                                                                                        $remarkss = 'Present - Late AM & PM';
+                                                                                                    } elseif ($lateDurationAM > 0) {
+                                                                                                        $remarkss = 'Present - Late AM';
+                                                                                                    } elseif ($lateDurationPM > 0) {
+                                                                                                        $remarkss = 'Present - Late PM';
+                                                                                                    }
+                                                                                                    else {
+                                                                                                        $remarkss = "Present";
+                                                                                                    }
+                                                                                                }
 
-                                                                                            $undertimeRemark = '';
-                                                                                            if ($am > 0) {
-                                                                                                $undertimeRemark .= 'Undertime AM';
-                                                                                            }
-                                                                                            if ($pm > 0) {
+                                                                                                $undertimeRemark = '';
+                                                                                                if ($am > 0) {
+                                                                                                    $undertimeRemark .= 'Undertime AM';
+                                                                                                }
+                                                                                                if ($pm > 0) {
+                                                                                                    if (!empty($undertimeRemark)) {
+                                                                                                        $undertimeRemark .= ' & PM';
+                                                                                                    } else {
+                                                                                                        $undertimeRemark .= 'Undertime PM';
+                                                                                                    }
+                                                                                                }
                                                                                                 if (!empty($undertimeRemark)) {
-                                                                                                    $undertimeRemark .= ' & PM';
-                                                                                                } else {
-                                                                                                    $undertimeRemark .= 'Undertime PM';
+                                                                                                    $remarkss .= ' - ' . $undertimeRemark;
                                                                                                 }
                                                                                             }
-                                                                                            if (!empty($undertimeRemark)) {
-                                                                                                $remarkss .= ' - ' . $undertimeRemark;
-                                                                                            }
-                                                                                        }
-                                                                                    @endphp
+                                                                                        @endphp
 
-                                                                                        {{ $remarkss }}
-                                                                                    </td>
+                                                                                            {{ $remarkss }}
+                                                                                        </td>
                                                                                 </tr>
                                                                                 @endforeach
                                                                             </tbody>
@@ -3221,3 +3374,45 @@ function handleImageError(image) {
         Alpine.store('loading', false);
     });
 </script>
+
+ <script>
+        function updateStatus() {
+            const amShift = document.getElementById('am_shift').checked;
+            const pmShift = document.getElementById('pm_shift').checked;
+            const amShiftHidden = document.getElementById('am_shift_hidden');
+            const pmShiftHidden = document.getElementById('pm_shift_hidden');
+            const statusSelect = document.getElementById('status');
+
+            // Update hidden inputs based on checkbox states
+            amShiftHidden.value = amShift ? '1' : '0';
+            pmShiftHidden.value = pmShift ? '1' : '0';
+
+            console.log('AM Shift:', amShift, 'PM Shift:', pmShift); // Debugging line
+            console.log('AM Shift Hidden Value:', amShiftHidden.value, 'PM Shift Hidden Value:', pmShiftHidden.value); // Debugging line
+
+            // Define default statuses for AM and PM shifts
+            const defaultAmStatus = 'On Leave';
+            const defaultPmStatus = 'Official Travel';
+
+            // Update status based on the shifts
+            if (amShift && pmShift) {
+                statusSelect.value = defaultAmStatus; // Choose based on additional logic if needed
+            } else if (amShift) {
+                statusSelect.value = defaultAmStatus;
+            } else if (pmShift) {
+                statusSelect.value = defaultPmStatus;
+            } else {
+                statusSelect.value = defaultAmStatus; // Set default value if no shifts are selected
+            }
+
+            // Ensure dropdown is always enabled
+            statusSelect.disabled = false;
+        }
+
+        // Initialize status based on checkboxes on page load
+        document.addEventListener('DOMContentLoaded', updateStatus);
+
+        // Update status on checkbox change
+        document.getElementById('am_shift').addEventListener('change', updateStatus);
+        document.getElementById('pm_shift').addEventListener('change', updateStatus);
+    </script>
