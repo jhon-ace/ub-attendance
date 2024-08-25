@@ -764,7 +764,9 @@ public function submitPortalTimeOut(Request $request)
             $selectedStatus = $validatedData['status'];
             $defaultStatus = 'On-Campus'; // Set default status
 
-
+            if ($validatedData['am_shift'] && $validatedData['pm_shift']) {
+                return back()->with('error', 'Error! AM and PM are selected for half day leave');
+            }
             // If only AM shift is selected, create PM attendance with default status
             if ($validatedData['am_shift'] && !$validatedData['pm_shift']) {
                 

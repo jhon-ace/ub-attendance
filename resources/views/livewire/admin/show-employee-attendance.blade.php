@@ -1609,7 +1609,11 @@
                                                     }
                                                 @endphp
 
-                                                    {{ $remarkss }}
+                                                    @if ($remarkss === 'Present')
+                                                        <span class="text-black">{{ $remarkss }}</span>
+                                                    @else
+                                                        <span class="text-red-500">{{ $remarkss }}</span>
+                                                    @endif
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -1640,9 +1644,9 @@
                                                 @csrf
 
                                                 <br>
-                                                <p class="text-[14px]">
+                                                <!-- <p class="text-[14px]">
                                                     <text class="text-red-500">Note:</text> The half day leave is the same as a full day leave if the working hours are not half day.
-                                                </p>
+                                                </p> -->
                                                 <br>
                                                 <div class="mb-2 hidden">
                                                     <label for="selected-date" class="block mb-2 text-left">Employee:</label>
@@ -2975,7 +2979,11 @@
                                                                                                     }
                                                                                                 @endphp
 
-                                                                                                    {{ $remarkss }}
+                                                                                                     @if ($remarkss === 'Present')
+                                                                                                        <span class="text-black">{{ $remarkss }}</span>
+                                                                                                    @else
+                                                                                                        <span class="text-red-500">{{ $remarkss }}</span>
+                                                                                                    @endif
                                                                                                 </td>
                                                                                         </tr>
                                                                                         @endforeach

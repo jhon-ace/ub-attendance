@@ -666,7 +666,11 @@
                                                             }
                                                         @endphp
 
-                                                            {{ $remarkss }}
+                                                             @if ($remarkss === 'Present')
+                                                                <span class="text-black">{{ $remarkss }}</span>
+                                                            @else
+                                                                <span class="text-red-500">{{ $remarkss }}</span>
+                                                            @endif
                                                         </td>
                                                 </tr>
                                                 @endforeach
@@ -1966,7 +1970,11 @@
                                                                                                     }
                                                                                                 @endphp
 
-                                                                                                    {{ $remarkss }}
+                                                                                                     @if ($remarkss === 'Present')
+                                                                                                        <span class="text-black">{{ $remarkss }}</span>
+                                                                                                    @else
+                                                                                                        <span class="text-red-500">{{ $remarkss }}</span>
+                                                                                                    @endif
                                                                                                 </td>
                                                                                             </tr>
                                                                                             @endif
