@@ -313,7 +313,7 @@ class PublicPageController extends Controller
                     ->whereHas('employee.department', function($query) {
                         $query->where('department_abbreviation', 'LIKE', '%VDT%');
                     })
-                    ->whereNotIn('status', ['On Leave', 'Official Travel'])
+                    ->whereNotIn('status', ['On Leave', 'Official Travel', 'Holiday'])
                     ->orderBy('check_in_time', 'asc') // Order by check_in_time in descending order
                     ->get();
 
@@ -321,7 +321,7 @@ class PublicPageController extends Controller
                     ->whereHas('employee.department', function($query) {
                         $query->where('department_abbreviation', 'LIKE', '%VDT%');
                     })
-                    ->whereNotIn('status', ['On Leave', 'Official Travel'])
+                    ->whereNotIn('status', ['On Leave', 'Official Travel', 'Holiday'])
                     ->orderBy('check_out_time', 'asc') // Order by check_out_time in descending order
                     ->get();
 
