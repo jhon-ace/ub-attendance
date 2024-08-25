@@ -244,14 +244,23 @@ class DisplayDataforPayroll extends Component
         // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')->get();
         // $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')->get();
 
-        $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+        // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+        //         ->orderBy('check_in_time', 'asc')
+        //         ->paginate(1000);
+
+        // $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+        //         ->orderBy('check_out_time', 'asc')
+        //         ->paginate(1000);
+
+        $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_in_time', 'asc')
                 ->paginate(1000);
 
-        $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+            $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_out_time', 'asc')
                 ->paginate(1000);
-
 
         $attendanceData = [];
         $overallTotalHours = 0;
@@ -1298,13 +1307,24 @@ class DisplayDataforPayroll extends Component
 
             // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')->get();
             // $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')->get();   
-            $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+            // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_in_time', 'asc')
+            //     ->paginate(1000);
+
+            // $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_out_time', 'asc')
+            //     ->paginate(1000);
+
+            $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_in_time', 'asc')
                 ->paginate(1000);
 
-            $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+            $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_out_time', 'asc')
                 ->paginate(1000);
+
 
         $attendanceData = [];
         $overallTotalHours = 0;
@@ -2285,11 +2305,22 @@ class DisplayDataforPayroll extends Component
             // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
             //     ->paginate(1000);
 
-            $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+            // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_in_time', 'asc')
+            //     ->paginate(1000);
+
+            // $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_out_time', 'asc')
+            //     ->paginate(1000);
+
+
+            $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_in_time', 'asc')
                 ->paginate(1000);
 
-            $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+            $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_out_time', 'asc')
                 ->paginate(1000);
 

@@ -188,17 +188,17 @@ class ShowEmployeeAttendance extends Component
 
         // $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
         //     ->paginate(100);
-
-
         // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
         //     ->paginate(100);
+        $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+            ->orderBy('check_in_time', 'asc')
+            ->paginate(100);
 
-             $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
-                ->paginate(100);
+        $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+            ->orderBy('check_out_time', 'asc')
+            ->paginate(100);
 
 
-            $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
-                ->paginate(100);
 
 
 
@@ -285,6 +285,7 @@ class ShowEmployeeAttendance extends Component
             $checkOut = $attendanceTimeOut->where('employee_id', $attendance->employee_id)
                                             ->where('check_out_time', '>=', $attendance->check_in_time)
                                             ->first();
+
 
             if ($checkOut) {
                 $checkOutDateTime = new DateTime($checkOut->check_out_time);
@@ -1240,11 +1241,13 @@ class ShowEmployeeAttendance extends Component
             //     ->paginate(50);
 
 
-            $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
-                ->paginate(100);
+        $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+            ->orderBy('check_in_time', 'asc')
+            ->paginate(100);
 
-            $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
-                ->paginate(100);
+        $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+            ->orderBy('check_out_time', 'asc')
+            ->paginate(100);
 
             //     $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
             //     ->paginate(100);
@@ -2270,13 +2273,25 @@ class ShowEmployeeAttendance extends Component
             // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
             //     ->paginate(1000);
 
-            $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+            // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_in_time', 'asc')
+            //     ->paginate(1000);
+
+            // $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_out_time', 'asc')
+            //     ->paginate(1000);
+
+            $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_in_time', 'asc')
                 ->paginate(1000);
 
-            $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+            $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_out_time', 'asc')
                 ->paginate(1000);
+
+
 
 
             // Construct the attendance data array

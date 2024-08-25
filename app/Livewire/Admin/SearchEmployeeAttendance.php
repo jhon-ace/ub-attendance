@@ -208,12 +208,12 @@ class SearchEmployeeAttendance extends Component
         }
 
         
-            $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
-                ->paginate(100);
+            // $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
+            //     ->paginate(100);
 
 
-            $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
-                ->paginate(100);
+            // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
+            //     ->paginate(100);
 
         // $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
         //     ->paginate(30);
@@ -222,6 +222,14 @@ class SearchEmployeeAttendance extends Component
         // $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
         //     ->paginate(30);
 
+        $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+            ->orderBy('check_in_time', 'asc')
+            ->paginate(100);
+
+        $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+            ->orderBy('check_out_time', 'asc')
+            ->paginate(100);
+            
 
 
         $attendanceData = [];
@@ -1257,12 +1265,19 @@ class SearchEmployeeAttendance extends Component
             // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
             //     ->paginate(31);
 
-            $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
+            // $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
+            //     ->paginate(100);
+
+            // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
+            //     ->paginate(100);
+
+            $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+                ->orderBy('check_in_time', 'asc')
                 ->paginate(100);
 
-            $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
+            $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+                ->orderBy('check_out_time', 'asc')
                 ->paginate(100);
-
 
 
         $attendanceData = [];
@@ -2278,11 +2293,21 @@ class SearchEmployeeAttendance extends Component
             // $attendanceTimeOut = $queryTimeOut->orderBy('check_out_time', 'asc')
             //     ->paginate(1000);
 
-            $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+            // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_in_time', 'asc')
+            //     ->paginate(1000);
+
+            // $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_out_time', 'asc')
+            //     ->paginate(1000);
+
+            $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_in_time', 'asc')
                 ->paginate(1000);
 
-            $attendanceTimeOut = $queryTimeOut->orderBy('employee_id', 'asc')
+            $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+                ->orderBy('employee_id', 'asc')
                 ->orderBy('check_out_time', 'asc')
                 ->paginate(1000);
 

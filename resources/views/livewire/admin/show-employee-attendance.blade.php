@@ -165,6 +165,7 @@
                     <p class="text-center mt-5"><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
                 @elseif(!$search && $attendanceTimeIn->isEmpty() && $attendanceTimeOut->isEmpty() && !$selectedAttendanceByDate->isEmpty())
                     <p class="text-black mt-8 text-center uppercase">No data available in employee <text class="text-red-500">{{ $selectedEmployeeToShow->employee_id }} | {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</text></p>
+                    
                 @else
                     <div class="flex justify-between mt-1 mb-2">
                         <div class="mt-2 text-sm font-bold ">
@@ -249,6 +250,13 @@
                                         class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
                                     >
                                         Modify Date for Approved Leave / Official Travel
+                                    </button>
+                                    <button 
+                                        @click="tab = 'modify_date'"
+                                        :class="{ 'bg-blue-500 text-white': tab === 'modify_date', 'border border-gray-500': tab !== 'modify_date' }"
+                                        class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                    >
+                                        View Holidays
                                     </button>
                                 </div>
                                 <!-- <div class="flex justify-end">
@@ -368,6 +376,8 @@
                                                             
                                                             } elseif($status === "Official Travel"){
                                                                 $display = "Official Travel";
+                                                            } elseif($status === "Holiday"){
+                                                                $display = "Holiday";
                                                             } else {
                                                                 $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
                                                             }
@@ -377,7 +387,8 @@
                                                             <span style="color: red;">{{ $display }}</span>
                                                         @elseif ($display === "Official Travel")
                                                             <span style="color: red;" class="text-xs">{{ $display }}</span>
-                                                        
+                                                        @elseif ($display === "Holiday")
+                                                            <span style="color: red;" class="text-xs">{{ $display }}</span>
                                                         @else
                                                             {{ $display }}
                                                         @endif
@@ -585,16 +596,21 @@
                                                                 $display = "Weekend";
                                                             } elseif($status === "awol"){
                                                                 $display = "Absent without leave";
+                                                            
                                                             } elseif($status === "Official Travel"){
                                                                 $display = "Official Travel";
+                                                            } elseif($status === "Holiday"){
+                                                                $display = "Holiday";
                                                             } else {
-                                                                $display = date('g:i:s A', strtotime($attendanceOut->check_out_time));
+                                                                $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
                                                             }
                                                         @endphp
 
                                                         @if ($display === "On Leave")
                                                             <span style="color: red;">{{ $display }}</span>
                                                         @elseif ($display === "Official Travel")
+                                                            <span style="color: red;" class="text-xs">{{ $display }}</span>
+                                                        @elseif ($display === "Holiday")
                                                             <span style="color: red;" class="text-xs">{{ $display }}</span>
                                                         @else
                                                             {{ $display }}
@@ -3465,6 +3481,7 @@ function handleImageError(image) {
             // Update status based on the shifts
             if (amShift && pmShift) {
                 statusSelect.value = defaultAmStatus; // Choose based on additional logic if needed
+
             } else if (amShift) {
                 statusSelect.value = defaultAmStatus;
             } else if (pmShift) {
