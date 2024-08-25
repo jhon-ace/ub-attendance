@@ -1195,7 +1195,6 @@ class DisplayDataforPayroll extends Component
         $employeesWithLeaves = EmployeeAttendanceTimeIn::select(
                 'employees_time_in_attendance.employee_id', 
                 'employees.employee_lastname', 
-                \DB::raw('DATE(employees_time_in_attendance.check_in_time) as date'),
                 \DB::raw('GROUP_CONCAT(DATE(employees_time_in_attendance.check_in_time) ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_dates'),
                 \DB::raw('GROUP_CONCAT(employees_time_in_attendance.check_in_time ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_times'),
                 \DB::raw('GROUP_CONCAT(employees_time_in_attendance.status ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_statuses'),
@@ -1207,10 +1206,13 @@ class DisplayDataforPayroll extends Component
                 $join->on('employees_time_in_attendance.employee_id', '=', 'employees_time_out_attendance.employee_id')
                     ->on(\DB::raw('DATE(employees_time_in_attendance.check_in_time)'), '=', \DB::raw('DATE(employees_time_out_attendance.check_out_time)'));
             })
-            ->where('employees_time_in_attendance.status', 'On Leave')
-            ->groupBy('employees_time_in_attendance.employee_id', 'employees.employee_lastname', \DB::raw('DATE(employees_time_in_attendance.check_in_time)'))
-            ->orderBy('employees_time_in_attendance.employee_id', 'asc')
+            ->whereIn('employees_time_in_attendance.status', ['On Leave', 'Official Travel'])
+            ->groupBy('employees_time_in_attendance.employee_id', 'employees.employee_lastname')
+            ->orderBy('check_in_times', 'asc')
+            ->orderBy('employees.employee_lastname', 'asc')
+
             ->get();
+
 
 
       $processedData = [];

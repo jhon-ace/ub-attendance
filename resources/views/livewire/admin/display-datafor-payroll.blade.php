@@ -775,7 +775,7 @@
                                                 View Employee who has filed leave
                                             </button>
 
-                                            <div x-show="open" @click.away="open = false" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                                            <div x-cloak x-show="open" @click.away="open = false" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
                                                 <div class="bg-white rounded shadow-lg w-full md:w-[50%] h-3/4 flex flex-col overflow-hidden">
                                                     <div class="p-4 border-b">
                                                         <h2 class="text-xl font-semibold">Employee On Leave</h2>
