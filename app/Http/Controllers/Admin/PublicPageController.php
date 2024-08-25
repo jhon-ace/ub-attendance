@@ -55,7 +55,7 @@ class PublicPageController extends Controller
                 ->whereHas('employee.department', function($query) {
                     $query->where('department_abbreviation', 'NOT LIKE', '%VDT%');
                 })
-                ->whereNotIn('status', ['On Leave', 'Official Travel']) // Exclude records with status 'On Leave' or 'Official Travel'
+                ->whereNotIn('status', ['On Leave', 'Official Travel', 'Holiday']) // Exclude records with status 'On Leave' or 'Official Travel'
                 ->orderBy('check_in_time', 'asc') // Order by check_in_time in ascending order
                 ->get();
 
@@ -63,7 +63,7 @@ class PublicPageController extends Controller
                 ->whereHas('employee.department', function($query) {
                     $query->where('department_abbreviation', 'NOT LIKE', '%VDT%');
                 })
-                ->whereNotIn('status', ['On Leave', 'Official Travel'])
+                ->whereNotIn('status', ['On Leave', 'Official Travel', 'Holiday'])
                 ->orderBy('check_out_time', 'asc') // Order by check_out_time in descending order
                 ->get();
 
@@ -651,7 +651,7 @@ class PublicPageController extends Controller
                 // Handle case where student with given RFID is not found
                 return redirect()->route('attendance.portal.student')->with('error', 'RFID not Recognized!');
             }
-        } else {
+        } else {    
             return redirect()->back()->with('error', 'Unauthorized access.');
         }
     }
