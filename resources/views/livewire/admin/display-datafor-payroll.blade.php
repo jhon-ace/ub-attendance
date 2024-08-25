@@ -770,6 +770,60 @@
                                                 
                                             </div>
                                         </div>
+                                        <div x-data="{ open: false }">
+                                            <button @click="open = true" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                                View Employee who has filed leave
+                                            </button>
+
+                                            <div x-show="open" @click.away="open = false" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                                                <div class="bg-white rounded shadow-lg w-full md:w-[50%] h-3/4 flex flex-col overflow-hidden">
+                                                    <div class="p-4 border-b">
+                                                        <h2 class="text-xl font-semibold">Employee On Leave</h2>
+                                                    </div>
+                                                    <div class="p-4 flex-1 overflow-y-auto">
+                                                        <h1 class="text-xl font-bold mb-4">Employees Details</h1>
+
+                                                        @if(empty($processedData))
+                                                            <p class="text-gray-600">No employees are currently on leave.</p>
+                                                        @else
+                                                            <div class="overflow-x-auto">
+                                                                <table class="min-w-full bg-white border border-gray-200">
+                                                                    <thead>
+                                                                        <tr class="bg-gray-100">
+                                                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Employee Name</th>
+                                                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check In Time</th>
+                                                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check In Status</th>
+                                                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check Out Time</th>
+                                                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check Out Status</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach($processedData as $employee)
+                                                                            @foreach($employee['times'] as $time)
+                                                                                <tr class="hover:bg-gray-50">
+                                                                                    <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $employee['employee_name'] }}</td>
+                                                                                    <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ \Carbon\Carbon::parse($time['check_in_time'])->format('F j, Y') }}</td>
+                                                                                    <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $time['check_in_status'] }}</td>
+                                                                                    <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ \Carbon\Carbon::parse($time['check_out_time'])->format('F j, Y') }}</td>
+                                                                                    <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $time['check_out_status'] }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <div class="p-4 border-t flex justify-end">
+                                                        <button @click="open = false" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                                            Close
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
 
                                         @if ($startDate && $endDate)
                                             <p>Selected Date Range:</p>

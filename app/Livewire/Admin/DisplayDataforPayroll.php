@@ -1192,6 +1192,88 @@ class DisplayDataforPayroll extends Component
             ->orderBy('check_in_date', 'asc') // Order by date (ascending)
             ->get();
 
+        $employeesWithLeaves = EmployeeAttendanceTimeIn::select(
+                'employees_time_in_attendance.employee_id', 
+                'employees.employee_lastname', 
+                \DB::raw('DATE(employees_time_in_attendance.check_in_time) as date'),
+                \DB::raw('GROUP_CONCAT(DATE(employees_time_in_attendance.check_in_time) ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_dates'),
+                \DB::raw('GROUP_CONCAT(employees_time_in_attendance.check_in_time ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_times'),
+                \DB::raw('GROUP_CONCAT(employees_time_in_attendance.status ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_statuses'),
+                \DB::raw('GROUP_CONCAT(employees_time_out_attendance.check_out_time ORDER BY employees_time_out_attendance.check_out_time ASC SEPARATOR ", ") AS check_out_times'),
+                \DB::raw('GROUP_CONCAT(employees_time_out_attendance.status ORDER BY employees_time_out_attendance.check_out_time ASC SEPARATOR ", ") AS check_out_statuses')
+            )
+            ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
+            ->leftJoin('employees_time_out_attendance', function ($join) {
+                $join->on('employees_time_in_attendance.employee_id', '=', 'employees_time_out_attendance.employee_id')
+                    ->on(\DB::raw('DATE(employees_time_in_attendance.check_in_time)'), '=', \DB::raw('DATE(employees_time_out_attendance.check_out_time)'));
+            })
+            ->where('employees_time_in_attendance.status', 'On Leave')
+            ->groupBy('employees_time_in_attendance.employee_id', 'employees.employee_lastname', \DB::raw('DATE(employees_time_in_attendance.check_in_time)'))
+            ->orderBy('employees_time_in_attendance.employee_id', 'asc')
+            ->get();
+
+
+      $processedData = [];
+
+        // Initialize an array to hold the grouped data by name
+        $groupedByName = [];
+
+        foreach ($employeesWithLeaves as $employee) {
+            $checkInTimes = explode(', ', $employee->check_in_times);
+            $checkInStatuses = explode(', ', $employee->check_in_statuses);
+            $checkOutTimes = explode(', ', $employee->check_out_times);
+            $checkOutStatuses = explode(', ', $employee->check_out_statuses);
+
+            $groupedTimes = [];
+
+            foreach ($checkInTimes as $index => $checkInTime) {
+                $date = \Carbon\Carbon::parse($checkInTime)->format('Y-m-d');
+                
+                if (isset($checkOutTimes[$index]) && \Carbon\Carbon::parse($checkOutTimes[$index])->format('Y-m-d') == $date) {
+                    if (isset($groupedTimes[$date])) {
+                        // Update check_out_time and check_out_status to the latest for that date
+                        $groupedTimes[$date]['check_out_time'] = $checkOutTimes[$index];
+                        $groupedTimes[$date]['check_out_status'] = $checkOutStatuses[$index];
+                    } else {
+                        // Add new entry with check_in_time, check_out_time, and statuses
+                        $groupedTimes[$date] = [
+                            'check_in_time' => $checkInTime,
+                            'check_in_status' => $checkInStatuses[$index],
+                            'check_out_time' => $checkOutTimes[$index],
+                            'check_out_status' => $checkOutStatuses[$index],
+                        ];
+                    }
+                }
+            }
+
+            // Convert groupedTimes from associative array to indexed array for rendering
+            $groupedTimesArray = array_values($groupedTimes);
+
+            // Group data by employee name
+            $employeeName = $employee->employee_lastname; // You can use any other field for name as required
+
+            if (!isset($groupedByName[$employeeName])) {
+                $groupedByName[$employeeName] = [
+                    'employee_id' => $employee->employee_id,
+                    'times' => [],
+                ];
+            }
+
+            $groupedByName[$employeeName]['times'] = array_merge($groupedByName[$employeeName]['times'], $groupedTimesArray);
+        }
+
+        // Convert groupedByName to the desired format for output
+        foreach ($groupedByName as $employeeName => $employeeData) {
+            $processedData[] = [
+                'employee_name' => $employeeName,
+                'employee_id' => $employeeData['employee_id'],
+                'times' => $employeeData['times'],
+            ];
+        }
+
+// Output or further process $processedData as needed
+
+
         return view('livewire.admin.display-datafor-payroll', [
             'overallTotalHours' => $overallTotalHours,
             'overallTotalLateHours' => $overallTotalLateHours,
@@ -1210,6 +1292,7 @@ class DisplayDataforPayroll extends Component
             'selectedAttendanceByDate' => $this->selectedAttendanceByDate,
             'departmentDisplayWorkingHour' => $departmentDisplayWorkingHour,
             'holidays' => $holidays,
+            'processedData' => $processedData,
         ]);
     }
 
