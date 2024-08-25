@@ -19,6 +19,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeAttendanceController extends Controller
 {
@@ -1145,7 +1146,14 @@ public function submitPortalTimeOut(Request $request)
 
     public function holiday()
     {
-        return view('Admin.holiday.index');
+        
+        $holidays = EmployeeAttendanceTimeIn::where('status', 'Holiday')
+            ->select(DB::raw('DATE(check_in_time) as check_in_date')) // Extract only the date
+            ->groupBy('check_in_date') // Group by the extracted date
+            ->orderBy('check_in_date', 'asc') // Order by date (ascending)
+            ->get();
+
+        return view('Admin.holiday.index', compact('holidays'));
     }
 
     public function setHoliday(Request $request)
@@ -1185,9 +1193,15 @@ public function submitPortalTimeOut(Request $request)
             $hasCheckOut = EmployeeAttendanceTimeOut::whereDate('check_out_time', $currentDate)
                 ->where('employee_id', $employeeId)
                 ->exists();
+                
 
             // Determine the status based on the day of the week
             $status = "Holiday";
+
+            if ($hasCheckIn && $hasCheckOut) {
+                return back()->with('error', 'Cannot modify the date to a holiday because it already exists.');
+            }
+
 
             // Create missing check-in record if none exists
             if (!$hasCheckIn) {
@@ -1222,9 +1236,9 @@ public function submitPortalTimeOut(Request $request)
             }
         }
 
+
         return back()->with('success', 'Holiday date implemented to attendances.');
     }
-
 
 
 }
