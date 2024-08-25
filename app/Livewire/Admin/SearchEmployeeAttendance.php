@@ -1154,6 +1154,11 @@ class SearchEmployeeAttendance extends Component
 
         $gracePeriod = GracePeriod::all();
 
+        $holidays = EmployeeAttendanceTimeIn::where('status', 'Holiday')
+            ->select(DB::raw('DATE(check_in_time) as check_in_date')) // Extract only the date
+            ->groupBy('check_in_date') // Group by the extracted date
+            ->orderBy('check_in_date', 'asc') // Order by date (ascending)
+            ->get();
 
         return view('livewire.admin.search-employee-attendance', [
             'overallTotalHours' => $overallTotalHours,
@@ -1172,6 +1177,7 @@ class SearchEmployeeAttendance extends Component
             'selectedAttendanceByDate' => $this->selectedAttendanceByDate,
             'departmentDisplayWorkingHour' => $this->departmentDisplayWorkingHour,
             'gracePeriod' => $gracePeriod,
+            'holidays' => $holidays,
         ]);
     }
 

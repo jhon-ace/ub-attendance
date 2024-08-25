@@ -1186,7 +1186,11 @@ class DisplayDataforPayroll extends Component
         $departmentDisplayWorkingHour = DepartmentWorkingHour::where('department_id', $this->selectedDepartment4)
                                                            ->get();
 
-
+        $holidays = EmployeeAttendanceTimeIn::where('status', 'Holiday')
+            ->select(DB::raw('DATE(check_in_time) as check_in_date')) // Extract only the date
+            ->groupBy('check_in_date') // Group by the extracted date
+            ->orderBy('check_in_date', 'asc') // Order by date (ascending)
+            ->get();
 
         return view('livewire.admin.display-datafor-payroll', [
             'overallTotalHours' => $overallTotalHours,
@@ -1205,6 +1209,7 @@ class DisplayDataforPayroll extends Component
             'employees' => $employees, // Ensure employees variable is defined if needed
             'selectedAttendanceByDate' => $this->selectedAttendanceByDate,
             'departmentDisplayWorkingHour' => $departmentDisplayWorkingHour,
+            'holidays' => $holidays,
         ]);
     }
 

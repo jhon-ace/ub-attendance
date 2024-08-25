@@ -170,10 +170,7 @@
                                           
             <div x-data="{ tab: 'modify_date' }" class="p-4">
                 <div class="overflow-x-auto">
-                    
-                    
-
-                    <div x-show="tab === 'computed-hours'" class="w-full">
+                    <div x-cloak x-show="tab === 'computed-hours'" class="w-full">
                         <!-- Table for Computed Working Hours -->
 
                         <p>Required Total Hour Per Week based on Working hour: <text class="text-red-500">{{ $overallTotalHoursSum }} hr/s.</text></p>
@@ -729,7 +726,7 @@
                                     @endphp
                                     
                                     <div class="flex justify-center">
-                                        <h1 class="uppercase text-[30px]">Department: {{ $departmentToShow->department_abbreviation }}</h1>
+                                        <h1 class="uppercase text-[30px]">Department: <text class="text-red-500">{{ $departmentToShow->department_abbreviation }}</text></h1>
                                     </div>
                                     <div x-data="{ loading: false, open: {{ session()->has('success') ? 'true' : 'false' }} }"
                                         x-init="() => {
@@ -1008,18 +1005,93 @@
                                                                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                                                         <div @click.away="open = false" class=" w-[85%] max-h-[90vh] bg-white p-6 rounded-md shadow-lg  mx-auto overflow-y-auto">
                                                                             <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
-                                                                                <p class="text-xl font-bold">Detailed Calculation of Work Hours</p>
+                                                                                <p class="text-xl font-bold">Detailed Calculation of Work Hours (<text class="text-red-500 text-sm">Dates that are missing or excluded may be weekends or holidays</text>)
+                                                                                    <div x-data="{ openWelcome: false, openHoliday: false }" class="relative inline-block">
+                                                                                        <!-- Button to Open Welcome Modal -->
+                                                                                        <button 
+                                                                                            @click="openWelcome = true"
+                                                                                            class="text-sm bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
+                                                                                        >
+                                                                                            View Holiday Dates
+                                                                                        </button>
+
+                                                                                        <!-- Welcome Modal -->
+                                                                                        <div 
+                                                                                            x-show="openWelcome" 
+                                                                                            @click.away="openWelcome = false"
+                                                                                            class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center"
+                                                                                        >
+                                                                                            <div class="bg-white p-6 rounded shadow-lg w-full max-w-md flex flex-col">
+                                                                                                <h2 class="text-xl font-semibold mb-4">Reminder!</h2>
+                                                                                                <p class="text-center mb-4 text-lg">Please add holiday dates in settings before the actual dates to avoid system automatic absences for those dates in calculations.</p>
+                                                                                                <div class="flex justify-end mt-4">
+                                                                                                    <button 
+                                                                                                        @click="openWelcome = false; openHoliday = true"
+                                                                                                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
+                                                                                                    >
+                                                                                                        Continue
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                        <!-- Holiday Dates Modal -->
+                                                                                        <div 
+                                                                                            x-show="openHoliday" 
+                                                                                            @click.away="openHoliday = true"
+                                                                                            class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center"
+                                                                                        >
+                                                                                            <div class="bg-white p-6 rounded shadow-lg w-full max-w-md h-3/4 max-h-screen flex flex-col">
+                                                                                                <div class="flex-1 overflow-auto">
+                                                                                                    <h2 class="text-xl font-semibold mb-4">Holiday Dates</h2>
+                                                                                                    <div class="w-full">
+                                                                                                        <div class="flex flex-col items-center mt-8 w-full mx-auto">
+                                                                                                            <p class="text-black text-xl text-center mb-2">LIST OF ADDED HOLIDAYS</p>
+                                                                                                            <p class="text-center mb-4">Holiday dates are excluded from calculations and are not included in the attendance or working hour computations.</p>
+                                                                                                            <div class="w-full flex justify-center mb-4">
+                                                                                                                @if($holidays->isNotEmpty())
+                                                                                                                    <table class="border border-collapse border-1 border-black w-full mb-4">
+                                                                                                                        <thead>
+                                                                                                                            <tr class="border border-collapse border-1 border-black">
+                                                                                                                                <th class="border border-collapse border-1 border-black p-2">Date</th>
+                                                                                                                            </tr>
+                                                                                                                        </thead>
+                                                                                                                        <tbody>
+                                                                                                                            @foreach($holidays as $holiday)
+                                                                                                                                <tr class="border border-collapse border-1 border-black text-center">
+                                                                                                                                    <td class="border border-collapse border-1 border-black p-2">{{ \Carbon\Carbon::parse($holiday->check_in_date)->format('F j, Y') }}</td>
+                                                                                                                                </tr>
+                                                                                                                            @endforeach
+                                                                                                                        </tbody>
+                                                                                                                    </table>
+                                                                                                                @else
+                                                                                                                    <p class="font-bold text-red-500 mb-4 text-center">No Holiday Dates Confirmed yet.</p>
+                                                                                                                @endif
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <!-- Fixed footer -->
+                                                                                                <div class="flex justify-end mt-4">
+                                                                                                    <button @click="openHoliday = false" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+                                                                                                        Close
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </p>
                                                                                 <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                                             </div>
                                                                             <div class="w-full">
                                                                                 <!-- <h3 class="text-center text-lg font-semibold uppercase mb-2 mt-6">Calculation of Work Hours</h3> -->
-                                                                                 <p> Employee: <text class="text-red-500 font-bold">{{ $employeeData['employee_lastname'] }},
+                                                                                 <p class="text-sm"> Employee: <text class="text-red-500 font-bold">{{ $employeeData['employee_lastname'] }},
                                                                                                                         {{ $employeeData['employee_firstname'] }},
                                                                                                                         {{ $employeeData['employee_middlename']}}</text></p>
-                                                                                <p> Employee ID: {{ $employeeData['employee_idd'] }}</p>
+                                                                                <p class="text-sm"> Employee ID: {{ $employeeData['employee_idd'] }}</p>
                                                                                 @if ($startDate && $endDate)
-                                                                                    <p>Selected Date Range:</p>
-                                                                                    <div class="flex justify-between -mt-4">
+                                                                                    <p class="text-sm"> Selected Date Range:</p>
+                                                                                    <div class="flex justify-between -mt-4 text-sm">
                                                                                         
                                                                                         <p class="py-4 text-red-500">{{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} &nbsp; to &nbsp; {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</p>
                                                                                         <!-- <div class="">
@@ -1032,8 +1104,8 @@
                                                                                         </div> -->
                                                                                     </div>
                                                                                 @else
-                                                                                    <p>Selected Date Range:</p>
-                                                                                    <div class="flex justify-between -mt-4">
+                                                                                    <p class="text-sm">Selected Date Range:</p>
+                                                                                    <div class="flex justify-between -mt-4 text-sm">
                                                                                         
                                                                                         <p class="py-4">Start Date: None selected &nbsp;&nbsp;End Date: None selected</p>
                                                                                         <!-- <div class="">

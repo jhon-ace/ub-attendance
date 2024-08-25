@@ -234,51 +234,109 @@
                     <!-- Tab buttons -->
                     <div class="flex justify-between mb-4">
                         <div>
-                            <button 
-                                @click="tab = 'time-in-time-out'"
-                                :class="{ 'bg-blue-500 text-white': tab === 'time-in-time-out', 'border border-gray-500': tab !== 'time-in-time-out' }"
-                                class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
-                            >
-                                Time In & Time Out
-                            </button>
-                            <!-- <button 
-                                @click="tab = 'time-out'"
-                                :class="{ 'bg-blue-500 text-white': tab === 'time-out', 'bg-gray-200': tab !== 'time-out' }"
-                                class="px-4 py-2 mr-2 rounded hover:bg-blue-600 focus:outline-none"
-                            >
-                                Time Out
-                            </button> -->
-                            <button 
-                                @click="tab = 'computed-hours'"
-                                :class="{ 'bg-blue-500 text-white': tab === 'computed-hours', 'border border-gray-500': tab !== 'computed-hours' }"
-                                class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
-                            >
-                                Detailed Calculation of Work Hours
-                            </button>
-                            <button 
-                                @click="tab = 'reports'"
-                                :class="{ 'bg-blue-500 text-white': tab === 'reports', 'border border-gray-500': tab !== 'reports' }"
-                                class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
-                            >
-                                Summary Report
-                            </button>
-                            <button 
-                                @click="tab = 'modify_date'"
-                                :class="{ 'bg-blue-500 text-white': tab === 'modify_date', 'border border-gray-500': tab !== 'modify_date' }"
-                                class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
-                            >
-                                Modify Date for Approved Leave / Official Travel
-                            </button>
+                            <div x-data="{ open: false }" class="relative inline-block">
+                                <button 
+                                    @click="tab = 'time-in-time-out'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'time-in-time-out', 'border border-gray-500': tab !== 'time-in-time-out' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                    @mouseover="open = true"
+                                    @mouseleave="open = false"
+                                >
+                                    Time In & Time Out
+                                </button>
+                                <div 
+                                    x-show="open"
+                                    class="w-full absolute left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 mt-2"
+                                    style="display: none;"
+                                >
+                                    Select specific time-in dates to view details.
+                                </div>
+                            </div>
+                            <div x-data="{ open: false }" class="relative inline-block">
+                                <button 
+                                    @click="tab = 'computed-hours'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'computed-hours', 'border border-gray-500': tab !== 'computed-hours' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                    @mouseover="open = true"
+                                    @mouseleave="open = false"
+                                >
+                                    Detailed Calculation of Work Hours
+                                </button>
+                                <div 
+                                    x-show="open"
+                                    class="w-full absolute left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 mt-2"
+                                    style="display: none;"
+                                >
+                                    View detailed calculations of work hours, including breakdowns and summaries.
+                                </div>
+                            </div>
+
+                            <div x-data="{ open: false }" class="relative inline-block">
+                                <button 
+                                    @click="tab = 'reports'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'reports', 'border border-gray-500': tab !== 'reports' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                    @mouseover="open = true"
+                                    @mouseleave="open = false"
+                                >
+                                    Summary Report
+                                </button>
+                                <div 
+                                    x-show="open"
+                                    class="w-full absolute left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 mt-2"
+                                    style="display: none;"
+                                >
+                                    View a summary of all attendance reports.
+                                </div>
+                            </div>
+
+                            <div x-data="{ open: false }" class="relative inline-block">
+                                <button 
+                                    @click="tab = 'modify_date'"
+                                    :class="{ 'bg-blue-500 text-white': tab === 'modify_date', 'border border-gray-500': tab !== 'modify_date' }"
+                                    class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                    @mouseover="open = true"
+                                    @mouseleave="open = false"
+                                >
+                                    Modify Date for Approved Leave / Official Travel
+                                </button>
+                                <div 
+                                    x-show="open"
+                                    class="w-full absolute left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 mt-2"
+                                    style="display: none;"
+                                >
+                                    Adjust dates for approved leave or official travel. Ensure to update these dates for accurate records.
+                                </div>
+                            </div>
+
+                            <!-- Button to Open Modal -->
+
                         </div>
-                        <!-- <div class="flex justify-end">
+                        
+                        <!-- Modal Background -->
+                        <div x-data="{ open: false }" @click.away="open = false">
+                            <!-- Modal -->
                             <button 
-                                @click="tab = 'period'"
-                                :class="{ 'bg-blue-500 text-white': tab === 'period', 'border border-gray-500': tab !== 'period' }"
-                                class="px-4 py-2 mr-2 rounded hover:bg-blue-600 hover:text-white focus:outline-none"
+                                @click="open = true; tab = 'holidays'"
+                                :class="{ 'bg-blue-500 text-white': tab === 'holidays', 'border border-gray-500': tab !== 'holidays' }"
+                                class="px-4 py-2 mr-[80px] rounded hover:bg-blue-600 hover:text-white focus:outline-none"
                             >
-                                Set Grace Period
+                                Holiday Dates
                             </button>
-                        </div> -->
+
+                            <div x-cloak x-show="open" 
+                                class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+                                <div class="bg-white p-6 rounded shadow-lg w-full max-w-sm">
+                                    <h2 class="text-xl font-semibold mb-4">Reminder</h2>
+                                    <p class="mb-4">Please add holiday dates in settings before the actual dates to avoid system automatic absences for those dates.</p>
+                                    <div class="flex justify-end">
+                                        <button @click="open = false" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+                                            OK
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Tab content -->
@@ -718,12 +776,12 @@
                     <div x-show="tab === 'computed-hours'" class="w-full">
                         <!-- Table for Computed Working Hours -->
 
-                       
-
-
                         <div class="w-full">
                             <h3 class="text-center text-lg font-semibold uppercase mb-2 mt-6">Calculation of Work Hours</h3>
-                            <p><text class="text-red-500">Note: </text> To assess time-in and time out duration, click working hour to verify.</p>
+                            <div class="flex justify-between">
+                                <p><text class="text-red-500">Note: </text> To assess time-in and time out duration, click working hour to verify.</p>
+                                <p><text class="text-red-500">Note: </text> Dates that are missing or excluded may be weekends or holidays.</p>
+                            </div>
                             <table class="table-auto min-w-full text-center text-xs mb-4 divide-y divide-gray-200">
                                 <thead class="bg-gray-200 text-black">
                                     <tr>
@@ -2053,7 +2111,7 @@
                                                             <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                                                                 <div @click.away="open = false" class=" w-[80%] max-h-[90vh] bg-white p-6 rounded-lg shadow-lg  mx-auto overflow-y-auto">
                                                                     <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
-                                                                        <p class="text-xl font-bold">Detailed Calculation of Work Hours</p>
+                                                                        <p class="text-xl font-bold">Detailed Calculation of Work Hours (<text class="text-red-500 text-sm">Dates that are missing or excluded may be weekends or holidays</text>)</p>
                                                                         <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                                     </div>
                                                                     <div class="w-full">
@@ -2999,100 +3057,33 @@
                             </div>
                         </div> 
                     </div>
-                    <div x-show="tab === 'peridod'" class="w-full">
-                        <div class="flex justify-center mt-8 w-full">
-                            <div class="w-[50%] flex justify-center mb-4 mx-auto">
-                                @if($gracePeriod->isNotEmpty())
-                                    @foreach($gracePeriod as $period)
-                                        <table class="border border-collapse border-1 border-black w-full mb-4">
-                                            <caption><p>Note: The Grace Period is applied to all departments and employees for their time-ins.</p><br></caption>
-                                            <thead>
-                                                <tr class="border border-collapse border-1 border-black">
-                                                    <th class="border border-collapse border-1 border-black">Grace Period</th>
-                                                    <th>Action</th>
+                    <!-- HOLIDAYS  -->
+                    <div x-show="tab === 'holidays'" class="w-full">
+                        <div class="flex flex-col items-center mt-8 w-full mx-auto">
+                            <p class="text-black text-xl text-center mb-2">LIST OF ADDED HOLIDAYS</p>
+                            <p class="text-center mb-4">Holiday dates are excluded from calculations and are not included in the attendance or working hour computations.</p>
+                            <div class="w-[40%] flex justify-center mb-4">
+                                @if($holidays->isNotEmpty())
+                                    <table class="border border-collapse border-1 border-black w-full mb-4">
+                                        <thead>
+                                            <tr class="border border-collapse border-1 border-black">
+                                                <th class="border border-collapse border-1 border-black p-2">Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($holidays as $holiday)
+                                                <tr class="border border-collapse border-1 border-black text-center">
+                                                    <td class="border border-collapse border-1 border-black p-2">{{ \Carbon\Carbon::parse($holiday->check_in_date)->format('F j, Y') }}</td>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr class="border border-collapse border-1 border-black text-center p-2">
-                                                    <td class="border border-collapse border-1 border-black p-2">{{ round($period->grace_period * 60) }} minutes</td>
-                                                    <td class="border border-collapse border-1 border-black p-2">
-                                                        <div class="flex justify-center items-center space-x-2">
-                                                            <div x-data="{ open: false }">
-                                                                <a @click="open = true" class="cursor-pointer bg-blue-500 text-white text-sm px-2 py-1 rounded hover:bg-blue-700">
-                                                                    <i class="fa-solid fa-pen fa-xs" style="color: #ffffff;"></i> Edit
-                                                                </a>
-                                                                <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                                    <div @click.away="open = true" class="w-[35%] bg-white p-6 rounded-lg shadow-lg  mx-auto">
-                                                                        <div class="flex justify-between items-start pb-3"> 
-                                                                            <p class="text-xl font-bold">Edit Grace Period</p>
-                                                                            <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
-                                                                        </div>
-                                                                        <div class="mb-4">
-                                                                            <form id="" action="{{ route('admin.attendance.gracePeriod.update', $period->id) }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to update?');">
-                                                                                <x-caps-lock-detector />
-                                                                                @csrf
-                                                                                @method('PUT')
-                                                                                    
-                                                                                    <div class="mb-4">
-                                                                                        @php
-                                                                                            $minutes = $period->grace_period * 60;
-                                                                                            $roundedMinutes = round($minutes);
-                                                                                        @endphp
-                                                                                        <label for="grace_period" class="block text-gray-700 text-md font-bold mb-2 text-left">New Grace Period</label>
-                                                                                        <input type="float" name="grace_period" id="grace_period" min="0" max="60" value="{{ $roundedMinutes }}" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('grace_period') is-invalid @enderror" autofocus required>
-                                                                                        <x-input-error :messages="$errors->get('grace_period')" class="mt-2" />
-                                                                                    </div>
-                                                                                    
-                                                                                    
-                                                                                <div class="flex mb-4 mt-10 justify-center">
-                                                                                    <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
-                                                                                        Save Changes
-                                                                                    </button>
-                                                                                </div>
-                                                                            </form>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <form action="{{ route('admin.attendance.gracePeriod.delete', $period->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this grace period?');">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="bg-red-500 text-white text-sm px-2 py-0.5 rounded hover:bg-red-700">
-                                                                    <i class="fa-solid fa-trash fa-xs" style="color: #ffffff;"></i> Delete
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    @endforeach
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 @else
-                                    <p class="font-bold text-red-500 mb-4">No Grace Period registered</p>
+                                    <p class="font-bold text-red-500 mb-4 text-center">No Holiday Dates Confirmed yet.</p>
                                 @endif
                             </div>
                         </div>
-                        <div class="flex justify-center">
-                            <div>
-                                <form action="{{ route('admin.attendance.gracePeriod') }}" method="POST" class="">
-                                <x-caps-lock-detector />
-                                @csrf
-                                    <div class="mb-2">
-                                        <label for="grace_period" class="block  mb-2 text-left">Enter New grace period:</label>
-                                        <input type="number" id="grace_period" name="grace_period" min="0" max="60" class="block mx-auto mb-4 p-2 border border-gray-300 rounded w-full max-w-md" required  autofocus >
-                                        <p>Note: This is minutes only.</p>
-                                    </div> 
-
-
-                                    <div class="flex mb-4 mt-10 justify-center">
-                                        <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
-                                            Save Period
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div> 
-                    </div>                      
+                    </div>                     
                 </div>
             </div>
             
