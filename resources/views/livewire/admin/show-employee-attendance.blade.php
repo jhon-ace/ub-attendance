@@ -659,7 +659,7 @@
                                                             } elseif($status === "Holiday"){
                                                                 $display = "Holiday";
                                                             } else {
-                                                                $display = date('g:i:s A', strtotime($attendanceIn->check_in_time));
+                                                                $display = date('g:i:s A', strtotime($attendanceOut->check_out_time));
                                                             }
                                                         @endphp
 
