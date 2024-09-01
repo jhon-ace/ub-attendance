@@ -95,6 +95,7 @@ class ShowEmployeeTable extends Component
         // $departments = Department::where('school_id', $this->selectedSchool)->get();
         $departments = Department::where('school_id', $this->selectedSchool)
         ->where('dept_identifier', '!=', 'student')
+        ->orderBy('department_abbreviation', 'asc')
         ->get();
 
 

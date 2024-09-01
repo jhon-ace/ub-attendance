@@ -579,7 +579,7 @@ class DisplayDataforPayroll extends Component
                                             }
                                         }
                                         else {
-                                            $hoursWorkedAM = 0;
+                                            // $hoursWorkedAM = 0;
                                         }
                                     } else {
                                         $hoursWorkedAM = 0;
@@ -1180,6 +1180,7 @@ class DisplayDataforPayroll extends Component
         $schools = School::all();
         $departments = Department::where('school_id', $this->selectedSchool)
             ->whereIn('dept_identifier', ['employee', 'faculty'])
+            ->orderBy('department_abbreviation', 'asc')
             ->get();
 
 
@@ -1253,10 +1254,11 @@ class DisplayDataforPayroll extends Component
 
             // Group data by employee name
             $employeeName = $employee->employee_lastname; // You can use any other field for name as required
-
+            $employeeFirstname = $employee->employee->employee_firstname; // Retrieve the first name
             if (!isset($groupedByName[$employeeName])) {
                 $groupedByName[$employeeName] = [
                     'employee_id' => $employee->employee_id,
+                    'employee_firstname' => $employeeFirstname,
                     'times' => [],
                 ];
             }
@@ -1264,14 +1266,30 @@ class DisplayDataforPayroll extends Component
             $groupedByName[$employeeName]['times'] = array_merge($groupedByName[$employeeName]['times'], $groupedTimesArray);
         }
 
-        // Convert groupedByName to the desired format for output
+        $processedData = [];
+        $counter = 1; // Initialize a counter
+        $nameToNumber = []; // Initialize an array to keep track of assigned numbers
+
         foreach ($groupedByName as $employeeName => $employeeData) {
+            // Create a unique key based on name and first name
+            $uniqueKey = $employeeName . ', ' . $employeeData['employee_firstname'];
+
+            // Check if this unique key already has a number assigned
+            if (!isset($nameToNumber[$uniqueKey])) {
+                // Assign a new number if not already assigned
+                $nameToNumber[$uniqueKey] = $counter;
+                $counter++; // Increment the counter
+            }
+
             $processedData[] = [
+                'number' => $nameToNumber[$uniqueKey], // Use the assigned number
                 'employee_name' => $employeeName,
+                'employee_firstname' => $employeeData['employee_firstname'],
                 'employee_id' => $employeeData['employee_id'],
                 'times' => $employeeData['times'],
             ];
         }
+
 
 // Output or further process $processedData as needed
 
@@ -1732,7 +1750,7 @@ class DisplayDataforPayroll extends Component
                                             }
                                         }
                                         else {
-                                            $hoursWorkedAM = 0;
+                                            // $hoursWorkedAM = 0;
                                         }
                                     } else {
                                         $hoursWorkedAM = 0;
@@ -2732,7 +2750,7 @@ class DisplayDataforPayroll extends Component
                                                 }
                                             }
                                             else {
-                                                $hoursWorkedAM = 0;
+                                                // $hoursWorkedAM = 0;
                                             }
                                         } else {
                                             $hoursWorkedAM = 0;

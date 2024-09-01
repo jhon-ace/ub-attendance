@@ -520,7 +520,7 @@ class ShowEmployeeAttendance extends Component
                                             }
                                         }
                                         else {
-                                            $hoursWorkedAM = 0;
+                                            // $hoursWorkedAM = 0;
                                         }
                                     } else {
                                         $hoursWorkedAM = 0;
@@ -1121,9 +1121,14 @@ class ShowEmployeeAttendance extends Component
 
 
         $schools = School::all();
+        // $departments = Department::where('school_id', $this->selectedSchool)
+        //     ->whereIn('dept_identifier', ['employee', 'faculty'])
+        //     ->get();
         $departments = Department::where('school_id', $this->selectedSchool)
-            ->whereIn('dept_identifier', ['employee', 'faculty'])
-            ->get();
+                    ->whereIn('dept_identifier', ['employee', 'faculty'])
+                    ->orderBy('department_abbreviation', 'asc')
+                    ->get();
+
 
 
         $departmentDisplayWorkingHour = DepartmentWorkingHour::where('department_id', $this->selectedDepartment4)
@@ -1586,7 +1591,7 @@ class ShowEmployeeAttendance extends Component
                                             }
                                         }
                                         else {
-                                            $hoursWorkedAM = 0;
+                                            // $hoursWorkedAM = 0;
                                         }
                                     } else {
                                         $hoursWorkedAM = 0;
@@ -2623,7 +2628,7 @@ class ShowEmployeeAttendance extends Component
                                                 }
                                             }
                                             else {
-                                                $hoursWorkedAM = 0;
+                                                // $hoursWorkedAM = 0;
                                             }
                                         } else {
                                             $hoursWorkedAM = 0;

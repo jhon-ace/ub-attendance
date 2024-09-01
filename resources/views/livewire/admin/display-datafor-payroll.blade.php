@@ -105,10 +105,18 @@
                                                         {{ $daysOfWeek[$working_hour->day_of_week] }}
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                       {{ date('h:i A', strtotime($working_hour->morning_start_time)) }} - {{ date('h:i A', strtotime($working_hour->morning_end_time)) }}
+                                                        @if($working_hour->morning_start_time && $working_hour->morning_end_time)
+                                                            {{ date('h:i A', strtotime($working_hour->morning_start_time)) }} - {{ date('h:i A', strtotime($working_hour->morning_end_time)) }}
+                                                        @else
+                                                            No set time
+                                                        @endif
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap">
-                                                       {{ date('h:i A', strtotime($working_hour->afternoon_start_time)) }} - {{ date('h:i A', strtotime($working_hour->afternoon_end_time)) }}
+                                                        @if($working_hour->afternoon_start_time && $working_hour->afternoon_end_time)
+                                                            {{ date('h:i A', strtotime($working_hour->afternoon_start_time)) }} - {{ date('h:i A', strtotime($working_hour->afternoon_end_time)) }}
+                                                        @else
+                                                            No set time
+                                                        @endif
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -627,7 +635,13 @@
                                                             }
                                                             
                                                             else {
-                                                                if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
+                                                                if ($totalHoursPM == null && $totalMinutesPM == null && $totalHoursAM == 0 && $totalMinutesAM == 0 && $modify_status == "Weekend") {
+                                                                    $remarkss = "Absent";
+                                                                } 
+                                                                else if ($totalHoursAM == null && $totalMinutesAM == null && $modify_status == "On-campus") {
+                                                                    $remarkss = "Present";
+                                                                } 
+                                                                else if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
                                                                     $remarkss = "Present Afternoon, Absent Morning";
                                                                 }
                                                                 else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
@@ -790,6 +804,7 @@
                                                                 <table class="min-w-full bg-white border border-gray-200">
                                                                     <thead>
                                                                         <tr class="bg-gray-100">
+                                                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">#</th>
                                                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Employee Name</th>
                                                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check In Time</th>
                                                                             <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check In Status</th>
@@ -801,7 +816,8 @@
                                                                         @foreach($processedData as $employee)
                                                                             @foreach($employee['times'] as $time)
                                                                                 <tr class="hover:bg-gray-50">
-                                                                                    <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $employee['employee_name'] }}</td>
+                                                                                    <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $employee['number'] }}</td>
+                                                                                    <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $employee['employee_name'] }}, {{ $employee['employee_firstname'] }}</td>
                                                                                     <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ \Carbon\Carbon::parse($time['check_in_time'])->format('F j, Y') }}</td>
                                                                                     <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $time['check_in_status'] }}</td>
                                                                                     <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ \Carbon\Carbon::parse($time['check_out_time'])->format('F j, Y') }}</td>
@@ -811,7 +827,6 @@
                                                                         @endforeach
                                                                     </tbody>
                                                                 </table>
-
                                                             </div>
                                                         @endif
                                                     </div>
@@ -1265,76 +1280,92 @@
                                                                                                 <td class="text-black border border-gray-400 px-2 py-1 font-bold">{{ $id }}</td>
                                                                                                 <td class="text-black border border-gray-400 px-2 py-1 font-bold">{{ date('M d, Y (D)', strtotime($attendance->worked_date)) }}</td>
                                                                                                 <td class="text-black border border-gray-400 px-2 py-1 w-28">
-                                                                                                @foreach ($groupedAttendance as $employeeId => $dates)
-                                                                                                    @foreach ($dates as $date => $attendance1)
-                                                                                                        @if ($date === $workedDate)
-                                                                                                            @if (!empty($attendance1['check_ins']))
-                                                                                                                <hr class="" style="border: none; border-top: 1px solid #000; margin: 2px 0;">
-                                                                                                                <text class="text-red-500">1ST TIME IN:  </text>
+                                                                                                    @foreach ($groupedAttendance as $employeeId => $dates)
+                                                                                                        @foreach ($dates as $date => $attendance1)
+                                                                                                            @if ($date === $workedDate)
+                                                                                                                {{-- Handle 1st check-in --}}
+                                                                                                                @if (!empty($attendance1['check_ins'][0]))
+                                                                                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                                                                    <text class="text-red-500">1ST TIME IN:</text>
+                                                                                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                                                                    
                                                                                                                     @php
-                                                                                                                        $isPmDisplayed = false;
+                                                                                                                        $firstCheckIn = $attendance1['check_ins'][0];
                                                                                                                     @endphp
-                                                                                                            
-                                                                                                                    @foreach ($attendance1['check_ins'] as $index => $checkIn)
-                                                                                                                        
-                                                                                                                        <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
-                                                                                                                        
-                                                                                                                        {{ $checkIn }}
-                                                                                                                        
-                                                                                                                        @if (!$isPmDisplayed)
-                                                                                                                            @php
-                                                                                                                                $isPmDisplayed = true;
-                                                                                                                            @endphp
-                                                                                                                                
-                                                                                                                                <br><br>
-                                                                                                                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
-                                                                                                                                <text class="text-blue-500">2ND TIME IN:  </text>
 
-                                                                                                                        @endif
-                                                                                                                        
-                                                                                                                    @endforeach
-
-                                                                                                                    @if (!$isPmDisplayed)
-                                                                                                                        <p>No AM check-in</p>
+                                                                                                                    @if (date('H:i:s', strtotime($firstCheckIn)) === '00:00:00' || empty($firstCheckIn))
+                                                                                                                        <text class="text-red-500">No 1st Check-In</text>
+                                                                                                                    @else
+                                                                                                                        {{ $firstCheckIn }}
                                                                                                                     @endif
-                                                                                                            @else
-                                                                                                                <p>No Check-Ins</p>
+                                                                                                                @else
+                                                                                                                    <p class="text-red-500">No 1st Check-In</p>
+                                                                                                                @endif
+
+                                                                                                                {{-- Handle 2nd check-in --}}
+                                                                                                                @if (!empty($attendance1['check_ins'][1]))
+                                                                                                                    <br><br>
+                                                                                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                                                                    <text class="text-blue-500">2ND TIME IN:</text>
+                                                                                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                                                                    
+                                                                                                                    @php
+                                                                                                                        $secondCheckIn = $attendance1['check_ins'][1];
+                                                                                                                    @endphp
+
+                                                                                                                    @if (date('H:i:s', strtotime($secondCheckIn)) === '00:00:00' || empty($secondCheckIn))
+                                                                                                                        <text class="text-red-500">No 2nd Check-In</text>
+                                                                                                                    @else
+                                                                                                                        {{ $secondCheckIn }}
+                                                                                                                    @endif
+                                                                                                                @else
+                                                                                                                    <p class="mt-10 text-red-500">No 2nd Check-In</p>
+                                                                                                                @endif
                                                                                                             @endif
-                                                                                                        @endif
+                                                                                                        @endforeach
                                                                                                     @endforeach
-                                                                                                @endforeach
                                                                                                 </td>
                                                                                                 <td class="text-black border border-gray-400 px-2 py-1 w-32">
                                                                                                     @foreach ($groupedAttendance as $employeeId => $dates)
                                                                                                         @foreach ($dates as $date => $attendance1)
                                                                                                             @if ($date === $workedDate)
-                                                                                                                @if (!empty($attendance1['check_outs']))
+                                                                                                                {{-- Handle 1st check-out --}}
+                                                                                                                @if (!empty($attendance1['check_outs'][0]))
                                                                                                                     <hr style="border: none; border-top: 1px solid #000;">
-                                                                                                                    <text class="text-red-500"> 1ST TIME OUT:  </text>
-                                                                                                                        @php
-                                                                                                                            $isPmDisplayed = false;
-                                                                                                                        @endphp
+                                                                                                                    <text class="text-red-500">1ST TIME OUT:</text>
+                                                                                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                                                                    
+                                                                                                                    @php
+                                                                                                                        $firstCheckOut = $attendance1['check_outs'][0];
+                                                                                                                    @endphp
 
-                                                                                                                        @foreach ($attendance1['check_outs'] as $index => $checkOut)
-                                                                                                                            <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
-                                                                                                                            {{ $checkOut }}
-
-                                                                                                                            @if (!$isPmDisplayed)
-                                                                                                                                @php
-                                                                                                                                    $isPmDisplayed = true;
-                                                                                                                                @endphp
-                                                                                                                                <br><br>
-                                                                                                                                <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
-                                                                                                                                <text class="text-blue-500"> 2ND TIME OUT:  </text>
-                                                                                                                                
-                                                                                                                            @endif
-                                                                                                                        @endforeach
-
-                                                                                                                        @if (!$isPmDisplayed)
-                                                                                                                            <p>No PM check-in</p>
-                                                                                                                        @endif
+                                                                                                                    @if (date('H:i:s', strtotime($firstCheckOut)) === '00:00:00' || empty($firstCheckOut))
+                                                                                                                        <text class="text-red-500">No 1st Check-Out</text>
+                                                                                                                    @else
+                                                                                                                        {{ $firstCheckOut }}
+                                                                                                                    @endif
                                                                                                                 @else
-                                                                                                                    <p>No Check-Ins</p>
+                                                                                                                    <p class="text-red-500">No 1st Check-Out</p>
+                                                                                                                @endif
+
+                                                                                                                {{-- Handle 2nd check-out --}}
+                                                                                                                @if (!empty($attendance1['check_outs'][1]))
+                                                                                                                    <br><br>
+                                                                                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                                                                    <text class="text-blue-500">2ND TIME OUT:</text>
+                                                                                                                    <hr style="border: none; border-top: 1px solid #000; margin: 2px 0;">
+                                                                                                                    
+                                                                                                                    @php
+                                                                                                                        $secondCheckOut = $attendance1['check_outs'][1];
+                                                                                                                    @endphp
+
+                                                                                                                    @if (date('H:i:s', strtotime($secondCheckOut)) === '00:00:00' || empty($secondCheckOut))
+                                                                                                                        <text class="text-red-500">No 2nd Check-Out</text>
+                                                                                                                    @else
+                                                                                                                        {{ $secondCheckOut }}
+                                                                                                                    @endif
+                                                                                                                @else
+                                                                                                                    <p class="mt-10 text-red-500">No 2nd Check-Out</p>
                                                                                                                 @endif
                                                                                                             @endif
                                                                                                         @endforeach
@@ -2060,7 +2091,13 @@
                                                                                                     }
                                                                                                     
                                                                                                     else {
-                                                                                                        if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
+                                                                                                        if ($totalHoursPM == null && $totalMinutesPM == null && $totalHoursAM == 0 && $totalMinutesAM == 0 && $modify_status == "Weekend") {
+                                                                                                            $remarkss = "Absent";
+                                                                                                        } 
+                                                                                                        else if ($totalHoursAM == null && $totalMinutesAM == null && $modify_status == "On-campus") {
+                                                                                                            $remarkss = "Present";
+                                                                                                        } 
+                                                                                                        else if ($totalHoursAM == 0 && $totalMinutesAM == 0) {
                                                                                                             $remarkss = "Present Afternoon, Absent Morning";
                                                                                                         }
                                                                                                         else if ($totalHoursPM == 0 && $totalMinutesPM == 0) {
@@ -2128,7 +2165,7 @@
         @endif
 </div>
 
-<script>
+<!-- <script>
 document.addEventListener('DOMContentLoaded', function() {
     const timeInput = document.getElementById('check_in_time_time');
 
@@ -2160,7 +2197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script>
+</script> -->
 
 
 @push('scripts')

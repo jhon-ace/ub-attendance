@@ -116,7 +116,8 @@ class ShowDepartmentWorkingHours extends Component
         $workingHour = $schedule->orderBy($this->sortField, $this->sortDirection)
                              ->paginate(200);
         $departments = $query->where('dept_identifier', '!=', 'student')
-                     ->orderBy($this->sortField, $this->sortDirection)
+                    //  ->orderBy($this->sortField, $this->sortDirection)
+                     ->orderBy('department_abbreviation', 'asc')
                      ->paginate(200);
 
         // $workingHour = $showSchedule->orderBy($this->sortField, $this->sortDirection)
