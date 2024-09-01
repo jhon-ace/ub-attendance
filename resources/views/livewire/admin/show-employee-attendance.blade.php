@@ -925,7 +925,7 @@
                                                                     @endphp
 
                                                                     @if (date('H:i:s', strtotime($firstCheckOut)) === '00:00:00' || empty($firstCheckOut))
-                                                                        <text class="text-red-500">NO TIME OUT</text>
+                                                                        <text class="text-red-500">No 1st Check-Out</text>
                                                                     @else
                                                                         {{ $firstCheckOut }}
                                                                     @endif
@@ -945,7 +945,7 @@
                                                                     @endphp
 
                                                                     @if (date('H:i:s', strtotime($secondCheckOut)) === '00:00:00' || empty($secondCheckOut))
-                                                                        <text class="text-red-500">NO TIME OUT</text>
+                                                                        <text class="text-red-500">No 2nd Check-Out</text>
                                                                     @else
                                                                         {{ $secondCheckOut }}
                                                                     @endif
