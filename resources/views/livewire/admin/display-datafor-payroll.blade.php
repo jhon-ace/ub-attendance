@@ -1939,6 +1939,15 @@
                                                                                                         $remarkss = 'Absent';
                                                                                                     }
                                                                                                     else if (
+                                                                                                        
+                                                                                                        $firstCheckInStatus == "On-campus" &&
+                                                                                                        $firstCheckOutStatus == null && 
+                                                                                                        $secondCheckInStatus == null &&
+                                                                                                        $secondCheckOutStatus == null
+                                                                                                    ) {
+                                                                                                        $remarkss = 'Absent';
+                                                                                                    }
+                                                                                                    else if (
                                                                                                         $lateDurationAM == 0 &&
                                                                                                         $lateDurationPM == 0 &&
                                                                                                         $am == 0 &&

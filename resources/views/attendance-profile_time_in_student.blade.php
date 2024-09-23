@@ -61,7 +61,7 @@
     <script>
         setTimeout(function() {
             window.location.href = "{{ route('attendance.portal.student') }}";
-        }, 5000); // 5000 milliseconds = 5 seconds
+        }, 500); // 5000 milliseconds = 5 seconds
     </script>
 </head>
 <body>
@@ -89,7 +89,7 @@
                 </div>
                 <div class="p-2 mb-2 font-bold uppercase">
                     <span class="text-sm">Student Full Name</span><br>
-                    <span style="font-size: 40px;" class="text-white shadow-sm">{{ $student->student_lastname }}, {{ $student->student_firstname }} {{ ucfirst($student->student_middlename[0]) }}</span>
+                    <span style="font-size: 40px;" class="text-white shadow-sm">{{ $student->student_lastname }}, {{ $student->student_firstname }} {{ $student->student_middlename }}</span>
                 </div>
                 <div class="p-2 font-bold uppercase">
                     <span class="text-sm">Program</span><br>
