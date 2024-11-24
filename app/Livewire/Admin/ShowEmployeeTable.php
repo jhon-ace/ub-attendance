@@ -8,6 +8,7 @@ use \App\Models\Admin\Department;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class ShowEmployeeTable extends Component
 {
@@ -105,11 +106,18 @@ class ShowEmployeeTable extends Component
             ->get()
             ->keyBy('department_id');
 
+        $departmentsAll = Department::all();
+        $schoolsAll = School::all();
+
+        
+
         return view('livewire.admin.show-employee-table', [
             'employees' => $employees,
             'schools' => $schools,
             'departments' => $departments,
             'departmentCounts' => $departmentCounts,
+            'departmentsAll' => $departmentsAll,
+            'schoolsAll' => $schoolsAll,
         ]);
     }
 

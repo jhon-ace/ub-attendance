@@ -17,7 +17,8 @@ class WorkingHourController extends Controller
     public function store(Request $request)
     {
         
-        if (Auth::user()->hasRole('admin')) {
+        if (Auth::user()->hasRole('admin')) 
+        {
         
             // Validate input data
             $request->validate([
@@ -81,6 +82,9 @@ class WorkingHourController extends Controller
                     ->with('error', ucfirst($dayName) . ' schedule already exists for this department.');
             }
 
+
+
+
         } else if (Auth::user()->hasRole('admin_staff')) {
 
             // Validate input data
@@ -88,10 +92,14 @@ class WorkingHourController extends Controller
                 'school_id' => 'required|exists:schools,id',
                 'department_id' => 'required|exists:departments,id',
                 'day_of_week' => 'required|integer|between:0,6', // Assuming 0 to 6 for Sunday to Saturday
-                'morning_start_time' => 'required|date_format:H:i',
-                'morning_end_time' => 'required|date_format:H:i',
-                'afternoon_start_time' => 'required|date_format:H:i',
-                'afternoon_end_time' => 'required|date_format:H:i',
+                'morning_start_time' => 'nullable',
+                'morning_end_time' => 'nullable',
+                'afternoon_start_time' => 'nullable',
+                'afternoon_end_time' => 'nullable',
+                // 'morning_start_time' => 'required|date_format:H:i',
+                // 'morning_end_time' => 'required|date_format:H:i',
+                // 'afternoon_start_time' => 'required|date_format:H:i',
+                // 'afternoon_end_time' => 'required|date_format:H:i',
             ]);
 
             // Check if a schedule already exists for the given department and day of the week
@@ -111,7 +119,7 @@ class WorkingHourController extends Controller
                 $working_hour->afternoon_end_time = $request->input('afternoon_end_time');
                 $working_hour->save();
 
-                return redirect()->route('staff.workinghour.index')
+                return redirect()->route('admin_staff.workinghour.index')
                     ->with('success', 'Schedule created successfully.');
             } else {
                 // Redirect with error if a schedule already exists for the department and day
@@ -141,7 +149,7 @@ class WorkingHourController extends Controller
                     default:
                         $dayName = 'Unknown'; 
                 }
-                return redirect()->route('staff.workinghour.index')
+                return redirect()->route('admin_staff.workinghour.index')
                     ->with('error', ucfirst($dayName) . ' schedule already exists for this department.');
             }
         }
@@ -153,7 +161,8 @@ class WorkingHourController extends Controller
     public function update(Request $request, $id)
     {
         
-        if (Auth::user()->hasRole('admin')) {
+        if (Auth::user()->hasRole('admin')) 
+        {
             // Validate input data
             $request->validate([
                 'school_id' => 'required|exists:schools,id',
@@ -269,7 +278,7 @@ class WorkingHourController extends Controller
                         $dayName = 'Unknown';
                 }
 
-                return redirect()->route('staff.workinghour.index')
+                return redirect()->route('admin_staff.workinghour.index')
                     ->with('error', ucfirst($dayName) . ' schedule already exists for this department.');
             }
 
@@ -283,7 +292,7 @@ class WorkingHourController extends Controller
             $working_hour->afternoon_end_time = $request->input('afternoon_end_time');
             $working_hour->save();
 
-            return redirect()->route('staff.workinghour.index')
+            return redirect()->route('admin_staff.workinghour.index')
                 ->with('success', 'Schedule updated successfully.');
         }
 
@@ -304,7 +313,7 @@ class WorkingHourController extends Controller
 
             } else if (Auth::user()->hasRole('admin_staff')) {
             
-                return redirect()->route('staff.workinghour.index')->with('success', 'Schedule deleted successfully.');
+                return redirect()->route('admin_staff.workinghour.index')->with('success', 'Schedule deleted successfully.');
             }
     }
 

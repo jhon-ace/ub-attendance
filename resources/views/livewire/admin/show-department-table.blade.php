@@ -557,7 +557,7 @@
                             <button @click="open = false" class=" text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                         </div>
                         <div class="mb-4">
-                            <form action="{{ route('staff.department.store') }}" method="POST" class="">
+                            <form action="{{ route('admin_staff.department.store') }}" method="POST" class="">
                             <x-caps-lock-detector />
                                 @csrf
 
@@ -736,7 +736,7 @@
                                                             <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                         </div>
                                                         <div class="mb-4">
-                                                            <form id="updateStaffForm" action="{{ route('staff.department.update', $department->id )}}" method="POST" class="">
+                                                            <form id="updateStaffForm" action="{{ route('admin_staff.department.update', $department->id )}}" method="POST" class="">
                                                                 <x-caps-lock-detector />
                                                                 @csrf
                                                                 @method('PUT')

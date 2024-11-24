@@ -13,16 +13,20 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 class AttendanceExportForPayroll implements FromView, WithColumnWidths, WithStyles
 {
     protected $attendanceData;
+    public $currentMonths;
 
-    public function __construct($attendanceData)
+    public function __construct($attendanceData, $currentMonths)
     {
         $this->attendanceData = $attendanceData;
+        $this->currentMonths = $currentMonths;
     }
 
     public function view(): View
     {
-        return view('exports.attendance_report', [
+        return view('exports.attendance_report_payroll', [
             'attendanceData' => $this->attendanceData,
+            'currentMonths' => $this->currentMonths,
+            
         ]);
     }
 

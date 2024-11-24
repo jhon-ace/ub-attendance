@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
+use App\Models\Admin\School; 
 
 class RegisteredUserController extends Controller
 {
@@ -20,7 +21,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        $schools = School::all();
+        return view('auth.register', compact('schools'));
     }
 
     /**
@@ -35,22 +37,31 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'string', 'in:admin,employee,student,admin_staff'],
+            'school_id' => $request->role !== 'admin'
+                ? ['required', 'integer']  // For non-admin roles, school_id is required
+                : ['nullable', 'integer'],  // For admin, school_id is nullable
         ]);
 
-        $user = User::create([
+        $data = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role, 
-        ]);
+            'role' => $request->role,
+            'school_id' => $request->role === 'admin' ? null : $request->school_id,  
+        ];
+
+        $user = User::create($data);
 
         $user->assignRole($request->role);
-
+        
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('admin.dashboard', absolute: false))
-        ->with('success', 'Successful Login');
+        if ($user->role === 'admin') {
+            return redirect(route('admin.dashboard'))->with('success', 'Successful Login');
+        } elseif ($user->role === 'admin_staff') {
+            return redirect(route('admin_staff.dashboard'))->with('success', 'Successful Login');
+        }
     }
 }

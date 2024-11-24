@@ -92,7 +92,7 @@ class EmployeeController extends Controller
                     ->with('success', 'Employee created successfully.');
 
                 } else {
-                    return redirect()->route('staff.employee.index')
+                    return redirect()->route('admin_staff.employee.index')
                     ->with('success', 'Employee created successfully.');
                 }
 
@@ -115,7 +115,7 @@ class EmployeeController extends Controller
 
                 } else {
 
-                    return redirect()->route('staff.employee.index')
+                    return redirect()->route('admin_staff.employee.index')
                     ->with('error', $errorMessage . 'Try again.');
                 }
                 

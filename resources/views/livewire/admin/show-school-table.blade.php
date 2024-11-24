@@ -12,7 +12,7 @@
             <x-sweetalert type="error" :message="session('error')" />
         @endif
         <div class="flex justify-between mb-4 sm:-mt-4">
-            <div class="font-bold text-md tracking-tight text-black  mt-2 uppercase">Admin / Manage School Year</div>
+            <div class="font-bold text-md tracking-tight text-black  mt-2 uppercase">Admin / Manage Schools</div>
             <div x-data="{ open: false }">
                 <button @click="open = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                     <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add School
@@ -28,12 +28,12 @@
                             <x-caps-lock-detector />
                                 @csrf
                                 <div class="mb-4">
-                                    <label for="abbreviation" class="block text-gray-700 text-md font-bold mb-2">Abbreviation:</label>
+                                    <label for="abbreviation" class="block text-gray-700 text-md font-bold mb-2">School:</label>
                                     <input type="text" name="abbreviation" id="abbreviation" value="{{ old('abbreviation') }}"  class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_name') is-invalid @enderror" required autofocus>
                                     <x-input-error :messages="$errors->get('abbreviation')" class="mt-2" />
                                 </div>
                                 <div class="mb-4">
-                                    <label for="school_name" class="block text-gray-700 text-md font-bold mb-2">School Name</label>
+                                    <label for="school_name" class="block text-gray-700 text-md font-bold mb-2">School Description</label>
                                     <input type="text" name="school_name" id="school_name" value="{{ old('school_name') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_description') is-invalid @enderror" required>
                                     <x-input-error :messages="$errors->get('school_name')" class="mt-2" />
                                 </div>
@@ -78,7 +78,7 @@
                         </th>
                         <th class="border border-gray-400 px-3 py-2">
                             <button wire:click="sortBy('abbreviation')" class="w-full h-full flex items-center justify-center">
-                                Shool Year
+                                Shool Name
                                 @if ($sortField == 'abbreviation')
                                     @if ($sortDirection == 'asc')
                                         &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -130,12 +130,12 @@
                                                         @csrf
                                                         @method('PUT')
                                                         <div class="mb-4">
-                                                            <label for="abbreviation" class="block text-gray-700 text-md font-bold mb-2 text-left">Abbreviation:</label>
+                                                            <label for="abbreviation" class="block text-gray-700 text-md font-bold mb-2 text-left">School:</label>
                                                             <input type="text" name="abbreviation" id="abbreviation" x-model="abbreviation" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_name') is-invalid @enderror" required autofocus>
                                                             <x-input-error :messages="$errors->get('abbreviation')" class="mt-2" />
                                                         </div>
                                                         <div class="mb-4">
-                                                            <label for="school_name" class="block text-gray-700 text-md font-bold mb-2 text-left">School Name</label>
+                                                            <label for="school_name" class="block text-gray-700 text-md font-bold mb-2 text-left">School Description</label>
                                                             <input type="text" name="school_name" id="school_name" x-model="school_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_description') is-invalid @enderror" required>
                                                             <x-input-error :messages="$errors->get('school_name')" class="mt-2" />
                                                         </div>

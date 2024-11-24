@@ -164,9 +164,19 @@ Route::middleware(['auth'])->group(function () {
 
 
     // ADMIN STAFF ROUTES ----------------------------------------------------------------------------
-    Route::middleware(['role:admin_staff'])->prefix('staff')->name('staff.')->group(function () {
+    Route::middleware(['role:admin_staff'])->prefix('staff')->name('admin_staff.')->group(function () {
          
             Route::get('/dashboard', [DashboardController::class, 'indexStaff'])->name('dashboard');
+
+
+            Route::controller(EmployeeAttendanceController::class)->group(function () {
+                Route::get('/employees/attendance/search', 'employeeSearch')->name('attendance.employee_attendance.search');
+                Route::get('/employees/attendance', 'employee')->name('attendance.employee_attendance');
+                Route::get('/employees/attendance/payroll', 'employeelist')->name('attendance.employee_attendance.payroll');
+            });
+
+
+ 
             //School Routes
             Route::resource('school', SchoolController::class)->names([
                     'index' => 'school.index',

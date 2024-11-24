@@ -60,6 +60,9 @@ class UserRoutePageName extends Component
             $titles = [
 
                 'staff.dashboard' => __('Staff | Dashboard'),
+                'admin_staff.attendance.employee_attendance.search' => __('Admin Staff | Search Employee Attendance'),
+                'admin_staff.attendance.employee_attendance' => __('Admin Staff | Employee Attendance'),
+                'admin_staff.attendance.employee_attendance.payroll' => __('Admin Staff | All Employee Attendance'),
                 'staff.school.index' => __('Staff | Manage School Year'),
                 'staff.department.index' => __('Staff | Manage Department'),
                 'staff.workinghour.index' => __('Staff | Manage Dept Working Hour'),

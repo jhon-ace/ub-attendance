@@ -1,9 +1,9 @@
 <div>
     @php
-    session(['selectedSchool' => $selectedSchool]);
-    session(['selectedDepartment' => $selectedDepartment]);
-    session(['showSelectedDepartment' => $showSelectedDepartment]);
-@endphp
+        session(['selectedSchool' => $selectedSchool]);
+        session(['selectedDepartment' => $selectedDepartment]);
+        session(['showSelectedDepartment' => $showSelectedDepartment]);
+    @endphp
     @if (session('success'))
         <x-sweetalert type="success" :message="session('success')" />
     @endif
@@ -102,7 +102,7 @@
                                     @if (Auth::user()->hasRole('admin')) 
                                         <form action="{{ route('admin.workinghour.store') }}" method="POST" class="">
                                     @else
-                                        <form action="{{ route('staff.workinghour.store') }}" method="POST" class="">
+                                        <form action="{{ route('admin_staff.workinghour.store') }}" method="POST" class="">
                                     @endif
                                     <x-caps-lock-detector />
                                         @csrf
@@ -293,7 +293,11 @@
                                                                 <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                             </div>
                                                             <div class="mb-4">
-                                                                <form action="{{ route('admin.workinghour.update', $schedule->id ) }}" method="POST" class="">
+                                                                @if(Auth::user()->hasRole('admin'))
+                                                                    <form action="{{ route('admin.workinghour.update', $schedule->id ) }}" method="POST" class="">
+                                                                @else
+                                                                    <form action="{{ route('admin_staff.workinghour.update', $schedule->id ) }}" method="POST" class="">
+                                                                @endif
                                                                 <x-caps-lock-detector />
                                                                     @csrf
                                                                     @method('PUT')

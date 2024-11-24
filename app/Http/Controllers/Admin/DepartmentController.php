@@ -91,13 +91,13 @@ class DepartmentController extends Controller
                 Department::create($validatedData);
                 
                 // If creation succeeds, redirect with success message
-                return redirect()->route('staff.department.index')
+                return redirect()->route('admin_staff.department.index')
                     ->with('success', 'Department created successfully.');
             } catch (\Exception $e) {
                 // If an exception occurs (unlikely in normal validation flow)
                 // Handle any specific errors or logging as needed
                 // You can redirect back with an error message or do other error handling
-                return  redirect()->route('staff.department.index')->with('error','The department ID is already taken in this school.');
+                return  redirect()->route('admin_staff.department.index')->with('error','The department ID is already taken in this school.');
             }
         }
 
@@ -215,13 +215,13 @@ class DepartmentController extends Controller
                 }
 
                 if (!$hasChanges) {
-                    return redirect()->route('staff.department.index')->with('info', 'No changes were made.');
+                    return redirect()->route('admin_staff.department.index')->with('info', 'No changes were made.');
                 }
 
                 // Update the department record
                 $department->update($validatedData);
 
-                return redirect()->route('staff.department.index')->with('success', 'Department updated successfully.');
+                return redirect()->route('admin_staff.department.index')->with('success', 'Department updated successfully.');
             } catch (ValidationException $e) {
                 $errors = $e->errors();
                 return redirect()->back()->withErrors($errors)->with('error', $errors['department_id'][0] ?? 'Validation error');

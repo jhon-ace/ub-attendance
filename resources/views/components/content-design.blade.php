@@ -51,7 +51,7 @@
                         <button id="toggleButton" class="text-white mr-0 px-3 py-1 rounded-md border border-transparent hover:border-blue-500">
                             <i id="toggleIcon" class="fa-solid fa-bars" style="color: #ffffff;"></i>
                         </button>
-                        School Attendance System
+                        {{ Auth::user()->school->school_name }} - Attendance System
                     </div>
                     <div x-cloak class="relative" x-data="{ open: false }">
                         <div @click="open = !open" class="mr-5 cursor-pointer">

@@ -54,18 +54,18 @@
 </head>
 <body>
     @foreach($departments as $department)
-        <h4>ATTENDANCE REPORT in {{$department->department_abbreviation}} department</h4>
+        <h4>ATTENDANCE REPORT in <text style="color:red;font-weight:bold">{{$department->department_abbreviation}} department</text></h4>
     @endforeach
     <!-- @foreach($departments as $department)
         <span>Department: <text style="color:red">{{$department->department_abbreviation}}</text></span><br>
     @endforeach -->
     @if ($selectedStartDate && $selectedEndDate)
         <div class="date-range">
-            <span>Selected Date: {{ date('F d, Y', strtotime($selectedStartDate)) }} to {{ date('F d, Y', strtotime($selectedEndDate)) }}</span>
+            <span>Selected Date: <text style="color:red;font-weight:bold">{{ \Carbon\Carbon::createFromFormat('m', str_pad($selectedMonth, 2, '0', STR_PAD_LEFT))->format('F') }} {{ $selectedStartDate}} - {{ $selectedEndDate }}, {{$selectedYear}}</text></span>
         </div>
     @else
         <div class="date-range">
-            <span>Selected Date: No date range selected</span>
+            <span>Selected Month: <text style="color:red;font-weight:bold">{{ \Carbon\Carbon::createFromFormat('m', str_pad($selectedMonth, 2, '0', STR_PAD_LEFT))->format('F') }}, {{$selectedYear}}</text></span>
         </div>
     @endif
     <div class="table-container">       

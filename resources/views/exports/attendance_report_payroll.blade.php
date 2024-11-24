@@ -70,13 +70,11 @@
     @endif
 
     @if($startDate && $endDate)
-        <h4 class="text-center font-bold">
-            {{ \Illuminate\Support\Carbon::parse($startDate)->format('F j, Y') }} 
-            &nbsp; to &nbsp; 
-            {{ \Illuminate\Support\Carbon::parse($endDate)->format('F j, Y') }}
-        </h4>
+        <p class="text-center font-bold">
+            Selected Date: {{ \Carbon\Carbon::createFromFormat('m', str_pad($currentMonths, 2, '0', STR_PAD_LEFT))->format('F') }} {{$startDate}} to {{ $endDate }}
+        </p>
     @else
-        <p>No selected date range.</p>
+        <p style="text-transform:uppercase;font-weight:bold">MONTH: {{ \Carbon\Carbon::createFromFormat('m', str_pad($currentMonths, 2, '0', STR_PAD_LEFT))->format('F') }}</p>
     @endif
 
     <table class="border border-black h-full" cellpadding="2">

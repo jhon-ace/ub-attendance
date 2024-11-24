@@ -72,6 +72,8 @@ public function render()
                              ->paginate(25);
 
         $schools = School::all();
+        //$departmentsAll = Department::paginate(20); // Adjust '10' to the number of items per page
+
 
 
          $departmentCounts = Department::select('school_id', \DB::raw('count(*) as department_count'))
@@ -83,6 +85,7 @@ public function render()
             'departments' => $departments,
             'schools' => $schools,
             'departmentCounts' => $departmentCounts,
+            //'departmentsAll' => $departmentsAll,
         ]);
     }
 

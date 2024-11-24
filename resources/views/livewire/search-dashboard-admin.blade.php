@@ -101,10 +101,8 @@
             }
         </style>
         
-        <h2 class="uppercase font-bold text-3xl">Current Date Employee Attendance Monitoring
-                    @if(Auth::user()->hasRole('employee'))
-@endif
-        </h2>
+        <h2 class="uppercase font-bold text-3xl">Current Date Employee Attendance Monitoring</h2>
+        <span class="font-bold uppercase text-xl">Date: <span class="text-red-500">{{ \Carbon\Carbon::now()->format('F j, Y') }}</span></span>
         <p>
             <div class="mt-4 mx-auto">
                 <input wire:model.live="search" type="text" class="text-sm border-0 text-black   px-3 ml-2 py-1.5 w-full md:w-64" placeholder="Search Employee or Department ..." autofocus>

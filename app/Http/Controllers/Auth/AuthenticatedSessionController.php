@@ -39,7 +39,7 @@ class AuthenticatedSessionController extends Controller
             }
             else if (Auth::user()->hasRole('admin_staff')) 
             {
-                return redirect()->intended(route('staff.dashboard'))->with('success', 'Successful Login');
+                return redirect()->intended(route('admin_staff.dashboard'))->with('success', 'Successful Login');
             } 
             else if (Auth::user()->hasRole('employee')) 
             {
@@ -64,39 +64,15 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {   
-        session()->flush(); 
+            session()->flush(); 
         
-         if (Auth::user()->hasRole('admin')) 
-            {
-                // return redirect()->intended(route('admin.dashboard'))->with('success', 'Successful Login');
-                Auth::guard('web')->logout();
+            Auth::guard('web')->logout();
 
-                $request->session()->invalidate();
+            $request->session()->invalidate();
 
-                $request->session()->regenerateToken();
+            $request->session()->regenerateToken();
 
-                return redirect()->route('login')->with('success', 'Successfully logged out');
-            }
-            else if (Auth::user()->hasRole('admin_staff')) 
-            {
-                Auth::guard('web')->logout();
-
-                $request->session()->invalidate();
-
-                $request->session()->regenerateToken();
-
-                return redirect()->route('login')->with('success', 'Successfully logged out');
-            } 
-
-            else  // This is HR Account
-            {
-                Auth::guard('web')->logout();
-
-                $request->session()->invalidate();
-
-                $request->session()->regenerateToken();
-
-                return redirect()->route('login')->with('success', 'Successfully logged out');
-            } 
+            return redirect(route('login'))->with('success', 'Successfully logged out');
+          
     }
 }

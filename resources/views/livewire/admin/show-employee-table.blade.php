@@ -66,6 +66,98 @@
             <div class="justify-end">
                 <input wire:model.live="search" type="text" class="text-sm border text-black border-gray-300 rounded-md px-3 ml-2 py-1.5 w-full md:w-64" placeholder="Search Employee or by department directly..." autofocus>
             </div>
+            
+        </div>
+        <div class="col-span-1 p-4 mt-5">
+            @if((!$departmentToShow && !$schoolToShow) || (!$departmentToShow && $schoolToShow) || ($departmentToShow && $schoolToShow))
+                <div class="flex justify-center items-center">
+                    <div x-data="{ open: false }">
+                        <button @click="open = true" class=" mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Employee to any department
+                        </button>
+                        <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                            <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
+                                <div class="flex justify-between items-center pb-3">
+                                    <p class="text-xl font-bold">Add Employee</p>
+                                    <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
+                                </div>
+                                <div class="mb-4">
+                                @if (Auth::user()->hasRole('admin'))
+                                    <form action="{{ route('admin.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                @else
+                                    <form action="{{ route('admin_staff.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                @endif
+                                        <x-caps-lock-detector />
+                                        @csrf
+
+                                        <div class="mb-2">
+                                            <input type="file" name="employee_photo" id="employee_photo" class="hidden" accept="image/*" onchange="previewImage(event)">
+                                            <label for="employee_photo" class="cursor-pointer flex flex-col items-center">
+                                                <div id="imagePreviewContainer" class="mb-2 text-center">
+                                                    <img id="imagePreview" src="{{ asset('assets/img/user.png') }}" class="rounded-lg w-48 h-auto">
+                                                </div>
+                                                <span class="text-sm text-gray-500">Select Photo</span>
+                                            </label>
+                                            <x-input-error :messages="$errors->get('employee_photo')" class="mt-2" />
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label for="employee_id" class="block text-gray-700 text-md font-bold mb-2">Employee School ID</label>
+                                            <input type="text" name="employee_id" id="employee_id" value="{{ old('employee_id') }}" class="shadow appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_id') is-invalid @enderror" required autofocus>
+                                            <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="employee_rfid" class="block text-gray-700 text-md font-bold mb-2">Employee RF ID No</label>
+                                            <input type="text" name="employee_rfid" id="employee_rfid" value="{{ old('employee_rfid') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_rfid') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('employee_rfid')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="employee_lastname" class="block text-gray-700 text-md font-bold mb-2">Employee Lastname</label>
+                                            <input type="text" name="employee_lastname" id="employee_lastname" value="{{ old('employee_lastname') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_lastname') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('employee_lastname')" class="mt-2" />
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label for="employee_firstname" class="block text-gray-700 text-md font-bold mb-2">Employee Firstname</label>
+                                            <input type="text" name="employee_firstname" id="employee_firstname" value="{{ old('employee_firstname') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_firstname') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('employee_firstname')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="employee_middlename" class="block text-gray-700 text-md font-bold mb-2">Employee Middlename</label>
+                                            <input type="text" name="employee_middlename" id="employee_middlename" value="{{ old('employee_middlename') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('employee_middlename') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
+                                            <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                                @foreach($schoolsAll as $schoolAll)
+                                                    <option value="{{ $schoolAll->id }}">{{ $schoolAll->abbreviation}}</option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Select Department:</label>
+                                            <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
+                                                @foreach($departmentsAll as $departmentAll)
+                                                        <option value="{{ $departmentAll->id }}">{{ $departmentAll->department_abbreviation}}</option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('id')" class="mt-2" />
+                                        </div>
+                                        <div class="flex mb-4 mt-10 justify-center">
+                                            <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                                Save
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
         <div class="justify-end mt-9">
             @if($search)
@@ -229,7 +321,7 @@
                                                     @if (Auth::user()->hasRole('admin'))
                                                         <form action="{{ route('admin.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
                                                     @else
-                                                        <form action="{{ route('staff.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
+                                                        <form action="{{ route('admin_staff.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
                                                     @endif
                                                             <x-caps-lock-detector />
                                                             @csrf
@@ -279,10 +371,13 @@
                                                                     <label for="department_id" class="block text-gray-700 text-md font-bold mb-2 text-left">Department:</label>
                                                                     <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
                                                                         <option selected value="{{ $employee->department->id }}">{{ $employee->department->department_abbreviation }}</option>
-                                                                        @foreach($departments as $department)
+                                                                        <!-- @foreach($departments as $department)
                                                                             @if($department->id != $employee->department->id)
                                                                                 <option value="{{ $department->id }}">{{ $department->department_abbreviation }}</option>
                                                                             @endif
+                                                                        @endforeach -->
+                                                                         @foreach($departmentsAll as $departmentAll)
+                                                                                <option value="{{ $departmentAll->id }}">{{ $departmentAll->department_abbreviation}}</option>
                                                                         @endforeach
                                                                     </select>
                                                                     <x-input-error :messages="$errors->get('id')" class="mt-2" />
@@ -339,7 +434,8 @@
                 </div>
             @endif
         <br>
-            <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected school</p>
+            <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected school year and department</p>
+            
         @endif
         @if(!empty($selectedSchool))
             @if(!$departmentToShow)
@@ -357,19 +453,19 @@
                 <div x-data="{ open: false }">
                     <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                         <!-- <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> {{$departmentToShow->department_id}} - {{$departmentToShow->department_name}} -->
-                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Employee in {{$departmentToShow->department_name}} department
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Employee in {{$departmentToShow->department_abbreviation}} - {{ $departmentToShow->department_name }} department
                     </button>
                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                         <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
                             <div class="flex justify-between items-center pb-3">
-                                <p class="text-xl font-bold">Add Employee</p>
+                                <p class="text-xl font-bold">Add Employee in {{$departmentToShow->department_abbreviation}} department</p>
                                 <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                             </div>
                             <div class="mb-4">
                             @if (Auth::user()->hasRole('admin'))
                                 <form action="{{ route('admin.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
                             @else
-                                <form action="{{ route('staff.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                <form action="{{ route('admin_staff.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
                             @endif
                                     <x-caps-lock-detector />
                                     @csrf
@@ -457,18 +553,21 @@
                             Import
                         </button>
                     </div>-->
-                    <div class="">
-                        <form action="{{ route('admin.insert.photos') }}" method="GET">
-                                  <button type="submit">Insert Photos</button>
-                                  
-                        </form>
-                    </div>
+                    @if(Auth::user()->hasRole('admin'))
+                        <div class="">
+                            <form action="{{ route('admin.insert.photos') }}" method="GET">
+                                    <button type="submit">Insert Photos</button>
+                                    
+                            </form>
+                        </div>
+                    @endif
+                    
                 </form> 
                 <div class="flex justify-center items-center">
                     <div x-data="{ open: false }">
                         <button @click="open = true" class="-mt-1 mb-2 bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                             <!-- <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> {{$departmentToShow->department_id}} - {{$departmentToShow->department_name}} -->
-                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Employee
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Employee to any department
                         </button>
                         <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                             <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
@@ -480,7 +579,7 @@
                                 @if (Auth::user()->hasRole('admin'))
                                     <form action="{{ route('admin.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
                                 @else
-                                    <form action="{{ route('staff.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
+                                    <form action="{{ route('admin_staff.employee.store') }}" method="POST" class="" enctype="multipart/form-data">
                                 @endif
                                         <x-caps-lock-detector />
                                         @csrf
@@ -535,11 +634,15 @@
                                             <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department:</label>
                                             <select id="department_id" name="department_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required>
                                                 <option selected value="{{ $departmentToShow->id }}">{{ $departmentToShow->department_abbreviation }}</option>
-                                                @foreach($departments as $department)
+                                                <!-- @foreach($departments as $department)
                                                     @if($department->id != $departmentToShow->id)
                                                         <option value="{{ $department->id }}">{{ $department->department_abbreviation }}</option>
                                                     @endif
+                                                @endforeach -->
+                                                 @foreach($departmentsAll as $departmentAll)
+                                                        <option value="{{ $departmentAll->id }}">{{ $departmentAll->department_abbreviation}}</option>
                                                 @endforeach
+
                                             </select>
                                             <x-input-error :messages="$errors->get('id')" class="mt-2" />
                                         </div>
@@ -699,7 +802,7 @@
                                                     @if (Auth::user()->hasRole('admin'))
                                                         <form action="{{ route('admin.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
                                                     @else
-                                                        <form action="{{ route('staff.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
+                                                        <form action="{{ route('admin_staff.employee.update', $employee->id)}}" method="POST" enctype="multipart/form-data">
                                                     @endif
                                                             <x-caps-lock-detector />
                                                             @csrf
