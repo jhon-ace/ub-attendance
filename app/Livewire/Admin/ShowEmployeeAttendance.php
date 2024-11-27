@@ -30,7 +30,7 @@ class ShowEmployeeAttendance extends Component
     use WithPagination;
 
     public $search = '';
-        public $searchh = '';
+    public $searchh = '';
     public $sortField = 'employee_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
@@ -1319,16 +1319,26 @@ class ShowEmployeeAttendance extends Component
     {
         $savePath = storage_path('/app/generatedPDF'); // Default save path (storage/app/)
         // $savePath = 'C:/Users/YourUsername/Downloads/'; // Windows example
-
+        //  $currentYear = Carbon::now()->year;
+        //     $currentMonth = Carbon::now()->month;
+        $currentMonth = $this->selectedMonth;  // Get the current month
+            $currentYear = now()->year;  
         try {
 
            // Determine the filename dynamically with date included if both startDate and endDate are selected
             if ($this->startDate && $this->endDate) {
-                $selectedStartDate = date('jS F Y', strtotime($this->startDate));
-                $selectedEndDate = date('jS F Y', strtotime($this->endDate));
+               
+                 $fullStartDate = "{$currentYear}-{$currentMonth}-{$this->startDate}";
+                $fullEndDate = "{$currentYear}-{$currentMonth}-{$this->endDate}";
+
+                // Format using Carbon
+                $selectedStartDate = Carbon::parse($fullStartDate)->format('jS F Y');
+                $selectedEndDate = Carbon::parse($fullEndDate)->format('jS F Y');
+
+
                 $dateRange = $selectedStartDate . ' to ' . $selectedEndDate;
             } else {
-                $dateRange = 'No Date Selected'; // Default text if no date range is selected
+                $dateRange = Carbon::createFromFormat('m', $this->selectedMonth)->format('F') . ', ' . $this->selectedYear;
             }
 
             // Construct the filename with the date range if available
@@ -1379,32 +1389,50 @@ class ShowEmployeeAttendance extends Component
                 $this->selectedEmployeeToShow = null;
             }
 
+            $currentMonth = $this->selectedMonth;  // Get the current month
+            $currentYear = now()->year;  
+
             // Apply date range filter if both dates are set
             if ($this->startDate && $this->endDate) {
-                $queryTimeIn->whereDate('check_in_time', '>=', $this->startDate)
-                            ->whereDate('check_in_time', '<=', $this->endDate);
+                $queryTimeIn->whereDay('check_in_time', '>=', $this->startDate)
+                            ->whereMonth('check_in_time', $currentMonth)  // Match current month
+                            ->whereYear('check_in_time', $currentYear) 
+                            ->whereDay('check_in_time', '<=', $this->endDate);
 
-                $queryTimeOut->whereDate('check_out_time', '>=', $this->startDate)
-                            ->whereDate('check_out_time', '<=', $this->endDate);
+
+                $queryTimeOut->whereDay('check_out_time', '>=', $this->startDate)
+                            ->whereMonth('check_out_time', $currentMonth)  // Match current month
+                            ->whereYear('check_out_time', $currentYear) 
+                            ->whereDay('check_out_time', '<=', $this->endDate);
                             
                 $selectedAttendanceByDate = $queryTimeIn->get();// Fetch data and assign to selectedAttendanceByDate
                 
                 $this->selectedAttendanceByDate = $selectedAttendanceByDate;   
             }
             
-            // $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
-            //     ->paginate(50);
-            // $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
-            //     ->paginate(50);
+            $attendanceTimeIn = $queryTimeIn
+                ->where('status', '!=', 'Holiday')
+                ->whereMonth('check_in_time', $currentMonth)  // Match current month
+                ->whereYear('check_in_time', $currentYear)    // Match current year        
+                ->orderBy('employee_id', 'asc')
+                ->orderBy('check_in_time', 'asc')
+                ->get();
 
+            $attendanceTimeOut = $queryTimeOut
+                ->where('status', '!=', 'Holiday')
+                ->whereMonth('check_out_time', $currentMonth)  // Match current month
+                ->whereYear('check_out_time', $currentYear)    // Match current year
+                ->orderBy('employee_id', 'asc')
+                ->orderBy('check_out_time', 'asc')
+                ->get();
 
-        $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
-            ->orderBy('check_in_time', 'asc')
-            ->paginate(100);
+        // $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+        //     ->orderBy('check_in_time', 'asc')
+        //     ->paginate(100);
 
-        $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
-            ->orderBy('check_out_time', 'asc')
-            ->paginate(100);
+        // $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+        //     ->orderBy('check_out_time', 'asc')
+        //     ->paginate(100);
 
             //     $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
             //     ->paginate(100);
@@ -1592,19 +1620,23 @@ class ShowEmployeeAttendance extends Component
                     $totalHoursNeed = $morningDuration + $afternoonDuration;
                     $totalHoursTobeRendered = $totalHoursNeed;
                     $totalHoursNeedperDay = $totalHoursNeed;
+
                     if ($this->startDate && $this->endDate) {
                         $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
 
                         // Determine if the start date and end date are the same
                         $isSameDate = $this->startDate === $this->endDate; // Adjust if necessary for your date format
-                        $startDate = Carbon::parse($this->startDate)->startOfDay(); // Start of the selected start date
-                        $endDate = Carbon::parse($this->endDate)->endOfDay(); // End of the selected end date
+                        // $startDate = Carbon::parse($this->startDate)->startOfDay(); // Start of the selected start date
+                        // $endDate = Carbon::parse($this->endDate)->endOfDay(); // End of the selected end date
+                         $startDate = Carbon::parse("{$currentYear}-{$currentMonth}-{$this->startDate}")->startOfDay();
+                        // $endDate = Carbon::parse($this->endDate)->endOfDay(); // End of the selected end date
+                        $endDate = Carbon::parse("{$currentYear}-{$currentMonth}-{$this->endDate}")->startOfDay();
 
                         if ($isSameDate) {
                             // If the start date and end date are the same, only consider that specific day
                             $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
                                 ->where('employee_id', $employeeId)
-                                ->whereDate('check_in_time', $this->startDate)
+                                ->whereDay('check_in_time', $this->startDate)
                                 ->first();
                         } else {
                             // If the start date and end date are different, consider the range
@@ -2344,6 +2376,8 @@ class ShowEmployeeAttendance extends Component
                 'totalHoursTobeRendered' => $totalHoursTobeRendered,
                 'selectedStartDate' => $this->startDate,
                 'selectedEndDate' => $this->endDate,
+                'selectedMonth' => $currentMonth,
+                'selectedYear' => $currentYear,
                 'attendanceData' => $attendanceData,
                 'attendanceTimeIn' => $attendanceTimeIn,
                 'attendanceTimeOut' => $attendanceTimeOut,
@@ -2362,7 +2396,7 @@ class ShowEmployeeAttendance extends Component
         }
     }
     
-    public function generateExcel()
+    public function generateExcelPayroll()
     {
 
         $this->dispatch('export-start');
@@ -2370,13 +2404,18 @@ class ShowEmployeeAttendance extends Component
         $departments = Department::where('id', $this->selectedDepartment4)->get();
         $department = Department::find($this->selectedDepartment4);
 
+            $currentYear = Carbon::now()->year;
+            $currentMonth = $this->selectedYear;
+
+            $fullStartDate = Carbon::createFromFormat('m', $this->selectedMonth)->format('F') . " {$this->startDate}";
+            $fullEndDate = Carbon::createFromFormat('m', $this->selectedMonth)->format('F') . " {$this->endDate}, {$currentYear}";
 
             if ($this->startDate && $this->endDate) {
-                $selectedStartDate = date('jS F Y', strtotime($this->startDate));
-                $selectedEndDate = date('jS F Y', strtotime($this->endDate));
+                 $selectedStartDate = $fullStartDate;
+                $selectedEndDate = $fullEndDate;
                 $dateRange = $selectedStartDate . ' to ' . $selectedEndDate;
             } else {
-                $dateRange = 'No Date Selected';
+                $dateRange = Carbon::createFromFormat('m', $this->selectedMonth)->format('F') . ', ' . $this->selectedYear;
             }
 
             if ($department) {
@@ -2415,11 +2454,24 @@ class ShowEmployeeAttendance extends Component
                 $employees = Employee::all();
             }
 
+            $currentMonth = $this->selectedMonth;  // Get the current month
+            $currentYear = now()->year;  
+
             if ($this->startDate && $this->endDate) {
-                $queryTimeIn->whereDate('check_in_time', '>=', $this->startDate)
-                            ->whereDate('check_in_time', '<=', $this->endDate);
-                $queryTimeOut->whereDate('check_out_time', '>=', $this->startDate)
-                            ->whereDate('check_out_time', '<=', $this->endDate);
+                $queryTimeIn->whereDay('check_in_time', '>=', $this->startDate)
+                            ->whereMonth('check_in_time', $currentMonth)  // Match current month
+                            ->whereYear('check_in_time', $currentYear) 
+                            ->whereDay('check_in_time', '<=', $this->endDate);
+
+
+                $queryTimeOut->whereDay('check_out_time', '>=', $this->startDate)
+                            ->whereMonth('check_out_time', $currentMonth)  // Match current month
+                            ->whereYear('check_out_time', $currentYear) 
+                            ->whereDay('check_out_time', '<=', $this->endDate);
+                // $queryTimeIn->whereDate('check_in_time', '>=', $this->startDate)
+                //             ->whereDate('check_in_time', '<=', $this->endDate);
+                // $queryTimeOut->whereDate('check_out_time', '>=', $this->startDate)
+                //             ->whereDate('check_out_time', '<=', $this->endDate);
             }
 
             // $attendanceTimeIn = $queryTimeIn->orderBy('employee_id', 'asc')->get();
@@ -2438,15 +2490,31 @@ class ShowEmployeeAttendance extends Component
             //     ->orderBy('check_out_time', 'asc')
             //     ->paginate(1000);
 
-            $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+            // $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+            //     ->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_in_time', 'asc')
+            //     ->paginate(1000);
+
+            // $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+            //     ->orderBy('employee_id', 'asc')
+            //     ->orderBy('check_out_time', 'asc')
+            //     ->paginate(1000);
+
+            $attendanceTimeIn = $queryTimeIn
+                ->where('status', '!=', 'Holiday')
+                ->whereMonth('check_in_time', $currentMonth)  // Match current month
+                ->whereYear('check_in_time', $currentYear)    // Match current year        
                 ->orderBy('employee_id', 'asc')
                 ->orderBy('check_in_time', 'asc')
-                ->paginate(1000);
+                ->get();
 
-            $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+            $attendanceTimeOut = $queryTimeOut
+                ->where('status', '!=', 'Holiday')
+                ->whereMonth('check_out_time', $currentMonth)  // Match current month
+                ->whereYear('check_out_time', $currentYear)    // Match current year
                 ->orderBy('employee_id', 'asc')
                 ->orderBy('check_out_time', 'asc')
-                ->paginate(1000);
+                ->get();
 
 
 
@@ -2629,19 +2697,25 @@ class ShowEmployeeAttendance extends Component
                         $totalHoursNeed = $morningDuration + $afternoonDuration;
                         $totalHoursTobeRendered = $totalHoursNeed;
                         $totalHoursNeedperDay = $totalHoursNeed;
+
+                          $currentMonth = $this->selectedMonth;  // Get the current month
+                                    $currentYear = now()->year;  
+
+
                         if ($this->startDate && $this->endDate) {
                             $employeeId = $attendance->employee_id; // Assuming you have this from $attendance
 
                             // Determine if the start date and end date are the same
                             $isSameDate = $this->startDate === $this->endDate; // Adjust if necessary for your date format
-                            $startDate = Carbon::parse($this->startDate)->startOfDay(); // Start of the selected start date
-                            $endDate = Carbon::parse($this->endDate)->endOfDay(); // End of the selected end date
+                             $startDate = Carbon::parse("{$currentYear}-{$currentMonth}-{$this->startDate}")->startOfDay();
+                            $endDate = Carbon::parse("{$currentYear}-{$currentMonth}-{$this->endDate}")->startOfDay();
+
 
                             if ($isSameDate) {
                                 // If the start date and end date are the same, only consider that specific day
                                 $checkInCount = EmployeeAttendanceTimeIn::select(DB::raw('COUNT(DISTINCT DATE(check_in_time)) as unique_check_in_days'))
                                     ->where('employee_id', $employeeId)
-                                    ->whereDate('check_in_time', $this->startDate)
+                                    ->whereDay('check_in_time', $this->startDate)
                                     ->first();
                             } else {
                                 // If the start date and end date are different, consider the range
@@ -3311,6 +3385,10 @@ class ShowEmployeeAttendance extends Component
                                 'department_abbreviation' => $department,
                                 'startDate' => $this->startDate,
                                 'startDate' => $this->endDate,
+                                'selectedMonth' => $this->selectedMonth,
+                                'selectedYear' => $this->selectedYear,
+                                'currentMonth' => $this->selectedMonth,
+                                'currentYear' => $this->selectedYear,
 
 
 

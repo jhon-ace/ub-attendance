@@ -31,8 +31,9 @@ class ShowEmployeeTable extends Component
 
     public function mount()
     {
-
-        $this->selectedSchool = session('selectedSchool', null);
+        if (Auth::check() && Auth::user()->school) {
+            $this->selectedSchool = Auth::user()->school->id;
+        }
         $this->selectedDepartment2 = session('selectedDepartment2', null);
         $this->departmentsToShow = collect([]); // Initialize as an empty collection
         $this->schoolToShow = collect([]); // Initialize as an empty collection
@@ -109,7 +110,6 @@ class ShowEmployeeTable extends Component
         $departmentsAll = Department::all();
         $schoolsAll = School::all();
 
-        
 
         return view('livewire.admin.show-employee-table', [
             'employees' => $employees,
@@ -118,6 +118,7 @@ class ShowEmployeeTable extends Component
             'departmentCounts' => $departmentCounts,
             'departmentsAll' => $departmentsAll,
             'schoolsAll' => $schoolsAll,
+            'schoolToShow' => $this->selectedSchool,
         ]);
     }
 

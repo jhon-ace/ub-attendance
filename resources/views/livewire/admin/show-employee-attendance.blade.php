@@ -5338,14 +5338,14 @@
                                                                     </p>
                                                                     <div class="">
                                                                         <div class="">
-                                                                            <button 
+                                                                            <!-- <button 
                                                                                 x-on:click="loading = true" 
                                                                                 wire:click="generateExcelPayroll" 
                                                                                 wire:loading.attr="disabled" 
                                                                             
                                                                                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                                 <i class="fa-solid fa-file"></i> Export to Excel
-                                                                            </button>
+                                                                            </button> -->
                                                                             <button 
                                                                                 
                                                                                 wire:click="generatePDF" 
@@ -5381,14 +5381,14 @@
                                                                             No selected Month to view Attendances
                                                                         </p>
                                                                         <div class="hidden">
-                                                                            <button 
+                                                                            <!-- <button 
                                                                                 
                                                                                 wire:click="generateExcelPayroll" 
                                                                                 wire:loading.attr="disabled" 
                                                                             
                                                                                 class=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2"  disabled>
                                                                                 <i class="fa-solid fa-file"></i> Export to Excel
-                                                                            </button>
+                                                                            </button> -->
                                                                             <button 
                                                                                 
                                                                                 wire:click="generatePDF" 
@@ -5406,12 +5406,12 @@
                                                                             
                                                                         @else
                                                                             <div class="">
-                                                                                <button 
+                                                                                <!-- <button 
                                                                                     wire:click="generateExcelPayroll" 
                                                                                     wire:loading.attr="disabled" 
                                                                                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2">
                                                                                     <i class="fa-solid fa-file"></i> Export to Excel
-                                                                                </button>
+                                                                                </button> -->
                                                                                 <button 
                                                                                     wire:click="generatePDF" 
                                                                                     wire:loading.attr="disabled" 

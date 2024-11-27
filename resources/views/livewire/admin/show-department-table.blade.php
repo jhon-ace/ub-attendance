@@ -494,30 +494,9 @@
         </div>
         <div class="flex flex-col md:flex-row items-start md:items-center md:justify-start">
             <!-- Dropdown and Delete Button -->
-            <div class="flex items-center w-full md:w-auto">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Year:</label>
-                <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments"
-                        class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
-                        required>
-                    <option value="">Select Year</option>
-                    @foreach($schools as $school)
-                        <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
-                    @endforeach
-                </select>
-                
-                @if($schoolToShow)
-                    <!-- <form id="deleteAll" action="{{ route('admin.department.deleteAll') }}" method="POST" onsubmit="return confirmDeleteAll(event);" class="flex ml-4">
-                    @csrf
-                    @method('DELETE')
-                    <input type="hidden" name="school_id" id="school_id_to_delete">
-                    <button type="submit" class="text-xs lg:text-sm bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-700">
-                        <i class="fa-solid fa-trash fa-sm"></i>
-                    </button>
-                </form> -->
-                @else
-                    
-                @endif
-            </div>
+            @if($schoolToShow)
+                <p class="w-96 text-black mt-2 text-sm mb-1">School: <span class="text-red-500 ml-2 font-bold uppercase">{{ $schoolToShow->abbreviation }}</span></p>
+            @endif
             <!-- Search Input -->
             <div class="w-full flex justify-end mt-4 md:mt-0 md:ml-4">
                 @if(empty($selectedSchool)) 
@@ -527,106 +506,92 @@
                 @endif
             </div>
         </div>
-        <hr class="border-gray-200 my-4">
+        <hr class="border-gray-200 my-2">
         @if($schoolToShow)
-        <!-- <form action="{{ route('admin.csv.import.department') }}" method="post" enctype="multipart/form-data">
-                        @csrf
-                        <div class="flex items-center space-x-2 mb-2">
-                            <label for="csv_file" class="text-sm font-medium text-gray-700">Import CSV file:</label>
-                            <div class="relative">
-                                <input id="csv_file" type="file" name="csv_file" accept=".csv,.txt" class="hidden" required>
-                                <label for="csv_file" class="cursor-pointer bg-white border border-gray-300 text-gray-700 rounded-md py-1 px-3 inline-block text-sm hover:bg-gray-50 hover:border-blue-500">
-                                    <i class="fa-solid fa-file-import mr-1"></i> Browse
-                                </label>
+            <div class="flex justify-end mb-2">
+                <div x-data="{ open: false }">
+                    <button @click="open = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Department
+                    </button>
+                    <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <div @click.away="open = true" class="w-[30%] max-h-[90%]  bg-white p-6 rounded-lg shadow-lg  mx-auto overflow-y-auto">
+                            <div class="flex justify-between items-center pb-3">
+                                <p class="text-xl font-bold">Add Department</p>
+                                <button @click="open = false" class=" text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                             </div>
-                            <button type="submit" class="bg-blue-500 text-white text-sm px-3 py-1 rounded hover:bg-blue-700">
-                                Import
-                            </button>
-                        </div>
-                    </form> -->
-        <div class="flex justify-between">
-            <p class="text-black mt-2 text-sm mb-4">Selected School Year: <text class="uppercase text-red-500">{{ $schoolToShow->abbreviation }}</text></p>
-            <div x-data="{ open: false }">
-                <button @click="open = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
-                    <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Department
-                </button>
-                <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div @click.away="open = true" class="w-[30%] max-h-[90%]  bg-white p-6 rounded-lg shadow-lg  mx-auto overflow-y-auto">
-                        <div class="flex justify-between items-center pb-3">
-                            <p class="text-xl font-bold">Add Department</p>
-                            <button @click="open = false" class=" text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
-                        </div>
-                        <div class="mb-4">
-                            <form action="{{ route('admin_staff.department.store') }}" method="POST" class="">
-                            <x-caps-lock-detector />
-                                @csrf
+                            <div class="mb-4">
+                                <form action="{{ route('admin_staff.department.store') }}" method="POST" class="">
+                                <x-caps-lock-detector />
+                                    @csrf
 
-                                    <div class="mb-2">
-                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year: </label>
-                                        <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
-                                                <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option>
-                                        </select>
-                                        <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
-                                    </div>
-                                    <div class="mb-2">
-                                        <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department School ID</label>
-                                        <input type="text" name="department_id" id="department_id" value="{{ old('department_id') }}" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required autofocus>
-                                        <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
-                                    </div>
+                                        <div class="mb-2">
+                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year: </label>
+                                            <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
+                                                    <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option>
+                                            </select>
+                                            <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="department_id" class="block text-gray-700 text-md font-bold mb-2">Department School ID</label>
+                                            <input type="text" name="department_id" id="department_id" value="{{ old('department_id') }}" class="shadow appearance-none  rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_id') is-invalid @enderror" required autofocus>
+                                            <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
+                                        </div>
 
-                                    <div class="mb-2">
-                                        <label for="department_abbreviation" class="block text-gray-700 text-md font-bold mb-2">Department Abbreviation</label>
-                                        <input type="text" name="department_abbreviation" id="department_abbreviation" value="{{ old('department_abbreviation') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_abbreviation') is-invalid @enderror" required>
-                                        <x-input-error :messages="$errors->get('department_abbreviation')" class="mt-2" />
-                                    </div>
+                                        <div class="mb-2">
+                                            <label for="department_abbreviation" class="block text-gray-700 text-md font-bold mb-2">Department Abbreviation</label>
+                                            <input type="text" name="department_abbreviation" id="department_abbreviation" value="{{ old('department_abbreviation') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_abbreviation') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('department_abbreviation')" class="mt-2" />
+                                        </div>
 
-                                    <div class="mb-2">
-                                        <label for="department_name" class="block text-gray-700 text-md font-bold mb-2">Department Name</label>
-                                        <input type="text" name="department_name" id="department_name" value="{{ old('department_name') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_name') is-invalid @enderror" required>
-                                        <x-input-error :messages="$errors->get('department_name')" class="mt-2" />
-                                    </div>
+                                        <div class="mb-2">
+                                            <label for="department_name" class="block text-gray-700 text-md font-bold mb-2">Department Name</label>
+                                            <input type="text" name="department_name" id="department_name" value="{{ old('department_name') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('department_name') is-invalid @enderror" required>
+                                            <x-input-error :messages="$errors->get('department_name')" class="mt-2" />
+                                        </div>
 
 
-                                    <div class="mb-2">
-                                        <label for="dept_identifier" class="block text-gray-700 text-md font-bold mb-2">This department is for: </label>
-                                        <select id="dept_identifier" name="dept_identifier" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('dept_identifier') is-invalid @enderror" required>
-                                                <option value="">Select Option</option>
-                                                <option value="employee">Employee</option>
-                                                <option value="student">Student</option>
-                                        </select>
-                                        <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                        <div class="mb-2">
+                                            <label for="dept_identifier" class="block text-gray-700 text-md font-bold mb-2">This department is for: </label>
+                                            <select id="dept_identifier" name="dept_identifier" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('dept_identifier') is-invalid @enderror" required>
+                                                    <option value="">Select Option</option>
+                                                    <option value="employee">Employee</option>
+                                                    <option value="student">Student</option>
+                                            </select>
+                                            <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                        </div>
+                                    <div class="flex mb-4 mt-10 justify-center">
+                                        <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
+                                            Save
+                                        </button>
                                     </div>
-                                <div class="flex mb-4 mt-10 justify-center">
-                                    <button type="submit" class="w-80 bg-blue-500 text-white px-4 py-2 rounded-md">
-                                        Save
-                                    </button>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
         @else
             
         @endif
         @if($search && $departments->isEmpty())
-        <p class="text-black mt-8 text-center">No employee/s found in <text class="text-red-500">{{ $schoolToShow->school_name }}</text> for matching "{{ $search }}"</p>  
-        <div class="flex justify-center mt-2">
-            @if($search)
-                <p><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
-            @endif
-        </div>
+            <p class="text-black mt-8 text-center">No employee/s found in <text class="text-red-500">{{ $schoolToShow->school_name }}</text> for matching "{{ $search }}"</p>  
+            <div class="flex justify-center mt-2">
+                @if($search)
+                    <p><button class="ml-2 border border-gray-600 px-3 py-2 text-black hover:border-red-500 hover:text-red-500" wire:click="$set('search', '')"><i class="fa-solid fa-remove"></i> Clear Search</button></p>
+                @endif
+            </div>
         @elseif(!$search && $departments->isEmpty())
             
-            <p class="text-black mt-8 text-center uppercase">No data available in school <text class="text-red-500">
-                @if($schoolToShow)
-                {{ $schoolToShow->school_name}}
-            @endif</text></p>
+            <p class="text-black mt-8 text-center uppercase">No data available in school 
+                <text class="text-red-500">
+                    @if($schoolToShow)
+                        {{ $schoolToShow->school_name}}
+                    @endif
+                </text>
+            </p>
         @else
 
             @if($schoolToShow)
-                
                 <div class="overflow-x-auto">
                     <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
                         <thead class="bg-gray-200 text-black">

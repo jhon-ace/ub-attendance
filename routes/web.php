@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminStaffController;
 use App\Http\Controllers\Admin\SchoolController;
@@ -14,17 +12,24 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\EmployeeAttendanceController;
 use App\Http\Controllers\Admin\CSVImportController;
 use App\Http\Controllers\Admin\PublicPageController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
-// Route::get('/staff', function () {
-//     return view('welcome');
-// });
-
-// Route::get('/human-resource', function () {
-//     return view('welcome');
-// });
 
 Route::get('/', function () {
-    return view('auth.login');
+    if(Auth::check() && Auth::user()->hasRole('admin'))
+    {
+        return redirect()->route('admin.dashboard');
+    } 
+    else if(Auth::check() && Auth::user()->hasRole('admin_staff')) 
+    {
+        return redirect()->route('admin_staff.dashboard');
+    }
+    else 
+    {
+        return view('auth.login');
+    }
+    
 });
 
 Route::get('/attendance/portal', [PublicPageController::class, 'portalTimeIn'])->name('attendance.portal');

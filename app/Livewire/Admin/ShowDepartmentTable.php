@@ -7,6 +7,7 @@ use \App\Models\Admin\Department;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class ShowDepartmentTable extends Component
 {
@@ -30,7 +31,9 @@ class ShowDepartmentTable extends Component
 
     public function mount()
     {
-        $this->selectedSchool = session('selectedSchool', null);
+        if (Auth::check() && Auth::user()->school) {
+            $this->selectedSchool = Auth::user()->school->id;
+        }
         $this->departmentsToShow = collect([]); // Initialize as an empty collection
         $this->schoolToShow = collect([]); // Initialize as an empty collection
     }
@@ -59,7 +62,7 @@ public function render()
 
         // Apply search filters
         $query = $this->applySearchFilters($query);
-
+        
         // Apply selected school filter
         if ($this->selectedSchool) {
             $query->where('school_id', $this->selectedSchool);
@@ -80,12 +83,12 @@ public function render()
                                   ->groupBy('school_id')
                                   ->get()
                                   ->keyBy('school_id');
-
+        
         return view('livewire.admin.show-department-table', [
             'departments' => $departments,
             'schools' => $schools,
             'departmentCounts' => $departmentCounts,
-            //'departmentsAll' => $departmentsAll,
+            'schoolToShow' => $this->schoolToShow,
         ]);
     }
 

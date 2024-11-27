@@ -9,6 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ShowDepartmentWorkingHours extends Component
 {
@@ -37,7 +38,11 @@ class ShowDepartmentWorkingHours extends Component
     {   
         // $this->todayDayOfWeekNumber = Carbon::now()->dayOfWeek;
         // $this->todayDayOfWeek = Carbon::now()->dayOfWeek;
-        $this->selectedSchool = session('selectedSchool', null);
+
+         if (Auth::check() && Auth::user()->school) {
+            $this->selectedSchool = Auth::user()->school->id;
+        }
+
         $this->selectedDepartment = session('selectedDepartment', null);
         $this->showSelectedDepartment = session('showSelectedDepartment', null);
 
@@ -140,6 +145,7 @@ class ShowDepartmentWorkingHours extends Component
             'departments' => $departments,
             'schools' => $schools,
             'departmentCounts' => $departmentCounts,
+            'schoolToShow' => $this->selectedSchool,
         ]);
     }
 

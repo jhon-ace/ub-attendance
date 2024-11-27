@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Time In Report</title>
+    <title>Attendance Time In Report - {{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</title>
     <style>
         @page { margin:18px; }
     </style>
@@ -79,7 +79,9 @@
     <span>Employee ID: <text style="color:red">{{ $selectedEmployeeToShow->employee_id }}</text></span>
     @if ($selectedStartDate && $selectedEndDate)
         <div class="date-range">
-            <span>Selected Date: {{ date('F d, Y', strtotime($selectedStartDate)) }} to {{ date('F d, Y', strtotime($selectedEndDate)) }}</span>
+            <span>
+                Selected Date:  <text style="color:red">{{ \Carbon\Carbon::createFromFormat('m', str_pad($selectedMonth, 2, '0', STR_PAD_LEFT))->format('F') }} {{$selectedStartDate}} to {{ $selectedEndDate }}, {{ $selectedYear }}</text>
+            </span>
         </div>
     @else
         <div class="date-range">
