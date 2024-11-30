@@ -232,7 +232,10 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/students/{id}', [StudentController::class, 'destroy'])->name('student.destroy');
             Route::delete('students', [StudentController::class, 'deleteAll'])->name('student.deleteAll');
 
-
+            
+            Route::get('/setAttendanceHoliday', [EmployeeAttendanceController::class, 'holiday'])->name('attendance.holiday');
+            Route::post('/setHoliday', [EmployeeAttendanceController::class, 'setHoliday'])->name('attendance.setHoliday');
+            Route::delete('/deleteHoliday/{id}', [EmployeeAttendanceController::class, 'deleteHoliday'])->name('holiday.destroy');
 
     });
 

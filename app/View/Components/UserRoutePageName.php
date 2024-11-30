@@ -63,12 +63,14 @@ class UserRoutePageName extends Component
                 'admin_staff.attendance.employee_attendance.search' => __('Admin Staff | Search Employee Attendance'),
                 'admin_staff.attendance.employee_attendance' => __('Admin Staff | Employee Attendance'),
                 'admin_staff.attendance.employee_attendance.payroll' => __('Admin Staff | All Employee Attendance'),
+                'admin_staff.attendance.holiday' => __('Staff | Manage Holiday'),
                 'staff.school.index' => __('Staff | Manage School Year'),
                 'staff.department.index' => __('Staff | Manage Department'),
                 'staff.workinghour.index' => __('Staff | Manage Dept Working Hour'),
                 'staff.course.index' => __('Staff | Manage Courses'),
                 'staff.employee.index' => __('Staff | Manage Employee'),
                 'staff.student.index' => __('Staff | Manage Student'),
+                
 
             ];
 

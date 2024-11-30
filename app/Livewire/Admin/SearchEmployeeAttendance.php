@@ -22,6 +22,7 @@ use DateTimeZone;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AttendanceExport;
+use Illuminate\Support\Facades\Auth;
 
 class SearchEmployeeAttendance extends Component
 {
@@ -47,6 +48,7 @@ class SearchEmployeeAttendance extends Component
     public $departmentDisplayWorkingHour = [];
     public $selectedEmployeeId = '';
     public $selected_date;
+    public $selectedSchoolDisplay;
 
 
     protected $listeners = ['searchById'];
@@ -66,8 +68,8 @@ class SearchEmployeeAttendance extends Component
     }
 
     public function mount()
-    {
-        $this->selectedSchool = session('selectedSchool', null);
+    {   $this->selectedSchoolDisplay = Auth::user()->school->abbreviation;
+        $this->selectedSchool = Auth::user()->school->id;
         $this->selectedDepartment4 = session('selectedDepartment4', null);
         $this->selectedEmployee = session('selectedEmployee', null);
         $this->departmentsToShow = collect([]);
@@ -181,6 +183,9 @@ class SearchEmployeeAttendance extends Component
 
     // Apply date range filter if both dates are set
     if ($this->startDate && $this->endDate) {
+        $currentMonth = now()->month;
+            $currentYear = now()->year; 
+            
         $queryTimeIn->whereDate('check_in_time', '>=', $this->startDate)
                     ->whereDate('check_in_time', '<=', $this->endDate);
 
@@ -190,22 +195,20 @@ class SearchEmployeeAttendance extends Component
         $selectedAttendanceByDate = $queryTimeIn->get();// Fetch data and assign to selectedAttendanceByDate
         
         $this->selectedAttendanceByDate = $selectedAttendanceByDate;   
+        $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+            ->whereMonth('check_in_time', $currentMonth)  // Match current month
+            ->whereYear('check_in_time', $currentYear)
+            ->orderBy('check_in_time', 'asc')
+            ->paginate(60);
+
+        $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+            ->whereMonth('check_out_time', $currentMonth)  // Match current month
+            ->whereYear('check_out_time', $currentYear)
+            ->orderBy('check_out_time', 'asc')
+            ->paginate(60);
     }
 
 
-
-        // Apply date range filter if both dates are set
-        if ($this->startDate && $this->endDate) {
-            $queryTimeIn->whereDate('check_in_time', '>=', $this->startDate)
-                        ->whereDate('check_in_time', '<=', $this->endDate);
-
-            $queryTimeOut->whereDate('check_out_time', '>=', $this->startDate)
-                        ->whereDate('check_out_time', '<=', $this->endDate);
-                        
-            $selectedAttendanceByDate = $queryTimeIn->get();// Fetch data and assign to selectedAttendanceByDate
-            
-            $this->selectedAttendanceByDate = $selectedAttendanceByDate;   
-        }
 
         
             // $attendanceTimeIn = $queryTimeIn->orderBy('check_in_time', 'asc')
@@ -221,14 +224,26 @@ class SearchEmployeeAttendance extends Component
 
         // $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
         //     ->paginate(30);
+            $currentMonth = now()->month;
+            $currentYear = now()->year; 
+
+         $queryTimeIn->whereDay('check_in_time', '>=', 1)
+                        ->whereDay('check_in_time', '<=', 31);
+
+            $queryTimeOut->whereDay('check_out_time', '>=', 1)
+                        ->whereDay('check_out_time', '<=', 31);
 
         $attendanceTimeIn = $queryTimeIn->where('status', '!=', 'Holiday')
+            ->whereMonth('check_in_time', $currentMonth)  // Match current month
+            ->whereYear('check_in_time', $currentYear)
             ->orderBy('check_in_time', 'asc')
-            ->paginate(100);
+            ->paginate(60);
 
         $attendanceTimeOut = $queryTimeOut->where('status', '!=', 'Holiday')
+            ->whereMonth('check_out_time', $currentMonth)  // Match current month
+            ->whereYear('check_out_time', $currentYear)
             ->orderBy('check_out_time', 'asc')
-            ->paginate(100);
+            ->paginate(60);
             
 
 
@@ -1181,6 +1196,7 @@ class SearchEmployeeAttendance extends Component
             'departmentDisplayWorkingHour' => $this->departmentDisplayWorkingHour,
             'gracePeriod' => $gracePeriod,
             'holidays' => $holidays,
+            'selectedSchoolDisplay' => $this->selectedSchoolDisplay,
         ]);
     }
 

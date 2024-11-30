@@ -1145,13 +1145,12 @@ public function submitPortalTimeOut(Request $request)
     }
 
     public function holiday()
-    {
-        
+    {       
         $holidays = EmployeeAttendanceTimeIn::where('status', 'Holiday')
-            ->select(DB::raw('DATE(check_in_time) as check_in_date')) // Extract only the date
-            ->groupBy('check_in_date') // Group by the extracted date
-            ->orderBy('check_in_date', 'asc') // Order by date (ascending)
-            ->get();
+                    ->select(DB::raw('DATE(check_in_time) as check_in_date'), 'holiday_description', 'id', 'employee_id') // Select both check_in_date and status
+                    ->distinct() // Ensure unique combinations of check_in_date and status
+                    ->orderBy('check_in_date', 'asc') // Order by date (ascending)
+                    ->get();
 
         return view('Admin.holiday.index', compact('holidays'));
     }
@@ -1161,6 +1160,7 @@ public function submitPortalTimeOut(Request $request)
         // Validate the selected date
         $validatedData = $request->validate([
             'selected_date' => 'required|date',
+            'holiday_description' => 'required|string|max:255'
         ]);
 
         // Set the current date from the validated data
@@ -1171,19 +1171,22 @@ public function submitPortalTimeOut(Request $request)
         $employees = Employee::all();
     
         foreach ($employees as $employee) {
+
             $employeeId = $employee->id;
             $departmentId = $employee->department_id;
 
-            // Fetch the working hour for the department on the selected day
-            $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $departmentId)
-                ->where('day_of_week', $dayOfWeek)  
-                ->first();
+            // // Fetch the working hour for the department on the selected day
+            // $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $departmentId)
+            //     ->where('day_of_week', $dayOfWeek)  
+            //     ->first();
 
-            // Check if the working hour record exists
-            if (!$departmentWorkingHour) {
-                // If no working hour is found, skip to the next employee
-                continue;
-            }
+
+
+            // // Check if the working hour record exists
+            // if (!$departmentWorkingHour) {
+            //     // If no working hour is found, skip to the next employee
+            //     continue;
+            // }
 
             // Check if there are check-in or check-out records for the current date
             $hasCheckIn = EmployeeAttendanceTimeIn::whereDate('check_in_time', $currentDate)
@@ -1207,37 +1210,69 @@ public function submitPortalTimeOut(Request $request)
             if (!$hasCheckIn) {
                 $attendance = new EmployeeAttendanceTimeIn();
                 $attendance->employee_id = $employeeId;
-                $attendance->check_in_time = "{$currentDate} {$departmentWorkingHour->morning_start_time}";
+                // $attendance->check_in_time = "{$currentDate} {$departmentWorkingHour->morning_start_time}";
+                $attendance->check_in_time = "{$currentDate} 00:00:00";
                 $attendance->status = $status;
+                $attendance->holiday_description = $validatedData['holiday_description'];
                 $attendance->save();
+
+
+                
 
                 // Duplicate record creation as per your request
                 $attendance = new EmployeeAttendanceTimeIn();
                 $attendance->employee_id = $employeeId;
-                $attendance->check_in_time = "{$currentDate} {$departmentWorkingHour->afternoon_start_time}";
+                // $attendance->check_in_time = "{$currentDate} {$departmentWorkingHour->afternoon_start_time}";
+                $attendance->check_in_time = "{$currentDate} 00:00:00";
                 $attendance->status = $status;
+                $attendance->holiday_description = $validatedData['holiday_description'];
                 $attendance->save();
+                
             }
 
             // Create missing check-out record if none exists
             if (!$hasCheckOut) {
                 $attendance = new EmployeeAttendanceTimeOut();
                 $attendance->employee_id = $employeeId;
-                $attendance->check_out_time = "{$currentDate} {$departmentWorkingHour->morning_end_time}";
+                // $attendance->check_out_time = "{$currentDate} {$departmentWorkingHour->morning_end_time}";
+                $attendance->check_out_time = "{$currentDate} 00:00:00";
                 $attendance->status = $status;
+                $attendance->holiday_description = $validatedData['holiday_description'];
                 $attendance->save();
 
                 // Duplicate record creation as per your request
                 $attendance = new EmployeeAttendanceTimeOut();
                 $attendance->employee_id = $employeeId;
-                $attendance->check_out_time = "{$currentDate} {$departmentWorkingHour->afternoon_end_time}";
+                // $attendance->check_out_time = "{$currentDate} {$departmentWorkingHour->afternoon_end_time}";
+                $attendance->check_out_time = "{$currentDate} 00:00:00";
                 $attendance->status = $status;
+                $attendance->holiday_description = $validatedData['holiday_description'];
                 $attendance->save();
             }
         }
 
 
         return back()->with('success', 'Holiday date implemented to attendances.');
+    }
+
+   public function deleteHoliday($id)
+    {
+        $holiday = EmployeeAttendanceTimeIn::find($id);
+
+        if ($holiday) {
+            $dateToDelete = Carbon::parse($holiday->check_in_time)->toDateString();
+
+            $holidaysToDelete = EmployeeAttendanceTimeIn::whereDate('check_in_time', $dateToDelete)->get();
+            
+            foreach ($holidaysToDelete as $holidayToDelete) {
+                $holidayToDelete->delete();
+                
+            }
+
+            return back()->with('success', 'Holiday and associated attendance records deleted successfully.');
+        } else {
+            return back()->with('error', 'Holiday record not found.');
+        }
     }
 
 

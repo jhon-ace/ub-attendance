@@ -212,7 +212,7 @@ class EmployeeController extends Controller
 
             } else {
 
-                return redirect()->route('staff.employee.index')
+                return redirect()->route('admin_staff.employee.index')
                 ->with('success', 'Employee updated successfully.');
 
             }
@@ -235,7 +235,7 @@ class EmployeeController extends Controller
 
             } else {
 
-                return redirect()->route('staff.employee.index')
+                return redirect()->route('admin_staff.employee.index')
                 ->with('error', $errorMessage . 'Try again.');
 
             }
@@ -253,7 +253,7 @@ class EmployeeController extends Controller
     {
         
         // Determine the route and role-based message
-        $route = Auth::user()->hasRole('admin') ? 'admin.employee.index' : 'staff.employee.index';
+        $route = Auth::user()->hasRole('admin') ? 'admin.employee.index' : 'admin_staff.employee.index';
 
         try {
             // Find the employee or throw a 404 exception

@@ -29,6 +29,7 @@
                 />
 
             </div>
+                
             <!-- cc -->
                         <!-- Modal -->
             <div x-data="{ open: false }" @keydown.window.escape="open = false" x-cloak>
@@ -3173,10 +3174,16 @@
         <div class="flex justify-between mb-4 sm:-mt-4">
             <div class="font-bold text-md tracking-tight text-md text-black mt-2 uppercase">Employee Attendance Search</div>
         </div>
-
+        <div>
+            @if($selectedSchoolDisplay)
+                <p class="text-black mt-2 text-sm mb-1">School: 
+                    <span class="text-red-500 ml-2 mb-10 font-bold uppercase">{{ $selectedSchoolDisplay }}</span>
+                </p>
+            @endif
+        </div>                                                                                   
         <div class="flex justify-start">
             <div>
-                <label for="search" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">Search Employees:</label>
+                <label for="search" class="block text-sm text-gray-700 font-bold md:mr-4 mb-2 mt-4 truncate uppercase">Search Employees:</label>
                 <input 
                     type="text" 
                     id="search" 
@@ -3188,6 +3195,7 @@
                 />
 
             </div>
+            
             <!-- cc -->
                         <!-- Modal -->
             <div x-data="{ open: false }" @keydown.window.escape="open = false" x-cloak>
@@ -3347,7 +3355,8 @@
             @else
                 <div class="flex justify-between mt-1 mb-2">
                     <div class="mt-2 text-sm font-bold ">
-                        <text class="uppercase">Selected Employee: <text class="text-red-500">{{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</text>
+                        <text class="uppercase">Selected Employee: <text class="text-red-500">{{ $selectedEmployeeToShow->employee_lastname }}, {{ $selectedEmployeeToShow->employee_firstname }} {{ $selectedEmployeeToShow->employee_middlename }}</text><br>
+                        <text class="uppercase">Employee ID: <text class="text-red-500">{{ $selectedEmployeeToShow->employee_id }}</text>
                     </div>
                     <div class="flex flex-col mt-11">
                         <div class="flex justify-between items-center mb-2">
