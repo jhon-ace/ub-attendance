@@ -368,7 +368,7 @@
                         <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Courses</span>
                     </a>
                 </li> -->
-                <li x-data="{ open: {{ request()->routeIs('admin_staff.employee.index') || request()->routeIs('admin.staff.index')  || request()->routeIs('admin.employee.index') || request()->routeIs('admin.student.index') ? 'true'  : 'false' }} }">
+                <li x-data="{ open: {{ request()->routeIs('admin_staff.employee.index') || request()->routeIs('admin_staff.show.fingerprint') || request()->routeIs('admin.staff.index')  || request()->routeIs('admin.employee.index') || request()->routeIs('admin.student.index') ? 'true'  : 'false' }} }">
                     <a @click="open = !open" class="cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
                         <span class="inline-flex justify-center items-center ml-3">
                             <i class="fa-solid fa-users fa-sm text-gray-200"></i>
@@ -393,6 +393,12 @@
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Employee Lists
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('admin_staff.show.fingerprint') }}" class="flex items-center h-11 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                            {{ request()->routeIs('admin_staff.show.fingerprint') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Enroll Fingerprint
+                            </a>
+                        </li>
                         <!-- <li>
                             <a href="{{ route('admin.student.index') }}" class="flex items-center h-11 pl-8 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white {{ request()->routeIs('admin.student.index') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Student
@@ -410,7 +416,7 @@
                         <span class="ml-2 text-sm tracking-wide truncate text-gray-200">Set Holiday Date</span>
                     </a>
                 </li>
-                <li x-data="{ open: {{ request()->routeIs('admin.attendance.gracePeriodSet') || request()->routeIs('admin.attendance.holiday') ? 'true'  : 'false' }} }">
+                <li x-data="{ open: {{ request()->routeIs('admin.attendance.gracePeriodSet') || request()->routeIs('admin_staff.fingerprint') || request()->routeIs('admin.attendance.holiday') || request()->routeIs('admin_staff.attendance.gracePeriodSet') || request()->routeIs('admin_staff.delete_attendance') ? 'true'  : 'false' }} }">
                     <a @click="open = !open" class="w-full cursor-pointer relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white pr-6">
                         <span class="inline-flex justify-center items-center ml-3">
                             <i class="fa-solid fa-cogs text-gray-200"></i>
@@ -425,8 +431,8 @@
                     </a>
                     <ul x-show="open"  x-cloak class="ml-3 mt-1 space-y-1 w-full">
                         <li>
-                            <a href="{{ route('admin.attendance.gracePeriodSet') }}" class="w-[500px] flex items-center h-11 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
-                            {{ request()->routeIs('admin.attendance.gracePeriodSet') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
+                            <a href="{{ route('admin_staff.attendance.gracePeriodSet') }}" class="w-[500px] flex items-center h-11 pl-4 pr-6 text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                            {{ request()->routeIs('admin_staff.attendance.gracePeriodSet') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}">
                                 <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Set Grace Period
                             </a>
                         </li>
@@ -437,9 +443,17 @@
                             </a>
                         </li> -->
                         <li>
-                            <a href="" class=" w-full flex items-center  h-16 pl-4  text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
-                            ">
-                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Change Password
+                            <a href="{{route('admin_staff.delete_attendance')}}" class=" w-full flex items-center  h-16 pl-4  text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                            {{ request()->routeIs('admin_staff.delete_attendance') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}"
+                            >
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Delete a date of attendance
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{route('admin_staff.fingerprint')}}" class=" w-full flex items-center  h-16 pl-4  text-sm hover:bg-blue-800 dark:hover:bg-slate-700 text-white hover:text-white-800 over:bg-blue-800 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white 
+                            {{ request()->routeIs('admin_staff.fingerprint') ? 'border-l-green-500 bg-[#172029] text-white' : 'hover:bg-blue-800 dark:hover:bg-slate-700 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-green-500 hover:text-white' }}"
+                            >
+                                <i class="fa-solid fa-user-circle fa-sm text-gray-200 mr-2"></i>Enable / Disable Fingerprint
                             </a>
                         </li>
                         

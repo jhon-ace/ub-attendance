@@ -85,11 +85,23 @@ class SearchDashboardAdmin extends Component
         $queryTimeOut = $this->applySearchFiltersTimeOut($queryTimeOut);
 
         // Get the results
-        $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
-            ->get();
+       $attendanceTimeIn = $queryTimeIn->where(function ($query) {
+                            $query->where('status', '!=', 'Holiday')
+                                ->where('status', '!=', 'On Leave')
+                                ->where('status', '!=', 'Official Travel');
+                        })
+                        ->orderBy($this->sortField, $this->sortDirection)
+                        ->get();
 
-        $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
-            ->get();
+        $attendanceTimeOut = $queryTimeOut->where(function ($query) {
+                            $query->where('status', '!=', 'Holiday')
+                                ->where('status', '!=', 'On Leave')
+                                ->where('status', '!=', 'Official Travel');
+                        })
+                        ->orderBy($this->sortField, $this->sortDirection)
+                        ->get();      
+
+
 
         return view('livewire.search-dashboard-admin', [
                     'attendanceTimeIn' =>  $attendanceTimeIn,

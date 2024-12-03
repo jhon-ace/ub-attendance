@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Facades\DB;
+use \App\Models\Admin\Fingerprint;
 
 class EmployeeAttendanceController extends Controller
 {
@@ -49,6 +50,11 @@ class EmployeeAttendanceController extends Controller
     public function student()
     {
         return view('Admin.attendance.student_attendance');
+    }
+
+        public function delete_attendance()
+    {
+        return view('Admin.delete_attendance.index');
     }
 
     public function portalTimeIn()
@@ -1145,15 +1151,40 @@ public function submitPortalTimeOut(Request $request)
     }
 
     public function holiday()
-    {       
-        $holidays = EmployeeAttendanceTimeIn::where('status', 'Holiday')
-                    ->select(DB::raw('DATE(check_in_time) as check_in_date'), 'holiday_description', 'id', 'employee_id') // Select both check_in_date and status
-                    ->distinct() // Ensure unique combinations of check_in_date and status
-                    ->orderBy('check_in_date', 'asc') // Order by date (ascending)
-                    ->get();
+    {
+        // Fetch the authenticated user's school_id
+        $schoolId = Auth::user()->school_id;
 
-        return view('Admin.holiday.index', compact('holidays'));
+        // Fetch holidays only for the authenticated user's school
+        $holidays = EmployeeAttendanceTimeIn::select(
+                            DB::raw('DATE(check_in_time) as check_in_date'),
+                            'holiday_description',
+                            DB::raw('MIN(id) as id'), // Ensure a unique ID for each group
+                            DB::raw('MIN(employee_id) as employee_id') // Pick one employee_id per group
+                        )
+                        ->where('status', 'Holiday')
+                        ->whereHas('employee.school', function($query) use ($schoolId) {
+                            $query->where('id', $schoolId); // Filter holidays by school_id
+                        })
+                        ->groupBy(DB::raw('DATE(check_in_time)'), 'holiday_description') // Group by the extracted date and holiday description
+                        ->orderBy('check_in_date', 'asc') // Order by the extracted date
+                        ->get();
+
+        // Count the number of unique holiday dates for the authenticated user's school
+        $holidayCount = EmployeeAttendanceTimeIn::where('status', 'Holiday')
+                        ->select(DB::raw('DATE(check_in_time) as check_in_date')) // Extract only the date
+                        ->whereHas('employee.school', function($query) use ($schoolId) {
+                            $query->where('id', $schoolId); // Filter holidays by school_id
+                        })
+                        ->groupBy('check_in_date') // Group by the extracted date
+                        ->get()
+                        ->count(); // Count the number of unique dates
+
+
+        return view('Admin.holiday.index', compact('holidays', 'holidayCount'));
     }
+
+
 
     public function setHoliday(Request $request)
     {
@@ -1255,25 +1286,62 @@ public function submitPortalTimeOut(Request $request)
         return back()->with('success', 'Holiday date implemented to attendances.');
     }
 
-   public function deleteHoliday($id)
+    public function deleteHoliday($id)
     {
-        $holiday = EmployeeAttendanceTimeIn::find($id);
+        $holidayIn = EmployeeAttendanceTimeIn::find($id);
 
-        if ($holiday) {
-            $dateToDelete = Carbon::parse($holiday->check_in_time)->toDateString();
+        if ($holidayIn) {
+            $dateToFind = Carbon::parse($holidayIn->check_in_time)->toDateString();
 
-            $holidaysToDelete = EmployeeAttendanceTimeIn::whereDate('check_in_time', $dateToDelete)->get();
+            // Delete related check-in attendance
+            $attendanceTimeInRecords = EmployeeAttendanceTimeIn::whereDate('check_in_time', $dateToFind)->get();
+            $attendanceTimeOutRecords = EmployeeAttendanceTimeOut::whereDate('check_out_time', $dateToFind)->get();
             
-            foreach ($holidaysToDelete as $holidayToDelete) {
-                $holidayToDelete->delete();
-                
+            foreach ($attendanceTimeInRecords as $record) {
+                $record->delete();
             }
 
+            
+            foreach ($attendanceTimeOutRecords as $record) {
+                $record->delete();
+            }
+           
+
             return back()->with('success', 'Holiday and associated attendance records deleted successfully.');
-        } else {
-            return back()->with('error', 'Holiday record not found.');
         }
+
+        return back()->with('error', 'Holiday record not found.');
     }
+
+    public function validate_delete_attendance(Request $request)
+    {
+        $request->validate([
+            'selected_date' => 'required|date',
+        ]);
+
+        $selectedDate = $request->input('selected_date');
+
+        // Delete attendance records for the selected date
+
+        $employee_in = EmployeeAttendanceTimeIn::whereDate('check_in_time', $selectedDate)->get();
+        $employee_out = EmployeeAttendanceTimeOut::whereDate('check_out_time', $selectedDate)->get();
+
+        $in_count = count($employee_in);
+        $out_count = count($employee_out);
+
+        if(($in_count == 0) && ($out_count == 0))
+        {
+            return back()->with('info', 'No attendance recorded in this date!');
+        } 
+        else 
+        {
+            EmployeeAttendanceTimeIn::whereDate('check_in_time', $selectedDate)->delete();
+            EmployeeAttendanceTimeOut::whereDate('check_out_time', $selectedDate)->delete();
+        }
+
+        return back()->with('success', 'Attendance successfully deleted!');
+    }
+
 
 
 }

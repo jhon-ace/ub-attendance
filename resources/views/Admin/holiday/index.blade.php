@@ -111,7 +111,6 @@
         </x-content-design>
 
 
-
     @elseif(Auth::user()->hasRole('admin_staff'))
 
         <x-content-design>
@@ -171,11 +170,12 @@
 
                                 <div x-cloak x-show="openTab === 2" class="w-[50%] mx-auto mb-4">
                                     <!-- Content for Tab 2 -->
-                                    <div class="flex flex-col mt-8 w-full mx-auto">
+                                    <div class="flex flex-col w-full mx-auto">
                                         <!-- Title and Description -->
                                         <p class="text-black text-2xl font-semibold text-center mb-2">List of Added Holidays</p>
                                         <!-- Table -->
-                                         <div class="flex justify-end">
+                                         <div class="flex justify-between">
+                                                <p class="text-black text-sm px-3 py-2 rounded">Total Count of Holidays: <span class="text-red-500 font-bold">{{ $holidayCount }}</span></p>
                                                 <div x-data="{ open: false, open2:false }">
                                                     <button @click="open = true, open2 = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                                                         <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Holiday
@@ -195,7 +195,7 @@
                                                     </div>
 
                                                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                                        <div @click.away="open = true" class="w-[30%] max-h-[90%] bg-white p-6 rounded-lg shadow-lg mx-auto overflow-y-auto">
+                                                        <div @click.away="open = true" class="w-[30%] max-h-[100%] bg-white p-6 rounded-lg shadow-lg mx-auto overflow-y-auto">
                                                             <div class="flex justify-between items-center pb-3">
                                                                 <p class="text-xl font-bold">Add Holiday Date</p>
                                                                 <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
@@ -235,7 +235,6 @@
                                                     <table class="border border-collapse border-gray-300 w-full bg-white shadow-md rounded-lg">
                                                         <thead>
                                                             <tr class="bg-gray-100 border-b border-gray-300">
-                                                                <th class="p-3 text-left text-gray-700 font-medium">Employee</th>
                                                                 <th class="p-3 text-left text-gray-700 font-medium">Date of Holiday</th>
                                                                 <th class="p-3 text-left text-gray-700 font-medium">Description</th>
                                                                 <th class="p-3 text-left text-gray-700 font-medium">Action</th>
@@ -243,14 +242,12 @@
                                                         </thead>
                                                         <tbody>
                                                             @foreach($holidays as $holiday)
-                                                                
-                                                                
                                                                 <tr class="border-b border-gray-300 text-left">
-                                                                    <td class="p-3 text-gray-800">{{ $holiday->employee->employee_lastname}}</td>
                                                                     <td class="p-3 text-gray-800">{{ \Carbon\Carbon::parse($holiday->check_in_date)->format('F j, Y') }}</td>
                                                                     <td class="p-3 text-gray-800">{{ $holiday->holiday_description }}</td> 
                                                                     <td class="p-3 text-gray-800">
-                                                                        <form id="deleteSelected" action="{{ route('admin_staff.holiday.destroy', $holiday->id)}}" method="POST" onsubmit="return ConfirmDeleteSelected(event, '{{ $holiday->id }}', '{{ $holiday->holiday_description }}');">
+                                                                        <form id="deleteSelected" action="{{ route('admin_staff.holiday.destroy', $holiday->id)}}" method="POST" 
+                                                                            onsubmit="return confirm('Are you sure you want to delete this holiday, {{ \Carbon\Carbon::parse($holiday->check_in_date)->format('F j, Y') }} ?')">
                                                                             @csrf
                                                                             @method('DELETE')
                                                                             <button class="bg-red-500 text-white text-sm px-3 py-2 rounded hover:bg-red-700">
@@ -263,9 +260,16 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                
                                             @else
                                                 <p class="font-bold text-red-500 mb-4 text-center">No holiday dates confirmed yet.</p>
                                             @endif
+                                        </div>
+                                        <div class="flex justify-center">
+                                            <p class="font-semibold text-center">
+                                                Dates that are added/listed here is not included in calculations of working hour / attendances of all employees.
+                                            </p>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -278,31 +282,7 @@
     @else
 
     @endif
-    <script>
-    function ConfirmDeleteSelected(event, rowId, holiday_description) {
-            event.preventDefault(); // Prevent form submission initially
-
-            Swal.fire({
-                title: `Are you sure you want to delete this holiday ${holiday_description} ?`,
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const form = document.getElementById('deleteSelected');
-                    // Replace the placeholders with the actual rowId and departmentId
-                    const actionUrl = form.action.replace(':id', rowId);
-                    form.action = actionUrl;
-                    form.submit();
-                }
-            });
-
-            return false; 
-        }
-</script>
+    
 </x-app-layout>
 
 <x-show-hide-sidebar

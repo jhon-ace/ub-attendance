@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\EmployeeAttendanceController;
 use App\Http\Controllers\Admin\CSVImportController;
 use App\Http\Controllers\Admin\PublicPageController;
+use App\Http\Controllers\Admin\FingerprintController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -236,6 +237,25 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/setAttendanceHoliday', [EmployeeAttendanceController::class, 'holiday'])->name('attendance.holiday');
             Route::post('/setHoliday', [EmployeeAttendanceController::class, 'setHoliday'])->name('attendance.setHoliday');
             Route::delete('/deleteHoliday/{id}', [EmployeeAttendanceController::class, 'deleteHoliday'])->name('holiday.destroy');
+
+
+            Route::get('/setGracePeriodSet', [EmployeeAttendanceController::class, 'storePeriodView'])->name('attendance.gracePeriodSet');
+            Route::post('/setGracePeriod', [EmployeeAttendanceController::class, 'storePeriod'])->name('attendance.gracePeriod');
+            Route::put('/setGracePeriod/update/{id}', [EmployeeAttendanceController::class, 'updatePeriod'])->name('attendance.gracePeriod.update');
+            Route::delete('/deletePeriod/{id}', [EmployeeAttendanceController::class, 'deletePeriod'])->name('attendance.gracePeriod.delete');
+
+
+            Route::get('/delete-date-of-an-attendance', [EmployeeAttendanceController::class, 'delete_attendance'])->name('delete_attendance');
+            Route::post('/delete-date-of-an-attendance-submit', [EmployeeAttendanceController::class, 'validate_delete_attendance'])->name('submit_delete_attendance');
+            
+            
+
+            Route::get('/fingerprint', [FingerprintController::class, 'index'])->name('show.fingerprint');
+
+
+            Route::get('/enable-fingerprint', [FingerprintController::class, 'activate_fingerprint'])->name('fingerprint');
+            Route::put('/set-fingerprint/{id}', [FingerprintController::class, 'set_fingerprint'])->name('enable_fingerprint');
+            
 
     });
 
