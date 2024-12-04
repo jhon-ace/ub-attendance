@@ -69,7 +69,7 @@
     <div class="logo-background"></div> <!-- Add this div for the logo background -->
     <div class="container">
         <!-- Form Section -->
-        <div class="form-section mx-auto mt-24">
+        <div class="form-section mx-auto mt-16">
             <!-- Session Status -->
             <x-auth-session-status class="mb-4" :status="session('status')" />
 
