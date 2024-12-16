@@ -472,8 +472,9 @@
         });
     });
 
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+</script> 
+<script src="{{asset('assets/js/fancybox.umd.js')}}" defer></script>
+
 <script>
       Fancybox.bind('[data-fancybox]', {
         contentClick: "iterateZoom",
@@ -561,7 +562,7 @@
         return false; 
     }
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{asset('assets/js/jquery-3.6.0.min.js')}}" defer></script>
 <script>
     function previewImage(event) {
         var reader = new FileReader();

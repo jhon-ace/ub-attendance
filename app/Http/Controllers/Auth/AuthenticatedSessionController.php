@@ -41,6 +41,10 @@ class AuthenticatedSessionController extends Controller
             {
                 return redirect()->intended(route('admin_staff.dashboard'))->with('success', 'Successful Login');
             } 
+            else if (Auth::user()->hasRole('sao')) 
+            {
+                return redirect()->intended(route('sao.dashboard'))->with('success', 'Successful Login');
+            } 
             else if (Auth::user()->hasRole('employee')) 
             {
                 return redirect()->intended(route('hr.dashboard'))->with('success', 'Successful Login');

@@ -2,16 +2,24 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+// // use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Database\Eloquent\Factories\HasFactory;
+// use Illuminate\Foundation\Auth\User as Authenticatable;
+// use Illuminate\Notifications\Notifiable;
+// use Spatie\Permission\Traits\HasRoles;
+// use \App\Models\Admin\School; 
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Laranex\LaravelBiometricAuth\Traits\HasBiometrics;  // Import the trait
 use \App\Models\Admin\School; 
+
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, HasBiometrics;
 
     /**
      * The attributes that are mass assignable.
@@ -53,4 +61,36 @@ class User extends Authenticatable
     {
         return $this->belongsTo(School::class);
     }
+
+    public function createUserBiometric(string $publicKey)
+    {
+        // Create a biometric for the user
+        $this->createBiometric($publicKey);
+    }
+
+    /**
+     * Verify a biometric signature for the user.
+     *
+     * @param string $uuid
+     * @param string $signature
+     * @return bool
+     */
+    public function verifyUserBiometric(string $uuid, string $signature)
+    {
+        // Verify the biometric for the user
+        return $this->verifyBiometric($uuid, $signature);
+    }
+
+    /**
+     * Revoke a biometric for the user.
+     *
+     * @param string $uuid
+     * @return void
+     */
+    public function revokeUserBiometric(string $uuid)
+    {
+        // Revoke the biometric for the user
+        $this->revokeBiometric($uuid);
+    }
+
 }

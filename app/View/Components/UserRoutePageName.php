@@ -81,6 +81,15 @@ class UserRoutePageName extends Component
             $this->title = $titles[$routeName] ?? __('University of Bohol Attendance System');
 
         }
+        else if (Auth::user()->hasRole('sao')) {
+
+            $titles = [
+
+                'sao.dashboard' => __('SAO | Dashboard'),
+            ];
+
+             $this->title = $titles[$routeName] ?? __('University of Bohol Attendance System');
+        }
         else if (Auth::user()->hasRole('employee')) {
 
             $titles = [

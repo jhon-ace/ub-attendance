@@ -25,17 +25,17 @@
         </div>
         <div class="flex flex-column overflow-x-auto -mb-5">
             <div class="col-span-3 pt-4">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Year:</label>
+                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Name:</label>
                 <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateEmployees"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                         required>
-                    <option value="">Select School Year</option>
+                    <option value="">Select School Name</option>
                     @foreach($schools as $school)
                         <option value="{{ $school->id }}">{{ $school->abbreviation }}</option>
                     @endforeach
                 </select>
                 @if($schoolToShow)
-                    <p class="text-black mt-2 text-sm mb-1 ">Selected School Year: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
+                    <p class="text-black mt-2 text-sm mb-1 ">Selected School Name: <span class="text-red-500 ml-2">{{ $schoolToShow->abbreviation }}</span></p>
                     <!-- <p class="text-black  text-sm ml-4">Selected School: <span class="text-red-500 ml-2">{{ $schoolToShow->school_name }}</span></p> -->
                 @endif
             </div>
@@ -129,7 +129,7 @@
                                                 <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                             </div>
                                             <div class="mb-2">
-                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
+                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Name:</label>
                                                 <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                     @foreach($schoolsAll as $schoolAll)
                                                         <option value="{{ $schoolAll->id }}">{{ $schoolAll->abbreviation}}</option>
@@ -262,7 +262,7 @@
                             </th>
                             <th class="border border-gray-400 px-3 py-2">
                                 <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                                    School Year
+                                    School Name
                                     @if ($sortField == 'school_id')
                                         @if ($sortDirection == 'asc')
                                             &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -360,7 +360,7 @@
                                                                         <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                                                     </div>
                                                                     <div class="mb-2">
-                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Year:</label>
+                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Name:</label>
                                                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                                             
                                                                             <option value="{{ $employee->school->id }}">{{ $employee->school->abbreviation }}</option>
@@ -435,7 +435,7 @@
                     </div>
                 @endif
             <br>
-                <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected school year and department</p>
+                <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected school name and department</p>
                 
             @endif
             @if(!empty($selectedSchool))
@@ -513,7 +513,7 @@
                                         </div>
 
                                         <div class="mb-2">
-                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
+                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Name:</label>
                                             <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                 <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                             </select>
@@ -623,7 +623,7 @@
                                                 <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                             </div>
                                             <div class="mb-2">
-                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
+                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Name:</label>
                                                 <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                     <!-- <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }} | {{ $departmentToShow->school->school_name }}</option> -->
                                                     <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
@@ -752,7 +752,7 @@
                                 </th>
                                 <th class="border border-gray-400 px-3 py-2">
                                     <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                                        School Year
+                                        School Name
                                         @if ($sortField == 'school_id')
                                             @if ($sortDirection == 'asc')
                                                 &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -841,7 +841,7 @@
                                                                         <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                                                     </div>
                                                                     <div class="mb-2">
-                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Year:</label>
+                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Name:</label>
                                                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                                             <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                                                         </select>
@@ -1046,7 +1046,7 @@
                                                 <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                             </div>
                                             <div class="mb-2">
-                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
+                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Name:</label>
                                                 <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                     @foreach($schoolsAll as $schoolAll)
                                                         <option value="{{ $schoolAll->id }}">{{ $schoolAll->abbreviation}}</option>
@@ -1179,7 +1179,7 @@
                             </th>
                             <th class="border border-gray-400 px-3 py-2">
                                 <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                                    School Year
+                                    School Name
                                     @if ($sortField == 'school_id')
                                         @if ($sortDirection == 'asc')
                                             &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -1277,7 +1277,7 @@
                                                                         <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                                                     </div>
                                                                     <div class="mb-2">
-                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Year:</label>
+                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Name:</label>
                                                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                                             
                                                                             <option value="{{ $employee->school->id }}">{{ $employee->school->abbreviation }}</option>
@@ -1352,7 +1352,7 @@
                     </div>
                 @endif
             <br>
-                <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected school year and department</p>
+                <p class="text-black text-sm mt-11 mb-4 uppercase text-center">No selected school name and department</p>
                 
             @endif
             @if(!empty($selectedSchool))
@@ -1430,7 +1430,7 @@
                                         </div>
 
                                         <div class="mb-2">
-                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
+                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Name:</label>
                                             <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                 <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                             </select>
@@ -1540,7 +1540,7 @@
                                                 <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                             </div>
                                             <div class="mb-2">
-                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year:</label>
+                                                <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Name:</label>
                                                 <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                     <!-- <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->id }} | {{ $departmentToShow->school->school_name }}</option> -->
                                                     <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
@@ -1669,7 +1669,7 @@
                                 </th>
                                 <th class="border border-gray-400 px-3 py-2">
                                     <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                                        School Year
+                                        School Name
                                         @if ($sortField == 'school_id')
                                             @if ($sortDirection == 'asc')
                                                 &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -1758,7 +1758,7 @@
                                                                         <x-input-error :messages="$errors->get('employee_middlename')" class="mt-2" />
                                                                     </div>
                                                                     <div class="mb-2">
-                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Year:</label>
+                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Name:</label>
                                                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                                             <option value="{{ $departmentToShow->school->id }}">{{ $departmentToShow->school->abbreviation }}</option>
                                                                         </select>
@@ -1888,7 +1888,7 @@
     });
 
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+<script src="{{asset('assets/js/fancybox.umd.js')}}" defer></script>
 <script>
       Fancybox.bind('[data-fancybox]', {
         contentClick: "iterateZoom",
@@ -1976,12 +1976,12 @@
         return false; 
     }
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{asset('assets/js/jquery-3.6.0.min.js')}}" defer></script>
 <script>
     function previewImage(event) {
         var reader = new FileReader();
         reader.onload = function() {
-            var output = document.getElementById('imagePreview');
+            var output = document.getElementById('imagePreview');  
             output.src = reader.result;
             document.getElementById('imagePreviewContainer').style.display = 'block';
         };

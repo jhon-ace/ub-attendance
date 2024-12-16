@@ -1154,7 +1154,7 @@ public function submitPortalTimeOut(Request $request)
     {
         // Fetch the authenticated user's school_id
         $schoolId = Auth::user()->school_id;
-
+        
         // Fetch holidays only for the authenticated user's school
         $holidays = EmployeeAttendanceTimeIn::select(
                             DB::raw('DATE(check_in_time) as check_in_date'),
@@ -1170,6 +1170,8 @@ public function submitPortalTimeOut(Request $request)
                         ->orderBy('check_in_date', 'asc') // Order by the extracted date
                         ->get();
 
+
+  
         // Count the number of unique holiday dates for the authenticated user's school
         $holidayCount = EmployeeAttendanceTimeIn::where('status', 'Holiday')
                         ->select(DB::raw('DATE(check_in_time) as check_in_date')) // Extract only the date
@@ -1180,7 +1182,7 @@ public function submitPortalTimeOut(Request $request)
                         ->get()
                         ->count(); // Count the number of unique dates
 
-
+ 
         return view('Admin.holiday.index', compact('holidays', 'holidayCount'));
     }
 

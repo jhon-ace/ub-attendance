@@ -36,7 +36,7 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:admin,employee,student,admin_staff'],
+            'role' => ['required', 'string', 'in:admin,employee,student,admin_staff,sao'],
             'school_id' => $request->role !== 'admin'
                 ? ['required', 'integer']  // For non-admin roles, school_id is required
                 : ['nullable', 'integer'],  // For admin, school_id is nullable
@@ -62,6 +62,8 @@ class RegisteredUserController extends Controller
             return redirect(route('admin.dashboard'))->with('success', 'Successful Login');
         } elseif ($user->role === 'admin_staff') {
             return redirect(route('admin_staff.dashboard'))->with('success', 'Successful Login');
+        } elseif ($user->role === 'sao') {
+            return redirect(route('sao.dashboard'))->with('success', 'Successful Login');
         }
     }
 }

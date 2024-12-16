@@ -11,6 +11,7 @@ use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Admin\StudentAttendanceTimeIn;
 use App\Models\Admin\StudentAttendanceTimeOut;
+use Illuminate\Support\Facades\Auth;
 
 class ShowStudentAttendance extends Component
 {
@@ -52,8 +53,9 @@ class ShowStudentAttendance extends Component
 
     public function mount()
     {
-
-        $this->selectedSchool = session('selectedSchool', null);
+        if (Auth::check() && Auth::user()->school) {
+            $this->selectedSchool = Auth::user()->school->id;
+        }
         $this->selectedDepartment5 = session('selectedDepartment5', null);
         $this->selectedCourse5 = session('selectedCourse5', null);
         $this->selectedStudent5 = session('selectedStudent5', null);
@@ -137,10 +139,14 @@ class ShowStudentAttendance extends Component
             $query->where('course_id', $this->selectedCourse5);
             $this->selectedCourseToShow = Course::find($this->selectedCourse5);
 
-            $students = Student::where('course_id', $this->selectedCourse5)->get();
+            // $students = Student::where('course_id', $this->selectedCourse5)->get();
+            $students = Student::where('course_id', $this->selectedCourse5)->paginate(10);
+
         } else {
             $this->selectedCourseToShow = null;
-            $students = Student::all();
+            // $students = Student::all();
+            $students = Student::paginate(10);
+
         }
 
         if ($this->selectedStudent5) {

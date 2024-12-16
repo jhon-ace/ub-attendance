@@ -21,7 +21,7 @@
         <div class="flex flex-col md:flex-row items-start md:items-center md:justify-start">
             <!-- Dropdown and Delete Button -->
             <div class="flex items-center w-full md:w-auto">
-                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Year:</label>
+                <label for="school_id" class="block text-sm text-gray-700 font-bold md:mr-4 truncate uppercase">School Name:</label>
                 <select wire:model="selectedSchool" id="school_id" name="school_id" wire:change="updateDepartments"
                         class="cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror md:w-auto"
                         required>
@@ -71,7 +71,7 @@
                         </div>
                     </form>
         <div class="flex justify-between">
-            <p class="text-black mt-2 text-sm mb-4">Selected School Year: <text class="uppercase text-red-500">{{ $schoolToShow->abbreviation }}</text></p>
+            <p class="text-black mt-2 text-sm mb-4">Selected School Name: <text class="uppercase text-red-500">{{ $schoolToShow->abbreviation }}</text></p>
             <div x-data="{ open: false }">
                 <button @click="open = true" class="bg-blue-500 text-white text-sm px-3 py-2 rounded hover:bg-blue-700">
                     <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add Department
@@ -88,7 +88,7 @@
                                 @csrf
 
                                     <div class="mb-2">
-                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year: </label>
+                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Name: </label>
                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                 <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option>
                                         </select>
@@ -200,7 +200,7 @@
                                 </th>
                                 <th class="border border-gray-400 px-3 py-2">
                                     <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                                        School Year
+                                        School Name
                                         @if ($sortField == 'school_id')
                                             @if ($sortDirection == 'asc')
                                                 &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -260,7 +260,7 @@
                                                                 @csrf
                                                                 @method('PUT')
                                                                     <div class="mb-2">
-                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Year: </label>
+                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Name: </label>
                                                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                                                 <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option>
                                                                         </select>
@@ -525,7 +525,7 @@
                                     @csrf
 
                                         <div class="mb-2">
-                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Year: </label>
+                                            <label for="school_id" class="block text-gray-700 text-md font-bold mb-2">School Name: </label>
                                             <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                     <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option>
                                             </select>
@@ -597,18 +597,6 @@
                         <thead class="bg-gray-200 text-black">
                             <tr>
                                 <th class="border border-gray-400 px-3 py-2">
-                                    <button wire:click="sortBy('department_id')" class="w-full h-full flex items-center justify-center">
-                                        Department ID
-                                        @if ($sortField == 'department_id')
-                                            @if ($sortDirection == 'asc')
-                                                &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
-                                            @else
-                                                &nbsp;<i class="fa-solid fa-up-long fa-xs"></i>
-                                            @endif
-                                        @endif
-                                    </button>
-                                </th>
-                                <th class="border border-gray-400 px-3 py-2">
                                     <button wire:click="sortBy('department_abbreviation')" class="w-full h-full flex items-center justify-center">
                                         Department Abbreviation
                                         @if ($sortField == 'department_abbreviation')
@@ -634,7 +622,7 @@
                                 </th>
                                 <th class="border border-gray-400 px-3 py-2">
                                     <button wire:click="sortBy('school_id')" class="w-full h-full flex items-center justify-center">
-                                        School Year
+                                        School Name
                                         @if ($sortField == 'school_id')
                                             @if ($sortDirection == 'asc')
                                                 &nbsp;<i class="fa-solid fa-down-long fa-xs"></i>
@@ -662,7 +650,7 @@
                         <tbody >
                             @foreach ($departments as $department)
                                 <tr class="hover:bg-gray-100" wire:model="selectedDepartment">
-                                    <td class="text-black border border-gray-400  ">{{ $department->department_id }}</td>
+
                                     <td class="text-black border border-gray-400">{{ $department->department_abbreviation}}</td>
                                     <td class="text-black border border-gray-400">{{ $department->department_name}}</td>
                                     <td class="text-black border border-gray-400">{{ $department->school->abbreviation}}</td>
@@ -693,7 +681,7 @@
                                                                 @csrf
                                                                 @method('PUT')
                                                                     <div class="mb-2">
-                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Year: </label>
+                                                                        <label for="school_id" class="block text-gray-700 text-md font-bold mb-2 text-left">School Name: </label>
                                                                         <select id="school_id" name="school_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline @error('school_id') is-invalid @enderror" required>
                                                                                 <option value="{{ $schoolToShow->id }}">{{ $schoolToShow->abbreviation }}</option>
                                                                         </select>

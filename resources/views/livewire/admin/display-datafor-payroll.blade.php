@@ -38,7 +38,7 @@
                         @if($departments->isEmpty())
                             <option value="0">No Departments</option>
                         @else
-                            <option value="">Select Department</option>
+                            <option>Select Department</option>
                             @foreach($departments as $department)
                                 <option value="{{ $department->id }}">{{ $department->department_abbreviation }}</option>
                             @endforeach
@@ -673,10 +673,9 @@
                                         @php
                                             // Group data by employee_id
                                             $employees = [];
-
+                                                                
                                             foreach ($attendanceData as $attendance) {
 
-                                                
                                                 $employeeId = $attendance->employee_id;
                                                 $check = $attendance->check_in_time;
                                                 if (!isset($employees[$employeeId])) {
@@ -693,10 +692,13 @@
                                                         'employee_lastname' => $attendance->employee_lastname,
                                                         'employee_firstname' => $attendance->employee_firstname,
                                                         'employee_middlename' => $attendance->employee_middlename,
-                                                        'uniqueDays' => []
+                                                        'uniqueDays' => [],
+                                                        'overtime_hours_display' => $attendance->overtime_hours,
+                                                        'overtime_minutes_display' => $attendance->overtime_minutes,
+
+
                                                     ];
                                                 }
-                                                
                                                 // Accumulate totals for each employee
                                                 $employees[$employeeId]['totalHours'] += $attendance->hours_perDay;
                                                 $total = $attendance->hours_workedAM + $attendance->hours_workedPM;
@@ -706,9 +708,20 @@
                                             
                                                 $date = \Illuminate\Support\Carbon::parse($attendance->check_in_time)->toDateString();
                                                 $employees[$employeeId]['uniqueDays'][$date] = true;
+
+                                                $employees[$employeeId]['overtime_hours'] = $attendance->overtime_hours;
+                                                $employees[$employeeId]['overtime_minutes'] = $attendance->overtime_minutes;
+                                                
+                                                
                                             }
+
+                                            
+
                                         @endphp
+
                                         
+                              
+
                                         <!-- <div class="flex justify-center">
                                             <h1 class="uppercase text-[30px]">Department: <text class="text-red-500">{{ $departmentToShow->department_abbreviation }}</text></h1>
                                         </div> -->
@@ -754,61 +767,110 @@
                                                     
                                                 </div>
                                             </div>
-                                            <div x-data="{ open: false }">
-                                                <button @click="open = true" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                                    View Employee who has filed leave
-                                                </button>
+                                            <div class="flex justify-start">
+                                                <div x-data="{ open: false }">
+                                                    <button @click="open = true" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                                        View Employee who has filed leave
+                                                    </button>
 
-                                                <div x-cloak x-show="open" @click.away="open = false" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                                                    <div class="bg-white rounded shadow-lg w-full md:w-[50%] h-3/4 flex flex-col overflow-hidden">
-                                                        <div class="p-4 border-b">
-                                                            <h2 class="text-xl font-semibold">Employee On Leave</h2>
-                                                        </div>
-                                                        <div class="p-4 flex-1 overflow-y-auto">
-                                                            <h1 class="text-xl font-bold mb-4">Employees Details</h1>
-
-                                                            @if(empty($processedData))
-                                                                <p class="text-gray-600">No employees are currently on leave.</p>
-                                                            @else
-                                                                <div class="overflow-x-auto">
-                                                                    <table class="min-w-full bg-white border border-gray-200">
-                                                                        <thead>
-                                                                            <tr class="bg-gray-100">
-                                                                                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">#</th>
-                                                                                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Employee Name</th>
-                                                                                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check In Time</th>
-                                                                                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check In Status</th>
-                                                                                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check Out Time</th>
-                                                                                <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Check Out Status</th>
+                                                    <div x-cloak x-show="open" @click.away="open = false" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                                                        <div class="bg-white rounded shadow-lg w-full md:w-[50%] h-3/4 flex flex-col overflow-hidden">
+                                                            <div class="pl-4 pt-4 pr-4 pb-1 border-b">
+                                                                <h2 class="text-xl font-semibold">Employee On Leave</h2>
+                                                                <div class="flex justify-start">
+                                                                    <label for="selectedMonth2" class="mt-7 mr-3">View:</label>
+                                                                    <select wire:model="selectedMonth2" id="selectedMonth2" name="selectedMonth2"
+                                                                            wire:change="updateMonth2"
+                                                                            class=" mt-5 mr-5 cursor-pointer text-sm shadow appearance-none border pr-16 rounded py-2 px-2 text-black leading-tight focus:outline-none focus:shadow-outline md:w-auto"
+                                                                            required>
+                                                                        <option value="">-- Select Month --</option>
+                                                                        @foreach($months as $key => $monthName)
+                                                                            <option value="{{ $key }}" {{ $selectedMonth == $key ? 'selected' : '' }}>{{ $monthName }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                    @empty(!$groupedByMonth)
+                                                                        <button wire:click="clearSelection" class="bg-blue-500 hover:bg-blue-800 text-center mt-5 mr-5 cursor-pointer text-sm shadow appearance-none border rounded py-2 px-2 text-white leading-tight focus:outline-none focus:shadow-outline md:w-auto">
+                                                                            Clear Selection
+                                                                        </button>
+                                                                    @else
+                                                                
+                                                                    @endempty
+                                                                    
+                                                                    <div wire:loading wire:target="selectedMonth2" class="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
+                                                                        <div class="h-full flex mx-auto justify-center items-center space-x-2 bg-opacity-50 p-6 rounded shadow-lg">
+                                                                            <div class="flex flex-col items-center">
+                                                                                <div class="w-8 h-8 border-4 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
+                                                                                <span class="text-center mt-3 text-white">Fetching records...</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>  
+                                                                <table class="min-w-full bg-white border border-gray-200 mt-5">
+                                                                    <thead>
+                                                                        <tr class="bg-gray-100">
+                                                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700">Employee Name</th>
+                                                                            <th class="py-2 px-4 border-b border-gray-200 text-left text-sm font-medium text-gray-700 ml-32">Leave Description</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                </table>
+                                                            </div>
+                                                            <div class="pl-4 pt-1 pr-4 pb-4 flex-1 overflow-y-auto">
+                                                                <table class="table-auto w-full border-collapse border border-gray-300">
+                                                                    <tbody>
+                                                                        @empty($groupedByMonth)
+                                                                            <tr class="bg-gray-200">
+                                                                                <td class=" text-center border border-gray-300 px-4 py-2 font-bold uppercase">No Data available</td>
                                                                             </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            @foreach($processedData as $employee)
-                                                                                @foreach($employee['times'] as $time)
-                                                                                    <tr class="hover:bg-gray-50">
-                                                                                        <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $employee['number'] }}</td>
-                                                                                        <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $employee['employee_name'] }}, {{ $employee['employee_firstname'] }}</td>
-                                                                                        <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ \Carbon\Carbon::parse($time['check_in_time'])->format('F j, Y') }}</td>
-                                                                                        <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $time['check_in_status'] }}</td>
-                                                                                        <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ \Carbon\Carbon::parse($time['check_out_time'])->format('F j, Y') }}</td>
-                                                                                        <td class="py-2 px-4 border-b border-gray-200 text-sm text-gray-600">{{ $time['check_out_status'] }}</td>
+                                                                        @else
+                                                                            @foreach ($groupedByMonth as $month => $employeess)
+                                                                                <tr class="bg-gray-200">
+                                                                                    <td class=" text-center border border-gray-300 px-4 py-2 font-bold uppercase" colspan="6">
+                                                                                        {{ $month }} <!-- Display the month -->
+                                                                                    </td>
+                                                                                </tr>
+                                                                                
+                                                                                @foreach ($employeess as $employeeName => $employeeData)
+                                                                                    <tr>
+                                                                                    
+                                                                                            <td class="font-bold border text-red-500 border-gray-300 px-4 py-2" colspan=6>
+                                                                                                {{ $employeeName }}
+                                                                                            </td>
+                                                                                
+                                                                                        @foreach ($employeeData['times'] as $time)
+                                                                                            <tr>
+                                                                                                <td class="border border-gray-300 px-4 py-2">
+                                                                                                    {{ \Carbon\Carbon::parse($time['check_in_time'])->format('F j, Y') }}
+                                                                                                </td>
+                                                                                                <td class="border border-gray-300 px-4 py-2">
+                                                                                                    {{ $time['check_in_status'] }}
+                                                                                                </td>
+                                                                                                <!-- <td class="border border-gray-300 px-4 py-2">
+                                                                                                    {{ $time['check_out_time'] ? \Carbon\Carbon::parse($time['check_out_time'])->format('F j, Y') : 'N/A' }}
+                                                                                                </td> -->
+                                                                                                <!-- <td class="border border-gray-300 px-4 py-2">
+                                                                                                    {{ $time['check_out_status'] ?? 'N/A' }}
+                                                                                                </td> -->
+                                                                                            </tr>
+                                                                                        @endforeach
                                                                                     </tr>
                                                                                 @endforeach
                                                                             @endforeach
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                        <div class="p-4 border-t flex justify-end">
-                                                            <button @click="open = false" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                                                                Close
-                                                            </button>
+                                                                        @endempty
+                                                                    </tbody>
+
+
+                                                                </table>
+                                                            </div>
+                                                            <div class="p-4 border-t flex justify-end">
+                                                                <button @click="open = false" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                                                    Close
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
+                                            </div>
 
                                             @if ($startDate && $endDate)
                                                 <p class="mt-4">Selected Date Range:</p>
@@ -932,6 +994,7 @@
                                                     <th class="border border-black text-center">Total Late</th>
                                                     <th class="border border-black text-center">Total Undertime</th>
                                                     <th class="border border-black text-center">Absent Hour</th>
+                                                    <th class="border border-black text-center">Overtime Hours</th>
                                                     <th class="border border-black text-center">Action</th>
                                                     
                                                 </tr>
@@ -943,8 +1006,10 @@
 
                                                     
                                                 @else
+
                                                 @foreach($employees as $employeeId => $employeeData)
-                                                
+
+
                                                     @php
                                                         // Total hours
                                                         $totalSeconds = $employeeData['totalHours'] * 3600;
@@ -1102,6 +1167,16 @@
                                                             <td class="text-black border border-black">{{ $lateFormatted }}</td>
                                                             <td class="text-black border border-black">{{ $undertimeFormatted }}</td>
                                                             <td class="text-black border border-black text-center">{{ $absentFormatted }}</td>
+                                                            <td class="text-black border border-black text-center">
+                                                                
+                                                                @if ($employees[$employeeId]['overtime_hours_display'] == 0 && $employees[$employeeId]['overtime_minutes_display'] == 0)
+                                                                    0 hr/s 0 min/s
+                                                                @else
+                                                                    {{ $employees[$employeeId]['overtime_hours_display'] }} hr/s {{ $employees[$employeeId]['overtime_minutes_display'] }} mins
+                                                                @endif
+                                                            </td>
+                                                            
+                                                           
                                                             <td class="text-black border border-black">
                                                                 <div class="flex justify-center items-center space-x-2 p-1 z-50">
                                                                     <div x-data="{ open: false }">
@@ -1243,6 +1318,7 @@
                                                                                                 <th class="border border-gray-400 px-2 py-1 uppercase">Total Deduction (late + undertime)</th>
                                                                                                 <th class="border border-gray-400 px-2 py-1 uppercase">Total Absent</th>
                                                                                                 <th class="border border-gray-400 px-2 py-1 uppercase">Required Hours</th>
+                                                                                                <th class="border border-gray-400 px-2 py-1 uppercase">Overtime Hours</th>
                                                                                                 <th class="border border-gray-400 px-2 py-1 uppercase">Remarks</th>
                                                                                             </tr>
                                                                                         </thead>
@@ -1308,7 +1384,8 @@
                                                                                                 
                                                                                             @endphp
                                                                                             
-                                                                                            @foreach ($attendanceData as $attendance )
+                                                                                            @foreach ($attendanceData as $attendance)
+                                                                                            
                                                                                                 @if($attendance->employee_id == $employeeData['id'])
                                                                                                     @php
                                                                                                         $workedDate = date('Y-m-d', strtotime($attendance->worked_date));
@@ -1843,6 +1920,9 @@
 
                                                                                                     </td>
                                                                                                     <td class="text-black border border-gray-400 px-3 py-2">
+                                                                                                 
+                                                                                                    </td>
+                                                                                                    <td class="text-black border border-gray-400 px-3 py-2">
                                                                                                         @php
 
                                                                                                         $totalHours = $attendance->hours_perDay;
@@ -1940,6 +2020,9 @@
                                                                                                         @endphp
 
                                                                                                         {{ $result }}
+                                                                                                    </td>
+                                                                                                    <td class="text-black border border-gray-400 text-xs">
+                                                                                                        {{ $attendance->overtime_hours }} hr/s,  {{ $attendance->overtime_minutes }} min/s
                                                                                                     </td>
                                                                                                     <td class="text-red-500 border uppercase border-gray-400 text-xs font-bold w-32">
                                                                                                     @php

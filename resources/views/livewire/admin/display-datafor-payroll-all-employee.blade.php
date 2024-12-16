@@ -2431,7 +2431,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+<script src="{{asset('assets/js/fancybox.umd.js')}}" defer></script>
 <script>
       Fancybox.bind('[data-fancybox]', {
         contentClick: "iterateZoom",

@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="refresh" content="30">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preload" as="image" href="{{ asset('assets/img/logo.png') }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Time Out Portal</title>

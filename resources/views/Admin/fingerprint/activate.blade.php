@@ -134,7 +134,7 @@
                             <div class="w-[50%] flex justify-center mb-4 mx-auto">
                                 <!-- Live Fingerprint View -->
                                 <div class="rounded-lg p-4  flex flex-col items-center">
-                                    @foreach($fingerprint as $finger)
+                                    @foreach($fingerprints as $finger)
                                         <h1>
                                             Fingerprint: 
 

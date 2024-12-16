@@ -34,7 +34,7 @@ class DisplayDataforPayroll extends Component
     public $sortField = 'employee_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
-    public $selectedDepartment4 = null;
+    public $selectedDepartment4 = "All Departments";
     public $selectedEmployee = null;
     public $departmentsToShow;
     public $schoolToShow;
@@ -50,9 +50,13 @@ class DisplayDataforPayroll extends Component
     public $selectedYear;
     public $currentMonth;
     public $currentYear;
+    public $groupedByMonth = [];
+    public $selectedMonth2 = null;
+    public $isAllDepartmentsSelected = false;
+    
 
 
-    protected $listeners = ['updateMonth','updateEmployees', 'updateEmployeesByDepartment', 'updateAttendanceByEmployee', 'updateAttendanceByDateRange'];
+    protected $listeners = ['selectMonth','updateMonth', 'updateMonth2','updateEmployees', 'updateEmployeesByDepartment', 'updateAttendanceByEmployee', 'updateAttendanceByDateRange'];
 
     public function updatingSearch()
     {
@@ -68,6 +72,10 @@ class DisplayDataforPayroll extends Component
         $this->searchh = '';
     }
     
+    public function clearSelection()
+    {
+        $this->selectedMonth2= '';
+    }
 
     public function mount()
     {
@@ -77,6 +85,12 @@ class DisplayDataforPayroll extends Component
         }
 
         $this->selectedMonth = now()->month;
+            // Reset the selected value to zero first
+        $this->selectedMonth2 = 0;
+
+        // Now update the value with the selected key
+        $this->selectedMonth2 = $this->selectedMonth2;
+        $this->groupedByMonth = [];
         $this->selectedYear = now()->year;
 
         // $this->selectedSchool = session('selectedSchool', null);
@@ -129,6 +143,130 @@ class DisplayDataforPayroll extends Component
 
 
 
+    public function updateMonth2()
+    {   
+            
+        
+        if ($this->selectedMonth2) {
+     
+            // $employeesWithLeaves = EmployeeAttendanceTimeIn::select(
+            //     'employees_time_in_attendance.employee_id',
+            //     'employees.employee_firstname',
+            //     'employees.employee_lastname', 
+            //     \DB::raw('GROUP_CONCAT(DATE(employees_time_in_attendance.check_in_time) ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_dates'),
+            //     \DB::raw('GROUP_CONCAT(employees_time_in_attendance.check_in_time ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_times'),
+            //     \DB::raw('GROUP_CONCAT(employees_time_in_attendance.status ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_statuses'),
+            //     \DB::raw('GROUP_CONCAT(employees_time_out_attendance.check_out_time ORDER BY employees_time_out_attendance.check_out_time ASC SEPARATOR ", ") AS check_out_times'),
+            //     \DB::raw('GROUP_CONCAT(employees_time_out_attendance.status ORDER BY employees_time_out_attendance.check_out_time ASC SEPARATOR ", ") AS check_out_statuses')
+            // )
+            // ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
+            // ->leftJoin('employees_time_out_attendance', function ($join) {
+            //     $join->on('employees_time_in_attendance.employee_id', '=', 'employees_time_out_attendance.employee_id')
+            //         ->on(\DB::raw('DATE(employees_time_in_attendance.check_in_time)'), '=', \DB::raw('DATE(employees_time_out_attendance.check_out_time)'));
+            // })
+            // ->whereIn('employees_time_in_attendance.status', ['On Leave', 'Official Travel'])
+            // // Use selected month if set
+            // ->whereMonth('employees_time_in_attendance.check_in_time', '=', $this->selectedMonth2)
+            // ->whereYear('employees_time_in_attendance.check_in_time', '=', $this->selectedYear) // Optional: add the year filter if necessary
+            // ->orWhere('employees.department_id', '=', $this->selectedDepartment4)
+            // ->groupBy('employees_time_in_attendance.employee_id', 'employees.employee_firstname', 'employees.employee_lastname') 
+            // ->orderBy('employees.employee_lastname', 'asc')
+            // ->orderBy('check_in_times', 'asc')
+            // ->get();
+
+            $employeesWithLeaves = EmployeeAttendanceTimeIn::select(
+                    'employees_time_in_attendance.employee_id',
+                    'employees.employee_firstname',
+                    'employees.employee_lastname', 
+                    \DB::raw('GROUP_CONCAT(DATE(employees_time_in_attendance.check_in_time) ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_dates'),
+                    \DB::raw('GROUP_CONCAT(employees_time_in_attendance.check_in_time ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_times'),
+                    \DB::raw('GROUP_CONCAT(employees_time_in_attendance.status ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_statuses'),
+                    \DB::raw('GROUP_CONCAT(employees_time_out_attendance.check_out_time ORDER BY employees_time_out_attendance.check_out_time ASC SEPARATOR ", ") AS check_out_times'),
+                    \DB::raw('GROUP_CONCAT(employees_time_out_attendance.status ORDER BY employees_time_out_attendance.check_out_time ASC SEPARATOR ", ") AS check_out_statuses')
+                )
+                ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
+                ->leftJoin('employees_time_out_attendance', function ($join) {
+                    $join->on('employees_time_in_attendance.employee_id', '=', 'employees_time_out_attendance.employee_id')
+                        ->on(\DB::raw('DATE(employees_time_in_attendance.check_in_time)'), '=', \DB::raw('DATE(employees_time_out_attendance.check_out_time)'));
+                })
+                ->where(function ($query) {
+                    $query->whereIn('employees_time_in_attendance.status', ['On Leave', 'Official Travel'])
+                        ->where('employees.department_id', '=', $this->selectedDepartment4);
+                })
+                ->whereMonth('employees_time_in_attendance.check_in_time', '=', $this->selectedMonth2)
+                ->whereYear('employees_time_in_attendance.check_in_time', '=', $this->selectedYear)
+                ->groupBy('employees_time_in_attendance.employee_id', 'employees.employee_firstname', 'employees.employee_lastname') 
+                ->orderBy('employees.employee_lastname', 'asc')
+                ->orderBy('check_in_times', 'asc')
+                ->get();
+
+
+            $processedData = [];
+
+            // Group and process data
+            foreach ($employeesWithLeaves as $employee) {
+                $checkInTimes = explode(', ', $employee->check_in_times);
+                $checkInStatuses = explode(', ', $employee->check_in_statuses);
+                $checkOutTimes = explode(', ', $employee->check_out_times);
+                $checkOutStatuses = explode(', ', $employee->check_out_statuses);
+
+                $groupedTimes = [];
+                foreach ($checkInTimes as $index => $checkInTime) {
+                    $date = \Carbon\Carbon::parse($checkInTime)->format('Y-m-d');
+                    if (isset($checkOutTimes[$index]) && \Carbon\Carbon::parse($checkOutTimes[$index])->format('Y-m-d') == $date) {
+                        $groupedTimes[$date] = [
+                            'check_in_time' => $checkInTime,
+                            'check_in_status' => $checkInStatuses[$index],
+                            'check_out_time' => $checkOutTimes[$index],
+                            'check_out_status' => $checkOutStatuses[$index],
+                        ];
+                    }
+                }
+
+                $processedData[] = [
+                    'employee_name' => $employee->employee_lastname .', '. $employee->employee_firstname,
+                    'employee_id' => $employee->employee_id,
+                    'times' => array_values($groupedTimes),
+                ];
+            }
+
+            // Debug processed data before filtering
+       
+
+   
+            foreach ($processedData as $employeeData) {
+                foreach ($employeeData['times'] as $time) {
+                    $checkInDate = \Carbon\Carbon::parse($time['check_in_time']);
+                    $month = $checkInDate->format('F Y');
+                    $monthNumber = $checkInDate->month;
+
+                    if ($this->selectedMonth2 && $monthNumber != $this->selectedMonth2) {
+                        continue; // Skip if the month doesn't match
+                    }
+
+                    if (!isset($this->groupedByMonth[$month])) {
+                        $this->groupedByMonth[$month] = [];
+                    }
+
+                    $this->groupedByMonth[$month][$employeeData['employee_name']] = [
+                        'employee_id' => $employeeData['employee_id'],
+                        'times' => $employeeData['times'],
+                    ];
+                }
+            }
+
+            // Debug grouped data by month
+         
+        } else {
+     
+           
+        }
+
+    }
+
+
+
+
     public function updatingSelectedSchool()
     {
         $this->resetPage();
@@ -171,9 +309,14 @@ class DisplayDataforPayroll extends Component
     public function render()
     {
 
+        
+            // Check if the month is already in the array before adding it
+            
+        
         $months = collect(range(1, 12))->mapWithKeys(function ($month) {
             return [$month => date('F', mktime(0, 0, 0, $month, 1))];
         });
+
         
         // Base query for EmployeeAttendanceTimeIn with left join to EmployeeAttendanceTimeOut
         $queryTimeIn = EmployeeAttendanceTimeIn::query()
@@ -218,6 +361,10 @@ class DisplayDataforPayroll extends Component
         // Number of records per page
         $perPage = 500;
 
+        // if($this->selectedDepartment4 == "All Departments" && $this->selectedSchool) {
+
+        // } else
+        
         if ($this->selectedDepartment4) {
             // Get employees in the selected department with pagination
             $employees = Employee::where('department_id', $this->selectedDepartment4)->paginate(25);
@@ -363,6 +510,7 @@ class DisplayDataforPayroll extends Component
         $totalHoursTobeRendered = 0;
         $overallTotalHoursSum = 0;
 
+        
         foreach ($attendanceTimeIn as $attendance) {
             // Initialize variables for each record
           
@@ -382,6 +530,12 @@ class DisplayDataforPayroll extends Component
             $totalundertime = 0;
             $totalhoursNeed = 0;
             $totalHoursNeedperDay = 0;
+            $overtimeHours = 0;
+            $overtimeMinutes = 0;
+            $ototalHours = 0;
+            $ototalMinutes = 0;
+
+
 
             $totalHoursByDay = [];
             $overallTotalHoursSumm = 0;
@@ -440,8 +594,18 @@ class DisplayDataforPayroll extends Component
                                             ->where('check_out_time', '>=', $attendance->check_in_time)
                                             ->first();
 
+            // $checkOuts = $attendanceTimeOut->where('employee_id', $attendance->employee_id)
+            //                    ->where('check_out_time', '>=', $attendance->check_in_time)
+            //                    ->orderBy('check_out_time', 'asc') // Ensure proper ordering
+            //                    ->get();
+
+            // // Get the second check-out time if it exists
+            // $secondCheckOut = $checkOuts->skip(1)->first(); 
+            // dd($secondCheckOut);
+
             if ($checkOut) {
                 $checkOutDateTime = new DateTime($checkOut->check_out_time);
+
 
 
                 // $departmentWorkingHour = DepartmentWorkingHour::where('department_id', $attendance->employee->department_id)
@@ -464,7 +628,10 @@ class DisplayDataforPayroll extends Component
 
                 
                 
+               
 
+                
+                                
 
                 
                 if ($departmentWorkingHour) 
@@ -520,6 +687,16 @@ class DisplayDataforPayroll extends Component
                     $morningEndw = new DateTime($morningEndTimew);
                     $afternoonStartw = new DateTime($afternoonStartTimew);
                     $afternoonEndw = new DateTime($afternoonEndTimew);
+
+                               $hoursOvertime = 0;
+                                $minutesOvertime = 0;
+                    
+                    
+
+                 
+
+
+                    
 
                     // Calculate the duration in minutes for morning and afternoon
                     $morningInterval = $morningStartw->diff($morningEndw);
@@ -1186,80 +1363,98 @@ class DisplayDataforPayroll extends Component
                     $employeeFirstname = $attendance->employee->employee_firstname;
                     $employeeMiddlename = $attendance->employee->employee_middlename;
                     $checkInTimer = $attendance->check_in_time;
-                    
-                    
-                    // Check if this entry already exists in $attendanceData
-                    if (isset($attendanceData[$key])) {
-                        // Update existing entry
-                        
-                        $attendanceData[$key]->hours_perDay = $totalHoursNeedperDay;
-                        $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
-                        $attendanceData[$key]->hours_workedPM = $hoursWorkedPM;
-                        $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
-                        $attendanceData[$key]->total_hours_late += $totalHoursLate;
-                        $attendanceData[$key]->late_duration += $lateDurationAM;
-                        $attendanceData[$key]->late_durationPM += $lateDurationPM;
-                        $attendanceData[$key]->undertimeAM += $undertimeAM;
-                        $attendanceData[$key]->undertimePM += $undertimePM;
-                        $attendanceData[$key]->total_late += $totalHoursLate;
-                        $attendanceData[$key]->remarks = $remark;
-                        $attendanceData[$key]->modify_status = $modifyStatus;
-                        $attendanceData[$key]->employee_idd = $employee_idd;
-                        $attendanceData[$key]->employee_id = $employee_id;
-                        $attendanceData[$key]->employee_lastname = $employeeLastname;
-                        $attendanceData[$key]->employee_firstname = $employeeFirstname;
-                        $attendanceData[$key]->employee_middlename = $employeeMiddlename;
-                        $attendanceData[$key]->hours_late_overall += $overallTotalHoursLate;
-                        $attendanceData[$key]->hours_undertime_overall += $totalundertime;
-                        $attendanceData[$key]->check_in_time = $checkInTimer;
-                        $attendanceData[$key]->firstCheckInStatus = $firstCheckIn ? $firstCheckIn->status : null;
-                        $attendanceData[$key]->firstCheckOutStatus = $firstCheckOut ? $firstCheckOut->status : null;
-                        $attendanceData[$key]->secondCheckInStatus = $secondCheckIn ? $secondCheckIn->status : null;
-                        $attendanceData[$key]->secondCheckOutStatus = $secondCheckOut ? $secondCheckOut->status : null;
-   
-               
 
-                        // dd($attendanceData[$key]->total_hours_worked += $totalHoursWorked;);
-                    } else {
-                        // Create new entry
-                        $attendanceData[$key] = (object) [
-                            'hours_perDay' => $totalHoursNeedperDay,
-                            'employee_id' => $attendance->employee_id,
-                            'employee_lastname' => $employeeLastname,
-                            'employee_firstname' => $employeeFirstname,
-                            'employee_middlename' => $employeeMiddlename,
-                            'worked_date' => $checkInDate,
-                            'hours_workedAM' => $hoursWorkedAM,
-                            'hours_workedPM' => $hoursWorkedPM,
-                            'total_hours_worked' => $totalHoursWorked,
-                            'total_hours_late' => $totalHoursLate,
-                            'late_duration' => $lateDurationAM,
-                            'late_durationPM' => $lateDurationPM,
-                            'undertimeAM' => $undertimeAM,
-                            'undertimePM' => $undertimePM,
-                            'total_late' => $totalHoursLate,
-                            'remarks' => $remark,
-                            'modify_status'=> $modifyStatus,
-                            'hours_late_overall' => $overallTotalHoursLate,
-                            'hours_undertime_overall' => $totalundertime,
-                            'check_in_time' => $checkInTimer,
-                            'employee_idd' => $employee_idd,
-                            'firstCheckInStatus' => $firstCheckIn->status ?? '',
-                            'firstCheckOutStatus' => $firstCheckOut->status ?? '',
-                            'secondCheckInStatus' => $secondCheckIn->status ?? '',
-                            'secondCheckOutStatus' => $secondCheckOut->status ?? '',
+                    if ($checkOutDateTime > $afternoonEndw) {
+                        $timeAfterEnd = $checkOutDateTime->diff($afternoonEndw);
 
-
-                        ];
-
-                        //  session()->put('late_duration', $lateDurationAM);
+                        // Format the result in hours and minutes
+                        $ototalHour = $timeAfterEnd->h; // Hours
+                        $ototalMinute = $timeAfterEnd->i; // Minutes
                     }
+
+     
+
+                        // Check if this entry already exists in $attendanceData
+                        if (isset($attendanceData[$key])) {
+                            // Update existing entry
+                  
+                            $attendanceData[$key]->hours_perDay = $totalHoursNeedperDay;
+                            $attendanceData[$key]->hours_workedAM += $hoursWorkedAM;
+                            $attendanceData[$key]->hours_workedPM = $hoursWorkedPM;
+                            $attendanceData[$key]->total_hours_worked += $totalHoursWorked;
+                            $attendanceData[$key]->total_hours_late += $totalHoursLate;
+                            $attendanceData[$key]->late_duration += $lateDurationAM;
+                            $attendanceData[$key]->late_durationPM += $lateDurationPM;
+                            $attendanceData[$key]->undertimeAM += $undertimeAM;
+                            $attendanceData[$key]->undertimePM += $undertimePM;
+                            $attendanceData[$key]->total_late += $totalHoursLate;
+                            $attendanceData[$key]->remarks = $remark;
+                            $attendanceData[$key]->modify_status = $modifyStatus;
+                            $attendanceData[$key]->employee_idd = $employee_idd;
+                            $attendanceData[$key]->employee_id = $employee_id;
+                            $attendanceData[$key]->employee_lastname = $employeeLastname;
+                            $attendanceData[$key]->employee_firstname = $employeeFirstname;
+                            $attendanceData[$key]->employee_middlename = $employeeMiddlename;
+                            $attendanceData[$key]->hours_late_overall += $overallTotalHoursLate;
+                            $attendanceData[$key]->hours_undertime_overall += $totalundertime;
+                            $attendanceData[$key]->check_in_time = $checkInTimer;
+                            $attendanceData[$key]->firstCheckInStatus = $firstCheckIn ? $firstCheckIn->status : null;
+                            $attendanceData[$key]->firstCheckOutStatus = $firstCheckOut ? $firstCheckOut->status : null;
+                            $attendanceData[$key]->secondCheckInStatus = $secondCheckIn ? $secondCheckIn->status : null;
+                            $attendanceData[$key]->secondCheckOutStatus = $secondCheckOut ? $secondCheckOut->status : null;
+
+                            // Add ototalHour and ototalMinute
+                            $attendanceData[$key]->overtime_hours = $ototalHour;
+                            $attendanceData[$key]->overtime_minutes = $ototalMinute;
+                
+
+                            // dd($attendanceData[$key]->total_hours_worked += $totalHoursWorked;);
+                        } else {
+                            // Create new entry
+                            $attendanceData[$key] = (object) [
+                                'hours_perDay' => $totalHoursNeedperDay,
+                                'employee_id' => $attendance->employee_id,
+                                'employee_lastname' => $employeeLastname,
+                                'employee_firstname' => $employeeFirstname,
+                                'employee_middlename' => $employeeMiddlename,
+                                'worked_date' => $checkInDate,
+                                'hours_workedAM' => $hoursWorkedAM,
+                                'hours_workedPM' => $hoursWorkedPM,
+                                'total_hours_worked' => $totalHoursWorked,
+                                'total_hours_late' => $totalHoursLate,
+                                'late_duration' => $lateDurationAM,
+                                'late_durationPM' => $lateDurationPM,
+                                'undertimeAM' => $undertimeAM,
+                                'undertimePM' => $undertimePM,
+                                'total_late' => $totalHoursLate,
+                                'remarks' => $remark,
+                                'modify_status'=> $modifyStatus,
+                                'hours_late_overall' => $overallTotalHoursLate,
+                                'hours_undertime_overall' => $totalundertime,
+                                'check_in_time' => $checkInTimer,
+                                'employee_idd' => $employee_idd,
+                                'firstCheckInStatus' => $firstCheckIn->status ?? '',
+                                'firstCheckOutStatus' => $firstCheckOut->status ?? '',
+                                'secondCheckInStatus' => $secondCheckIn->status ?? '',
+                                'secondCheckOutStatus' => $secondCheckOut->status ?? '',
+
+                                'overtime_hours' => $ototalHour ?? 0,
+                                'overtime_minutes' => $ototalMinute ?? 0,
+
+                            ];
+
+                            //  session()->put('late_duration', $lateDurationAM);
+                        }
+                    
+                    
 
                     // Add total hours worked to overall total
                     $overallTotalHours += $totalHoursWorked;
                     $overallTotalLateHours += $overallTotalHoursLate;
                     $overallTotalUndertime += $totalundertime;
-                    $overallTotalHoursSum = $overallTotalHoursSumm;
+
+                    // $overtimeHours += $totalHours;
+                  
                 }
             }
         }
@@ -1289,8 +1484,137 @@ class DisplayDataforPayroll extends Component
             ->orderBy('check_in_date', 'asc') // Order by date (ascending)
             ->get();
 
-        $employeesWithLeaves = EmployeeAttendanceTimeIn::select(
-                'employees_time_in_attendance.employee_id', 
+//         $employeesWithLeaves = EmployeeAttendanceTimeIn::select(
+//                 'employees_time_in_attendance.employee_id', 
+//                 'employees.employee_lastname', 
+//                 \DB::raw('GROUP_CONCAT(DATE(employees_time_in_attendance.check_in_time) ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_dates'),
+//                 \DB::raw('GROUP_CONCAT(employees_time_in_attendance.check_in_time ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_times'),
+//                 \DB::raw('GROUP_CONCAT(employees_time_in_attendance.status ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_statuses'),
+//                 \DB::raw('GROUP_CONCAT(employees_time_out_attendance.check_out_time ORDER BY employees_time_out_attendance.check_out_time ASC SEPARATOR ", ") AS check_out_times'),
+//                 \DB::raw('GROUP_CONCAT(employees_time_out_attendance.status ORDER BY employees_time_out_attendance.check_out_time ASC SEPARATOR ", ") AS check_out_statuses')
+//             )
+//             ->join('employees', 'employees_time_in_attendance.employee_id', '=', 'employees.id')
+//             ->leftJoin('employees_time_out_attendance', function ($join) {
+//                 $join->on('employees_time_in_attendance.employee_id', '=', 'employees_time_out_attendance.employee_id')
+//                     ->on(\DB::raw('DATE(employees_time_in_attendance.check_in_time)'), '=', \DB::raw('DATE(employees_time_out_attendance.check_out_time)'));
+//             })
+//             ->whereIn('employees_time_in_attendance.status', ['On Leave', 'Official Travel'])
+//             ->groupBy('employees_time_in_attendance.employee_id', 'employees.employee_lastname')
+//             ->orderBy('check_in_times', 'asc')
+//             ->orderBy('employees.employee_lastname', 'asc')
+
+//             ->get();
+
+
+
+//       $processedData = [];
+
+//         // Initialize an array to hold the grouped data by name
+//         $groupedByName = [];
+
+//         foreach ($employeesWithLeaves as $employee) {
+//             $checkInTimes = explode(', ', $employee->check_in_times);
+//             $checkInStatuses = explode(', ', $employee->check_in_statuses);
+//             $checkOutTimes = explode(', ', $employee->check_out_times);
+//             $checkOutStatuses = explode(', ', $employee->check_out_statuses);
+
+//             $groupedTimes = [];
+
+//             foreach ($checkInTimes as $index => $checkInTime) {
+//                 $date = \Carbon\Carbon::parse($checkInTime)->format('Y-m-d');
+                
+//                 if (isset($checkOutTimes[$index]) && \Carbon\Carbon::parse($checkOutTimes[$index])->format('Y-m-d') == $date) {
+//                     if (isset($groupedTimes[$date])) {
+//                         // Update check_out_time and check_out_status to the latest for that date
+//                         $groupedTimes[$date]['check_out_time'] = $checkOutTimes[$index];
+//                         $groupedTimes[$date]['check_out_status'] = $checkOutStatuses[$index];
+//                     } else {
+//                         // Add new entry with check_in_time, check_out_time, and statuses
+//                         $groupedTimes[$date] = [
+//                             'check_in_time' => $checkInTime,
+//                             'check_in_status' => $checkInStatuses[$index],
+//                             'check_out_time' => $checkOutTimes[$index],
+//                             'check_out_status' => $checkOutStatuses[$index],
+//                         ];
+//                     }
+//                 }
+//             }
+
+//             // Convert groupedTimes from associative array to indexed array for rendering
+//             $groupedTimesArray = array_values($groupedTimes);
+
+//             // Group data by employee name
+//             $employeeName = $employee->employee_lastname; // You can use any other field for name as required
+//             $employeeFirstname = $employee->employee->employee_firstname; // Retrieve the first name
+//             if (!isset($groupedByName[$employeeName])) {
+//                 $groupedByName[$employeeName] = [
+//                     'employee_id' => $employee->employee_id,
+//                     'employee_firstname' => $employeeFirstname,
+//                     'times' => [],
+//                 ];
+//             }
+
+//             $groupedByName[$employeeName]['times'] = array_merge($groupedByName[$employeeName]['times'], $groupedTimesArray);
+//         }
+
+//         $processedData = [];
+//         $counter = 1; // Initialize a counter
+//         $nameToNumber = []; // Initialize an array to keep track of assigned numbers
+
+//         foreach ($groupedByName as $employeeName => $employeeData) {
+//             // Create a unique key based on name and first name
+//             $uniqueKey = $employeeName . ', ' . $employeeData['employee_firstname'];
+
+//             // Check if this unique key already has a number assigned
+//             if (!isset($nameToNumber[$uniqueKey])) {
+//                 // Assign a new number if not already assigned
+//                 $nameToNumber[$uniqueKey] = $counter;
+//                 $counter++; // Increment the counter
+//             }
+
+//             $processedData[] = [
+//                 'number' => $nameToNumber[$uniqueKey], // Use the assigned number
+//                 'employee_name' => $employeeName,
+//                 'employee_firstname' => $employeeData['employee_firstname'],
+//                 'employee_id' => $employeeData['employee_id'],
+//                 'times' => $employeeData['times'],
+//             ];
+//         }
+
+
+
+
+// foreach ($processedData as $employeeData) {
+//     $employeeName = $employeeData['employee_name'];
+//     $employeeFirstname = $employeeData['employee_firstname'];
+//     $employeeId = $employeeData['employee_id'];
+
+//     foreach ($employeeData['times'] as $time) {
+//         $checkInDate = Carbon::parse($time['check_in_time']);
+//         $month = $checkInDate->format('F Y'); // e.g., "July 2024"
+
+//         if (!isset($groupedByMonth[$month])) {
+//             $groupedByMonth[$month] = [];
+//         }
+
+//         if (!isset($groupedByMonth[$month][$employeeName])) {
+//             $groupedByMonth[$month][$employeeName] = [
+//                 'employee_id' => $employeeId,
+//                 'employee_firstname' => $employeeFirstname,
+//                 'times' => [],
+//             ];
+//         }
+
+//         $groupedByMonth[$month][$employeeName]['times'][] = $time;
+//     }
+// }
+
+// Display the grouped data
+        
+        if($this->selectedMonth2) {
+           $employeesWithLeaves = EmployeeAttendanceTimeIn::select(
+                'employees_time_in_attendance.employee_id',
+                'employees.employee_firstname',
                 'employees.employee_lastname', 
                 \DB::raw('GROUP_CONCAT(DATE(employees_time_in_attendance.check_in_time) ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_dates'),
                 \DB::raw('GROUP_CONCAT(employees_time_in_attendance.check_in_time ORDER BY employees_time_in_attendance.check_in_time ASC SEPARATOR ", ") AS check_in_times'),
@@ -1304,37 +1628,30 @@ class DisplayDataforPayroll extends Component
                     ->on(\DB::raw('DATE(employees_time_in_attendance.check_in_time)'), '=', \DB::raw('DATE(employees_time_out_attendance.check_out_time)'));
             })
             ->whereIn('employees_time_in_attendance.status', ['On Leave', 'Official Travel'])
-            ->groupBy('employees_time_in_attendance.employee_id', 'employees.employee_lastname')
-            ->orderBy('check_in_times', 'asc')
+            // Use selected month if set
+            ->whereMonth('employees_time_in_attendance.check_in_time', '=', null)
+            ->whereYear('employees_time_in_attendance.check_in_time', '=', null) // Optional: add the year filter if necessary
+            ->groupBy('employees_time_in_attendance.employee_id', 'employees.employee_firstname', 'employees.employee_lastname') 
+                        ->orderBy('check_in_times', 'asc')
             ->orderBy('employees.employee_lastname', 'asc')
 
             ->get();
+            
 
 
+            $processedData = [];
 
-      $processedData = [];
+            // Group and process data
+            foreach ($employeesWithLeaves as $employee) {
+                $checkInTimes = explode(', ', $employee->check_in_times);
+                $checkInStatuses = explode(', ', $employee->check_in_statuses);
+                $checkOutTimes = explode(', ', $employee->check_out_times);
+                $checkOutStatuses = explode(', ', $employee->check_out_statuses);
 
-        // Initialize an array to hold the grouped data by name
-        $groupedByName = [];
-
-        foreach ($employeesWithLeaves as $employee) {
-            $checkInTimes = explode(', ', $employee->check_in_times);
-            $checkInStatuses = explode(', ', $employee->check_in_statuses);
-            $checkOutTimes = explode(', ', $employee->check_out_times);
-            $checkOutStatuses = explode(', ', $employee->check_out_statuses);
-
-            $groupedTimes = [];
-
-            foreach ($checkInTimes as $index => $checkInTime) {
-                $date = \Carbon\Carbon::parse($checkInTime)->format('Y-m-d');
-                
-                if (isset($checkOutTimes[$index]) && \Carbon\Carbon::parse($checkOutTimes[$index])->format('Y-m-d') == $date) {
-                    if (isset($groupedTimes[$date])) {
-                        // Update check_out_time and check_out_status to the latest for that date
-                        $groupedTimes[$date]['check_out_time'] = $checkOutTimes[$index];
-                        $groupedTimes[$date]['check_out_status'] = $checkOutStatuses[$index];
-                    } else {
-                        // Add new entry with check_in_time, check_out_time, and statuses
+                $groupedTimes = [];
+                foreach ($checkInTimes as $index => $checkInTime) {
+                    $date = \Carbon\Carbon::parse($checkInTime)->format('Y-m-d');
+                    if (isset($checkOutTimes[$index]) && \Carbon\Carbon::parse($checkOutTimes[$index])->format('Y-m-d') == $date) {
                         $groupedTimes[$date] = [
                             'check_in_time' => $checkInTime,
                             'check_in_status' => $checkInStatuses[$index],
@@ -1343,52 +1660,47 @@ class DisplayDataforPayroll extends Component
                         ];
                     }
                 }
-            }
 
-            // Convert groupedTimes from associative array to indexed array for rendering
-            $groupedTimesArray = array_values($groupedTimes);
-
-            // Group data by employee name
-            $employeeName = $employee->employee_lastname; // You can use any other field for name as required
-            $employeeFirstname = $employee->employee->employee_firstname; // Retrieve the first name
-            if (!isset($groupedByName[$employeeName])) {
-                $groupedByName[$employeeName] = [
+                $processedData[] = [
+                    'employee_name' => $employee->employee_lastname .', '. $employee->employee_firstname,
                     'employee_id' => $employee->employee_id,
-                    'employee_firstname' => $employeeFirstname,
-                    'times' => [],
+                    'times' => array_values($groupedTimes),
                 ];
             }
 
-            $groupedByName[$employeeName]['times'] = array_merge($groupedByName[$employeeName]['times'], $groupedTimesArray);
-        }
+            // Debug processed data before filtering
+       
 
-        $processedData = [];
-        $counter = 1; // Initialize a counter
-        $nameToNumber = []; // Initialize an array to keep track of assigned numbers
+   
+            foreach ($processedData as $employeeData) {
+                foreach ($employeeData['times'] as $time) {
+                    $checkInDate = \Carbon\Carbon::parse($time['check_in_time']);
+                    $month = $checkInDate->format('F Y');
+                    $monthNumber = $checkInDate->month;
 
-        foreach ($groupedByName as $employeeName => $employeeData) {
-            // Create a unique key based on name and first name
-            $uniqueKey = $employeeName . ', ' . $employeeData['employee_firstname'];
+                    if ($this->selectedMonth2 && $monthNumber != $this->selectedMonth2) {
+                        continue; // Skip if the month doesn't match
+                    }
 
-            // Check if this unique key already has a number assigned
-            if (!isset($nameToNumber[$uniqueKey])) {
-                // Assign a new number if not already assigned
-                $nameToNumber[$uniqueKey] = $counter;
-                $counter++; // Increment the counter
+                    if (!isset($this->groupedByMonth[$month])) {
+                        $this->groupedByMonth[$month] = [];
+                    }
+
+                    $this->groupedByMonth[$month][$employeeData['employee_name']] = [
+                        'employee_id' => $employeeData['employee_id'],
+                        'times' => $employeeData['times'],
+                    ];
+                }
             }
-
-            $processedData[] = [
-                'number' => $nameToNumber[$uniqueKey], // Use the assigned number
-                'employee_name' => $employeeName,
-                'employee_firstname' => $employeeData['employee_firstname'],
-                'employee_id' => $employeeData['employee_id'],
-                'times' => $employeeData['times'],
-            ];
+        } else {
+          $processedData = null;
+          $this->selectedMonth2 = null;
+          $this->groupedByMonth = [];
         }
+            // Debug grouped data by month
+          
 
 
-
-    
 
 // Output or further process $processedData as needed
 
@@ -1414,6 +1726,7 @@ class DisplayDataforPayroll extends Component
             'processedData' => $processedData,
             'months' => $months,
             'currentMonth' => $this->selectedMonth,
+            'groupedByMonth' => $this->groupedByMonth,
         ]);
     }
 

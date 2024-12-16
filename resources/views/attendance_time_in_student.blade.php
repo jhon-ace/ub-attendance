@@ -3,15 +3,16 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="refresh" content="3600">  <!-- 30 seconds refresh -->
+    <meta http-equiv="refresh" content="3600">  
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preload" as="image" href="{{ asset('assets/img/logo.png') }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Time In-Out Portal | STUDENT</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .logo-background {
-            background-image: url('{{ asset('assets/img/ublogo.jpg') }}');
+            background-image: url('{{ asset('assets/img/ublogo.jpg?v=1') }}');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
@@ -22,6 +23,7 @@
             height: 100%;
             z-index:1;
             opacity:.9;
+             transition: background-image 0.3s ease-in-out; /* Smooth transition */
             /* z-index: -1; Ensure it's behind other content */
             /* opacity: 0.2; Adjust opacity as needed */
         }
@@ -186,7 +188,7 @@
 </head>
 <body>
 <div class="container ">
-<div class="logo-background"></div> 
+<div class="logo-background" id="logoBackground"></div> 
     <div class="flex-container">
         <div class="table-container shadow-xl mr-[50px]">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Student Time - In List</h2>
@@ -560,6 +562,20 @@
             }, 5000); // 5000 milliseconds = 5 seconds
         });
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const bgElement = document.getElementById('logoBackground');
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    bgElement.style.backgroundImage = "url('{{ asset('assets/img/ublogo.jpg') }}')";
+                    observer.disconnect(); // Stop observing once loaded
+                }
+            });
+        });
 
+        observer.observe(bgElement);
+    });
+</script>
 </body>
 </html>

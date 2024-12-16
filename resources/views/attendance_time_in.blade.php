@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="refresh" content="3600">  <!-- 30 seconds refresh -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preload" as="image" href="{{ asset('assets/img/logo.png') }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Time In Portal | UB</title>
@@ -22,6 +23,7 @@
             height: 100%;
             z-index:1;
             opacity:.9;
+             transition: background-image 0.3s ease-in-out; 
             /* z-index: -1; Ensure it's behind other content */
             /* opacity: 0.2; Adjust opacity as needed */
         }
@@ -186,7 +188,7 @@
 </head>
 <body>
 <div class="container ">
-<div class="logo-background"></div> 
+<div class="logo-background" id="logoBackground"></div> 
     <div class="flex-container">
         <div class="table-container shadow-xl mr-[50px]">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - In List</h2>
@@ -234,7 +236,7 @@
             </table>
         </div>
         <div class="flex-col z-50">
-            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[250px]">
+            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[250px]" loading="lazy">
         </div>
     </div>
     
@@ -559,6 +561,20 @@
             }, 5000); // 5000 milliseconds = 5 seconds
         });
     </script>
+     <!-- <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bgElement = document.getElementById('logoBackground');
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        bgElement.style.backgroundImage = "url('{{ asset('assets/img/ublogo.jpg') }}')";
+                        observer.disconnect(); // Stop observing once loaded
+                    }
+                });
+            });
 
+            observer.observe(bgElement);
+        });
+    </script> -->
 </body>
 </html>
