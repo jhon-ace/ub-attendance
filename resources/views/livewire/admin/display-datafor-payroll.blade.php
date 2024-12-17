@@ -675,7 +675,7 @@
                                             $employees = [];
                                                                 
                                             foreach ($attendanceData as $attendance) {
-
+                                             
                                                 $employeeId = $attendance->employee_id;
                                                 $check = $attendance->check_in_time;
                                                 if (!isset($employees[$employeeId])) {
@@ -693,8 +693,9 @@
                                                         'employee_firstname' => $attendance->employee_firstname,
                                                         'employee_middlename' => $attendance->employee_middlename,
                                                         'uniqueDays' => [],
-                                                        'overtime_hours_display' => $attendance->overtime_hours,
-                                                        'overtime_minutes_display' => $attendance->overtime_minutes,
+                                                        'overtime_hours_display' => 0,
+                                                        'overtime_minutes_display' => 0,
+                                                        'total_overtime_display' => '0 hr/s and 0 mins', 
 
 
                                                     ];
@@ -709,9 +710,29 @@
                                                 $date = \Illuminate\Support\Carbon::parse($attendance->check_in_time)->toDateString();
                                                 $employees[$employeeId]['uniqueDays'][$date] = true;
 
-                                                $employees[$employeeId]['overtime_hours'] = $attendance->overtime_hours;
-                                                $employees[$employeeId]['overtime_minutes'] = $attendance->overtime_minutes;
-                                                
+                                                $employees[$employeeId]['overtime_hours_display'] += $attendance->overtime_hours;
+                                                $employees[$employeeId]['overtime_minutes_display'] += $attendance->overtime_minutes;
+
+                                                // Handle minute overflow (e.g., 90 minutes becomes 1 hr and 30 mins)
+                                                $overtimeHours = $employees[$employeeId]['overtime_hours_display'];
+                                                $overtimeMinutes = $employees[$employeeId]['overtime_minutes_display'];
+
+                                                if ($overtimeMinutes >= 60) {
+                                                    $additionalHours = intdiv($overtimeMinutes, 60); // Get additional hours
+                                                    $remainingMinutes = $overtimeMinutes % 60; // Remaining minutes
+
+                                                    $employees[$employeeId]['overtime_hours_display'] = $overtimeHours + $additionalHours;
+                                                    $employees[$employeeId]['overtime_minutes_display'] = $remainingMinutes;
+                                                }
+
+                                                // Format total overtime display
+                                                $hours = $employees[$employeeId]['overtime_hours_display'];
+                                                $minutes = $employees[$employeeId]['overtime_minutes_display'];
+                                                $employees[$employeeId]['total_overtime_display'] = "{$hours} hr/s and {$minutes} mins";
+
+
+
+
                                                 
                                             }
 
@@ -1170,7 +1191,7 @@
                                                             <td class="text-black border border-black text-center">
                                                                 
                                                                 @if ($employees[$employeeId]['overtime_hours_display'] == 0 && $employees[$employeeId]['overtime_minutes_display'] == 0)
-                                                                    0 hr/s 0 min/s
+                                                                    0
                                                                 @else
                                                                     {{ $employees[$employeeId]['overtime_hours_display'] }} hr/s {{ $employees[$employeeId]['overtime_minutes_display'] }} mins
                                                                 @endif
@@ -1184,7 +1205,7 @@
                                                                             <i class="fa-solid fa-eye fa-xs" style="color: #ffffff;"></i> View Records
                                                                         </a>
                                                                         <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                                                                            <div @click.away="open = false" class=" w-[85%] max-h-[90vh] bg-white p-6 rounded-md shadow-lg  mx-auto overflow-y-auto">
+                                                                            <div @click.away="open = false" class=" w-[92%] max-h-[90vh] bg-white p-6 rounded-md shadow-lg  mx-auto overflow-y-auto">
                                                                                 <div class="flex justify-between items-start pb-3"> <!-- Changed items-center to items-start -->
                                                                                     <p class="text-xl font-bold">Detailed Calculation of Work Hours (<text class="text-red-500 text-sm">Dates that are missing or excluded may be weekends or holidays</text>)
                                                                                         <div x-data="{ openWelcome: false, openHoliday: false }" class="relative inline-block">
@@ -1920,9 +1941,6 @@
 
                                                                                                     </td>
                                                                                                     <td class="text-black border border-gray-400 px-3 py-2">
-                                                                                                 
-                                                                                                    </td>
-                                                                                                    <td class="text-black border border-gray-400 px-3 py-2">
                                                                                                         @php
 
                                                                                                         $totalHours = $attendance->hours_perDay;
@@ -2021,10 +2039,18 @@
 
                                                                                                         {{ $result }}
                                                                                                     </td>
-                                                                                                    <td class="text-black border border-gray-400 text-xs">
-                                                                                                        {{ $attendance->overtime_hours }} hr/s,  {{ $attendance->overtime_minutes }} min/s
+                                                                                                   <td class="text-black border border-gray-400 text-xs">
+                                                                                                                
+                                                                                                        @if ($attendance->overtime_hours == 0 && $attendance->overtime_minutes == 0)
+                                                                                                            0
+                                                                                                        @else
+                                                                                                            {{ $attendance->overtime_hours ?? 0 }} hr/s, {{ $attendance->overtime_minutes ?? 0 }} min/s
+                                                                                                        @endif
                                                                                                     </td>
+
+
                                                                                                     <td class="text-red-500 border uppercase border-gray-400 text-xs font-bold w-32">
+                                                                                                        
                                                                                                     @php
                                                                                                         $lateDurationAM = $attendance->late_duration;
                                                                                                         $lateDurationPM = $attendance->late_durationPM;

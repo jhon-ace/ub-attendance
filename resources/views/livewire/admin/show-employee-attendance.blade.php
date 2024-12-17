@@ -3592,7 +3592,7 @@
                                                                         <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                                     </div>
                                                                     <div class="mb-4">
-                                                                        <form action="{{ route('admin.attendance.employee_attendance.addIn') }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to add time in?');">
+                                                                        <form action="{{ route('admin_staff.attendance.employee_attendance.addIn') }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to add time in?');">
                                                                             <x-caps-lock-detector />
                                                                             @csrf
                                                                                 <div class="mb-2">
@@ -3716,7 +3716,7 @@
                                                                                     <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                                                 </div>
                                                                                 <div class="mb-4">
-                                                                                    <form id="updateTimeInForm" action="{{ route('admin.attendanceIn.edit', $attendanceIn->id) }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to update?');">
+                                                                                    <form id="updateTimeInForm" action="{{ route('admin_staff.attendanceIn.edit', $attendanceIn->id) }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to update?');">
                                                                                         <x-caps-lock-detector />
                                                                                         @csrf
                                                                                         @method('PUT')
@@ -3776,7 +3776,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <form action="{{ route('admin.attendance.employee_attendance.deleteTimeIn', $attendanceIn->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this time in?');">
+                                                                    <form action="{{ route('admin_staff.attendance.employee_attendance.deleteTimeIn', $attendanceIn->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this time in?');">
                                                                         @csrf
                                                                         @method('DELETE')
                                                                         <button type="submit" class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700">
@@ -3814,7 +3814,7 @@
                                                                         <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                                     </div>
                                                                     <div class="mb-4">
-                                                                        <form action="{{ route('admin.attendance.employee_attendance.addOut') }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to add time out?');">
+                                                                        <form action="{{ route('admin_staff.attendance.employee_attendance.addOut') }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to add time out?');">
                                                                             <x-caps-lock-detector />
                                                                             @csrf
                                                                                 <div class="mb-2">
@@ -3943,7 +3943,7 @@
                                                                                     <a @click="open = false" class="cursor-pointer text-black text-sm px-3 py-2 rounded hover:text-red-500">X</a>
                                                                                 </div>
                                                                                 <div class="mb-4">
-                                                                                    <form id="updateTimeOutForm" action="{{ route('admin.attendanceOut.edit', $attendanceOut->id) }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to update?');">
+                                                                                    <form id="updateTimeOutForm" action="{{ route('admin_staff.attendanceOut.edit', $attendanceOut->id) }}" method="POST" class="" onsubmit="return confirm('Are you sure you want to update?');">
                                                                                         <x-caps-lock-detector />
                                                                                         @csrf
                                                                                         @method('PUT')
@@ -3999,7 +3999,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    <form action="{{ route('admin.attendance.employee_attendance.deleteTimeOut', $attendanceOut->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this time out?');">
+                                                                    <form action="{{ route('admin_staff.attendance.employee_attendance.deleteTimeOut', $attendanceOut->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this time out?');">
                                                                         @csrf
                                                                         @method('DELETE')
                                                                         <button type="submit" class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700">

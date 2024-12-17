@@ -691,6 +691,7 @@ class DisplayDataforPayroll extends Component
                                $hoursOvertime = 0;
                                 $minutesOvertime = 0;
                     
+    
                     
 
                  
@@ -1348,6 +1349,7 @@ class DisplayDataforPayroll extends Component
                         ->orderBy('check_out_time', 'asc')
                         ->skip(1)
                         ->first();
+  
 
                     $modifyStatusFirstAM = $firstCheckIn;
                     $modifyStatusSecondAM = $firstCheckOut;
@@ -1364,15 +1366,129 @@ class DisplayDataforPayroll extends Component
                     $employeeMiddlename = $attendance->employee->employee_middlename;
                     $checkInTimer = $attendance->check_in_time;
 
-                    if ($checkOutDateTime > $afternoonEndw) {
-                        $timeAfterEnd = $checkOutDateTime->diff($afternoonEndw);
 
-                        // Format the result in hours and minutes
-                        $ototalHour = $timeAfterEnd->h; // Hours
-                        $ototalMinute = $timeAfterEnd->i; // Minutes
+                // $secondCheckOutsLists = EmployeeAttendanceTimeOut::orderBy('employee_id')
+                //     ->orderBy('check_out_time', 'asc') // Ensure records are ordered by check-out time
+                //     ->get() // Get all check-out records
+                //     ->groupBy('employee_id') // Group by employee_id
+                //     ->map(function ($checkOutsPerEmployee) {
+                //         // Group by date by comparing only the date part of check_out_time
+                //         return $checkOutsPerEmployee->groupBy(function ($checkOut) {
+                //             // Use DateTime instead of Carbon to extract the date
+                //             $checkOutTime = new DateTime($checkOut->check_out_time);
+                //             return $checkOutTime->format('Y-m-d'); // Extract the date part only
+                //         })
+                //         ->map(function ($checkOutsPerDate) {
+                //             // Skip the first check-out and get the second one for each date
+                //             return $checkOutsPerDate->skip(1)->first(); // Skip the first check-out and get the second one
+                //         })
+                //         ->filter(); // Remove null values for dates with fewer than 2 check-outs
+                //     });
+
+                // $afternoonEndTimeww = new DateTime($afternoonEndTimew); // Keep this as DateTime object
+            
+                //     $ototalHour = 0;
+                //     $ototalMinute = 0;
+
+                // $checkOutDifferences = $secondCheckOutsLists->map(function ($checkOutsPerEmployee) use ($afternoonEndTimeww) {
+                //         return $checkOutsPerEmployee->map(function ($secondCheckOut) use ($afternoonEndTimeww) {
+                //             $checkOutTime = new DateTime($secondCheckOut->check_out_time); // Convert check-out time to DateTime
+
+                //             // Calculate the difference in seconds
+                //             $interval = $afternoonEndTimeww->diff($checkOutTime);
+
+                //             // Return the difference in a formatted way (e.g., hours and minutes)
+                //             return [
+                //                 'check_out_time' => $checkOutTime->format('Y-m-d H:i:s'),
+                //                 'difference_in_minutes' => ($interval->h * 60) + $interval->i, // Convert to minutes
+                //             ];
+                //         });
+                //     });
+
+                //     $differencesInMinutes = [];
+
+                //     foreach ($checkOutDifferences as $checkOutsPerEmployee) {
+                //         foreach ($checkOutsPerEmployee as $tot) {
+                //             // Store each difference_in_minutes value
+                //             $differencesInMinutes[] = $tot['difference_in_minutes'];
+                //         }
+                //     }
+
+                //     // Now store the accumulated differences_in_minutes array in the session
+         
+                    $oTotalHour = 0;
+                    $oTotalMinute = 0;
+
+                    $firstCheckOutt = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                        ->whereDate('check_out_time', $dateKey2)
+                        ->orderBy('check_out_time', 'asc')
+                        ->first();
+
+                    $secondCheckOutr = EmployeeAttendanceTimeOut::where('employee_id', $employeeId)
+                        ->whereDate('check_out_time', $dateKey2)
+                        ->orderBy('check_out_time', 'asc')
+                        ->skip(1)
+                        ->first();
+
+                        
+
+
+                      
+                    
+                    if ($firstCheckOutt && $secondCheckOutr) 
+                    {
+
+                        //     // To retrieve and use the session data later
+                        if ($checkOutDateTime > $afternoonEndw) {
+                                $timeAfterEnd = $checkOutDateTime->diff($afternoonEndw);
+
+                                // Format the result in hours and minutes
+                                $oTotalHour = $timeAfterEnd->h; // Hours
+                                $oTotalMinute = $timeAfterEnd->i; // Minutes
+                            } 
+
+
+                            if($checkOutDateTime == null){
+                                $oTotalHour = 0;
+                                    $oTotalMinute = 0;
+                            }
+                      
+                            // Adjust `afternoonEndw` for previous days as needed
+                         
+                            if($checkOutDateTime < $afternoonEndw) {
+                                
+                                while($checkOutDateTime < $afternoonEndw) {
+
+                                    // Move `afternoonEndw` back one day
+                                    $afternoonEndw = (clone $afternoonEndw)->modify('-1 day');
+                                    
+                                }
+
+                                
+                            } else {
+                                
+                                    $oTotalHour = 0;
+                                    $oTotalMinute = 0;
+                                     
+                                    
+                                }
+                                    
+                            
+
+                            // Check if `checkOutDateTime` exceeds the adjusted `afternoonEndw`
+                            if ($checkOutDateTime > $afternoonEndw) {
+                                
+                                $timeAfterEnd = $checkOutDateTime->diff($afternoonEndw);
+
+                                // Format the result in hours and minutes
+                                $oTotalHour = $timeAfterEnd->h;
+                                $oTotalMinute = $timeAfterEnd->i;
+                            }
+                    }  else {
+                            $oTotalHour = 0;
+                            $oTotalMinute = 0;
                     }
-
-     
+                 
 
                         // Check if this entry already exists in $attendanceData
                         if (isset($attendanceData[$key])) {
@@ -1404,8 +1520,8 @@ class DisplayDataforPayroll extends Component
                             $attendanceData[$key]->secondCheckOutStatus = $secondCheckOut ? $secondCheckOut->status : null;
 
                             // Add ototalHour and ototalMinute
-                            $attendanceData[$key]->overtime_hours = $ototalHour;
-                            $attendanceData[$key]->overtime_minutes = $ototalMinute;
+                            $attendanceData[$key]->overtime_hours = $oTotalHour;
+                            $attendanceData[$key]->overtime_minutes = $oTotalMinute;
                 
 
                             // dd($attendanceData[$key]->total_hours_worked += $totalHoursWorked;);
@@ -1438,8 +1554,8 @@ class DisplayDataforPayroll extends Component
                                 'secondCheckInStatus' => $secondCheckIn->status ?? '',
                                 'secondCheckOutStatus' => $secondCheckOut->status ?? '',
 
-                                'overtime_hours' => $ototalHour ?? 0,
-                                'overtime_minutes' => $ototalMinute ?? 0,
+                                'overtime_hours' => $oTotalHour,
+                                'overtime_minutes' => $oTotalMinute,
 
                             ];
 
@@ -1456,6 +1572,8 @@ class DisplayDataforPayroll extends Component
                     // $overtimeHours += $totalHours;
                   
                 }
+            } else {
+                dd("jbdkcdj");
             }
         }
 
