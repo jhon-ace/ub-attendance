@@ -1430,11 +1430,7 @@ class DisplayDataforPayroll extends Component
                         ->skip(1)
                         ->first();
 
-                        
 
-
-                      
-                    
                     if ($firstCheckOutt && $secondCheckOutr) 
                     {
 
@@ -1447,15 +1443,8 @@ class DisplayDataforPayroll extends Component
                                 $oTotalMinute = $timeAfterEnd->i; // Minutes
                             } 
 
-
-                            if($checkOutDateTime == null){
-                                $oTotalHour = 0;
-                                    $oTotalMinute = 0;
-                            }
-                      
                             // Adjust `afternoonEndw` for previous days as needed
-                         
-                            if($checkOutDateTime < $afternoonEndw) {
+       
                                 
                                 while($checkOutDateTime < $afternoonEndw) {
 
@@ -1463,16 +1452,7 @@ class DisplayDataforPayroll extends Component
                                     $afternoonEndw = (clone $afternoonEndw)->modify('-1 day');
                                     
                                 }
-
-                                
-                            } else {
-                                
-                                    $oTotalHour = 0;
-                                    $oTotalMinute = 0;
-                                     
-                                    
-                                }
-                                    
+                                   
                             
 
                             // Check if `checkOutDateTime` exceeds the adjusted `afternoonEndw`
@@ -1572,8 +1552,6 @@ class DisplayDataforPayroll extends Component
                     // $overtimeHours += $totalHours;
                   
                 }
-            } else {
-                dd("jbdkcdj");
             }
         }
 
