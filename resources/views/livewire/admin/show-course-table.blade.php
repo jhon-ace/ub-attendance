@@ -99,7 +99,7 @@
                     <div x-cloak x-show="open" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                         <div  class="w-[35%] bg-white p-6 rounded-lg shadow-lg mx-auto max-h-[90vh] overflow-y-auto">
                             <div class="flex justify-between items-center pb-3">
-                                <p class="text-xl font-bold">Add Employee</p>
+                                <p class="text-xl font-bold">Add Course</p>
                                 <button @click="open = false" class="text-black text-sm px-3 py-2 rounded hover:text-red-500">X</button>
                             </div>
                             <div class="mb-4">

@@ -5,6 +5,10 @@
 .highlight-row {
     background-color: #e5e7eb; /* Choose your highlight color */
 }
+.text-stroke {
+    -webkit-text-stroke: 1px black;
+}
+
 
 ::-webkit-scrollbar {
     width: 8px;

@@ -41,6 +41,8 @@ Route::controller(PublicPageController::class)->group(function () {
 
     Route::get('/attendance/portal/student', 'portalTimeInStudent')->name('attendance.portal.student');
     Route::post('/attendance/portal/student', 'submitAttendanceStudent')->name('admin.attendance.store.student');
+
+    Route::get('/attendance/fetch-latest', 'fetchLatest')->name('admin.attendance.fetch.latest');
 });
 
 

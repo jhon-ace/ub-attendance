@@ -17,9 +17,12 @@
     },
     "dependencies": {
         "@fancyapps/ui": "^5.0.36",
+        "@vitejs/plugin-react": "^4.3.4",
         "fancybox": "^3.0.1",
         "flatpickr": "^4.6.13",
         "jquery": "^3.7.1",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
         "tippy.js": "^6.3.7",
         "ws": "^8.18.0"
     }

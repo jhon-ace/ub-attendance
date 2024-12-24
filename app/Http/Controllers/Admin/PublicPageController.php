@@ -781,99 +781,132 @@ class PublicPageController extends Controller
 
 
 
+    public function fetchLatest()
+    {
+
+
+        $curdateDataIn = StudentAttendanceTimeIn::with('student.course')->whereDate('check_in_time', now())->get();
+        $curdateDataOut = StudentAttendanceTimeOut::with('student.course')->whereDate('check_out_time', now())->get();
+
+        // Add full image URL for the student profile image
+    $curdateDataIn->each(function ($record) {
+        $record->student->profile_image = asset('storage/student_photo/' . $record->student->student_photo);
+    });
+
+    $curdateDataOut->each(function ($record) {
+        $record->student->profile_image = asset('storage/student_photo/' . $record->student->student_photo);
+    });
+
+        return response()->json([
+            'curdateDataIn' => $curdateDataIn,
+            'curdateDataOut' => $curdateDataOut
+        ]);
+    }
+
 
 
     // STUDENT PORTAL IN / OUT
-    public function portalTimeInStudent()
-    {
-        // Retrieve any user with the role 'admin'
-        $adminUser = User::where('role', 'admin')->first();
+   public function portalTimeInStudent()
+{
+    // Retrieve any user with the role 'admin'
+    $adminUser = User::where('role', 'admin')->first();
 
-        // Check if there is an admin user
-        if ($adminUser) {
-            // $current_date = now()->setTimezone('Asia/Kuala_Lumpur')->format('Y-m-d');
-            $current_date = now()->setTimezone('Asia/Taipei')->format('Y-m-d');
-            $current_time = now()->setTimezone('Asia/Taipei')->format('H:i:s');
+    // Check if there is an admin user
+    if ($adminUser) {
+        $current_date = now()->setTimezone('Asia/Taipei')->format('Y-m-d');
+        $current_time = now()->setTimezone('Asia/Taipei')->format('H:i:s');
 
-               $timezone = 'Asia/Taipei';
+        $timezone = 'Asia/Taipei';
 
-            $current_date1 = Carbon::now($timezone)->format('D, M d, Y'); // E.g., "Mon, Jul 30, 2024"
-            $current_time1 = Carbon::now($timezone)->format('h:i:s A'); 
+        $current_date1 = Carbon::now($timezone)->format('D, M d, Y'); // E.g., "Mon, Jul 30, 2024"
+        $current_time1 = Carbon::now($timezone)->format('h:i:s A'); 
 
-            // Retrieve attendance data for the current date
-            $curdateDataIn = StudentAttendanceTimeIn::whereDate('check_in_time', $current_date)->get();
-            $curdateDataOut = StudentAttendanceTimeOut::whereDate('check_out_time', $current_date)->get();
+        // Retrieve attendance data for the current date
+        $curdateDataIn = StudentAttendanceTimeIn::whereDate('check_in_time', $current_date)->get();
+        $curdateDataOut = StudentAttendanceTimeOut::whereDate('check_out_time', $current_date)->get();
+        
 
-            // Return view with the attendance data
-            return view('attendance_time_in_student', compact('curdateDataIn', 'curdateDataOut','current_time1', 'current_date1'));
+        if (request()->ajax()) {
+            // Log the attendance data being returned
+            \Log::info('Attendance data:', [
+                'curdateDataIn' => $curdateDataIn,
+                'curdateDataOut' => $curdateDataOut,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Attendance data fetched successfully',
+                'curdateDataIn' => $curdateDataIn,
+                'curdateDataOut' => $curdateDataOut,
+            ]);
+                // Return view with the attendance data for page load
+               
         }
-
-        // Redirect with an error message if no admin user is found
-        return redirect()->back()->with('error', 'No admin user found.');
+         return view('attendance_time_in_student', compact('curdateDataIn', 'curdateDataOut', 'current_time1', 'current_date1'));
     }
+}
+
+
+        
+
+
 
 
     public function submitAttendanceStudent(Request $request)
     {
         $request->validate([
-            'user_rfid' => 'required|string|max:255',
-        ]);
+        'user_rfid' => 'required|string|max:255',
+    ]);
 
-        $adminUser = User::where('role', 'admin')->first();
-        
-        if ($adminUser) {
-            $rfid = $request->input('user_rfid');
-            
-            // Query to get the student based on the RFID
-            $student = Student::where('student_rfid', $rfid)->first();
-            // Query to get the student based on the RFID for compact
-            $students = Student::where('student_rfid', $rfid)->get();
-                
-            if ($student) {
-                // Get the current datetime in Taipei timezone
-                $now = Carbon::now('Asia/Taipei');
-                // Format datetime for database insertion
-                $formattedDateTime = $now->format('Y-m-d H:i:s');
+    $adminUser = User::where('role', 'admin')->first();
 
-                // Get the count of time-in records for today
-                $timeInCount = StudentAttendanceTimeIn::where('student_id', $student->id)
-                    ->whereDate('check_in_time', $now->format('Y-m-d'))
-                    ->count();
+    if ($adminUser) {
+        $rfid = $request->input('user_rfid');
 
-                // Get the count of time-out records for today
-                $timeOutCount = StudentAttendanceTimeOut::where('student_id', $student->id)
-                    ->whereDate('check_out_time', $now->format('Y-m-d'))
-                    ->count();
+        // Query to get the student based on the RFID
+        $student = Student::where('student_rfid', $rfid)->first();
 
-                // Logic for alternating time-in and time-out
-                if ($timeInCount == $timeOutCount) {
-                    // Next action is time-in
-                    $attendanceIn = new StudentAttendanceTimeIn();
-                    $attendanceIn->student_id = $student->id;
-                    $attendanceIn->check_in_time = $formattedDateTime; // Store formatted datetime
-                    $attendanceIn->status = "On-campus";
-                    $attendanceIn->save();
+        if ($student) {
+            // Get the current datetime in Taipei timezone
+            $now = Carbon::now('Asia/Taipei');
+            $formattedDateTime = $now->format('Y-m-d H:i:s');
 
-                    return view('attendance-profile_time_in_student', compact('students'));
-                } else {
-                    // Next action is time-out
-                    $attendanceOut = new StudentAttendanceTimeOut();
-                    $attendanceOut->student_id = $student->id;
-                    $attendanceOut->check_out_time = $formattedDateTime; // Store formatted datetime
-                    $attendanceOut->status = "Outside Campus";
-                    $attendanceOut->save();
+            // Get the count of time-in and time-out records for today
+            $timeInCount = StudentAttendanceTimeIn::where('student_id', $student->id)
+                ->whereDate('check_in_time', $now->format('Y-m-d'))
+                ->count();
 
-                    return view('attendance-profile_time_out_student', compact('students'));
-                }
+            $timeOutCount = StudentAttendanceTimeOut::where('student_id', $student->id)
+                ->whereDate('check_out_time', $now->format('Y-m-d'))
+                ->count();
+
+            // Logic for alternating time-in and time-out
+            if ($timeInCount == $timeOutCount) {
+                // Time-in logic
+                $attendanceIn = new StudentAttendanceTimeIn();
+                $attendanceIn->student_id = $student->id;
+                $attendanceIn->check_in_time = $formattedDateTime;
+                $attendanceIn->status = "On-campus";
+                $attendanceIn->save();
+
+                return response()->json(['success' => true, 'message' => 'Time-in recorded successfully.']);
             } else {
-                // Handle case where student with given RFID is not found
-                return redirect()->route('attendance.portal.student')->with('error', 'RFID not Recognized!');
-            }
-        } else {    
-            return redirect()->back()->with('error', 'Unauthorized access.');
-        }
-    }
+                // Time-out logic
+                $attendanceOut = new StudentAttendanceTimeOut();
+                $attendanceOut->student_id = $student->id;
+                $attendanceOut->check_out_time = $formattedDateTime;
+                $attendanceOut->status = "Outside Campus";
+                $attendanceOut->save();
 
+                return response()->json(['success' => true, 'message' => 'Time-out recorded successfully.']);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'RFID not recognized.']);
+        }
+    } else {
+        return response()->json(['success' => false, 'message' => 'Unauthorized access.']);
+    }
+    }
 
 
 
