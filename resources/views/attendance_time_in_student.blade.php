@@ -298,68 +298,8 @@
         });
     </script>
     @endpush
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('error-modal');
-            const closeModalButton = document.getElementById('close-modal');
-
-            // Show the modal
-            if (modal) {
-                modal.classList.remove('hidden');
-
-                setTimeout(function() {
-                modal.classList.add('hidden');
-            }, 2000); // 120000 milliseconds = 2 minutes
-
-
-            }
-
-            // Close the modal when the close button is clicked
-            if (closeModalButton) {
-                closeModalButton.addEventListener('click', function() {
-                    modal.classList.add('hidden');
-                });
-            }
-
-            // Optionally, close the modal when clicking outside of it
-            window.addEventListener('click', function(event) {
-                if (event.target === modal) {
-                    modal.classList.add('hidden');
-                }
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('success-modal');
-            const closeModalButton = document.getElementById('close-modal');
-
-            // Show the modal
-            if (modal) {
-                modal.classList.remove('hidden');
-
-                setTimeout(function() {
-                modal.classList.add('hidden');
-            }, 2000); // 120000 milliseconds = 2 minutes
-
-
-            }
-
-            // Close the modal when the close button is clicked
-            if (closeModalButton) {
-                closeModalButton.addEventListener('click', function() {
-                    modal.classList.add('hidden');
-                });
-            }
-
-            // Optionally, close the modal when clicking outside of it
-            window.addEventListener('click', function(event) {
-                if (event.target === modal) {
-                    modal.classList.add('hidden');
-                }
-            });
-        });
-    </script>
+    
+  
    
 
           <script>
@@ -413,68 +353,6 @@
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Function to scroll to the bottom of a container
-            function scrollToBottom(containerId) {
-                var container = document.getElementById(containerId);
-                container.scrollTop = container.scrollHeight;
-            }
-
-            // Example usage: scroll to bottom of timeInTable on page load
-            scrollToBottom('timeInTable');
-             scrollToBottom('timeOutTable');
-
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var prevScrollpos = window.pageYOffset;
-            // var header = document.querySelector('.table-container th');
-
-            window.addEventListener('scroll', function () {
-                var currentScrollPos = window.pageYOffset;
-                if (prevScrollpos > currentScrollPos) {
-                    // Scrolling up
-                    // header.classList.add('show');
-                } else {
-                    // Scrolling down
-                    // header.classList.remove('show');
-                }
-                prevScrollpos = currentScrollPos;
-            });
-        });
-    </script>
-     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(function () {
-                var sessionError = document.getElementById('session-error');
-                if (sessionError) {
-                    sessionError.style.display = 'none';
-                }
-
-                var validationErrors = document.getElementById('validation-errors');
-                if (validationErrors) {
-                    validationErrors.style.display = 'none';
-                }
-            }, 5000); // 5000 milliseconds = 5 seconds
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(function () {
-                var sessionSuccess = document.getElementById('session-success');
-                if (sessionSuccess) {
-                    sessionSuccess.style.display = 'none';
-                }
-
-                var validationErrors = document.getElementById('validation-errors');
-                if (validationErrors) {
-                    validationErrors.style.display = 'none';
-                }
-            }, 5000); // 5000 milliseconds = 5 seconds
-        });
-    </script>
-    <script>
     document.addEventListener('DOMContentLoaded', () => {
         const bgElement = document.getElementById('logoBackground');
         const observer = new IntersectionObserver((entries, observer) => {
@@ -496,18 +374,7 @@
 
         const formData = new FormData(this); // Collect form data
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        const rfid = document.getElementById('user_rfid').value;
-
-        if (rfid.length <= 5) {
-            event.preventDefault();  // Prevent page reload or form submission
-            const responseMessage = document.getElementById('responseMessage');
-            responseMessage.textContent = 'Please enter a valid RFID with more than 5 characters.';
-            responseMessage.style.color = 'red';
-            responseMessage.style.textShadow = '0px 0px 1px white, -2px -2px 1px black';
-
-            document.getElementById('user_rfid').value = '';
-        }
-
+        document.getElementById('user_rfid').value = ''; // Reset the input field
         fetch('{{ route("admin.attendance.store.student") }}', { // Replace with your route
             method: 'POST',
             headers: {
@@ -519,21 +386,24 @@
         .then(data => {
             const responseMessage = document.getElementById('responseMessage');
             if (data.success) {
+                
                 responseMessage.textContent = data.message; // Display success message
                 responseMessage.style.color = 'white';
 
                  responseMessage.style.textShadow = '0px 0px 1px white, -2px -2px 1px black';
 
-                document.getElementById('user_rfid').value = ''; // Reset the input field
+                
                 fetchAttendanceData();  
                 
              
             }
              else {
+                
+                // document.getElementById('user_rfid').value = '';
                 responseMessage.textContent = data.message; // Display error message
                 responseMessage.style.color = 'red';
 
-                document.getElementById('user_rfid').value = '';
+
                 
             }
         })
@@ -591,8 +461,7 @@
                                     ? `<p class="text-md text-white uppercase font-bold tracking-widest mt-2 
                                             [text-shadow:0px_0px_1px_yellow]">
                                             ${idLabel}${idNumber}
-                                        </p>
-`
+                                        </p>`
                                     : ``
                                 }
                                 ${
@@ -655,8 +524,7 @@
                                     ? `<p class="text-md text-white uppercase font-bold tracking-widest mt-2 
                                             [text-shadow:0px_0px_1px_yellow]">
                                             ${idLabel}${idNumber}
-                                        </p>
-`
+                                        </p>`
                                     : ``
                                 }
                                 ${

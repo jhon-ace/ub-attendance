@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
 use \App\Models\Admin\Fingerprint;
+use Illuminate\Support\Facades\Cache;
 
 class PublicPageController extends Controller
 {
@@ -783,25 +784,48 @@ class PublicPageController extends Controller
 
     public function fetchLatest()
     {
+        $curdateDataIn = StudentAttendanceTimeIn::with('student.course')
+            ->whereDate('check_in_time', now())
+            ->latest()
+            ->take(1)
+            ->get();
+            
 
+        $curdateDataOut = StudentAttendanceTimeOut::with('student.course')
+            ->whereDate('check_out_time', now())
+            ->latest()
+            ->take(1)
+            ->get();
 
-        $curdateDataIn = StudentAttendanceTimeIn::with('student.course')->whereDate('check_in_time', now())->get();
-        $curdateDataOut = StudentAttendanceTimeOut::with('student.course')->whereDate('check_out_time', now())->get();
+        $curdateDataIn->each(function ($record) {
+            if ($record->student) {
+                $cacheKey = 'student_image_' . $record->student->id;
 
-        // Add full image URL for the student profile image
-    $curdateDataIn->each(function ($record) {
-        $record->student->profile_image = asset('storage/student_photo/' . $record->student->student_photo);
-    });
+                $record->student->profile_image = Cache::remember($cacheKey, now()->addDay(), function () use ($record) {
+                    return $record->student->student_photo
+                        ? asset('storage/student_photo/' . $record->student->student_photo)
+                        : asset('assets/img/user.png');
+                });
+            }
+        });
 
-    $curdateDataOut->each(function ($record) {
-        $record->student->profile_image = asset('storage/student_photo/' . $record->student->student_photo);
-    });
+        $curdateDataOut->each(function ($record) {
+            if ($record->student) {
+                $cacheKey = 'student_image_' . $record->student->id;
 
+                $record->student->profile_image = Cache::remember($cacheKey, now()->addDay(), function () use ($record) {
+                    return $record->student->student_photo
+                        ? asset('storage/student_photo/' . $record->student->student_photo)
+                        : asset('assets/img/user.png');
+                });
+            }
+        });
         return response()->json([
             'curdateDataIn' => $curdateDataIn,
             'curdateDataOut' => $curdateDataOut
         ]);
     }
+
 
 
 
