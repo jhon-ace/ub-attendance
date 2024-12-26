@@ -780,16 +780,14 @@ class PublicPageController extends Controller
        
     }
 
-
-
     public function fetchLatest()
     {
+        // Retrieve data for 'check_in' and 'check_out'
         $curdateDataIn = StudentAttendanceTimeIn::with('student.course')
             ->whereDate('check_in_time', now())
             ->latest()
             ->take(1)
             ->get();
-            
 
         $curdateDataOut = StudentAttendanceTimeOut::with('student.course')
             ->whereDate('check_out_time', now())
@@ -797,34 +795,67 @@ class PublicPageController extends Controller
             ->take(1)
             ->get();
 
-        $curdateDataIn->each(function ($record) {
-            if ($record->student) {
-                $cacheKey = 'student_image_' . $record->student->id;
+        // Optimize by processing the students' profile image logic only once
+        $this->addProfileImages($curdateDataIn);
+        $this->addProfileImages($curdateDataOut);
 
-                $record->student->profile_image = Cache::remember($cacheKey, now()->addDay(), function () use ($record) {
-                    return $record->student->student_photo
-                        ? asset('storage/student_photo/' . $record->student->student_photo)
-                        : asset('assets/img/user.png');
-                });
-            }
-        });
-
-        $curdateDataOut->each(function ($record) {
-            if ($record->student) {
-                $cacheKey = 'student_image_' . $record->student->id;
-
-                $record->student->profile_image = Cache::remember($cacheKey, now()->addDay(), function () use ($record) {
-                    return $record->student->student_photo
-                        ? asset('storage/student_photo/' . $record->student->student_photo)
-                        : asset('assets/img/user.png');
-                });
-            }
-        });
+        // Return the result
         return response()->json([
             'curdateDataIn' => $curdateDataIn,
             'curdateDataOut' => $curdateDataOut
         ]);
     }
+
+    // Reusable method to add profile image URLs
+    private function addProfileImages($data)
+    {
+        $data->each(function ($record) {
+            if ($record->student) {
+                $record->student->profile_image = $record->student->student_photo
+                    ? asset('storage/student_photo/' . $record->student->student_photo)
+                    : asset('assets/img/user.png');
+            }
+        });
+    }
+
+
+    // public function fetchLatest()
+    // {
+    //     $curdateDataIn = StudentAttendanceTimeIn::with('student.course')
+    //         ->whereDate('check_in_time', now())
+    //         ->latest()
+    //         ->take(1)
+    //         ->get();
+            
+
+    //     $curdateDataOut = StudentAttendanceTimeOut::with('student.course')
+    //         ->whereDate('check_out_time', now())
+    //         ->latest()
+    //         ->take(1)
+    //         ->get();
+
+    //     // Safely add full image URL if the student exists
+    //     $curdateDataIn->each(function ($record) {
+    //         if ($record->student) {
+    //             $record->student->profile_image = $record->student->student_photo
+    //                 ? asset('storage/student_photo/' . $record->student->student_photo)
+    //                 : asset('assets/img/user.png');
+    //         }
+    //     });
+
+    //     $curdateDataOut->each(function ($record) {
+    //         if ($record->student) {
+    //             $record->student->profile_image = $record->student->student_photo
+    //                 ? asset('storage/student_photo/' . $record->student->student_photo)
+    //                 : asset('assets/img/user.png');
+    //         }
+    //     });
+
+    //     return response()->json([
+    //         'curdateDataIn' => $curdateDataIn,
+    //         'curdateDataOut' => $curdateDataOut
+    //     ]);
+    // }
 
 
 

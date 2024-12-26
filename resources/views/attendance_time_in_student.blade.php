@@ -200,10 +200,8 @@
             <h2 class="text-3xl md:text-3xl font-bold tracking-widest">TIME IN</h2>
             <div id="timeInContainer" class="flex flex-wrap md:flex-nowrap gap-2 justify-center md:justify-start">
                 <div class="w-[250px] h-[250px] md:w-[350px] md:h-[350px] border flex items-center justify-center text-center">
-                    <p class="font-bold">LATEST</p>
+                    <!-- <p class="font-bold">LATEST</p> -->
                 </div>
-                <!-- <div class="w-24 h-24 md:w-32 md:h-32 border"></div>
-                <div class="w-24 h-24 md:w-32 md:h-32 border"></div> -->
             </div>
         </div>
 
@@ -212,7 +210,7 @@
                 <div class="w-[300px] h-[250px] md:w-[350px] md:h-[350px] flex items-center justify-center text-center relative">
                     <div>
                         
-                        <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[300px] mt-24">
+                        <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[350px] mt-28">
                         <!-- Response Message Above the Image -->
                         <div id="responseMessage" class="mb-4 text-center text-lg font-semibold uppercase absolute top-0 left-0 w-full tracking-normal"></div>
                         
@@ -231,7 +229,7 @@
             <h2 class="text-3xl md:text-3xl  font-bold tracking-widest">TIME OUT</h2>
             <div id="timeOutContainer" class="flex flex-wrap md:flex-nowrap gap-2 justify-center md:justify-start">
                 <div class="w-[250px] h-[250px] md:w-[350px] md:h-[350px] border flex items-center justify-center text-center">
-                    <p class="font-bold">LATEST</p>
+                    <!-- <p class="font-bold">LATEST</p> -->
                 </div>
                 <!-- <div class="w-24 h-24 md:w-32 md:h-32 border"></div>
                 <div class="w-24 h-24 md:w-32 md:h-32 border"></div> -->
@@ -454,7 +452,8 @@
                                         ? record.student.profile_image 
                                         : '{{ asset('assets/img/user.png') }}'}" 
                                         alt="Student Photo" 
-                                        class="border border-white rounded-sm ${imageSizeClass}"/>
+                                        class="border border-white rounded-sm ${imageSizeClass}"
+                                        loading="lazy"/>
                                 </div>
                                 ${
                                     index === 0 
@@ -517,7 +516,7 @@
                                         ? record.student.profile_image 
                                         : '{{ asset('assets/img/user.png') }}'}" 
                                         alt="Student Photo" 
-                                        class="border border-white rounded-sm ${imageSizeClass}"/>
+                                        class="border border-white rounded-sm ${imageSizeClass}" loading="lazy"/>
                                 </div>
                                 ${
                                     index === 0 
@@ -552,13 +551,13 @@
             // Fallback in case of fetch error
             document.getElementById('timeInContainer').innerHTML = `
                 <div class="flex-col text-center">
-                    <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]"/>
+                    <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
                     <p class="text-sm font-medium text-gray-500">Failed to fetch Check-In Data</p>
                 </div>
             `;
             document.getElementById('timeOutContainer').innerHTML = `
                 <div class="flex-col text-center">
-                    <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]"/>
+                    <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
                     <p class="text-sm font-medium text-gray-500">Failed to fetch Check-Out Data</p>
                 </div>
             `;

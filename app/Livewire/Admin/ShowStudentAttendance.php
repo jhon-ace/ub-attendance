@@ -18,7 +18,7 @@ class ShowStudentAttendance extends Component
     use WithPagination;
 
     public $search = '';
-    public $sortField = 'id';
+    public $sortField = 'student_id';
     public $sortDirection = 'asc';
     public $selectedSchool = null;
     public $selectedDepartment5 = null;
@@ -33,7 +33,8 @@ class ShowStudentAttendance extends Component
     public $selectedStudentToShow;
     public $startDate = null;
     public $endDate = null;
-    
+    public $selectedMonth;
+    public $searchTerm = '';
 
 
     protected $listeners = ['updateEmployees', 'updateEmployeesByDepartment', 'updateStudentsByCourse', 'updateAttendanceByStudent', 'updateAttendanceByDateRange'];
@@ -56,6 +57,8 @@ class ShowStudentAttendance extends Component
         if (Auth::check() && Auth::user()->school) {
             $this->selectedSchool = Auth::user()->school->id;
         }
+
+        $this->selectedMonth = now()->month;
         $this->selectedDepartment5 = session('selectedDepartment5', null);
         $this->selectedCourse5 = session('selectedCourse5', null);
         $this->selectedStudent5 = session('selectedStudent5', null);
@@ -140,7 +143,36 @@ class ShowStudentAttendance extends Component
             $this->selectedCourseToShow = Course::find($this->selectedCourse5);
 
             // $students = Student::where('course_id', $this->selectedCourse5)->get();
-            $students = Student::where('course_id', $this->selectedCourse5)->paginate(10);
+            // $students = Student::where('course_id', $this->selectedCourse5)->paginate(10);
+            // Initialize the query builder for the Student model
+            $studentsQuery = Student::query();
+
+            // Apply course filter if a course is selected
+            if (!empty($this->selectedCourse5)) {
+                $studentsQuery->where('course_id', $this->selectedCourse5);
+            }
+
+            $studentsQuery->where(function ($query) {
+                $searchTerm = '%' . strtolower($this->searchTerm) . '%'; // Convert the search term to lowercase
+
+                // Ensure the search term is not empty
+                if (!empty($this->searchTerm)) {
+                    $query->whereRaw('LOWER(student_firstname) LIKE ?', [$searchTerm])
+                        ->orWhereRaw('LOWER(student_lastname) LIKE ?', [$searchTerm])
+                        ->orWhereRaw('LOWER(student_id) LIKE ?', [$searchTerm]);
+                }
+            });
+
+
+
+            // Apply sorting if necessary
+            if ($this->sortField && $this->sortDirection) {
+                $studentsQuery->orderBy($this->sortField, $this->sortDirection);
+            }
+
+            // Execute the query to get the matching students
+            $students = $studentsQuery->paginate(10);
+            
 
         } else {
             $this->selectedCourseToShow = null;
@@ -184,18 +216,40 @@ class ShowStudentAttendance extends Component
             $this->selectedAttendanceByDate = $selectedAttendanceByDate;   
         }
         else {
-            $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(50);
+        //     $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
+        //     ->paginate(50);
 
-        $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(50);
+        // $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
+        //     ->paginate(50);
         }
         
-        $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(50);
+        // $attendanceTimeIn = $queryTimeIn->orderBy($this->sortField, $this->sortDirection)
+        //     ->paginate(50);
 
-        $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(50);
+        // $attendanceTimeOut = $queryTimeOut->orderBy($this->sortField, $this->sortDirection)
+        //     ->paginate(50);
+         $queryTimeIn->whereDay('check_in_time', '>=', 1)
+                        ->whereDay('check_in_time', '<=', 31);
+
+            $queryTimeOut->whereDay('check_out_time', '>=', 1)
+                        ->whereDay('check_out_time', '<=', 31);
+
+        $currentYear = now()->year; 
+
+
+         $attendanceTimeIn = $queryTimeIn
+                ->whereMonth('check_in_time', $this->selectedMonth)  // Match current month
+                ->whereYear('check_in_time', $currentYear)    // Match current year
+                ->orderBy('student_id', 'asc')
+                ->orderBy('check_in_time', 'asc')
+                ->get();
+
+        $attendanceTimeOut = $queryTimeOut
+                ->whereMonth('check_out_time', $this->selectedMonth)  // Match current month
+                ->whereYear('check_out_time', $currentYear)    // Match current year
+                ->orderBy('student_id', 'asc')
+                ->orderBy('check_out_time', 'asc')
+                ->get();
 
 
         $attendanceData = [];
