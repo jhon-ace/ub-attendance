@@ -632,7 +632,7 @@
                                                                                             <tr class="hover:bg-gray-100">
                                                                                                 @if ($index == 0)
                                                                                                     <!-- Only show the date once for the first record in each date group -->
-                                                                                                    <td class="text-black border text-center border-gray-400 align-middle w-1/3" rowspan="{{ count($records) }}">
+                                                                                                    <td class="text-black border text-center font-bold border-gray-400 align-middle w-1/3" rowspan="{{ count($records) }}">
                                                                                                         {{ date('m-d-Y (l)', strtotime($date)) }}
                                                                                                     </td>
                                                                                                 @endif
