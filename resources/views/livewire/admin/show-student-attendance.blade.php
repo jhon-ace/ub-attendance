@@ -504,10 +504,9 @@
                                     
                                     <template x-if="selectedStudent">
                                         <div>
-                                            <p><strong>School ID:</strong> <span x-text="selectedStudent.student_id"></span></p>
-                                            <p><strong>Last Name:</strong> <span x-text="selectedStudent.student_lastname"></span></p>
-                                            <p><strong>First Name:</strong> <span x-text="selectedStudent.student_firstname"></span></p>
-                                            <p><strong>Course:</strong> <span x-text="selectedStudent.course_abbreviation"></span> <span x-text="selectedStudent.course_name"></span></p>
+                                            <p><strong>School ID:</strong> <span x-text="selectedStudent.student_id" class="text-red-500 font-bold"></span></p>
+                                            <p><strong>Student Name:</strong> <span x-text="selectedStudent.student_lastname" class="text-red-500 font-bold"></span>, <span x-text="selectedStudent.student_firstname" class="text-red-500 font-bold"></span></p>
+                                            <p><strong>Course:</strong> <span x-text="selectedStudent.course_abbreviation" class="text-red-500 font-bold"></span> <span x-text="selectedStudent.course_name" class="text-red-500 font-bold"></span></p>
                                         </div>
                                     </template>
                                     
@@ -532,7 +531,7 @@
                                                         <div class="flex justify-end items-center mb-2">
                                                             <div class="grid grid-rows-2 grid-flow-col ml-10">
                                                         
-                                                                <div class="text-center uppercase ml-16">
+                                                                <div class="text-center uppercase ml-16 font-bold">
                                                                     Select Specific Date
                                                                 </div>
                                                                 <div class="flex items-center space-x-4">
@@ -615,47 +614,51 @@
                                                         @endphp
 
                                                                 <div class="flex">
-                                                                    <div class="w-[100%]">
-                                                                        <h1 class="text-center uppercase font-bold">Attendance Records</h1>
-                                                                        <table class="table-auto min-w-full text-center text-sm mb-4 divide-y divide-gray-200">
-                                                                            <thead class="bg-gray-200 text-black">
+                                                                    <div class="w-full border border-gray-400">
+                                                                        <table class="w-full table-fixed border-collapse">
+                                                                            <thead class="bg-gray-200">
                                                                                 <tr>
-                                                                                    <th class="border border-gray-400 px-3 py-2 w-60">Date</th>
-                                                                                    <th class="border border-gray-400 px-3 py-2">Check - In (On - Campus)</th>
-                                                                                    <th class="border border-gray-400 px-3 py-2">Check - Out (Outside - Campus)</th>
+                                                                                    <th class="text-black border border-gray-400 w-1/3 text-center">Date</th>
+                                                                                    <th class="text-black border border-gray-400 w-1/3 text-center">Check-In Time (On-Campus)</th>
+                                                                                    <th class="text-black border border-gray-400 w-1/3 text-center">Check-Out Time (Off-Campus)</th>
                                                                                 </tr>
                                                                             </thead>
-                                                                            <tbody>
-                                                                                @foreach ($groupedAttendance as $date => $records)
-                                                                                    @foreach ($records as $index => $record)
-                                                                                        <tr class="hover:bg-gray-100">
-                                                                                            @if ($index == 0)
-                                                                                                <!-- Only show the date once for the first record in each date group -->
-                                                                                                <td class="text-black border border-gray-400" rowspan="{{ count($records) }}">
-                                                                                                    {{ date('m-d-Y (l)', strtotime($date)) }}
-                                                                                                </td>
-                                                                                            @endif
-                                                                                            <td class="text-black border border-gray-400">
-                                                                                                @if ($record->check_in_time)
-                                                                                                    {{ date('g:i:s A', strtotime($record->check_in_time)) }}
-                                                                                                @else
-                                                                                                    No check-in recorded
-                                                                                                @endif
-                                                                                            </td>
-                                                                                            <td class="text-black border border-gray-400">
-                                                                                                @if ($record->check_out_time)
-                                                                                                    {{ date('g:i:s A', strtotime($record->check_out_time)) }}
-                                                                                                @else
-                                                                                                    No check-out recorded
-                                                                                                @endif
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    @endforeach
-                                                                                @endforeach
-                                                                            </tbody>
                                                                         </table>
+                                                                        <div class="overflow-y-auto max-h-96">
+                                                                            <table class="w-full table-fixed border-collapse">
+                                                                                <tbody>
+                                                                                    @foreach ($groupedAttendance as $date => $records)
+                                                                                        @foreach ($records as $index => $record)
+                                                                                            <tr class="hover:bg-gray-100">
+                                                                                                @if ($index == 0)
+                                                                                                    <!-- Only show the date once for the first record in each date group -->
+                                                                                                    <td class="text-black border text-center border-gray-400 align-middle w-1/3" rowspan="{{ count($records) }}">
+                                                                                                        {{ date('m-d-Y (l)', strtotime($date)) }}
+                                                                                                    </td>
+                                                                                                @endif
+                                                                                                <td class="text-black border border-gray-400 w-1/3 text-center align-middle">
+                                                                                                    @if ($record->check_in_time)
+                                                                                                        {{ date('g:i:s A', strtotime($record->check_in_time)) }}
+                                                                                                    @else
+                                                                                                        No check-in recorded
+                                                                                                    @endif
+                                                                                                </td>
+                                                                                                <td class="text-black border border-gray-400 w-1/3 text-center align-middle">
+                                                                                                    @if ($record->check_out_time)
+                                                                                                        {{ date('g:i:s A', strtotime($record->check_out_time)) }}
+                                                                                                    @else
+                                                                                                        No check-out recorded
+                                                                                                    @endif
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                        @endforeach
+                                                                                    @endforeach
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
+
                                                             @else
                                                                 <p>No Time In & Time Out Records found.</p>
                                                             @endif
