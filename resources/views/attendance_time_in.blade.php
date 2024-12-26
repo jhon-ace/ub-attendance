@@ -74,7 +74,6 @@
         align-items: center;
         justify-content: center;
         padding: 2rem;
-        margin-left:60px;
         text-align: center;
         flex: 1;
         overflow: hidden; /* Prevents container scroll */
@@ -189,56 +188,53 @@
 <body>
 <div class="container ">
 <div class="logo-background" id="logoBackground"></div> 
-    <div class="flex-container">
-        <div class="table-container shadow-xl mr-[50px]">
+    <div class="flex flex-wrap items-center justify-center gap-10 p-2 w-full">
+        <!-- Left Table (Time-In List) -->
+        <div class="table-container shadow-xl w-[390px] p-1" id="timeInContainer">
             <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - In List</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th class="uppercase text-center tracking-widest" style="max-width:283px;">Employee Name</th>
-                        <th class="uppercase text-center tracking-widest">MM - DD :: TIME</th>
-                    </tr>
-                </thead>
-                <tbody  id="timeInTable" >
-                    @foreach($curdateDataIn as $data)
+            <div class="overflow-x-auto">
+                <table class="w-[366px] table-fixed border-collapse">
+                    <thead>
                         <tr>
-                            <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
-                                <text>{{ $data->employee->employee_lastname}}, {{ $data->employee->employee_firstname}} {{ $data->employee->employee_middlename}}</text>
-                            </td>
-                            <td class="font-bold text-md uppercase text-center tracking-wider" >{{ date('m-d :: g:i:s A', strtotime($data->check_in_time)) }}</td>
+                            <th class="uppercase text-sm text-center tracking-widest w-[190px]">Employee Name</th>
+                            <th class="uppercase text-sm text-center tracking-widest w-[190px]">MM - DD :: TIME</th>
                         </tr>
-                    @endforeach
-                    <!-- Repeat the above <tr> structure for each row as needed    date('g:i:s A', strtotime($attendanceIn->check_in_time)) -->
-                </tbody>
-            </table>
-        </div> 
-
-        <div class="table-container shadow-xl mr-10">
-            <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - OUT List</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th class="uppercase text-center tracking-widest"  style="max-width:281px;">Employee Name</th>
-                        <th class="uppercase text-center tracking-widest">MM - DD :: TIME</th>
-                    </tr>
-                </thead>
-                <tbody  id="timeOutTable" >
-                    @foreach($curdateDataOut as $dataOut)
-                        <tr>
-                            <td class="font-bold text-sm uppercase truncate tracking-wider" style="max-width:214px;">
-                                <text>{{ $dataOut->employee->employee_lastname}}, {{ $dataOut->employee->employee_firstname}} {{ $dataOut->employee->employee_middlename}}</text>
-                            </td>
-                            <td class="font-bold text-md uppercase text-center tracking-wider">{{ date('m-d :: g:i:s A', strtotime($dataOut->check_out_time)) }}</td>
-                        </tr>
-                    @endforeach
-                    <!-- Repeat the above <tr> structure for each row as needed -->
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody id="timeInTable"></tbody>
+                </table>
+            </div>
         </div>
-        <div class="flex-col z-50">
-            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" class="w-[250px]" loading="lazy">
+
+        <!-- Center Logo -->
+        <!-- <div class="flex items-center justify-center z-50 pl-3 pr-3">
+            <img src="{{ asset('assets/img/logo.png') }}" 
+                alt="Logo" 
+                class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                loading="lazy">
+        </div> -->
+        <div id="responseMessage" class="mt-14 text-center text-lg font-semibold uppercase absolute top-0 left-0 w-full tracking-normal z-50"></div>
+        <div id="employeePhoto" class="flex items-center justify-center z-50 pl-3 pr-3">
+        </div>
+
+
+        <!-- Right Table (Time-Out List) -->
+        <div class="table-container shadow-xl w-[390px] p-1">
+            <h2 class="font-bold text-2xl text-black uppercase mb-2 mt-4 tracking-widest text-center">Time - Out List</h2>
+            <div class="overflow-x-auto">
+                <table class="w-[366px] table-fixed border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="uppercase text-sm text-center tracking-widest w-[190px]">Employee Name</th>
+                            <th class="uppercase text-sm text-center tracking-widest w-[190px]">MM - DD :: TIME</th>
+                        </tr>
+                    </thead>
+                    <tbody id="timeOutTable"></tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+
     
 
     @if (session('error'))
@@ -287,15 +283,21 @@
 </div>
 
     <div class="w-full z-10">
-        <form id="attendanceForm" action="{{ route('admin.attendance.store') }}" method="POST">
+        <!-- <form id="attendanceForm" action="{{ route('admin.attendance.store') }}" method="POST">
             @csrf
             <div class="z-10">
                 <input type="password" id="inputField" name="user_rfid"
                     class=" mt-1 p-2 text-[#F9C915] w-full"
                     autocomplete="off" autofocus>
             </div>
+        </form> -->
+        <form id="attendanceForm">
+            @csrf
+            <input type="password" id="user_rfid" ID="inputField" name="user_rfid" class=" mt-1 p-2 text-[#F9C915] w-full"
+                autocomplete="off" autofocus>
         </form>
     </div>
+
     <footer class="w-full uppercase  font-semibold border-t border-white text-white text-center py-3 tracking-widest">
         <div class="w-full mx-auto">
             A premier university transforming lives for a great future. Anchored on: SCHOLARSHIP, CHARACTER, SERVICE
@@ -314,6 +316,249 @@
         });
     </script>
     @endpush
+
+    <script>
+        document.getElementById('attendanceForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent page reload
+
+            const formData = new FormData(this); // Collect form data
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            document.getElementById('user_rfid').value = ''; // Reset the input field
+            fetch('{{ route("admin.attendance.store") }}', { // Replace with your route
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const responseMessage = document.getElementById('responseMessage');
+                if (data.success) {
+                    
+                    responseMessage.textContent = data.message; // Display success message
+                    responseMessage.style.color = 'white';
+
+                    responseMessage.style.textShadow = '0px 0px 1px white, -2px -2px 1px black';
+
+                    
+                    fetchAttendanceData();  
+                    
+                
+                }
+                else {
+                    
+                    // document.getElementById('user_rfid').value = '';
+                    responseMessage.textContent = data.message; // Display error message
+                    responseMessage.style.color = 'red';
+
+
+                    
+                }
+
+                setTimeout(() => {
+                    responseMessage.innerHTML = '';  // Hide the message
+                }, 3000); // 3000 milliseconds = 3 seconds
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+
+        function fetchAttendanceData() {
+            fetch('{{ route("admin.attendance.fetch.latest.ub") }}', {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    "Content-Type": "application/json"
+                },
+                credentials: "same-origin"
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                function scrollToBottom(containerId) {
+                    const container = document.getElementById(containerId);
+                    if (container) {
+                        container.scrollTop = container.scrollHeight;
+                    }
+                }
+
+                function formatDateTime(dateTime) {
+                    if (!dateTime) return 'N/A';
+
+                    const dateObj = new Date(dateTime);
+                    if (isNaN(dateObj.getTime())) return 'N/A'; 
+
+
+                    const year = dateObj.getFullYear();
+                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+
+                    let hours = dateObj.getHours();
+                    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                    const period = hours >= 12 ? 'PM' : 'AM';
+
+                    hours = hours % 12 || 12; 
+
+                    return `${month}-${day} :: ${hours}:${minutes} ${period}`;
+                }
+
+                
+
+
+                const timeInTable = document.getElementById('timeInTable');
+
+                timeInTable.innerHTML = ''; 
+
+                if (!data.curdateDataIn || data.curdateDataIn.length === 0) {
+
+                    timeInTable.innerHTML = `
+                        <tr>
+                            <td colspan="2" class="text-center text-black font-bold uppercase tracking-widest w-96">
+                                No Check-In Data Available
+                            </td>
+                        </tr>
+                    `;
+                } else {
+
+                    data.curdateDataIn.forEach((record) => {
+                        const EmployeeName = `${record.employee ? record.employee.employee_lastname : 'N/A'}, 
+                                            ${record.employee ? record.employee.employee_firstname : 'N/A'}`;
+                        
+                        const checkInTime = record.check_in_time ? formatDateTime(record.check_in_time) : 'N/A';
+                        const profileImage = record.employee ? record.employee.profile_image : 'N/A'; // Profile image URL
+
+                        timeInTable.innerHTML += `
+                            <tr>
+                                <td class="text-left text-black text-sm uppercase tracking-widest truncate overflow-hidden whitespace-nowrap max-w-[184.5px]">
+                                    ${EmployeeName}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td class="text-left text-black text-sm uppercase tracking-widest ">${checkInTime}</td>
+                            </tr>
+                        `;
+                    });
+
+                    scrollToBottom('timeInTable');
+                    // <img src="${profileImage}" alt="Profile Image" class="w-[30px] h-[30px] object-cover rounded-full inline-block mr-3"> 
+                }
+
+
+                const image = document.getElementById('employeePhoto');
+
+                if (!data.curdateDataIn || data.curdateDataIn.length === 0) {
+                    image.innerHTML = `
+                        <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                            <img src="{{ asset('assets/img/logo.png') }}" 
+                                alt="Logo" 
+                                class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                                loading="lazy">
+                        </div>
+                    `;
+                    // After 3 seconds, bring back the logo
+    
+                } else {
+                    // Sort the records by check_in_time (or check_out_time) in descending order to get the latest one
+                    const latestRecord = data.curdateDataIn.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+                    
+                    // Check if the employee exists and fetch their profile image
+                    const profileImager = latestRecord.employee ? latestRecord.employee.profile_image : 'N/A';
+
+                    // Update the HTML with the profile image
+                    image.innerHTML = `
+                        <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                            <img src="${profileImager}" 
+                                alt="Profile Image" 
+                                class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                                loading="lazy">
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        image.innerHTML = `
+                            <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                                <img src="{{ asset('assets/img/logo.png') }}" 
+                                    alt="Logo" 
+                                    class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                                    loading="lazy">
+                            </div>
+                        `;
+                    }, 3000); // 3000 milliseconds = 3 seconds
+                }
+
+
+                const timeOutTable = document.getElementById('timeOutTable');
+                timeOutTable.innerHTML = ''; 
+
+                if (data.curdateDataOut.length === 0) {
+
+                    timeOutTable.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center text-black font-bold uppercase tracking-widest w-96">
+                                No Check-Out Data Available
+                            </td>
+                        </tr>
+                    `;
+                } else {
+
+                    data.curdateDataOut.forEach((record) => {
+                        const EmployeeName = `${record.employee ? record.employee.employee_lastname : 'N/A'}, 
+                                            ${record.employee ? record.employee.employee_firstname : 'N/A'}`;
+                        
+
+                        const checkOutTime = record.check_out_time ? formatDateTime(record.check_out_time) : 'N/A';
+                        const profileImage = record.employee ? record.employee.profile_image : 'N/A'; // Profile image URL
+
+                        timeOutTable.innerHTML += `
+                            <tr>
+                                <td class="text-left text-black text-sm uppercase tracking-widest truncate overflow-hidden whitespace-nowrap max-w-[184.5px]">
+                                    ${EmployeeName}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td class="text-left text-black text-sm uppercase tracking-widest">${checkOutTime}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching attendance data:', error);
+
+                document.getElementById('timeInContainer').innerHTML = `
+                    <div class="flex-col text-center">
+                        <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
+                        <p class="text-sm font-medium text-gray-500">Failed to fetch Check-In Data</p>
+                    </div>
+                `;
+                document.getElementById('timeOutContainer').innerHTML = `
+                    <div class="flex-col text-center">
+                        <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
+                        <p class="text-sm font-medium text-gray-500">Failed to fetch Check-Out Data</p>
+                    </div>
+                `;
+            });
+
+        }
+
+        // Fetch initial attendance data on page load
+        document.addEventListener('DOMContentLoaded', fetchAttendanceData);
+    </script>
+
+
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to scroll to the bottom of a container
+            function scrollToBottom(containerId) {
+                var container = document.getElementById(containerId);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            // Example usage: scroll to bottom of timeInTable on page load
+            scrollToBottom('timeInTable');
+             scrollToBottom('timeOutTable');
+
+        });
+    </script>
+
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('error-modal');
@@ -499,20 +744,7 @@
         updateTime();
     </script> -->
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Function to scroll to the bottom of a container
-            function scrollToBottom(containerId) {
-                var container = document.getElementById(containerId);
-                container.scrollTop = container.scrollHeight;
-            }
-
-            // Example usage: scroll to bottom of timeInTable on page load
-            scrollToBottom('timeInTable');
-             scrollToBottom('timeOutTable');
-
-        });
-    </script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var prevScrollpos = window.pageYOffset;

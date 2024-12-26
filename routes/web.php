@@ -36,6 +36,8 @@ Route::controller(PublicPageController::class)->group(function () {
     Route::get('/attendance/portal', 'portalTimeIn')->name('attendance.portal');
     Route::post('/attendance/portal', 'submitAttendance')->name('admin.attendance.store');
 
+    Route::get('/attendance/fetch-latest-ub', 'fetchLatestEmployeeUB')->name('admin.attendance.fetch.latest.ub');
+
     Route::get('/attendance/portal/vdt', 'portalTimeInvdt')->name('attendance.portal.vdt');
     Route::post('/attendance/portal/vdt', 'submitAttendancevdt')->name('admin.attendance.store.vdt');
 

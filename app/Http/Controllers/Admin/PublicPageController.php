@@ -25,6 +25,43 @@ use Illuminate\Support\Facades\Cache;
 class PublicPageController extends Controller
 {
 
+    public function fetchLatestEmployeeUB()
+    {
+        // Retrieve data for 'check_in' and 'check_out'
+        $curdateDataIn = EmployeeAttendanceTimeIn::with('employee')
+            ->whereDate('check_in_time', now())
+            ->orderBy('created_at', 'asc') // Order by check_in_time ascending
+            ->get();
+
+
+        $curdateDataOut = EmployeeAttendanceTimeOut::with('employee')
+            ->whereDate('check_out_time', now())
+            ->orderBy('created_at', 'asc') // Order by check_out_time ascending
+            ->get();
+
+        // Optimize by processing the students' profile image logic only once
+        $this->addProfileImagesEmployeeUB($curdateDataIn);
+        $this->addProfileImagesEmployeeUB($curdateDataOut);
+
+        // Return the result
+        return response()->json([
+            'curdateDataIn' => $curdateDataIn,
+            'curdateDataOut' => $curdateDataOut,
+
+        ]);
+    }
+
+    // Reusable method to add profile image URLs
+    private function addProfileImagesEmployeeUB($data)
+    {
+        $data->each(function ($record) {
+            if ($record->employee) {
+                $record->employee->profile_image = $record->employee->employee_photo
+                    ? asset('storage/employee_photo/' . $record->employee->employee_photo)
+                    : asset('assets/img/user.png');
+            }
+        });
+    }
 
      public function portalTimeIn()
     {
@@ -160,7 +197,8 @@ class PublicPageController extends Controller
                         // Check if the employee has already checked out in the afternoon
                         if ($timeInCount == 2 && $timeOutCount == 2) {
 
-                            return redirect()->route('attendance.portal')->with('success', 'Attendance completed. Safe travels home!');
+                            // return redirect()->route('attendance.portal')->with('success', 'Attendance completed. Safe travels home!');
+                            return response()->json(['success' => true, 'message' => 'Attendance completed. Safe travels home!']);
                             // return response()->json([
                             //     'message' => 'Already checked out in the afternoon. Go home safely!',
                             // ], 403);
@@ -193,13 +231,15 @@ class PublicPageController extends Controller
                                 //     'employee' => $employee,
                                 //     'check_in_time' => $formattedDateTime,
                                 // ], 200);
-                                return view('attendance-profile_time_in_employee', compact('employees', 'first_time_in'));
+                                // return view('attendance-profile_time_in_employee', compact('employees', 'first_time_in'));
+                                return response()->json(['success' => true, 'message' => 'Time-In Attendance recorded successfully']);
                             } else {
                                 // return response()->json([
                                 //     'message' => 'Already Check-out in morning! Afternoon - Check-In not allowed yet. Please wait 45 minutes after check-out.',
                                 // ], 403);
                                 // return redirect()->route('admin.attendance.time-in.portal')->with('error', 'Already Check-out in morning! Afternoon - Check-In not allowed yet. Please wait 45 minutes after check-out!');
-                                return redirect()->route('attendance.portal')->with('error', 'Please wait 45 minutes to time in!');
+                                // return redirect()->route('attendance.portal')->with('error', 'Please wait 45 minutes to time in!');
+                                return response()->json(['error' => true, 'message' => 'Please wait 45 minutes to time in!']);
                             }
 
                         } elseif ($timeInCount == 1 && $timeOutCount == 0) {
@@ -220,12 +260,15 @@ class PublicPageController extends Controller
                                 //     'employee' => $employee,
                                 //     'check_out_time' => $formattedDateTime,
                                 // ], 200);
-                                return view('attendance-profile_time_out_employee', compact('employees', 'first_time_out'));
+                                // return view('attendance-profile_time_out_employee', compact('employees', 'first_time_out'));
+                                // return response()->json(['success' => true, 'message' => 'Attendance Recorded']);
+                                return response()->json(['success' => true, 'message' => 'Time-Out Attendance recorded successfully']);
                             } else {
                                 // return response()->json([
                                 //     'message' => 'Already Time In Morning.',
                                 // ], 403);
-                                return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
+                                // return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
+                                return response()->json(['success' => true, 'message' => 'Already Timed In!']);
                             }
 
                         } elseif ($timeInCount == 2 && $timeOutCount == 1) {
@@ -254,12 +297,15 @@ class PublicPageController extends Controller
                                 //     'employee' => $employee,
                                 //     'check_out_time' => $formattedDateTime,
                                 // ], 200);
-                                return view('attendance-profile_time_out_employee', compact('employees', 'first_time_out'));
+                                // return view('attendance-profile_time_out_employee', compact('employees', 'first_time_out'));
+                                // return response()->json(['success' => true, 'message' => 'Attendance Recorded']);
+                                return response()->json(['success' => true, 'message' => 'Time-Out Attendance recorded successfully']);
                             } else {
                                 // return response()->json([
                                 //     'message' => 'Already Time-in Afternoon.',
                                 // ], 403);
-                                return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
+                                // return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
+                                return response()->json(['success' => true, 'message' => 'Already Timed In!']);
                             }
 
                         } else {
@@ -274,7 +320,9 @@ class PublicPageController extends Controller
 
                             
 
-                            return view('attendance-profile_time_in_employee', compact('employees','first_time_in'));
+                            // return view('attendance-profile_time_in_employee', compact('employees','first_time_in'));
+                            // return response()->json(['success' => true, 'message' => 'Attendance Recorded']);
+                            return response()->json(['success' => true, 'message' => 'Time-In Attendance recorded successfully']);
                             // return response()->json([
                             //     'message' => 'AM Time-in recorded successfully.',
                             //     'employee' => $employee,
@@ -284,7 +332,8 @@ class PublicPageController extends Controller
                     } else {
                         // Handle case where employee with given RFID is not found
                         // return response()->json(['error' => 'Employee not found.'], 404);
-                        return redirect()->route('attendance.portal')->with('error', 'RFID not Recognized!');
+                        // return redirect()->route('attendance.portal')->with('error', 'RFID not Recognized!');
+                        return response()->json(['error' => true, 'message' => 'RFID not Recognized!']);
                     }
 
 
@@ -362,7 +411,8 @@ class PublicPageController extends Controller
                         // Check if the employee has already checked out in the afternoon
                         if ($timeInCount == 2 && $timeOutCount == 2) {
 
-                            return redirect()->route('attendance.portal')->with('success', 'Attendance completed. Safe travels home!');
+                            // return redirect()->route('attendance.portal')->with('success', 'Attendance completed. Safe travels home!');
+                            return response()->json(['success' => true, 'message' => 'Attendance completed. Safe travels home!']);
                             // return response()->json([
                             //     'message' => 'Already checked out in the afternoon. Go home safely!',
                             // ], 403);
@@ -396,13 +446,15 @@ class PublicPageController extends Controller
                                 //     'employee' => $employee,
                                 //     'check_in_time' => $formattedDateTime,
                                 // ], 200);
-                                return view('attendance-profile_time_in_employee', compact('employees', 'first_time_in'));
+                                // return view('attendance-profile_time_in_employee', compact('employees', 'first_time_in'));
+                                return response()->json(['success' => true, 'message' => 'Time-In Attendance recorded successfully']);
                             } else {
                                 // return response()->json([
                                 //     'message' => 'Already Check-out in morning! Afternoon - Check-In not allowed yet. Please wait 45 minutes after check-out.',
                                 // ], 403);
                                 // return redirect()->route('admin.attendance.time-in.portal')->with('error', 'Already Check-out in morning! Afternoon - Check-In not allowed yet. Please wait 45 minutes after check-out!');
-                                return redirect()->route('attendance.portal')->with('error', 'Please wait 45 minutes to time in!');
+                                // return redirect()->route('attendance.portal')->with('error', 'Please wait 45 minutes to time in!');
+                                return response()->json(['error' => true, 'message' => 'Please wait 45 minutes to time in!']);
                             }
 
                         } elseif ($timeInCount == 1 && $timeOutCount == 0) {
@@ -423,12 +475,14 @@ class PublicPageController extends Controller
                                 //     'employee' => $employee,
                                 //     'check_out_time' => $formattedDateTime,
                                 // ], 200);
-                                return view('attendance-profile_time_out_employee', compact('employees', 'first_time_out'));
+                                // return view('attendance-profile_time_out_employee', compact('employees', 'first_time_out'));
+                                return response()->json(['success' => true, 'message' => 'Time-Out Attendance recorded successfully']);
                             } else {
                                 // return response()->json([
                                 //     'message' => 'Already Time In Morning.',
                                 // ], 403);
-                                return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
+                                // return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
+                                return response()->json(['success' => true, 'message' => 'Already Timed In!']);
                             }
 
                         } elseif ($timeInCount == 2 && $timeOutCount == 1) {
@@ -459,12 +513,15 @@ class PublicPageController extends Controller
                                 //     'employee' => $employee,
                                 //     'check_out_time' => $formattedDateTime,
                                 // ], 200);
-                                return view('attendance-profile_time_out_employee', compact('employees', 'first_time_out'));
+                                // return view('attendance-profile_time_out_employee', compact('employees', 'first_time_out'));
+                                return response()->json(['success' => true, 'message' => 'Time-Out Attendance recorded successfully']);
                             } else {
                                 // return response()->json([
                                 //     'message' => 'Already Time-in Afternoon.',
                                 // ], 403);
-                                return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
+                                // return redirect()->route('attendance.portal')->with('success', 'Already Timed In!');
+                                return response()->json(['success' => true, 'message' => 'Already Timed In!']);
+                                
                             }
 
                         } else {
@@ -481,7 +538,8 @@ class PublicPageController extends Controller
 
                             
 
-                            return view('attendance-profile_time_in_employee', compact('employees','first_time_in'));
+                            // return view('attendance-profile_time_in_employee', compact('employees','first_time_in'));
+                            return response()->json(['success' => true, 'message' => 'Time-In Attendance recorded successfully']);
                             // return response()->json([
                             //     'message' => 'AM Time-in recorded successfully.',
                             //     'employee' => $employee,
@@ -491,7 +549,8 @@ class PublicPageController extends Controller
                     } else {
                         // Handle case where employee with given RFID is not found
                         // return response()->json(['error' => 'Employee not found.'], 404);
-                        return redirect()->route('attendance.portal')->with('error', 'RFID not Recognized!');
+                        // return redirect()->route('attendance.portal')->with('error', 'RFID not Recognized!');
+                        return response()->json(['error' => true, 'message' => 'RFID not Recognized!']);
                     }
 
                 }
