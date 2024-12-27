@@ -361,7 +361,9 @@
                     
                     // document.getElementById('user_rfid').value = '';
                     responseMessage.textContent = data.message; // Display error message
-                    responseMessage.style.color = 'red';
+                     responseMessage.style.color = 'white';
+
+                    responseMessage.style.textShadow = '0px 0px 1px white, -2px -2px 1px black';
 
 
                     
