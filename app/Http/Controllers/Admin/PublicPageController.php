@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
 use \App\Models\Admin\Fingerprint;
+use \App\Models\Admin\ImageHandler;
 use Illuminate\Support\Facades\Cache;
 
 class PublicPageController extends Controller
@@ -28,25 +29,32 @@ class PublicPageController extends Controller
     public function fetchLatestEmployeeUB()
     {
         // Retrieve data for 'check_in' and 'check_out'
-        $curdateDataIn = EmployeeAttendanceTimeIn::with('employee')
+        $curdateDataIn = EmployeeAttendanceTimeIn::with('employee.department')
             ->whereDate('check_in_time', now())
-            ->orderBy('created_at', 'asc') // Order by check_in_time ascending
+            ->orderBy('check_in_time', 'asc') // Order by check_in_time ascending
             ->get();
 
 
-        $curdateDataOut = EmployeeAttendanceTimeOut::with('employee')
+
+
+        $curdateDataOut = EmployeeAttendanceTimeOut::with('employee.department')
             ->whereDate('check_out_time', now())
-            ->orderBy('created_at', 'asc') // Order by check_out_time ascending
+            ->orderBy('check_out_time', 'asc') // Order by check_out_time ascending
             ->get();
 
         // Optimize by processing the students' profile image logic only once
         $this->addProfileImagesEmployeeUB($curdateDataIn);
         $this->addProfileImagesEmployeeUB($curdateDataOut);
 
+
+        $imageHandler = ImageHandler::first();
+
         // Return the result
         return response()->json([
             'curdateDataIn' => $curdateDataIn,
-            'curdateDataOut' => $curdateDataOut,
+            'imageHandler' => $imageHandler,
+            'curdateDataOut' => $curdateDataOut
+
 
         ]);
     }
@@ -138,6 +146,9 @@ class PublicPageController extends Controller
                     $employee = Employee::where('employee_rfid', $rfid)->first();
                     // Query to get the employee based on the RFID for compact
                     $employees = Employee::where('employee_rfid', $rfid)->get();
+
+                    $imageHandler = ImageHandler::first();
+
                         
                     if ($employee) {
                         // Get the current datetime in Kuala Lumpur timezone
@@ -226,6 +237,11 @@ class PublicPageController extends Controller
                                 $attendanceIn->save();
 
                                 $first_time_in = $attendanceIn->check_in_time = $formattedDateTime;
+
+                                if ($imageHandler) {
+                                     $imageHandler->value = 0;
+                                     $imageHandler->save();
+                                 }
                                 // return response()->json([
                                 //     'message' => 'PM Time-in recorded successfully.',
                                 //     'employee' => $employee,
@@ -255,6 +271,11 @@ class PublicPageController extends Controller
                                 $attendanceOut->save();
 
                                 $first_time_out = $attendanceOut->check_out_time = $formattedDateTime;
+
+                                 if ($imageHandler) {
+                                     $imageHandler->value = 1;
+                                     $imageHandler->save();
+                                 }
                                 // return response()->json([
                                 //     'message' => 'AM Time-out recorded successfully.',
                                 //     'employee' => $employee,
@@ -292,6 +313,11 @@ class PublicPageController extends Controller
                                 $attendanceOut->save();
 
                                 $first_time_out = $attendanceOut->check_out_time = $formattedDateTime;
+
+                                if ($imageHandler) {
+                                     $imageHandler->value = 1;
+                                     $imageHandler->save();
+                                 }
                                 // return response()->json([
                                 //     'message' => 'PM Time-out recorded successfully.',
                                 //     'employee' => $employee,
@@ -318,6 +344,10 @@ class PublicPageController extends Controller
 
                             $first_time_in = $attendanceIn->check_in_time = $formattedDateTime;
 
+                            if ($imageHandler) {
+                                     $imageHandler->value = 0;
+                                     $imageHandler->save();
+                                 }
                             
 
                             // return view('attendance-profile_time_in_employee', compact('employees','first_time_in'));

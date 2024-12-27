@@ -212,9 +212,19 @@
                 class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
                 loading="lazy">
         </div> -->
-        <div id="responseMessage" class="mt-14 text-center text-lg font-semibold uppercase absolute top-0 left-0 w-full tracking-normal z-50"></div>
-        <div id="employeePhoto" class="flex items-center justify-center z-50 pl-3 pr-3">
-        </div>
+        <div id="responseMessage" class="mt-12 text-center text-lg font-semibold uppercase absolute top-0 left-0 w-full tracking-widest z-50"></div>
+        
+        @php
+            $imageHandler = \App\Models\Admin\ImageHandler::first(); // Get the first ImageHandler record
+        @endphp
+
+        @if($imageHandler && $imageHandler->value == 0)
+            <div id="employeePhoto" class="flex items-center justify-center z-50 pl-3 pr-3"></div>
+        @else
+            <div id="employeePhotoOut" class="flex items-center justify-center z-50 pl-3 pr-3"></div>
+        @endif
+
+
 
 
         <!-- Right Table (Time-Out List) -->
@@ -343,6 +353,7 @@
 
                     
                     fetchAttendanceData();  
+                    fetchAttendanceDataImage(); 
                     
                 
                 }
@@ -404,7 +415,7 @@
                 }
 
                 
-
+                
 
                 const timeInTable = document.getElementById('timeInTable');
 
@@ -436,54 +447,13 @@
                                 <td class="text-left text-black text-sm uppercase tracking-widest ">${checkInTime}</td>
                             </tr>
                         `;
+
+                        
                     });
 
                     scrollToBottom('timeInTable');
                     // <img src="${profileImage}" alt="Profile Image" class="w-[30px] h-[30px] object-cover rounded-full inline-block mr-3"> 
                 }
-
-
-                const image = document.getElementById('employeePhoto');
-
-                if (!data.curdateDataIn || data.curdateDataIn.length === 0) {
-                    image.innerHTML = `
-                        <div class="flex items-center justify-center z-50 pl-3 pr-3">
-                            <img src="{{ asset('assets/img/logo.png') }}" 
-                                alt="Logo" 
-                                class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
-                                loading="lazy">
-                        </div>
-                    `;
-                    // After 3 seconds, bring back the logo
-    
-                } else {
-                    // Sort the records by check_in_time (or check_out_time) in descending order to get the latest one
-                    const latestRecord = data.curdateDataIn.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-                    
-                    // Check if the employee exists and fetch their profile image
-                    const profileImager = latestRecord.employee ? latestRecord.employee.profile_image : 'N/A';
-
-                    // Update the HTML with the profile image
-                    image.innerHTML = `
-                        <div class="flex items-center justify-center z-50 pl-3 pr-3">
-                            <img src="${profileImager}" 
-                                alt="Profile Image" 
-                                class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
-                                loading="lazy">
-                        </div>
-                    `;
-                    setTimeout(() => {
-                        image.innerHTML = `
-                            <div class="flex items-center justify-center z-50 pl-3 pr-3">
-                                <img src="{{ asset('assets/img/logo.png') }}" 
-                                    alt="Logo" 
-                                    class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
-                                    loading="lazy">
-                            </div>
-                        `;
-                    }, 3000); // 3000 milliseconds = 3 seconds
-                }
-
 
                 const timeOutTable = document.getElementById('timeOutTable');
                 timeOutTable.innerHTML = ''; 
@@ -517,28 +487,273 @@
                         `;
                     });
                 }
+
+
+                
+                // if(data.imageHandler.value === 0){
+                //     const image = document.getElementById('employeePhoto');
+
+                //     if (!data.curdateDataIn || data.curdateDataIn.length === 0) {
+                //         image.innerHTML = `
+                //             <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                //                 <img src="{{ asset('assets/img/logo.png') }}" 
+                //                     alt="Logo" 
+                //                     class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                //                     loading="lazy">
+                //             </div>
+                //         `;
+                //         // After 3 seconds, bring back the logo
+        
+                //     } else {
+                //         // Sort the records by check_in_time (or check_out_time) in descending order to get the latest one
+                //         const latestRecord = data.curdateDataIn[data.curdateDataIn.length - 1];
+
+
+                //         const profileImager = latestRecord.employee ? latestRecord.employee.profile_image : 'N/A';
+
+                //         // Update the HTML with the profile image
+                //         image.innerHTML = `
+                //             <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                //                 <img src="${profileImager}" 
+                //                     alt="Profile Image" 
+                //                     class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                //                     loading="lazy">
+                //             </div>
+                //         `;
+                //         setTimeout(() => {
+                //             image.innerHTML = `
+                //                 <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                //                     <img src="{{ asset('assets/img/logo.png') }}" 
+                //                         alt="Logo" 
+                //                         class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                //                         loading="lazy">
+                //                 </div>
+                //             `;
+                //         }, 9000); 
+                //     }
+                // } 
+                
+                
+
+                
+                // if(data.imageHandler.value === 1) 
+                // {
+                //     const imageOut = document.getElementById('employeePhotoOut');
+
+                //     if (!data.curdateDataOut || data.curdateDataOut.length === 0) {
+                //         imageOut.innerHTML = `
+                //             <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                //                 <img src="{{ asset('assets/img/logo.png') }}" 
+                //                     alt="Logo" 
+                //                     class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                //                     loading="lazy">
+                //             </div>
+                //         `;
+                //         // After 3 seconds, bring back the logo
+        
+                //     } else {
+      
+                //         const latestRecordOut = data.curdateDataOut[data.curdateDataOut.length - 1];
+                        
+
+                //         const profileImager = latestRecordOut.employee ? latestRecordOut.employee.profile_image : 'N/A';
+
+                //         imageOut.innerHTML = `
+                //             <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                //                 <img src="${profileImager}" 
+                //                     alt="Profile Image" 
+                //                     class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                //                     loading="lazy">
+                //             </div>
+                //         `;
+                //         setTimeout(() => {
+                //             imageOut.innerHTML = `
+                //                 <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                //                     <img src="{{ asset('assets/img/logo.png') }}" 
+                //                         alt="Logo" 
+                //                         class="w-[400px] h-[400px] object-cover rounded-full border-4 border-gray-300 shadow-lg" 
+                //                         loading="lazy">
+                //                 </div>
+                //             `;
+                //         }, 9000); 
+                //     }
+                // }
+                
+
+
+                
+
+                
             })
             .catch(error => {
                 console.error('Error fetching attendance data:', error);
 
-                document.getElementById('timeInContainer').innerHTML = `
-                    <div class="flex-col text-center">
-                        <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
-                        <p class="text-sm font-medium text-gray-500">Failed to fetch Check-In Data</p>
-                    </div>
-                `;
-                document.getElementById('timeOutContainer').innerHTML = `
-                    <div class="flex-col text-center">
-                        <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
-                        <p class="text-sm font-medium text-gray-500">Failed to fetch Check-Out Data</p>
-                    </div>
-                `;
+                // document.getElementById('timeInContainer').innerHTML = `
+                //     <div class="flex-col text-center">
+                //         <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
+                //         <p class="text-sm font-medium text-gray-500">Failed to fetch Check-In Data</p>
+                //     </div>
+                // `;
+                // document.getElementById('timeOutContainer').innerHTML = `
+                //     <div class="flex-col text-center">
+                //         <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
+                //         <p class="text-sm font-medium text-gray-500">Failed to fetch Check-Out Data</p>
+                //     </div>
+                // `;
             });
 
         }
 
+        function fetchAttendanceDataImage() {
+            fetch('{{ route("admin.attendance.fetch.latest.ub") }}', {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    "Content-Type": "application/json"
+                },
+                credentials: "same-origin"
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                
+
+
+                
+                if(data.imageHandler.value === 0){
+                    const image = document.getElementById('employeePhoto');
+
+                    if (!data.curdateDataIn || data.curdateDataIn.length === 0) {
+                        image.innerHTML = `
+                            <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                                <img src="{{ asset('assets/img/logo.png') }}" 
+                                    alt="Logo" 
+                                    class="w-[400px] h-[400px] object-cover rounded-full  shadow-lg" 
+                                    loading="lazy">
+                            </div>
+                        `;
+                        // After 3 seconds, bring back the logo
+        
+                    } else {
+
+                        // Sort the records by check_in_time (or check_out_time) in descending order to get the latest one
+                        const latestRecord = data.curdateDataIn[data.curdateDataIn.length - 1];
+
+                        const profileImager = latestRecord.employee ? latestRecord.employee.profile_image : 'N/A';
+                        const name = latestRecord.employee 
+                                        ? `${latestRecord.employee.employee_lastname}, ${latestRecord.employee.employee_firstname}` 
+                                        : 'N/A';
+
+                        // Get the department abbreviation
+                        let department = latestRecord.employee 
+                                        ? `${latestRecord.employee.department.department_abbreviation}` 
+                                        : 'N/A';
+
+                        // Remove '- non-teaching' or '- teaching' if present in the department value
+                        department = department.replace(/(?:- (non-teaching|teaching))$/, '').trim();
+
+                        // Update the HTML with the profile image and text
+                        image.innerHTML = `
+                                <div class="flex flex-col items-center justify-center z-50 pl-3 pr-3">
+                                    <img src="${profileImager}" 
+                                        alt="Profile Image" 
+                                        class="w-[400px] h-[400px] object-cover rounded-full" 
+                                        loading="lazy">
+                                    <h1 class="text-xl text-white font-semibold mt-4 tracking-wider text-left">Name: ${name}</h1>  <!-- mt-4 adds margin-top for spacing between image and text -->
+                                    <h1 class="text-xl text-white font-semibold mt-1 tracking-wider text-left">Department: ${department}</h1>  <!-- mt-1 adds margin-top for spacing between the name and department -->
+                                </div>
+                            `;
+
+
+                        setTimeout(() => {
+                            image.innerHTML = `
+                                <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                                    <img src="{{ asset('assets/img/logo.png') }}" 
+                                        alt="Logo" 
+                                        class="w-[400px] h-[400px] object-cover rounded-full" 
+                                        loading="lazy">
+                                </div>
+                            `;
+                        }, 9000); 
+                    }
+                } 
+                
+                
+
+                
+                if(data.imageHandler.value === 1) 
+                {
+                    const imageOut = document.getElementById('employeePhotoOut');
+
+                    if (!data.curdateDataOut || data.curdateDataOut.length === 0) {
+                        imageOut.innerHTML = `
+                            <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                                <img src="{{ asset('assets/img/logo.png') }}" 
+                                    alt="Logo" 
+                                    class="w-[400px] h-[400px] object-cover rounded-full" 
+                                    loading="lazy">
+                            </div>
+                        `;
+                        // After 3 seconds, bring back the logo
+        
+                    } else {
+      
+                        const latestRecordOut = data.curdateDataOut[data.curdateDataOut.length - 1];
+                        
+
+                        const profileImager = latestRecordOut.employee ? latestRecordOut.employee.profile_image : 'N/A';
+
+                        imageOut.innerHTML = `
+                            <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                                <img src="${profileImager}" 
+                                    alt="Profile Image" 
+                                    class="w-[400px] h-[400px] object-cover rounded-full" 
+                                    loading="lazy">
+                            </div>
+                        `;
+                        setTimeout(() => {
+                            imageOut.innerHTML = `
+                                <div class="flex items-center justify-center z-50 pl-3 pr-3">
+                                    <img src="{{ asset('assets/img/logo.png') }}" 
+                                        alt="Logo" 
+                                        class="w-[400px] h-[400px] object-cover rounded-full" 
+                                        loading="lazy">
+                                </div>
+                            `;
+                        }, 9000); 
+                    }
+                }
+                
+
+
+                
+
+                
+            })
+            .catch(error => {
+                console.error('Error fetching attendance data:', error);
+
+                // document.getElementById('timeInContainer').innerHTML = `
+                //     <div class="flex-col text-center">
+                //         <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
+                //         <p class="text-sm font-medium text-gray-500">Failed to fetch Check-In Data</p>
+                //     </div>
+                // `;
+                // document.getElementById('timeOutContainer').innerHTML = `
+                //     <div class="flex-col text-center">
+                //         <img src="{{ asset('assets/img/user.png') }}" alt="Default User Photo" class="rounded-full w-[350px] h-[350px]" loading="lazy"/>
+                //         <p class="text-sm font-medium text-gray-500">Failed to fetch Check-Out Data</p>
+                //     </div>
+                // `;
+            });
+
+        }
+
+        setInterval(fetchAttendanceData, 1000);
+
         // Fetch initial attendance data on page load
         document.addEventListener('DOMContentLoaded', fetchAttendanceData);
+        document.addEventListener('DOMContentLoaded', fetchAttendanceDataImage);
     </script>
 
 
